@@ -18,5 +18,17 @@ namespace Primative {
 		inline void bind() const { glBindVertexArray(VAO); };
 		inline void draw() const { glDrawElements(shape_type, num_indices, GL_UNSIGNED_INT, 0); };
 	};
+	class StaticBuffer {
+	private:
+		unsigned UBO;
+		short bindingPoint;
+		static short usedBindingPoint;
+	public:
+		inline StaticBuffer() : UBO(0), bindingPoint(-1) { };
+		const unsigned short init(unsigned dataSize, short bindingPoint = -1);
+		inline const short getBindingPoint() const { return bindingPoint; };
+		void fill(unsigned offset, unsigned size, const void* data) const;
+		inline void bind() const { glBindBuffer(GL_UNIFORM_BUFFER, UBO); };
+	};
 }
 

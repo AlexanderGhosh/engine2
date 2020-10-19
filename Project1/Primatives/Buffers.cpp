@@ -2,6 +2,8 @@
 #include <string>
 #include <iostream>
 
+short Primative::StaticBuffer::usedBindingPoint = -1;
+
 Primative::Buffers::Buffers(const Mesh& mesh) : Buffers()
 {
 	num_indices = static_cast<int>(mesh.indices.size());
@@ -25,4 +27,25 @@ Primative::Buffers::Buffers(const Mesh& mesh) : Buffers()
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
+}
+
+const unsigned short Primative::StaticBuffer::init(unsigned dataSize, short bindingPoint)
+{
+	this->bindingPoint = (bindingPoint < 0) ? Primative::StaticBuffer::usedBindingPoint + 1 : bindingPoint;
+	this->bindingPoint %= GL_MAX_UNIFORM_BUFFER_BINDINGS;
+	Primative::StaticBuffer::usedBindingPoint = this->bindingPoint;
+	glGenBuffers(1, &UBO);
+	this->bind();
+	glBufferData(GL_UNIFORM_BUFFER, dataSize, NULL, GL_STATIC_DRAW);
+
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+	glBindBufferRange(GL_UNIFORM_BUFFER, this->bindingPoint, UBO, 0, dataSize);
+	return 0;
+}
+void Primative::StaticBuffer::fill(unsigned offset, unsigned size, const void* data) const
+{
+	this->bind();
+	glBufferSubData(GL_UNIFORM_BUFFER, offset, size, data);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }

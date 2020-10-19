@@ -9,7 +9,7 @@ namespace Render {
 	{
 	public:
 		Rendering();
-		virtual void draw();
+		virtual void draw(unsigned shaderId);
 		const void addMesh(Primative::Mesh* m);
 	protected:
 		vector<Primative::Buffers> buffers;

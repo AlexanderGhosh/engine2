@@ -4,8 +4,9 @@ Render::Rendering::Rendering()
 {
 }
 
-void Render::Rendering::draw()
+void Render::Rendering::draw(unsigned shaderId)
 {
+	glUseProgram(shaderId);
 	for (const Primative::Buffers& buffer : buffers) {
 		buffer.bind();
 		buffer.draw();

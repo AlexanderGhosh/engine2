@@ -149,6 +149,7 @@
     <ClCompile Include="Rendering\Rendering.cpp" />
     <ClCompile Include="Rendering\Engine.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Utils\ResourceLoader.cpp" />
     <ClCompile Include="Scene\Scene.cpp" />
     <ClCompile Include="Primatives\Vertex.cpp" />
   </ItemGroup>
@@ -159,8 +160,15 @@
     <ClInclude Include="Primatives\Mesh.h" />
     <ClInclude Include="Rendering\Rendering.h" />
     <ClInclude Include="Rendering\Engine.h" />
+    <ClInclude Include="Utils\General.h" />
+    <ClInclude Include="Utils\ResourceLoader.h" />
     <ClInclude Include="Scene\Scene.h" />
     <ClInclude Include="Primatives\Vertex.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Basics\DefaultShader\fragment.glsl" />
+    <None Include="Basics\DefaultShader\geometry.glsl" />
+    <None Include="Basics\DefaultShader\vertex.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
