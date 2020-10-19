@@ -2,10 +2,12 @@
 #include <GLFW/glfw3.h>
 #include <GL/glew.h>
 #include <iostream>
+#include <string>
 
 #include <glm.hpp>
 
 #include "Rendering/Engine.h"
+#include "Rendering/Shading/Manager.h"
 
 int main() {
     glfwInit();
@@ -38,9 +40,10 @@ int main() {
     const char* fragmentShaderSource = 
         "#version 330 core\n"
         "out vec4 FragColor;\n"
+        "uniform vec3 col;\n"
         "void main()\n"
         "{\n"
-        "   FragColor = vec4(0, 0, 1, 1);\n"
+        "   FragColor = vec4(col, 1);\n"
         "}\n\0";
 
 
@@ -106,11 +109,13 @@ int main() {
 
     while (!glfwWindowShouldClose(window))
     {
-        glClearColor(1, 0, 0, 1);
+        glClearColor(0.5, 0.5, 0.5, 1);
         glClear(GL_COLOR_BUFFER_BIT);
 
         glUseProgram(shaderProgram);
 
+        Render::Shading::Manager::setActive(shaderProgram);
+        Render::Shading::Manager::setValue("col", { 1, 0, 1 });
         r.draw();
 
         glfwSwapBuffers(window);
