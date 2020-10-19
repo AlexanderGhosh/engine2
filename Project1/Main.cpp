@@ -32,10 +32,7 @@ int main() {
 
 
     string name = ResourceLoader::createShader("Basics/DefaultShader");
-    const unsigned& shaderProgram = ResourceLoader::getShader(name);
-
-
-
+    const unsigned& shaderProgram = ResourceLoader::getShader("fhseiu");
 
     Primative::Mesh* m = new Primative::Mesh();
     Primative::Vertex v1({ 0.5, 0.5, 0 });
@@ -61,21 +58,17 @@ int main() {
     b.init(sizeof(vec3), 1);
     b.fill(0, sizeof(vec3), value_ptr(vec3(0, 1, 1)));
 
-    float c = 0;
-    float d = 1.0f / 60.0f;
     while (!glfwWindowShouldClose(window))
     {
-        c += d;
-        if (c > 1 || c < 0) d *= -1;
-        glClearColor(0.5, 0.5, 0.5, 1);
+        glClearColor(1, 1, 1, 0.5);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
         /*Render::Shading::Manager::setActive(shaderProgram);
         Render::Shading::Manager::setValue("col", { 1, 0, 1 });*/
-        b.fill(0, sizeof(float), &c);
+        /*b.fill(0, sizeof(float), &c);
         b.fill(sizeof(float), sizeof(float), &c);
-        b.fill(2 * sizeof(float), sizeof(float), &c);
+        b.fill(2 * sizeof(float), sizeof(float), &c);*/
         r.draw(shaderProgram);
 
         glfwSwapBuffers(window);

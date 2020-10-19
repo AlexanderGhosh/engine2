@@ -83,7 +83,7 @@ unsigned ResourceLoader::getShader(const string& name)
     unsigned s = shaders.size();
     unsigned r = shaders[name];
     if (s < shaders.size()) {
-        r = -1;
+        r = (*shaders.begin()).second;
         shaders.erase(name);
     }
     return r;
