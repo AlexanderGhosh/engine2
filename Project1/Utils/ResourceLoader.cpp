@@ -2,15 +2,14 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include "General.h"
 
-unordered_map<string, unsigned> ResourceLoader::shaders = { };
+std::unordered_map<std::string, unsigned> ResourceLoader::shaders = { };
 
-string ResourceLoader::createShader(const string& filePath)
+std::string ResourceLoader::createShader(const std::string& filePath)
 {
-    const string extensions[] = { "/vertex.glsl", "/fragment.glsl" };
-    string codes[] = { "", "" };
-    ifstream streams[] = { { }, { } };
+    const std::string extensions[] = { "/vertex.glsl", "/fragment.glsl" };
+    std::string codes[] = { "", "" };
+    std::ifstream streams[] = { { }, { } };
     const GLenum types[] = { GL_VERTEX_SHADER, GL_FRAGMENT_SHADER };
     unsigned shaders[] = { 0, 0 };
 
@@ -18,9 +17,9 @@ string ResourceLoader::createShader(const string& filePath)
     int success;
     char infoLog[512];
     for (short i = 0; i < 2; i++) {
-        const string& extension = extensions[i];
-        string& code = codes[i];
-        ifstream& stream = streams[i];
+        const std::string& extension = extensions[i];
+        std::string& code = codes[i];
+        std::ifstream& stream = streams[i];
         const GLenum& type = types[i];
         unsigned& shader = shaders[i];
 
@@ -29,7 +28,7 @@ string ResourceLoader::createShader(const string& filePath)
         {
             // open files
             stream.open(filePath + extension);
-            stringstream s;
+            std::stringstream s;
             // read file's buffer contents into streams
             s << stream.rdbuf();
             // close file handlers
@@ -70,14 +69,14 @@ string ResourceLoader::createShader(const string& filePath)
     glDeleteShader(shaders[1]);
 
     auto shader_s = Utils::split(filePath, " ");
-    string name = shader_s.back();
+    std::string name = shader_s.back();
     
     ResourceLoader::shaders[name] = shaderProgram;
 
     return name;
 }
 
-unsigned ResourceLoader::getShader(const string& name)
+const unsigned ResourceLoader::getShader(const std::string& name)
 {
     auto& shaders = ResourceLoader::shaders;
     unsigned s = shaders.size();
@@ -87,4 +86,11 @@ unsigned ResourceLoader::getShader(const string& name)
         shaders.erase(name);
     }
     return r;
+}
+
+void ResourceLoader::cleanUp()
+{
+    for (const auto& item : shaders) {
+        glDeleteShader(item.second);
+    }
 }

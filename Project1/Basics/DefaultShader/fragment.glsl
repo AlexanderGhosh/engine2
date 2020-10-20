@@ -1,12 +1,8 @@
 #version 460 core
 
 out vec4 FragCol;
-
-layout(std140, binding = 1) uniform Colors
-{
-    vec3 col;
-};
+in vec3 fragPos;
 
 void main() {
-    FragCol = vec4(col, 1);
+    FragCol = vec4(1, 0, 0, 1);
 }

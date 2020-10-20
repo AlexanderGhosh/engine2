@@ -142,6 +142,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Componets\Componets.cpp" />
+    <ClCompile Include="GameObject\GameObject.cpp" />
+    <ClCompile Include="Utils\Camera.cpp" />
     <ClCompile Include="Rendering\Shading\Manager.cpp" />
     <ClCompile Include="Primatives\Buffers.cpp" />
     <ClCompile Include="Rendering\Animation\Animation.cpp" />
@@ -154,6 +157,9 @@
     <ClCompile Include="Primatives\Vertex.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Componets\Componets.h" />
+    <ClInclude Include="GameObject\GameObject.h" />
+    <ClInclude Include="Utils\Camera.h" />
     <ClInclude Include="Rendering\Shading\Manager.h" />
     <ClInclude Include="Primatives\Buffers.h" />
     <ClInclude Include="Rendering\Animation\Animation.h" />

@@ -3,13 +3,11 @@
 #include <array>
 #include <glm.hpp>
 #include "Vertex.h"
-using namespace std;
-using namespace glm;
 namespace Primative {
 	struct Mesh
 	{
-		vector<Vertex> verts;
-		vector<unsigned> indices;
+		std::vector<Vertex> verts;
+		std::vector<unsigned> indices;
 		const Vertex operator[](int index) const;
 	};
 }

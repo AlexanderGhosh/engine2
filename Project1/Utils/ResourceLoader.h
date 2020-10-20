@@ -2,13 +2,14 @@
 #include <unordered_map>
 #include <string>
 #include <GL/glew.h>
-using namespace std;
+#include "General.h"
 class ResourceLoader
 {
 public:
-	static string createShader(const string& filePath);
-	static unsigned getShader(const string& name);
+	static std::string createShader(const std::string& filePath);
+	static const unsigned getShader(const std::string& name);
+	static void cleanUp();
 private:
-	static unordered_map<string, unsigned> shaders;
+	static std::unordered_map<std::string, unsigned> shaders;
 };
 

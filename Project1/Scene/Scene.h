@@ -4,7 +4,7 @@
 #include "../Rendering/Rendering.h"
 using namespace std;
 
-class Scene : Render::Rendering
+class Scene : Render::RenderMesh
 {
 private:
 	vector<void*> loaded_objects;
