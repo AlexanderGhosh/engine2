@@ -20,6 +20,7 @@ namespace Utils {
     };
 
     inline glm::mat4 rotate(glm::mat4 matrix, const glm::vec3& vec) {
+        if (glm::all(glm::equal(vec, { 0, 0, 0 }))) return matrix;
         return glm::rotate(matrix, glm::radians(glm::length(vec)), glm::normalize(vec));
         /*for (short i = 0; i < 3; i++) {
             glm::vec3 d(0);

@@ -101,4 +101,9 @@
     <None Include="Basics\DefaultShader\geometry.glsl" />
     <None Include="Basics\DefaultShader\fragment.glsl" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="Basics\Textures\default.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
 </Project>

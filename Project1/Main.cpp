@@ -43,6 +43,7 @@ int main() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_SAMPLES, 4);
     GLFWwindow* window = glfwCreateWindow(800, 600, "LearnOpenGL", NULL, NULL);
     if (!window)
     {
@@ -55,6 +56,7 @@ int main() {
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glEnable(GL_DEPTH_TEST);
     // glEnable(GL_CULL_FACE);
+    glEnable(GL_MULTISAMPLE);
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetKeyCallback(window, key_callback);
 
@@ -65,15 +67,15 @@ int main() {
     string name = ResourceLoader::createShader("Basics/DefaultShader");
 
     // cube
-    /*Primative::Mesh* m = new Primative::Mesh();
-    Primative::Vertex v1({ -0.5, -0.5, -0.5 });
-    Primative::Vertex v2({ 0.5, -0.5, -0.5 });
-    Primative::Vertex v3({ 0.5, 0.5, -0.5 });
-    Primative::Vertex v4({ -0.5, 0.5, -0.5 });
-    Primative::Vertex v5({ -0.5, -0.5, 0.5 });
-    Primative::Vertex v6({ 0.5, -0.5, 0.5 });
-    Primative::Vertex v7({ 0.5, 0.5, 0.5 });
-    Primative::Vertex v8({ -0.5, 0.5, 0.5 });
+    Primative::Mesh* m = new Primative::Mesh();
+    Primative::Vertex v1({ -0.5, -0.5, -0.5 }, { 0, 0 });
+    Primative::Vertex v2({ 0.5, -0.5, -0.5 }, { 1, 0 });
+    Primative::Vertex v3({ 0.5, 0.5, -0.5 }, { 1, 1 });
+    Primative::Vertex v4({ -0.5, 0.5, -0.5 }, { 0, 1 });
+    Primative::Vertex v5({ -0.5, -0.5, 0.5 }, { 0, 0 });
+    Primative::Vertex v6({ 0.5, -0.5, 0.5 }, { 1, 0 });
+    Primative::Vertex v7({ 0.5, 0.5, 0.5 }, { 1, 1 });
+    Primative::Vertex v8({ -0.5, 0.5, 0.5 }, { 0, 1 });
 
     m->verts.push_back(v1);
     m->verts.push_back(v2);
@@ -91,10 +93,10 @@ int main() {
         4, 0, 7, 7, 0, 3,
         3, 2, 7, 7, 2, 6,
         4, 5, 0, 0, 5, 1
-    };*/
+    };
 
     // pyramid
-    Primative::Mesh* m = new Primative::Mesh();
+    /*Primative::Mesh* m = new Primative::Mesh();
     Primative::Vertex v1({ -0.5, -0.5, -0.5 });
     Primative::Vertex v2({ 0.5, -0.5, -0.5 });
     Primative::Vertex v3({ 0.5, 0.5, -0.5 });
@@ -113,7 +115,9 @@ int main() {
         0, 4, 3,
         2, 4, 1,
         2, 4, 3
-    };
+    };*/
+
+    unsigned tex = ResourceLoader::createTexture("Basics/Textures/black.jpg", TextureType::DiffuseMap);
 
     Render::RenderMesh* r = new Render::RenderMesh();
     r->addMesh(m);
@@ -147,8 +151,14 @@ int main() {
         b.fill(sizeof(float), sizeof(float), &c);
         b.fill(2 * sizeof(float), sizeof(float), &c);*/
 
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, tex);
+
+        
+
         b.fill(0, sizeof(mat4), value_ptr(cam.getView()));
         obj.tick(++tick % FIXED_UPDATE_RATE);
+
 
         glfwSwapBuffers(window);
         glfwPollEvents();

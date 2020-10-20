@@ -16,6 +16,8 @@ void Render::RenderMesh::update()
 	const glm::mat4 m = Componet::Base::parent->getTransform()->getModel();
 	Shading::Manager::setValue("model", m);
 
+	// Shading::Manager::setValue("tex", 0);
+
 	for (const Primative::Buffers& buffer : buffers) {
 		buffer.bind();
 		buffer.draw();

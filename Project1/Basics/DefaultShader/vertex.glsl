@@ -11,9 +11,11 @@ layout(std140, binding = 0) uniform Matrices
 
 uniform mat4 model;
 out vec3 fragPos;
+out vec2 texCoords;
 
 void main() {
     // projection * view * model * 
 	gl_Position = projection * view * model * vec4(pos, 1);
     fragPos = pos;
+    texCoords = tex;
 }

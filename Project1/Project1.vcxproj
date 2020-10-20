@@ -176,6 +176,9 @@
     <None Include="Basics\DefaultShader\geometry.glsl" />
     <None Include="Basics\DefaultShader\vertex.glsl" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="Basics\Textures\default.png" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
