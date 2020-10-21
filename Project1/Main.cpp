@@ -124,8 +124,13 @@ int main() {
     unsigned tex = ResourceLoader::createTexture("Basics/Textures/black.jpg", TextureType::DiffuseMap);
 
     Render::RenderMesh* r = new Render::RenderMesh();
+    // std::cout << t.size() << std::endl;
+    t.pop_back();
+    t.pop_back();
     for (auto& m : t) {
-        r->addMesh(&m);
+        r->addMesh(m);
+        delete m;
+        m = nullptr;
     }
     r->setShader("default");
 
@@ -145,8 +150,17 @@ int main() {
     b.fill(sizeof(mat4), sizeof(mat4), value_ptr(projection));
 
     short tick = 0;
+    float lastTime = glfwGetTime();
+    float deltaTime = 0;
+    unsigned fps = 0;
+
     while (!glfwWindowShouldClose(window))
     {
+        float currentTime = glfwGetTime();
+        deltaTime = currentTime - lastTime;
+        fps = 1.0f / deltaTime;
+        lastTime = currentTime;
+        std::cout << fps << std::endl;
         glClearColor(1, 1, 1, 0.5);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
