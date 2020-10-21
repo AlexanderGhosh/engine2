@@ -116,13 +116,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\GLM\glm;C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\GLFW\include;C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\GLEW\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\ASSIMP\include;C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\GLM\glm;C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\GLFW\include;C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\GLEW\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\GLFW\lib-vc2019;C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\GLEW\lib\Release\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opengl32.lib;glew32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\ASSIMP\lib;C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\GLFW\lib-vc2019;C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\GLEW\lib\Release\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>assimp-vc142-mt.lib;opengl32.lib;glew32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -142,6 +142,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Utils\AssimpWrapper.cpp" />
     <ClCompile Include="Componets\Componets.cpp" />
     <ClCompile Include="GameObject\GameObject.cpp" />
     <ClCompile Include="Utils\Camera.cpp" />
@@ -157,6 +158,7 @@
     <ClCompile Include="Primatives\Vertex.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Utils\AssimpWrapper.h" />
     <ClInclude Include="Componets\Componets.h" />
     <ClInclude Include="GameObject\GameObject.h" />
     <ClInclude Include="Utils\Camera.h" />

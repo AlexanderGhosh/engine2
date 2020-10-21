@@ -12,6 +12,7 @@
 #include "Utils/ResourceLoader.h"
 #include "Utils/Camera.h"
 #include "GameObject/GameObject.h"
+#include "Utils/AssimpWrapper.h"
 
 Utils::Camera cam;
 bool firstMouse = 1;
@@ -67,7 +68,7 @@ int main() {
     string name = ResourceLoader::createShader("Basics/DefaultShader");
 
     // cube
-    Primative::Mesh* m = new Primative::Mesh();
+    /*Primative::Mesh* m = new Primative::Mesh();
     Primative::Vertex v1({ -0.5, -0.5, -0.5 }, { 0, 0 });
     Primative::Vertex v2({ 0.5, -0.5, -0.5 }, { 1, 0 });
     Primative::Vertex v3({ 0.5, 0.5, -0.5 }, { 1, 1 });
@@ -93,7 +94,7 @@ int main() {
         4, 0, 7, 7, 0, 3,
         3, 2, 7, 7, 2, 6,
         4, 5, 0, 0, 5, 1
-    };
+    };*/
 
     // pyramid
     /*Primative::Mesh* m = new Primative::Mesh();
@@ -117,13 +118,18 @@ int main() {
         2, 4, 3
     };*/
 
+    AssimpWrapper w;
+    auto t = w.loadModel("C:\\Users\\AGWDW\\Desktop\\blend\\Handgun_Game_Blender Gamer Engine.obj");
+
     unsigned tex = ResourceLoader::createTexture("Basics/Textures/black.jpg", TextureType::DiffuseMap);
 
     Render::RenderMesh* r = new Render::RenderMesh();
-    r->addMesh(m);
+    for (auto& m : t) {
+        r->addMesh(&m);
+    }
     r->setShader("default");
 
-    delete m;
+    // delete m;
 
 
     GameObject obj;

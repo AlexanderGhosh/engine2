@@ -9,6 +9,7 @@ namespace Primative {
 		std::vector<Vertex> verts;
 		std::vector<unsigned> indices;
 		const Vertex operator[](int index) const;
+		inline Mesh(std::vector<Vertex> verts = { }, std::vector<unsigned> indi = { }) : verts(verts), indices(indi) { };
 	};
 }
 

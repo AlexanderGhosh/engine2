@@ -126,3 +126,7 @@ void ResourceLoader::cleanUp()
         glDeleteShader(item.second);
     }
 }
+
+void ResourceLoader::createModel(const std::string& filePath)
+{
+}

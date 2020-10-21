@@ -14,6 +14,9 @@ public:
 
 	static const unsigned createTexture(const std::string& filePath, const TextureType type);
 	static void cleanUp();
+
+	static void createModel(const std::string& filePath);
+
 private:
 	static std::unordered_map<std::string, unsigned> shaders;
 };
