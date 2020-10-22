@@ -142,6 +142,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Primatives\Material.cpp" />
     <ClCompile Include="Utils\AssimpWrapper.cpp" />
     <ClCompile Include="Componets\Componets.cpp" />
     <ClCompile Include="GameObject\GameObject.cpp" />
@@ -158,6 +159,7 @@
     <ClCompile Include="Primatives\Vertex.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Primatives\Material.h" />
     <ClInclude Include="Utils\AssimpWrapper.h" />
     <ClInclude Include="Componets\Componets.h" />
     <ClInclude Include="GameObject\GameObject.h" />

@@ -160,7 +160,7 @@ int main() {
         deltaTime = currentTime - lastTime;
         fps = 1.0f / deltaTime;
         lastTime = currentTime;
-        std::cout << fps << std::endl;
+        // std::cout << fps << std::endl;
         glClearColor(1, 1, 1, 0.5);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

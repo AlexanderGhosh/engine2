@@ -16,7 +16,15 @@ void Render::RenderMesh::update()
 	const glm::mat4 m = Componet::Base::parent->getTransform()->getModel();
 	Shading::Manager::setValue("model", m);
 
-	// Shading::Manager::setValue("tex", 0);
+	Materials::Forward fwd;
+	fwd.getDiffuse()(1); // set to the texture id
+	fwd.getSpecular()({ 0.5, 0.5, 0.5 });
+	fwd.shininess = 32;
+
+	Shading::Manager::setValue("material", fwd);
+	// Shading::Manager::setValue("t", 0);
+
+	fwd.activateTextures();
 
 	for (const Primative::Buffers& buffer : buffers) {
 		buffer.bind();

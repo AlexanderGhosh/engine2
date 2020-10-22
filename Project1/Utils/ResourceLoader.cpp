@@ -1,4 +1,5 @@
 #include "ResourceLoader.h"
+#include <array>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -105,16 +106,18 @@ const unsigned ResourceLoader::createTexture(const std::string& filePath, const 
     
     int width, height, nrChannels;
     unsigned char* data = stbi_load(filePath.c_str(), &width, &height, &nrChannels, 0);
+    // unsigned char data[] = { 255, 127, 127 };
     if (data)
     {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        // glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1, 1, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
     }
     else
     {
         std::cout << "Failed to load texture" << std::endl;
     }
-    stbi_image_free(data);
+    // stbi_image_free(data);
     glBindTexture(GL_TEXTURE_2D, 0);
 
     return tex;
