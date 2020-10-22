@@ -91,9 +91,9 @@ const unsigned ResourceLoader::getShader(const std::string& name)
     return r;
 }
 
-const unsigned ResourceLoader::createTexture(const std::string& filePath, const TextureType type)
+const unsigned ResourceLoader::createTexture(const std::string& filePath, const TextureType type, const bool& flip)
 {
-    stbi_set_flip_vertically_on_load(true);
+    stbi_set_flip_vertically_on_load(flip);
     unsigned tex = 0;
     glGenTextures(1, &tex);
     glBindTexture(GL_TEXTURE_2D, tex);

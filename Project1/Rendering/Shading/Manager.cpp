@@ -53,14 +53,14 @@ unsigned Render::Shading::Manager::active = 0;
  }
  bool Render::Shading::Manager::setValue(const std::string& name, Materials::Forward& fwd)
  {
-	 bool vals[] = { 0, 0 ,0 };
-	 std::string names[] = { ".diffuse", ".specular" };
-	 auto& diff_spec = fwd.getDiffSpec();
-	 for (short i = 0; i < 2; i++) {
-		 vals[i] = !Render::Shading::Manager::setValue(name + names[i], diff_spec[i], i);
+	 bool vals[] = { 0, 0 ,0, 0 };
+	 std::string names[] = { ".diffuse", ".specular", ".normals" };
+	 auto& diff_spec_norm = fwd.getDiffSpecNorm();
+	 for (short i = 0; i < 3; i++) {
+		 vals[i] = !Render::Shading::Manager::setValue(name + names[i], diff_spec_norm[i], i);
 	 }
-	 vals[2] = !Render::Shading::Manager::setValue(name + ".shininess", fwd.shininess);
+	 vals[3] = !Render::Shading::Manager::setValue(name + ".shininess", fwd.shininess);
 
-	 return vals[0] && vals[1] && vals[2];
+	 return vals[0] && vals[1] && vals[2] && vals[3];
  }
  

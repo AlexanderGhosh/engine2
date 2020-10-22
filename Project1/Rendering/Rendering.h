@@ -5,6 +5,7 @@
 #include "../Primatives/Mesh.h"
 #include "Animation/Animation.h"
 #include "../Componets/Componets.h"
+#include "../Primatives/Material.h"
 namespace Render {
 	class RenderMesh : public Animation::Animation, public Componet::Base // special case of animation with only one frame
 	{
@@ -22,6 +23,7 @@ namespace Render {
 		std::string shaderName;
 		GameObject* parent;
 		unsigned shaderId;
+		Materials::Forward material;
 	};
 }
 

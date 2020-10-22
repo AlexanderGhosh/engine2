@@ -7,15 +7,22 @@ layout(std140, binding = 0) uniform Matrices
 {
     mat4 view;
     mat4 projection;
+    vec3 viewPosition;
 };
 
+out VS_OUT{
+    vec3 fragPos;
+    vec3 normals;
+    vec2 texCoords;
+    vec3 viewPos;
+} vs_out;
+
 uniform mat4 model;
-out vec3 fragPos;
-out vec2 texCoords;
 
 void main() {
-    // projection * view * model * 
 	gl_Position = projection * view * model * vec4(pos, 1);
-    fragPos = pos;
-    texCoords = tex;
+    vs_out.fragPos = pos;
+    vs_out.texCoords = tex;
+    vs_out.normals = norm;
+    vs_out.viewPos = viewPosition;
 }

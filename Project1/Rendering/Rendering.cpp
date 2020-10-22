@@ -4,8 +4,15 @@
 #include "../Componets/Componets.h"
 #include "../GameObject/GameObject.h"
 
-Render::RenderMesh::RenderMesh() : buffers(), shaderName("default"), parent(nullptr), shaderId(ResourceLoader::getShader(shaderName)), Componet::Base()
+Render::RenderMesh::RenderMesh() : buffers(), shaderName("default"), parent(nullptr), shaderId(ResourceLoader::getShader(shaderName)), material(), Componet::Base()
 {
+	Materials::Forward fwd; 
+	fwd.getDiffuse()(1); // set to the texture id
+	// fwd.getDiffuse()({ 1, 0, 0 }); // set to the texture id
+	fwd.getSpecular()(2);
+	fwd.getNormals()(3);
+	fwd.shininess = 32;
+	this->material = fwd;
 }
 
 
@@ -16,15 +23,10 @@ void Render::RenderMesh::update()
 	const glm::mat4 m = Componet::Base::parent->getTransform()->getModel();
 	Shading::Manager::setValue("model", m);
 
-	Materials::Forward fwd;
-	fwd.getDiffuse()(1); // set to the texture id
-	fwd.getSpecular()({ 0.5, 0.5, 0.5 });
-	fwd.shininess = 32;
-
-	Shading::Manager::setValue("material", fwd);
+	Shading::Manager::setValue("material", this->material);
 	// Shading::Manager::setValue("t", 0);
 
-	fwd.activateTextures();
+	this->material.activateTextures();
 
 	for (const Primative::Buffers& buffer : buffers) {
 		buffer.bind();

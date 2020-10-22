@@ -56,7 +56,7 @@ int main() {
 
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glEnable(GL_DEPTH_TEST);
-    // glEnable(GL_CULL_FACE);
+    glEnable(GL_CULL_FACE);
     glEnable(GL_MULTISAMPLE);
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetKeyCallback(window, key_callback);
@@ -64,6 +64,7 @@ int main() {
     glViewport(0, 0, 800, 600);
     glewInit();
 
+    cam.pos = { 0, 0.5, 5 };
 
     string name = ResourceLoader::createShader("Basics/DefaultShader");
 
@@ -121,7 +122,10 @@ int main() {
     AssimpWrapper w;
     auto t = w.loadModel("C:\\Users\\AGWDW\\Desktop\\blend\\Handgun_Game_Blender Gamer Engine.obj");
 
-    unsigned tex = ResourceLoader::createTexture("Basics/Textures/black.jpg", TextureType::DiffuseMap);
+    unsigned tex1 = ResourceLoader::createTexture("Basics/Textures/handgun_C.jpg", TextureType::DiffuseMap, 0);
+    unsigned tex2 = ResourceLoader::createTexture("Basics/Textures/handgun_S.jpg", TextureType::SpecularMap, 0);
+    unsigned tex3 = ResourceLoader::createTexture("Basics/Textures/handgun_N.jpg", TextureType::NormalMap, 0);
+    // unsigned tex = ResourceLoader::createTexture("Basics/Textures/wood.jpg", TextureType::DiffuseMap);
 
     Render::RenderMesh* r = new Render::RenderMesh();
     // std::cout << t.size() << std::endl;
@@ -138,11 +142,12 @@ int main() {
 
 
     GameObject obj;
+    obj.getTransform()->Position = { 0, 0, 0 };
     obj.addComponet(r);
 
 
     Primative::StaticBuffer b;
-    b.init(2 * sizeof(mat4), 0);
+    b.init(2 * sizeof(mat4) + sizeof(vec3), 0);
 
 
     mat4 projection = perspective(glm::radians(cam.getFOV()), 800.0f / 600.0f, 0.1f, 100.0f);
@@ -161,7 +166,7 @@ int main() {
         fps = 1.0f / deltaTime;
         lastTime = currentTime;
         // std::cout << fps << std::endl;
-        glClearColor(1, 1, 1, 0.5);
+        glClearColor(0.5, 0.5, 0.5, 1);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
@@ -171,14 +176,11 @@ int main() {
         b.fill(sizeof(float), sizeof(float), &c);
         b.fill(2 * sizeof(float), sizeof(float), &c);*/
 
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, tex);
-
-        
 
         b.fill(0, sizeof(mat4), value_ptr(cam.getView()));
-        obj.tick(++tick % FIXED_UPDATE_RATE);
+        b.fill(sizeof(mat4) * 2, sizeof(vec3), value_ptr(cam.getPos()));
 
+        obj.tick(++tick % FIXED_UPDATE_RATE);
 
         glfwSwapBuffers(window);
         glfwPollEvents();

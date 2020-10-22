@@ -23,12 +23,14 @@ namespace Materials {
 	};
 	struct Forward {
 	private:
-		std::array<MatItem, 2> diff_spec;
+		std::array<MatItem, 3> diff_spec_norm;
 	public:
+		inline Forward() : diff_spec_norm{ MatItem({1, 0, 0}), MatItem({1, 1, 1}), MatItem({1, 1, 1}) }, shininess(32) { };
 		float shininess;
-		inline MatItem& getDiffuse() { return diff_spec[0]; };
-		inline MatItem& getSpecular() { return diff_spec[1]; };
-		inline std::array<MatItem, 2>& getDiffSpec() { return diff_spec; };
+		inline MatItem& getDiffuse() { return diff_spec_norm[0]; };
+		inline MatItem& getSpecular() { return diff_spec_norm[1]; };
+		inline MatItem& getNormals() { return diff_spec_norm[2]; };
+		inline std::array<MatItem, 3>& getDiffSpecNorm() { return diff_spec_norm; };
 		void activateTextures() const;
 	};
 
