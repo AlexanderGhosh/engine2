@@ -8,6 +8,7 @@ layout(std140, binding = 0) uniform Matrices
     mat4 view;
     mat4 projection;
     vec3 viewPosition;
+    float gamma;
 };
 
 out VS_OUT{
@@ -15,6 +16,7 @@ out VS_OUT{
     vec3 normals;
     vec2 texCoords;
     vec3 viewPos;
+    float gammaValue;
 } vs_out;
 
 uniform mat4 model;
@@ -25,4 +27,5 @@ void main() {
     vs_out.texCoords = tex;
     vs_out.normals = norm;
     vs_out.viewPos = viewPosition;
+    vs_out.gammaValue = gamma;
 }

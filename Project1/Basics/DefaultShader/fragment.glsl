@@ -7,6 +7,7 @@ in VS_OUT {
     vec3 normals;
     vec2 texCoords;
     vec3 viewPos;
+    float gammaValue;
 } fs_in;
 
 struct Material {
@@ -62,6 +63,9 @@ void main() {
      vec3 specular = spec_ * spec; // assuming bright white light color
      vec3 sum = ambient + diffuse + specular;
      sum *= 1;
+
+     sum = pow(sum, vec3(1.0 / fs_in.gammaValue));
+
      FragColor = vec4(sum, 1.0);
      // FragColor = vec4(diff_, 1);
 }

@@ -147,12 +147,15 @@ int main() {
 
 
     Primative::StaticBuffer b;
-    b.init(2 * sizeof(mat4) + sizeof(vec3), 0);
+    b.init(2 * sizeof(mat4) + sizeof(vec3) + sizeof(float), 0);
 
 
     mat4 projection = perspective(glm::radians(cam.getFOV()), 800.0f / 600.0f, 0.1f, 100.0f);
 
     b.fill(sizeof(mat4), sizeof(mat4), value_ptr(projection));
+
+    float gamma = 2.2f;
+    b.fill(sizeof(mat4) * 2 + sizeof(vec3), sizeof(float), &gamma);
 
     short tick = 0;
     float lastTime = glfwGetTime();
@@ -166,7 +169,7 @@ int main() {
         fps = 1.0f / deltaTime;
         lastTime = currentTime;
         // std::cout << fps << std::endl;
-        glClearColor(0.5, 0.5, 0.5, 1);
+        glClearColor(0, 0, 0, 1);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
