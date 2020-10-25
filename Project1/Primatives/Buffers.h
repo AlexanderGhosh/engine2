@@ -35,13 +35,24 @@ namespace Primative {
 	class FrameBuffer {
 	private:
 		unsigned FBO;
+		glm::ivec2 dimentions;
 		std::unordered_map<std::string, unsigned> textures;
+		std::vector<unsigned> renderBuffers;
 	public:
 		inline FrameBuffer() : textures(), FBO(0) { };
 		FrameBuffer(std::vector<std::string> textuers, glm::ivec2 dimentions);
-		inline void bind() const { glBindFramebuffer(GL_FRAMEBUFFER, FBO);};
+		inline void bind() const 
+		{ 
+			glViewport(0, 0, dimentions.x, dimentions.y);
+			glBindFramebuffer(GL_FRAMEBUFFER, FBO);
+		};
 		inline void unBind() const { glBindFramebuffer(GL_FRAMEBUFFER, 0); };
-		inline ~FrameBuffer() { if (FBO == 0) return;  this->unBind(); glDeleteFramebuffers(1, &FBO); };
+		inline void cleanUp() const {
+			if (FBO == 0) return;
+			this->unBind();
+			glDeleteFramebuffers(1, &FBO);
+		};
+		const unsigned& getTextureId(const std::string& name);
 	};
 }
 

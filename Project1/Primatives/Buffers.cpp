@@ -1,6 +1,7 @@
 #include "Buffers.h"
 #include <string>
 #include <iostream>
+#include "../Utils/General.h"
 
 short Primative::StaticBuffer::usedBindingPoint = -1;
 
@@ -58,13 +59,9 @@ void Primative::StaticBuffer::fill(unsigned offset, unsigned size, const void* d
 
 Primative::FrameBuffer::FrameBuffer(std::vector<std::string> textureTypes, glm::ivec2 dimentions) : FrameBuffer()
 {
+	this->dimentions = dimentions;
 	glGenFramebuffers(1, &FBO);
 	this->bind();
-	std::unordered_map<std::string, GLenum> conversion = {
-		{ "col", GL_COLOR_ATTACHMENT0 }
-	};
-
-	std::vector<std::string> req = { "depth", "dep_sten" };
 
 	if (textureTypes.size() < 0) {
 		textureTypes.push_back("col");
@@ -72,44 +69,79 @@ Primative::FrameBuffer::FrameBuffer(std::vector<std::string> textureTypes, glm::
 
 	unsigned colTypes = 0;
 	for (short i = 0; i < textureTypes.size(); i++) {
-		GLenum texType, type;
-		const std::string& t = textureTypes[i];
+		GLenum attachmentType, type;
+		std::string t = textureTypes[i];
 		if (t == "col") {
-			texType = GL_COLOR_ATTACHMENT0 + colTypes++;
+			attachmentType = GL_COLOR_ATTACHMENT0 + colTypes++;
 			type = GL_RGB;
+			t += std::to_string(colTypes);
 		}
 		else if (t == "depth") {
-			texType = GL_DEPTH_ATTACHMENT;
-			type = GL_DEPTH_COMPONENT32;
+			attachmentType = GL_DEPTH_ATTACHMENT;
+			type = GL_DEPTH_COMPONENT;
 		}
 		else if (t == "stencil") {
-			texType = GL_STENCIL_ATTACHMENT;
+			attachmentType = GL_STENCIL_ATTACHMENT;
 			type = GL_FLOAT;
 		}
 		else if (t == "dep_sten") {
-			texType = GL_DEPTH_STENCIL_ATTACHMENT;
+			attachmentType = GL_DEPTH_STENCIL_ATTACHMENT;
 			type = GL_DEPTH24_STENCIL8;
 		}
 		else {
 			continue;
 		}
 
-		unsigned tex = 0;
+		textures.insert({ t, 0 });
+		unsigned& tex = textures[t];
 		glGenTextures(1, &tex);
 		glBindTexture(GL_TEXTURE_2D, tex);
-		glTexImage2D(GL_TEXTURE_2D, 0, type, dimentions.x, dimentions.y, 0, GL_RGB, GL_FLOAT, NULL);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexImage2D(GL_TEXTURE_2D, 0, type, dimentions.x, dimentions.y, 0, type, GL_UNSIGNED_BYTE, NULL);
+		glBindTexture(GL_TEXTURE_2D, 0);
 
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex, 0);
-		textures.insert({ std::to_string(i), tex });
-
-		//glBindTexture(GL_TEXTURE_2D, 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, attachmentType, GL_TEXTURE_2D, tex, 0);
 	}
-	glDrawBuffer(GL_NONE);
-	glReadBuffer(GL_NONE);
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE) {
-		std::cout << "ghnoirs\n";
+	
+	if (!Utils::contains(textureTypes, { "col" })) {
+		glDrawBuffer(GL_NONE);
+		glReadBuffer(GL_NONE);
+	}
+	if (!Utils::contains(textureTypes, { "depth" })) {
+		unsigned rbo = 0;
+		glGenRenderbuffers(1, &rbo);
+		glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, dimentions.x, dimentions.y);
+		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_COMPONENT, GL_RENDERBUFFER, rbo);
+		glBindRenderbuffer(GL_RENDERBUFFER, 0);
+		renderBuffers.push_back(rbo);
+	}
+	/*if (!Utils::contains(textureTypes, { "stencil" })) {
+		unsigned rbo = 0;
+		glGenRenderbuffers(1, &rbo);
+		glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_UNSIGNED_BYTE, dimentions.x, dimentions.y);
+		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+		glBindRenderbuffer(GL_RENDERBUFFER, 0);
+		renderBuffers.push_back(rbo);
+	}*/
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+		std::cout << "error\n";
 	}
 	this->unBind();
+}
+
+const unsigned& Primative::FrameBuffer::getTextureId(const std::string& name)
+{
+	unsigned s = textures.size();
+	const unsigned& r = textures[name];
+	bool b = true;
+	if (s < textures.size()) {
+		textures.erase(name);
+		b = false;
+	}
+	if (b) 
+		return r;
+	return 0;
 }

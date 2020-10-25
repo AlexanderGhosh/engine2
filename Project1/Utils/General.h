@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <tuple>
 #include <string>
 #include <glm.hpp>
 #include <gtc/matrix_transform.hpp>
@@ -29,4 +30,21 @@ namespace Utils {
         }
         return matrix;*/
     };
+    template<class T>
+    inline bool contains(const std::vector<T>& a, const T& b) {
+        auto found = std::find(a.begin(), a.end(), b);
+        return found != a.end();
+    }
+
+    /*template<typename T, typename U>
+    inline std::tuple<bool, U> get(std::unordered_map<T, U>& a, const T& b) {
+        unsigned s = a.size();
+        const U& r = a[b];
+        bool b = true;
+        if (s < a.size()) {
+            a.erase(r);
+            b = false;
+        }
+        return std::tuple<bool, U>(b, r);
+    }*/
 }

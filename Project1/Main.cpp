@@ -141,7 +141,7 @@ int main() {
     };*/
 
     AssimpWrapper w;
-    auto t = w.loadModel("C:\\Users\\AGWDW\\Desktop\\blend\\Handgun_Game_Blender Gamer Engine.obj");
+    auto t = w.loadModel("C:/Users/AGWDW/Desktop/blend/Handgun_Game_Blender Gamer Engine.obj");
 
     unsigned tex1 = ResourceLoader::createTexture("Basics/Textures/handgun_C.jpg", TextureType::DiffuseMap, 0);
     unsigned tex2 = ResourceLoader::createTexture("Basics/Textures/handgun_S.jpg", TextureType::SpecularMap, 0);
@@ -171,11 +171,6 @@ int main() {
     };
     
     Render::RenderMesh* quad_r = new Render::RenderMesh();
-    /*for (auto& m : t) {
-        quad_r->addMesh(m);
-        delete m;
-        m = nullptr;
-    }*/
     quad_r->addMesh(quad_mesh, GL_TRIANGLE_STRIP);
     delete quad_mesh;
     quad_mesh = nullptr;
@@ -207,47 +202,8 @@ int main() {
     float lastTime = glfwGetTime();
     float deltaTime = 0;
     unsigned fps = 0;
-    // frameBuffer = Primative::FrameBuffer({ GL_COLOR_ATTACHMENT0 }, { 800, 600 });
-    //frameBuffer.bind();
-    
-#pragma region fbo
-    unsigned fbo = 0;
-    unsigned depthMap = 0, colMap = 0;
-    glGenFramebuffers(1, &fbo);
-    // depth map
-    glGenTextures(1, &depthMap);
-    glBindTexture(GL_TEXTURE_2D, depthMap);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, 800, 600, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-    glBindTexture(GL_TEXTURE_2D, 0);
-    // color map
-    glGenTextures(1, &colMap);
-    glBindTexture(GL_TEXTURE_2D, colMap);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 800, 600, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-    glBindTexture(GL_TEXTURE_2D, 0);
-    // attach depth texture as FBO's depth buffer
-    
-    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-    glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, colMap, 0);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
-    // glDrawBuffer(GL_NONE);
-    // glReadBuffer(GL_NONE);
 
-    // unsigned int rbo;
-    // glGenRenderbuffers(1, &rbo);
-    // glBindRenderbuffer(GL_RENDERBUFFER, rbo);
-    // glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 800, 600); // use a single renderbuffer object for both a depth AND stencil buffer.
-    // glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo); // now actually attach it
-
-    // now that we actually created the framebuffer and added all attachments we want to check if it is actually complete now
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) // GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT 0x8CD6
-        cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << glCheckFramebufferStatus(GL_FRAMEBUFFER)<<endl;
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-#pragma endregion
+    frameBuffer = Primative::FrameBuffer({ "depth" }, { 800, 600 });
 
     while (!glfwWindowShouldClose(window))
     {
@@ -266,19 +222,20 @@ int main() {
 
 
         // new fbo
-        glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+        // glBindFramebuffer(GL_FRAMEBUFFER, 1);
+        frameBuffer.bind();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         obj.tick(++tick % FIXED_UPDATE_RATE);
         
         // default fbo
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        frameBuffer.unBind();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glDisable(GL_DEPTH_TEST);
         glDisable(GL_CULL_FACE);
 
         glActiveTexture(GL_TEXTURE3);
-        glBindTexture(GL_TEXTURE_2D, depthMap);
+        glBindTexture(GL_TEXTURE_2D, frameBuffer.getTextureId("depth"));
         
         quad.tick(++tick % FIXED_UPDATE_RATE);
 
@@ -289,7 +246,8 @@ int main() {
         glfwPollEvents();
     }
     delete r;
-    ResourceLoader::cleanUp();
+    ResourceLoader::cleanUp(); 
+    frameBuffer.cleanUp();
     glfwTerminate();
     // delete window;
     return 0;
