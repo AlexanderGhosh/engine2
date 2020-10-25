@@ -19,5 +19,6 @@ public:
 
 private:
 	static std::unordered_map<std::string, unsigned> shaders;
+	static std::string defaultShaderName;
 };
 

@@ -3,7 +3,7 @@
 out vec4 FragColor;
 
 in VS_OUT {
-    vec3 fragPos;
+    vec4 fragPos;
     vec3 normals;
     vec2 texCoords;
     vec3 viewPos;
@@ -23,9 +23,14 @@ struct Material {
      float shininess;
 };
 
+uniform sampler2D depthMap;
 uniform Material material;
 
 void main() {
+     FragColor = vec4(vec3(gl_FragCoord.z), 1);
+     
+     /*float depthValue = texture(depthMap, fs_in.texCoords).r;
+     
      vec3 lightPos = vec3(0, 0, 0);
 
      vec3 diff_ = material.diffuse_vec.rgb;
@@ -68,4 +73,5 @@ void main() {
 
      FragColor = vec4(sum, 1.0);
      // FragColor = vec4(diff_, 1);
+     */
 }

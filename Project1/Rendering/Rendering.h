@@ -12,7 +12,7 @@ namespace Render {
 	public:
 		RenderMesh();
 		virtual void update();
-		void addMesh(Primative::Mesh* m);
+		void addMesh(Primative::Mesh* m, GLenum draw_type = GL_TRIANGLES);
 		inline void setShader(std::string name) { 
 			shaderName = name;
 			shaderId = ResourceLoader::getShader(shaderName);

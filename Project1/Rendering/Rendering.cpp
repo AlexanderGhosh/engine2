@@ -21,20 +21,24 @@ void Render::RenderMesh::update()
 	glUseProgram(shaderId);
 	Shading::Manager::setActive(shaderId);
 	const glm::mat4 m = Componet::Base::parent->getTransform()->getModel();
-	Shading::Manager::setValue("model", m);
+	bool succ = Shading::Manager::setValue("model", m);
 
-	Shading::Manager::setValue("material", this->material);
-	// Shading::Manager::setValue("t", 0);
+	succ = Shading::Manager::setValue("material", this->material);
 
+	succ = Shading::Manager::setValue("depthMap", 3);
+	/*glActiveTexture(GL_TEXTURE3);
+	glBindTexture(GL_TEXTURE_2D, 4);*/
 	this->material.activateTextures();
-
 	for (const Primative::Buffers& buffer : buffers) {
 		buffer.bind();
 		buffer.draw();
+		buffer.unBind();
 	}
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glUseProgram(0);
 }
 
-void Render::RenderMesh::addMesh(Primative::Mesh* m)
+void Render::RenderMesh::addMesh(Primative::Mesh* m, GLenum draw_type)
 {
-	buffers.emplace_back(*m);
+	buffers.emplace_back(*m, draw_type);
 };

@@ -32,11 +32,32 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
 
     cam.ProcessMouseMovement(xoffset, yoffset);
 }
-
+Primative::FrameBuffer frameBuffer;
+void saveScreenshotToFile(std::string filename, int windowWidth, int windowHeight, unsigned depthMap);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode) {
     if (key == GLFW_KEY_W){
         cam.pos += cam.fwd * 0.1f;
     }
+}
+
+void saveScreenshotToFile(std::string filename, int windowWidth, int windowHeight, unsigned depthMap) {
+    const int numberOfPixels = windowWidth * windowHeight * 3;
+    std::vector<unsigned char> pixels;
+    pixels.reserve(numberOfPixels);
+
+    glPixelStorei(GL_PACK_ALIGNMENT, 1);
+    glReadBuffer(GL_FRONT);
+    // glReadPixels(0, 0, windowWidth, windowHeight, GL_BGR_EXT, GL_UNSIGNED_BYTE, pixels.data());
+    glGetTexImage(1, 0, GL_RGB_INTEGER, GL_UNSIGNED_BYTE, pixels.data());
+
+    FILE* outputFile = fopen(filename.c_str(), "w");
+    short header[] = { 0, 2, 0, 0, 0, 0, (short)windowWidth, (short)windowHeight, 24 };
+
+    fwrite(&header, sizeof(header), 1, outputFile);
+    fwrite(pixels.data(), numberOfPixels, 1, outputFile);
+    fclose(outputFile);
+
+    printf("Finish writing to file.\n");
 }
 
 int main() {
@@ -64,10 +85,10 @@ int main() {
     glViewport(0, 0, 800, 600);
     glewInit();
 
-    cam.pos = { 0, 0.5, 5 };
+    cam.pos = { 0, 0.5, 0.25 };
 
-    string name = ResourceLoader::createShader("Basics/DefaultShader");
-
+    ResourceLoader::createShader("Basics/DefaultShader");
+    ResourceLoader::createShader("Basics/QuadShader");
     // cube
     /*Primative::Mesh* m = new Primative::Mesh();
     Primative::Vertex v1({ -0.5, -0.5, -0.5 }, { 0, 0 });
@@ -136,17 +157,42 @@ int main() {
         delete m;
         m = nullptr;
     }
-    r->setShader("default");
-
-    // delete m;
+    r->setShader("DefaultShader");
 
 
+    Primative::Mesh* quad_mesh = new Primative::Mesh();
+    quad_mesh->verts.push_back(Primative::Vertex({ -1, -1, 0 }, { 0, 0 }));
+    quad_mesh->verts.push_back(Primative::Vertex({ -1, 1, 0 }, { 0, 1 }));
+    quad_mesh->verts.push_back(Primative::Vertex({ 1, -1, 0 }, { 1, 0 }));
+    quad_mesh->verts.push_back(Primative::Vertex({ 1, 1, 0 }, { 1, 1 }));
+    
+    quad_mesh->indices = {
+        0, 1, 2, 3
+    };
+    
+    Render::RenderMesh* quad_r = new Render::RenderMesh();
+    /*for (auto& m : t) {
+        quad_r->addMesh(m);
+        delete m;
+        m = nullptr;
+    }*/
+    quad_r->addMesh(quad_mesh, GL_TRIANGLE_STRIP);
+    delete quad_mesh;
+    quad_mesh = nullptr;
+    quad_r->setShader("QuadShader");// QuadShader
+    
+    GameObject quad;
+    quad.addComponet(quad_r);
+    
     GameObject obj;
     obj.getTransform()->Position = { 0, 0, 0 };
     obj.addComponet(r);
 
-
     Primative::StaticBuffer b;
+    // view    | matrix
+    // proj    | matrix
+    // viewPos | vec
+    // gamma   | float
     b.init(2 * sizeof(mat4) + sizeof(vec3) + sizeof(float), 0);
 
 
@@ -161,29 +207,83 @@ int main() {
     float lastTime = glfwGetTime();
     float deltaTime = 0;
     unsigned fps = 0;
+    // frameBuffer = Primative::FrameBuffer({ GL_COLOR_ATTACHMENT0 }, { 800, 600 });
+    //frameBuffer.bind();
+    
+#pragma region fbo
+    unsigned fbo = 0;
+    unsigned depthMap = 0, colMap = 0;
+    glGenFramebuffers(1, &fbo);
+    // depth map
+    glGenTextures(1, &depthMap);
+    glBindTexture(GL_TEXTURE_2D, depthMap);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, 800, 600, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    // color map
+    glGenTextures(1, &colMap);
+    glBindTexture(GL_TEXTURE_2D, colMap);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 800, 600, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    // attach depth texture as FBO's depth buffer
+    
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+    glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, colMap, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
+    // glDrawBuffer(GL_NONE);
+    // glReadBuffer(GL_NONE);
+
+    // unsigned int rbo;
+    // glGenRenderbuffers(1, &rbo);
+    // glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+    // glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 800, 600); // use a single renderbuffer object for both a depth AND stencil buffer.
+    // glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo); // now actually attach it
+
+    // now that we actually created the framebuffer and added all attachments we want to check if it is actually complete now
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) // GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT 0x8CD6
+        cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << glCheckFramebufferStatus(GL_FRAMEBUFFER)<<endl;
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+#pragma endregion
 
     while (!glfwWindowShouldClose(window))
     {
+        // frameBuffer.bind();
         float currentTime = glfwGetTime();
         deltaTime = currentTime - lastTime;
         fps = 1.0f / deltaTime;
         lastTime = currentTime;
         // std::cout << fps << std::endl;
-        glClearColor(0, 0, 0, 1);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-
-        /*Render::Shading::Manager::setActive(shaderProgram);
-        Render::Shading::Manager::setValue("col", { 1, 0, 1 });*/
-        /*b.fill(0, sizeof(float), &c);
-        b.fill(sizeof(float), sizeof(float), &c);
-        b.fill(2 * sizeof(float), sizeof(float), &c);*/
-
 
         b.fill(0, sizeof(mat4), value_ptr(cam.getView()));
         b.fill(sizeof(mat4) * 2, sizeof(vec3), value_ptr(cam.getPos()));
 
+        glClearColor(0.5, 1, 0.5, 1);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+
+        // new fbo
+        glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
         obj.tick(++tick % FIXED_UPDATE_RATE);
+        
+        // default fbo
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glDisable(GL_DEPTH_TEST);
+        glDisable(GL_CULL_FACE);
+
+        glActiveTexture(GL_TEXTURE3);
+        glBindTexture(GL_TEXTURE_2D, depthMap);
+        
+        quad.tick(++tick % FIXED_UPDATE_RATE);
+
+        glEnable(GL_CULL_FACE);
+        glEnable(GL_DEPTH_TEST);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -191,6 +291,6 @@ int main() {
     delete r;
     ResourceLoader::cleanUp();
     glfwTerminate();
-    delete window;
+    // delete window;
     return 0;
 }

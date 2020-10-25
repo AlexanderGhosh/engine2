@@ -6,6 +6,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "../stb_image.h"
 
+std::string ResourceLoader::defaultShaderName = "";
 std::unordered_map<std::string, unsigned> ResourceLoader::shaders = { };
 
 std::string ResourceLoader::createShader(const std::string& filePath)
@@ -68,13 +69,21 @@ std::string ResourceLoader::createShader(const std::string& filePath)
         glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
         std::cout << filePath << " faild to link " << infoLog << std::endl;
     }
+
+    glDetachShader(shaderProgram, shaders[0]);
+    glDetachShader(shaderProgram, shaders[1]);
     glDeleteShader(shaders[0]);
     glDeleteShader(shaders[1]);
+    glUseProgram(0);
 
-    auto shader_s = Utils::split(filePath, " ");
+    auto shader_s = Utils::split(filePath, "/");
     std::string name = shader_s.back();
     
     ResourceLoader::shaders[name] = shaderProgram;
+
+    if (ResourceLoader::defaultShaderName == "") {
+        ResourceLoader::defaultShaderName = name;
+    }
 
     return name;
 }
@@ -85,7 +94,7 @@ const unsigned ResourceLoader::getShader(const std::string& name)
     unsigned s = shaders.size();
     unsigned r = shaders[name];
     if (s < shaders.size()) {
-        r = (*shaders.begin()).second;
+        r = ResourceLoader::getShader(ResourceLoader::defaultShaderName);
         shaders.erase(name);
     }
     return r;
