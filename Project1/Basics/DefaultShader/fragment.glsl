@@ -3,11 +3,12 @@
 out vec4 FragColor;
 
 in VS_OUT {
-    vec4 fragPos;
+    vec3 fragPos;
     vec3 normals;
     vec2 texCoords;
     vec3 viewPos;
     float gammaValue;
+    vec4 fragPosLightSpace;
 } fs_in;
 
 struct Material {
@@ -26,10 +27,26 @@ struct Material {
 uniform sampler2D depthMap;
 uniform Material material;
 
+float ShadowCalculation(vec4 fragPosLightSpace)
+{
+    // perform perspective divide
+    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+    // transform to [0,1] range
+    projCoords = projCoords * 0.5 + 0.5;
+    // get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
+    float closestDepth = texture(shadowMap, projCoords.xy).r; 
+    // get depth of current fragment from light's perspective
+    float currentDepth = projCoords.z;
+    // check whether current frag pos is in shadow
+    float shadow = currentDepth > closestDepth  ? 1.0 : 0.0;
+
+    return shadow;
+}  
+
 void main() {
-     FragColor = vec4(vec3(gl_FragCoord.z), 1);
+     // FragColor = vec4(vec3(gl_FragCoord.z), 1);
      
-     /*float depthValue = texture(depthMap, fs_in.texCoords).r;
+     float depthValue = texture(depthMap, fs_in.texCoords).r;
      
      vec3 lightPos = vec3(0, 0, 0);
 
@@ -66,12 +83,13 @@ void main() {
      spec = pow(max(dot(normal, halfwayDir), 0.0), material.shininess);
 
      vec3 specular = spec_ * spec; // assuming bright white light color
-     vec3 sum = ambient + diffuse + specular;
-     sum *= 1;
 
-     sum = pow(sum, vec3(1.0 / fs_in.gammaValue));
+
+     float shadow = ShadowCalculation(fs_in.fragPosLightSpace);       
+     vec3 lighting = (ambient + (1.0 - shadow) * (diffuse + specular)) * color;
+     lighting = pow(lighting, vec3(1.0 / fs_in.gammaValue));
 
      FragColor = vec4(sum, 1.0);
      // FragColor = vec4(diff_, 1);
-     */
+     
 }

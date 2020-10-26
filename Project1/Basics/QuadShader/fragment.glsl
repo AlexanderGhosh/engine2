@@ -9,5 +9,5 @@ in VS_OUT {
 uniform sampler2D depthMap;
 void main() {
     float depthValue = texture(depthMap, fs_in.texCoords).r;
-    FragColor = vec4(vec3(depthValue), 1);
+    FragColor = vec4(vec3(1 - depthValue), 1);
 }

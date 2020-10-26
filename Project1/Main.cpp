@@ -188,7 +188,7 @@ int main() {
     // proj    | matrix
     // viewPos | vec
     // gamma   | float
-    b.init(2 * sizeof(mat4) + sizeof(vec3) + sizeof(float), 0);
+    b.init(3 * sizeof(mat4) + sizeof(vec3) + sizeof(float), 0);
 
 
     mat4 projection = perspective(glm::radians(cam.getFOV()), 800.0f / 600.0f, 0.1f, 100.0f);
@@ -215,7 +215,16 @@ int main() {
         // std::cout << fps << std::endl;
 
         b.fill(0, sizeof(mat4), value_ptr(cam.getView()));
-        b.fill(sizeof(mat4) * 2, sizeof(vec3), value_ptr(cam.getPos()));
+        b.fill(sizeof(mat4) * 2, sizeof(vec3), value_ptr(cam.getPos())); // viewPos
+        glm::vec3 lightPos = { 10, 10, 10 };
+
+        glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 0.1f, 100.0f);
+
+        glm::mat4 lightView = glm::lookAt(glm::vec3(-2.0f, 4.0f, -1.0f),
+            glm::vec3(0.0f, 0.0f, 0.0f),
+            glm::vec3(0.0f, 1.0f, 0.0f));
+        glm::mat4 lightSpaceMatrix = lightProjection * lightView;
+        b.fill(sizeof(mat4) * 2, sizeof(vec3) + sizeof(float), value_ptr(lightSpaceMatrix));
 
         glClearColor(0.5, 1, 0.5, 1);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -226,6 +235,8 @@ int main() {
         frameBuffer.bind();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        glActiveTexture(GL_TEXTURE3);
+        glBindTexture(GL_TEXTURE_2D, frameBuffer.getTextureId("depth"));
         obj.tick(++tick % FIXED_UPDATE_RATE);
         
         // default fbo
@@ -234,10 +245,8 @@ int main() {
         glDisable(GL_DEPTH_TEST);
         glDisable(GL_CULL_FACE);
 
-        glActiveTexture(GL_TEXTURE3);
-        glBindTexture(GL_TEXTURE_2D, frameBuffer.getTextureId("depth"));
-        
-        quad.tick(++tick % FIXED_UPDATE_RATE);
+        obj.tick(++tick % FIXED_UPDATE_RATE);
+        // quad.tick(++tick % FIXED_UPDATE_RATE);
 
         glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);

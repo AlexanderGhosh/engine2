@@ -72,9 +72,9 @@ Primative::FrameBuffer::FrameBuffer(std::vector<std::string> textureTypes, glm::
 		GLenum attachmentType, type;
 		std::string t = textureTypes[i];
 		if (t == "col") {
-			attachmentType = GL_COLOR_ATTACHMENT0 + colTypes++;
+			attachmentType = GL_COLOR_ATTACHMENT0 + colTypes;
 			type = GL_RGB;
-			t += std::to_string(colTypes);
+			t += std::to_string(colTypes++);
 		}
 		else if (t == "depth") {
 			attachmentType = GL_DEPTH_ATTACHMENT;
