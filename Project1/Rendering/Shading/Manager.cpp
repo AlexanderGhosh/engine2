@@ -57,10 +57,16 @@ unsigned Render::Shading::Manager::active = 0;
 	 std::string names[] = { ".diffuse", ".specular", ".normals" };
 	 auto& diff_spec_norm = fwd.getDiffSpecNorm();
 	 for (short i = 0; i < 3; i++) {
-		 vals[i] = !Render::Shading::Manager::setValue(name + names[i], diff_spec_norm[i], i);
+		 vals[i] = Render::Shading::Manager::setValue(name + names[i], diff_spec_norm[i], i);
 	 }
-	 vals[3] = !Render::Shading::Manager::setValue(name + ".shininess", fwd.shininess);
+	 vals[3] = Render::Shading::Manager::setValue(name + ".shininess", fwd.shininess);
 
 	 return vals[0] && vals[1] && vals[2] && vals[3];
+ }
+
+ void Render::Shading::Manager::setActive(const unsigned& shaderId)
+ {
+	 Manager::active = shaderId;
+	 glUseProgram(shaderId);
  }
  

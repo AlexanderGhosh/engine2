@@ -34,11 +34,12 @@ float ShadowCalculation(vec4 fragPosLightSpace)
     // transform to [0,1] range
     projCoords = projCoords * 0.5 + 0.5;
     // get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
-    float closestDepth = texture(shadowMap, projCoords.xy).r; 
+    float closestDepth = texture(depthMap, projCoords.xy).r; 
     // get depth of current fragment from light's perspective
     float currentDepth = projCoords.z;
     // check whether current frag pos is in shadow
-    float shadow = currentDepth > closestDepth  ? 1.0 : 0.0;
+    float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);  
+    float shadow = currentDepth - bias > closestDepth  ? 1.0 : 0.0;
 
     return shadow;
 }  
@@ -48,7 +49,7 @@ void main() {
      
      float depthValue = texture(depthMap, fs_in.texCoords).r;
      
-     vec3 lightPos = vec3(0, 0, 0);
+     vec3 lightPos = vec3(10, 10, 10);
 
      vec3 diff_ = material.diffuse_vec.rgb;
      if (material.diffuse_vec.a == 0){
@@ -84,12 +85,11 @@ void main() {
 
      vec3 specular = spec_ * spec; // assuming bright white light color
 
-
+     vec3 sum = ambient + specular + diffuse;
+     // sum *= 2;
      float shadow = ShadowCalculation(fs_in.fragPosLightSpace);       
      vec3 lighting = (ambient + (1.0 - shadow) * (diffuse + specular)) * color;
      lighting = pow(lighting, vec3(1.0 / fs_in.gammaValue));
 
-     FragColor = vec4(sum, 1.0);
-     // FragColor = vec4(diff_, 1);
-     
+     FragColor = vec4(lighting, 1.0);
 }

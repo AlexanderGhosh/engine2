@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -144,6 +144,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Componets\Light.cpp" />
+    <ClCompile Include="GameObject\GameScene.cpp" />
+    <ClCompile Include="PreProcessing.cpp" />
     <ClCompile Include="Primatives\Material.cpp" />
     <ClCompile Include="Utils\AssimpWrapper.cpp" />
     <ClCompile Include="Componets\Componets.cpp" />
@@ -162,6 +164,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Componets\Light.h" />
+    <ClInclude Include="GameObject\GameScene.h" />
+    <ClInclude Include="PreProcessing.h" />
     <ClInclude Include="Primatives\Material.h" />
     <ClInclude Include="Utils\AssimpWrapper.h" />
     <ClInclude Include="Componets\Componets.h" />
@@ -182,6 +186,9 @@
     <None Include="Basics\DefaultShader\fragment.glsl" />
     <None Include="Basics\DefaultShader\geometry.glsl" />
     <None Include="Basics\DefaultShader\vertex.glsl" />
+    <None Include="Basics\ShadowShader\fragment.glsl" />
+    <None Include="Basics\ShadowShader\geometry.glsl" />
+    <None Include="Basics\ShadowShader\vertex.glsl" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Basics\Textures\default.png" />

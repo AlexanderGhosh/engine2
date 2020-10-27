@@ -15,3 +15,12 @@ void GameObject::tick(short currentTick)
 		}
 	}
 }
+
+void GameObject::cleanUp()
+{
+	for (Componet::Base*& componet : componets) {
+		componet->cleanUp();
+		delete componet;
+		componet = nullptr;
+	}
+}

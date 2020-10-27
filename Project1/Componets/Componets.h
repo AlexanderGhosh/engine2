@@ -7,6 +7,7 @@ namespace Componet {
 	public:
 		virtual void update() { }; // every tick
 		virtual void fixedUpdate() { }; // every x ticks
+		virtual void cleanUp() { parent = nullptr; };
 		inline void setParent(GameObject* parent) { this->parent = parent; };
 	protected:
 		inline Base() : parent(nullptr) { };

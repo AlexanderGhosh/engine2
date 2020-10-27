@@ -10,7 +10,7 @@ Render::RenderMesh::RenderMesh() : buffers(), shaderName("default"), parent(null
 	fwd.getDiffuse()(1); // set to the texture id
 	// fwd.getDiffuse()({ 1, 0, 0 }); // set to the texture id
 	fwd.getSpecular()(2);
-	fwd.getNormals()(3);
+	fwd.getNormals()({ 0, 0, 0 });
 	fwd.shininess = 32;
 	this->material = fwd;
 }
@@ -18,16 +18,12 @@ Render::RenderMesh::RenderMesh() : buffers(), shaderName("default"), parent(null
 
 void Render::RenderMesh::update()
 {
-	glUseProgram(shaderId);
-	Shading::Manager::setActive(shaderId);
+	// glUseProgram(shaderId);
+	// Shading::Manager::setActive(shaderId);
 	const glm::mat4 m = Componet::Base::parent->getTransform()->getModel();
 	bool succ = Shading::Manager::setValue("model", m);
 
 	succ = Shading::Manager::setValue("material", this->material);
-
-	succ = Shading::Manager::setValue("depthMap", 3);
-	/*glActiveTexture(GL_TEXTURE3);
-	glBindTexture(GL_TEXTURE_2D, 4);*/
 	this->material.activateTextures();
 	for (const Primative::Buffers& buffer : buffers) {
 		buffer.bind();
@@ -35,7 +31,7 @@ void Render::RenderMesh::update()
 		buffer.unBind();
 	}
 	glBindTexture(GL_TEXTURE_2D, 0);
-	glUseProgram(0);
+	// glUseProgram(0);
 }
 
 void Render::RenderMesh::addMesh(Primative::Mesh* m, GLenum draw_type)

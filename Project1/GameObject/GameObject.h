@@ -16,5 +16,6 @@ public:
 	};
 	void tick(short currentTick);
 	inline Componet::Transform* getTransform() const { return dynamic_cast<Componet::Transform*>(componets[0]); };
+	void cleanUp();
 };
 

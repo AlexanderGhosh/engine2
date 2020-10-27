@@ -30,5 +30,5 @@ void main() {
     vs_out.normals = norm;
     vs_out.viewPos = viewPosition;
     vs_out.gammaValue = gamma;
-    vs_out.fragPosLightSpace = lightSpaceMatrix * vec4(vs_out.FragPos, 1.0);
+    vs_out.fragPosLightSpace = lightSpaceMatrix * vec4(pos, 1.0);
 }

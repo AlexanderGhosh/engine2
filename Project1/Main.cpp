@@ -11,7 +11,7 @@
 #include "Rendering/Shading/Manager.h"
 #include "Utils/ResourceLoader.h"
 #include "Utils/Camera.h"
-#include "GameObject/GameObject.h"
+#include "GameObject/GameScene.h"
 #include "Utils/AssimpWrapper.h"
 
 Utils::Camera cam;
@@ -32,7 +32,6 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
 
     cam.ProcessMouseMovement(xoffset, yoffset);
 }
-Primative::FrameBuffer frameBuffer;
 void saveScreenshotToFile(std::string filename, int windowWidth, int windowHeight, unsigned depthMap);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode) {
     if (key == GLFW_KEY_W){
@@ -85,9 +84,10 @@ int main() {
     glViewport(0, 0, 800, 600);
     glewInit();
 
-    cam.pos = { 0, 0.5, 0.25 };
+    cam.pos = { 0, 0.5, 5 };
 
     ResourceLoader::createShader("Basics/DefaultShader");
+    ResourceLoader::createShader("Basics/ShadowShader");
     ResourceLoader::createShader("Basics/QuadShader");
     // cube
     /*Primative::Mesh* m = new Primative::Mesh();
@@ -179,9 +179,9 @@ int main() {
     GameObject quad;
     quad.addComponet(quad_r);
     
-    GameObject obj;
-    obj.getTransform()->Position = { 0, 0, 0 };
-    obj.addComponet(r);
+    GameObject* gun = new GameObject();
+    gun->getTransform()->Position = { 0, 0, 0 };
+    gun->addComponet(r);
 
     Primative::StaticBuffer b;
     // view    | matrix
@@ -191,19 +191,36 @@ int main() {
     b.init(3 * sizeof(mat4) + sizeof(vec3) + sizeof(float), 0);
 
 
-    mat4 projection = perspective(glm::radians(cam.getFOV()), 800.0f / 600.0f, 0.1f, 100.0f);
+    mat4 projection = perspective(glm::radians(cam.getFOV()), 800.0f / 600.0f, 0.01f, 1000.0f);
 
     b.fill(sizeof(mat4), sizeof(mat4), value_ptr(projection));
 
     float gamma = 2.2f;
     b.fill(sizeof(mat4) * 2 + sizeof(vec3), sizeof(float), &gamma);
 
+
+    glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 0.1f, 100.0f);
+
+    glm::mat4 lightView = glm::lookAt(glm::vec3(-2.0f, 4.0f, -1.0f),
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(0.0f, 1.0f, 0.0f));
+    glm::mat4 lightSpaceMatrix = lightProjection * lightView;
+    b.fill(sizeof(mat4) * 2, sizeof(vec3) + sizeof(float), value_ptr(lightSpaceMatrix));
+
     short tick = 0;
     float lastTime = glfwGetTime();
     float deltaTime = 0;
     unsigned fps = 0;
 
-    frameBuffer = Primative::FrameBuffer({ "depth" }, { 800, 600 });
+    Primative::FrameBuffer* frameBuffer = new Primative::FrameBuffer({ "depth" }, { 800, 600 });
+
+
+    GameScene scene;
+    scene.addFBO("shadows", frameBuffer);
+    scene.addPreProcLayer("shadows", ResourceLoader::getShader("ShadowShader"));
+    scene.setPostProcShader(ResourceLoader::getShader("DefaultShader"));
+    scene.addObject(gun);
+
 
     while (!glfwWindowShouldClose(window))
     {
@@ -218,26 +235,19 @@ int main() {
         b.fill(sizeof(mat4) * 2, sizeof(vec3), value_ptr(cam.getPos())); // viewPos
         glm::vec3 lightPos = { 10, 10, 10 };
 
-        glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 0.1f, 100.0f);
 
-        glm::mat4 lightView = glm::lookAt(glm::vec3(-2.0f, 4.0f, -1.0f),
-            glm::vec3(0.0f, 0.0f, 0.0f),
-            glm::vec3(0.0f, 1.0f, 0.0f));
-        glm::mat4 lightSpaceMatrix = lightProjection * lightView;
-        b.fill(sizeof(mat4) * 2, sizeof(vec3) + sizeof(float), value_ptr(lightSpaceMatrix));
-
-        glClearColor(0.5, 1, 0.5, 1);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        scene.preProcess(); // shadows
+        scene.postProcess();// render to screen
 
 
         // new fbo
         // glBindFramebuffer(GL_FRAMEBUFFER, 1);
-        frameBuffer.bind();
+        /*frameBuffer.bind();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glActiveTexture(GL_TEXTURE3);
         glBindTexture(GL_TEXTURE_2D, frameBuffer.getTextureId("depth"));
-        obj.tick(++tick % FIXED_UPDATE_RATE);
+        gun.tick(++tick % FIXED_UPDATE_RATE);
         
         // default fbo
         frameBuffer.unBind();
@@ -245,18 +255,18 @@ int main() {
         glDisable(GL_DEPTH_TEST);
         glDisable(GL_CULL_FACE);
 
-        obj.tick(++tick % FIXED_UPDATE_RATE);
+        gun.tick(++tick % FIXED_UPDATE_RATE);
         // quad.tick(++tick % FIXED_UPDATE_RATE);
 
         glEnable(GL_CULL_FACE);
-        glEnable(GL_DEPTH_TEST);
+        glEnable(GL_DEPTH_TEST);*/
 
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
     delete r;
     ResourceLoader::cleanUp(); 
-    frameBuffer.cleanUp();
+    // frameBuffer.cleanUp();
     glfwTerminate();
     // delete window;
     return 0;
