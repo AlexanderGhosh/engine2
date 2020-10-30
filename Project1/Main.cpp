@@ -86,7 +86,7 @@ int main() {
     glViewport(0, 0, 800, 600);
     glewInit();
 
-    cam.pos = { 0, 2, 5 };
+    cam.pos = { 0, 200, 700 };
 
     ResourceLoader::createShader("Basics/DefaultShader");
     ResourceLoader::createShader("Basics/ShadowShader");
@@ -144,18 +144,27 @@ int main() {
     };*/
 
     AssimpWrapper w;
-    auto t = w.loadModel("C:/Users/AGWDW/Desktop/blend/Handgun_Game_Blender Gamer Engine.obj");
-    //auto t = w.loadModel("Basics/Models/sword.obj");
+    // auto t = w.loadModel("C:/Users/AGWDW/Desktop/blend/Handgun_Game_Blender Gamer Engine.obj");
+    // auto t = w.loadModel("Basics/Models/sword.obj");
+    auto t = w.loadModel("Basics/Models/pistol.obj");
 
-    ResourceLoader::createTexture("Basics/Textures/handgun_C.jpg", TextureType::DiffuseMap, 0); // diff
-    ResourceLoader::createTexture("Basics/Textures/handgun_S.jpg", TextureType::SpecularMap, 0); // spec
-    ResourceLoader::createTexture("Basics/Textures/handgun_N.jpg", TextureType::NormalMap, 0); // norm
+    // ResourceLoader::createTexture("Basics/Textures/handgun_C.jpg", TextureType::DiffuseMap, 0); // diff
+    // ResourceLoader::createTexture("Basics/Textures/handgun_S.jpg", TextureType::SpecularMap, 0); // spec
+    // ResourceLoader::createTexture("Basics/Textures/handgun_N.jpg", TextureType::NormalMap, 0); // norm
 
     // ResourceLoader::createTexture("Basics/Textures/NazghulGreatsword_BaseColor.png", TextureType::AlbedoMap, 0); // albedo
     // ResourceLoader::createTexture("Basics/Textures/NazghulGreatsword_Metallic.png", TextureType::MetalicMap, 0); // metalic
     // ResourceLoader::createTexture("Basics/Textures/NazghulGreatsword_NormalOpenGL.png", TextureType::NormalMap, 0); // norm
     // ResourceLoader::createTexture("Basics/Textures/NazghulGreatsword_AmbientOcclusion.png", TextureType::AOMap, 0); // ao
     // ResourceLoader::createTexture("Basics/Textures/NazghulGreatsword_Roughness.png", TextureType::RoughnessMap, 0); // roughness
+
+    ResourceLoader::createTexture("Basics/Textures/Base_color 1.jpg", TextureType::AlbedoMap, 0); // albedo
+    ResourceLoader::createTexture("Basics/Textures/metal.jpg", TextureType::MetalicMap, 0); // metalic
+    ResourceLoader::createTexture("Basics/Textures/handgun_N.jpg", TextureType::NormalMap, 0); // norm
+    ResourceLoader::createTexture("Basics/Textures/gloss.jpg", TextureType::AOMap, 0); // ao
+    ResourceLoader::createTexture("Basics/Textures/rough.jpg", TextureType::RoughnessMap, 0); // roughness
+
+
     // unsigned tex = ResourceLoader::createTexture("Basics/Textures/wood.jpg", TextureType::DiffuseMap);
 
     Render::RenderMesh* r = new Render::RenderMesh();
@@ -164,7 +173,7 @@ int main() {
         delete m;
         m = nullptr;
     }
-    Materials::Base* mat = new Materials::PBR({ 1 }, { 3 }, { 2 }, { { 0.025, 0, 0 } }, { { 1, 1, 1 } }); // new Materials::PBR({ 1 }, { 3 }, { 2 }, { 5 }, { 4 });
+    Materials::Base* mat = new Materials::PBR({ 1 }, { 3 }, { 2 }, { 5 }, { 4 }); // new Materials::PBR({ 1 }, { 3 }, { 2 }, { 5 }, { 4 });
     if (!PBRen) {
         mat = new Materials::Forward({ 1 }, { 2 }, { 3 }, 32);
     }

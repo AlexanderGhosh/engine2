@@ -104,8 +104,8 @@ void main()
     if (material.normal_vec.a == 0){
         norm_ = normalize(texture(material.normal_id, fs_in.texCoords).rgb);
     }
-    FragColor = vec4(getNormalFromMap(), 1);
-    //return;
+    FragColor = vec4(albedo_, 1);
+    // return;
     float metallic = material.metalic_vec.r;
     if (material.metalic_vec.a == 0){
         metallic = texture(material.metalic_id, fs_in.texCoords).r;
@@ -137,8 +137,8 @@ void main()
 
     // reflectance equation
     vec3 Lo = vec3(0.0);
-    vec3 lightPositions[1] = {vec3(2, 2 ,0)};
-    vec3 lightColors[1] = {vec3(300, 300, 300)};
+    vec3 lightPositions[1] = {vec3(200, 700 ,0)};
+    vec3 lightColors[1] = {vec3(3000, 3000, 3000)};
     for(int i = 0; i < 1; ++i) 
     {
         // calculate per-light radiance

@@ -137,7 +137,7 @@ const unsigned ResourceLoader::createTexture(const std::string& filePath, const 
     }
     else
     {
-        std::cout << "Failed to load texture" << std::endl;
+        std::cout << "Failed to load texture: " << filePath << std::endl;
     }
     // stbi_image_free(data);
     glBindTexture(GL_TEXTURE_2D, 0);
