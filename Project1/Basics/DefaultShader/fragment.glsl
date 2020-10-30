@@ -27,7 +27,7 @@ struct Material {
 uniform sampler2D depthMap;
 uniform Material material;
 
-float ShadowCalculation(vec4 fragPosLightSpace)
+float ShadowCalculation(vec4 fragPosLightSpace, vec3 normal, vec3 lightDir)
 {
     // perform perspective divide
     vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
@@ -69,7 +69,7 @@ void main() {
 
      vec3 color = diff_;
      // ambient
-     vec3 ambient = 0.05 * color;
+     vec3 ambient = 0.1 * color;
      // diffuse
      vec3 lightDir = normalize(lightPos - fs_in.fragPos);
      vec3 normal = normalize(norm_);
@@ -87,9 +87,9 @@ void main() {
 
      vec3 sum = ambient + specular + diffuse;
      // sum *= 2;
-     float shadow = ShadowCalculation(fs_in.fragPosLightSpace);       
+     float shadow = ShadowCalculation(fs_in.fragPosLightSpace, normal, lightDir);       
      vec3 lighting = (ambient + (1.0 - shadow) * (diffuse + specular)) * color;
-     lighting = pow(lighting, vec3(1.0 / fs_in.gammaValue));
+     lighting = pow(lighting, vec3(1.0 / fs_in.gammaValue)) * 10;
 
-     FragColor = vec4(lighting, 1.0);
+     FragColor = vec4(diff_, 1.0);
 }

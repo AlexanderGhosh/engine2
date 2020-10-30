@@ -66,9 +66,6 @@
     <ClCompile Include="GameObject\GameScene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PreProcessing.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Rendering\Engine.h">
@@ -122,9 +119,6 @@
     <ClInclude Include="GameObject\GameScene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PreProcessing.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Basics\DefaultShader\vertex.glsl" />
@@ -133,6 +127,9 @@
     <None Include="Basics\ShadowShader\fragment.glsl" />
     <None Include="Basics\ShadowShader\geometry.glsl" />
     <None Include="Basics\ShadowShader\vertex.glsl" />
+    <None Include="Basics\PBRShader\fragment.glsl" />
+    <None Include="Basics\PBRShader\geometry.glsl" />
+    <None Include="Basics\PBRShader\vertex.glsl" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Basics\Textures\default.png">

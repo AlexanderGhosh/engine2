@@ -11,7 +11,7 @@ private:
 	unsigned currentTick, postProcShaderId;
 	std::unordered_map<std::string, Primative::FrameBuffer*> FBOs;
 	inline void clearFBO() const {
-		glClearColor(0.5, 0, 0, 1);
+		glClearColor(0.5, 0.5, 0.5, 1);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 public:

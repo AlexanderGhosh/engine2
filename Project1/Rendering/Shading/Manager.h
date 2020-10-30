@@ -16,8 +16,9 @@ namespace Render {
 			static bool setValue(const std::string& name, glm::vec4 val);
 			static bool setValue(const std::string& name, glm::mat3 val);
 			static bool setValue(const std::string& name, glm::mat4 val);
-			static bool setValue(const std::string& name, const Materials::MatItem& fwd, const short& texUnit = -1);
+			static bool setValue(const std::string& name, const Materials::MatItem& fwd, short& texUnit);
 			static bool setValue(const std::string& name, Materials::Forward& fwd);
+			static bool setValue(const std::string& name, Materials::PBR& mat);
 			static void setActive(const unsigned& shaderId);
 		private:
 			static unsigned active;

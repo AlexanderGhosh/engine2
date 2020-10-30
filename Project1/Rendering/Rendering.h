@@ -13,17 +13,11 @@ namespace Render {
 		RenderMesh();
 		virtual void update();
 		void addMesh(Primative::Mesh* m, GLenum draw_type = GL_TRIANGLES);
-		inline void setShader(std::string name) { 
-			shaderName = name;
-			shaderId = ResourceLoader::getShader(shaderName);
-		};
-
+		inline void setMaterial(Materials::Base* mat) { material = mat; };
 	private:
 		std::vector<Primative::Buffers> buffers;
-		std::string shaderName;
 		GameObject* parent;
-		unsigned shaderId;
-		Materials::Forward material;
+		Materials::Base* material;
 	};
 }
 

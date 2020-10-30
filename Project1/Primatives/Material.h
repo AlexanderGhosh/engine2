@@ -3,6 +3,16 @@
 #include <array>
 #include <GL/glew.h>
 namespace Materials {
+	enum class Type {
+		Forward, PBR
+	};
+	class Base {
+	protected:
+		Materials::Type type;
+	public:
+		virtual void activateTextures() const { };
+		inline const Materials::Type& getType() const { return type; };
+	};
 	class MatItem {
 	private:
 		glm::vec3 raw;
@@ -21,11 +31,12 @@ namespace Materials {
 		void operator()(const glm::vec3& raw);
 		void operator()(const unsigned& id);
 	};
-	struct Forward {
+	struct Forward : public Base {
 	private:
 		std::array<MatItem, 3> diff_spec_norm;
 	public:
-		inline Forward() : diff_spec_norm{ MatItem({1, 0, 0}), MatItem({1, 1, 1}), MatItem({1, 1, 1}) }, shininess(32) { };
+		inline Forward() : diff_spec_norm{ MatItem({1, 0, 0}), MatItem({1, 1, 1}), MatItem({1, 1, 1}) }, shininess(32), Base() { Base::type = Materials::Type::Forward; };
+		Forward(const MatItem& diffuse, const MatItem& specular, const MatItem& normal, float shininess);
 		float shininess;
 		inline MatItem& getDiffuse() { return diff_spec_norm[0]; };
 		inline MatItem& getSpecular() { return diff_spec_norm[1]; };
@@ -34,8 +45,23 @@ namespace Materials {
 		void activateTextures() const;
 	};
 
-	struct PBR {
-
+	struct PBR: public Base{
+	private:
+		MatItem albedo;
+		MatItem normal;
+		MatItem metalic;
+		MatItem roughness;
+		MatItem ao;
+	public:
+		inline PBR() : albedo({ 1, 0, 0 }), normal({ 0, 1, 0 }), metalic({ 0.5, 0, 0 }), roughness({ 0.1, 0, 0 }), ao({ 1, 0, 0 }), Base() { Base::type = Materials::Type::PBR; };
+		PBR(const MatItem& albedo, const MatItem& normal, const MatItem& metalic, const MatItem& roughness, const MatItem& ao);
+		inline MatItem& getAlbedo() { return albedo; };
+		inline MatItem& getNormal() { return normal; };
+		inline MatItem& getMetalic() { return metalic; };
+		inline MatItem& getRoughness() { return roughness; };
+		inline MatItem& getAO() { return ao; };
+		inline std::array<MatItem, 5> getAll() const { return std::array<MatItem, 5>{ albedo, normal, metalic, roughness, ao }; };
+		void activateTextures() const;
 	};
 };
 

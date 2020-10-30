@@ -14,6 +14,8 @@
 #include "GameObject/GameScene.h"
 #include "Utils/AssimpWrapper.h"
 
+#define PBRen 1
+
 Utils::Camera cam;
 bool firstMouse = 1;
 float lastX = 0, lastY = 0;
@@ -84,11 +86,12 @@ int main() {
     glViewport(0, 0, 800, 600);
     glewInit();
 
-    cam.pos = { 0, 0.5, 5 };
+    cam.pos = { 0, 2, 5 };
 
     ResourceLoader::createShader("Basics/DefaultShader");
     ResourceLoader::createShader("Basics/ShadowShader");
     ResourceLoader::createShader("Basics/QuadShader");
+    ResourceLoader::createShader("Basics/PBRShader");
     // cube
     /*Primative::Mesh* m = new Primative::Mesh();
     Primative::Vertex v1({ -0.5, -0.5, -0.5 }, { 0, 0 });
@@ -142,42 +145,30 @@ int main() {
 
     AssimpWrapper w;
     auto t = w.loadModel("C:/Users/AGWDW/Desktop/blend/Handgun_Game_Blender Gamer Engine.obj");
+    //auto t = w.loadModel("Basics/Models/sword.obj");
 
-    unsigned tex1 = ResourceLoader::createTexture("Basics/Textures/handgun_C.jpg", TextureType::DiffuseMap, 0);
-    unsigned tex2 = ResourceLoader::createTexture("Basics/Textures/handgun_S.jpg", TextureType::SpecularMap, 0);
-    unsigned tex3 = ResourceLoader::createTexture("Basics/Textures/handgun_N.jpg", TextureType::NormalMap, 0);
+    ResourceLoader::createTexture("Basics/Textures/handgun_C.jpg", TextureType::DiffuseMap, 0); // diff
+    ResourceLoader::createTexture("Basics/Textures/handgun_S.jpg", TextureType::SpecularMap, 0); // spec
+    ResourceLoader::createTexture("Basics/Textures/handgun_N.jpg", TextureType::NormalMap, 0); // norm
+
+    // ResourceLoader::createTexture("Basics/Textures/NazghulGreatsword_BaseColor.png", TextureType::AlbedoMap, 0); // albedo
+    // ResourceLoader::createTexture("Basics/Textures/NazghulGreatsword_Metallic.png", TextureType::MetalicMap, 0); // metalic
+    // ResourceLoader::createTexture("Basics/Textures/NazghulGreatsword_NormalOpenGL.png", TextureType::NormalMap, 0); // norm
+    // ResourceLoader::createTexture("Basics/Textures/NazghulGreatsword_AmbientOcclusion.png", TextureType::AOMap, 0); // ao
+    // ResourceLoader::createTexture("Basics/Textures/NazghulGreatsword_Roughness.png", TextureType::RoughnessMap, 0); // roughness
     // unsigned tex = ResourceLoader::createTexture("Basics/Textures/wood.jpg", TextureType::DiffuseMap);
 
     Render::RenderMesh* r = new Render::RenderMesh();
-    // std::cout << t.size() << std::endl;
-    t.pop_back();
-    t.pop_back();
     for (auto& m : t) {
         r->addMesh(m);
         delete m;
         m = nullptr;
     }
-    r->setShader("DefaultShader");
-
-
-    Primative::Mesh* quad_mesh = new Primative::Mesh();
-    quad_mesh->verts.push_back(Primative::Vertex({ -1, -1, 0 }, { 0, 0 }));
-    quad_mesh->verts.push_back(Primative::Vertex({ -1, 1, 0 }, { 0, 1 }));
-    quad_mesh->verts.push_back(Primative::Vertex({ 1, -1, 0 }, { 1, 0 }));
-    quad_mesh->verts.push_back(Primative::Vertex({ 1, 1, 0 }, { 1, 1 }));
-    
-    quad_mesh->indices = {
-        0, 1, 2, 3
-    };
-    
-    Render::RenderMesh* quad_r = new Render::RenderMesh();
-    quad_r->addMesh(quad_mesh, GL_TRIANGLE_STRIP);
-    delete quad_mesh;
-    quad_mesh = nullptr;
-    quad_r->setShader("QuadShader");// QuadShader
-    
-    GameObject quad;
-    quad.addComponet(quad_r);
+    Materials::Base* mat = new Materials::PBR({ 1 }, { 3 }, { 2 }, { { 0.025, 0, 0 } }, { { 1, 1, 1 } }); // new Materials::PBR({ 1 }, { 3 }, { 2 }, { 5 }, { 4 });
+    if (!PBRen) {
+        mat = new Materials::Forward({ 1 }, { 2 }, { 3 }, 32);
+    }
+    r->setMaterial(mat);
     
     GameObject* gun = new GameObject();
     gun->getTransform()->Position = { 0, 0, 0 };
@@ -201,7 +192,7 @@ int main() {
 
     glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 0.1f, 100.0f);
 
-    glm::mat4 lightView = glm::lookAt(glm::vec3(-2.0f, 4.0f, -1.0f),
+    glm::mat4 lightView = glm::lookAt(glm::vec3(10, 10 ,10),
         glm::vec3(0.0f, 0.0f, 0.0f),
         glm::vec3(0.0f, 1.0f, 0.0f));
     glm::mat4 lightSpaceMatrix = lightProjection * lightView;
@@ -218,53 +209,31 @@ int main() {
     GameScene scene;
     scene.addFBO("shadows", frameBuffer);
     scene.addPreProcLayer("shadows", ResourceLoader::getShader("ShadowShader"));
-    scene.setPostProcShader(ResourceLoader::getShader("DefaultShader"));
+    scene.setPostProcShader(ResourceLoader::getShader(PBRen ? "PBRShader" : "DefaultShder")); // PBRShader
     scene.addObject(gun);
 
 
     while (!glfwWindowShouldClose(window))
     {
-        // frameBuffer.bind();
         float currentTime = glfwGetTime();
         deltaTime = currentTime - lastTime;
         fps = 1.0f / deltaTime;
         lastTime = currentTime;
-        // std::cout << fps << std::endl;
+
+        // std::cout << fps << std::endl; // FPS Count
 
         b.fill(0, sizeof(mat4), value_ptr(cam.getView()));
         b.fill(sizeof(mat4) * 2, sizeof(vec3), value_ptr(cam.getPos())); // viewPos
-        glm::vec3 lightPos = { 10, 10, 10 };
 
 
-        scene.preProcess(); // shadows
+        // scene.preProcess(); // shadows
         scene.postProcess();// render to screen
-
-
-        // new fbo
-        // glBindFramebuffer(GL_FRAMEBUFFER, 1);
-        /*frameBuffer.bind();
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        glActiveTexture(GL_TEXTURE3);
-        glBindTexture(GL_TEXTURE_2D, frameBuffer.getTextureId("depth"));
-        gun.tick(++tick % FIXED_UPDATE_RATE);
-        
-        // default fbo
-        frameBuffer.unBind();
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glDisable(GL_DEPTH_TEST);
-        glDisable(GL_CULL_FACE);
-
-        gun.tick(++tick % FIXED_UPDATE_RATE);
-        // quad.tick(++tick % FIXED_UPDATE_RATE);
-
-        glEnable(GL_CULL_FACE);
-        glEnable(GL_DEPTH_TEST);*/
 
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
     delete r;
+    delete mat;
     ResourceLoader::cleanUp(); 
     // frameBuffer.cleanUp();
     glfwTerminate();

@@ -4,7 +4,8 @@
 #include <GL/glew.h>
 #include "General.h"
 enum class TextureType {
-	NormalMap, SpecularMap, DiffuseMap, HeightMap
+	NormalMap, SpecularMap, DiffuseMap, HeightMap,
+	AlbedoMap, MetalicMap, AOMap, RoughnessMap
 };
 class ResourceLoader
 {

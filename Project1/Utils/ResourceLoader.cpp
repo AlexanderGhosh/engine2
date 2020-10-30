@@ -115,10 +115,23 @@ const unsigned ResourceLoader::createTexture(const std::string& filePath, const 
     
     int width, height, nrChannels;
     unsigned char* data = stbi_load(filePath.c_str(), &width, &height, &nrChannels, 0);
+    GLenum t = GL_SRGB;
+    switch (nrChannels)
+    {
+    case 1:
+        t = GL_RED;
+        break;
+    case 3:
+        t = GL_RGB;
+        break;
+    case 4:
+        t = GL_RGBA;
+        break;
+    };
     // unsigned char data[] = { 255, 127, 127 };
     if (data)
     {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glTexImage2D(GL_TEXTURE_2D, 0, t, width, height, 0, t, GL_UNSIGNED_BYTE, data);
         // glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1, 1, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
     }
