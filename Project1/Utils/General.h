@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include <tuple>
+#include <array>
 #include <string>
 #include <glm.hpp>
 #include <gtc/matrix_transform.hpp>
@@ -34,6 +34,13 @@ namespace Utils {
     inline bool contains(const std::vector<T>& a, const T& b) {
         auto found = std::find(a.begin(), a.end(), b);
         return found != a.end();
+    }
+
+    inline bool contained(std::array<glm::vec2, 2> bound, glm::vec2 pos) {
+        return glm::all(glm::greaterThanEqual(pos, bound[0]) && glm::lessThanEqual(pos, bound[1]));
+    }
+    inline bool contained(std::array<glm::vec3, 2> bound, glm::vec3 pos) {
+        return glm::all(glm::greaterThanEqual(pos, bound[0]) && glm::lessThanEqual(pos, bound[1]));
     }
 
     /*template<typename T, typename U>

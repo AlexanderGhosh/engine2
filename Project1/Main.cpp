@@ -13,6 +13,8 @@
 #include "Utils/Camera.h"
 #include "GameObject/GameScene.h"
 #include "Utils/AssimpWrapper.h"
+#include "UI/Renderer.h"
+#include "EventSystem/Handler.h"
 
 #define PBRen 1
 
@@ -76,7 +78,7 @@ int main() {
     }
     glfwMakeContextCurrent(window);
 
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    // glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glEnable(GL_MULTISAMPLE);
@@ -92,6 +94,7 @@ int main() {
     ResourceLoader::createShader("Basics/ShadowShader");
     ResourceLoader::createShader("Basics/QuadShader");
     ResourceLoader::createShader("Basics/PBRShader");
+    ResourceLoader::createShader("Basics/UIShader");
     // cube
     /*Primative::Mesh* m = new Primative::Mesh();
     Primative::Vertex v1({ -0.5, -0.5, -0.5 }, { 0, 0 });
@@ -221,6 +224,28 @@ int main() {
     scene.setPostProcShader(ResourceLoader::getShader(PBRen ? "PBRShader" : "DefaultShder")); // PBRShader
     scene.addObject(gun);
 
+    // UI //
+    UI::Renderer::init(ResourceLoader::getShader("UIShader"), { 800, 600 });
+
+    UI::Element element;
+    element.setPos({ 400, 300 });
+    element.setWidth(400);
+    element.setHeight(300);
+    element.mouseEnter = [](const UI::Element* sender) {
+        std::cout << "mouse entered\n";
+    };
+
+    UI::Element element2;
+    element2.setPos({ 600, 450 });
+    element2.setWidth(10);
+    element2.setHeight(10);
+
+    UI::Pane pane;
+    pane.addElement(&element);
+    pane.addElement(&element2);
+    // UI //
+
+    Events::Handler::init(window);
 
     while (!glfwWindowShouldClose(window))
     {
@@ -238,8 +263,15 @@ int main() {
         // scene.preProcess(); // shadows
         scene.postProcess();// render to screen
 
+        glDisable(GL_DEPTH_TEST);
+        glDisable(GL_CULL_FACE);
+        UI::Renderer::render(&pane);
+        glEnable(GL_DEPTH_TEST);
+        glEnable(GL_CULL_FACE);
+        pane.update();
+
         glfwSwapBuffers(window);
-        glfwPollEvents();
+        Events::Handler::pollEvents();
     }
     delete r;
     delete mat;

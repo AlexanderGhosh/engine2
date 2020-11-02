@@ -66,6 +66,18 @@
     <ClCompile Include="GameObject\GameScene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="UI\Elements.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\Pane.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="EventSystem\Handler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\Renderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Rendering\Engine.h">
@@ -119,6 +131,18 @@
     <ClInclude Include="GameObject\GameScene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="UI\Elements.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\Pane.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EventSystem\Handler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\Renderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Basics\DefaultShader\vertex.glsl" />
@@ -130,6 +154,9 @@
     <None Include="Basics\PBRShader\fragment.glsl" />
     <None Include="Basics\PBRShader\geometry.glsl" />
     <None Include="Basics\PBRShader\vertex.glsl" />
+    <None Include="Basics\UIShader\fragment.glsl" />
+    <None Include="Basics\UIShader\geometry.glsl" />
+    <None Include="Basics\UIShader\vertex.glsl" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Basics\Textures\default.png">
