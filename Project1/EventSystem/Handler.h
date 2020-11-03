@@ -4,7 +4,7 @@
 namespace Events {
 	enum class Action {
 		Down = GLFW_PRESS,
-		// Up = GLFW_RELEASE,
+		Up = GLFW_RELEASE,
 		Repeat = GLFW_REPEAT
 	};
 	enum class Key {

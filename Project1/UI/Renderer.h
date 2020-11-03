@@ -1,10 +1,9 @@
 #pragma once
 #include "../Primatives/Buffers.h"
-#include "Pane.h"
+#include "Panes/Pane.h"
 namespace UI {
 	class Renderer
 	{
-		static glm::mat4 projectionMatrix;
 		static unsigned shaderId;
 		static Primative::Buffers quadBuffer;
 		static Primative::StaticBuffer uiBuffer;

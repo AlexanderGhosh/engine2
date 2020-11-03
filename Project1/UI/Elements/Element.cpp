@@ -1,8 +1,8 @@
-#include "Elements.h"
-#include "../EventSystem/Handler.h"
-#include "../Utils/General.h"
+#include "Element.h"
+#include "../../EventSystem/Handler.h"
+#include "../../Utils/General.h"
 
-UI::Element::Element() : screenPos(0), width(0), height(0), name(""), content(nullptr), cursorOver(0)
+UI::Element::Element() : screenPos(0), width(0), height(0), name(""), cursorOver(0)
 {
 	auto event = [](const Element* sender) { };
 	mouseEnter = event;

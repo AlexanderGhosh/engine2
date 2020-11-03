@@ -15,6 +15,8 @@
 #include "Utils/AssimpWrapper.h"
 #include "UI/Renderer.h"
 #include "EventSystem/Handler.h"
+#include "UI/TextRenderer.h"
+#include "UI/Elements/TextBox.h"
 
 #define PBRen 1
 
@@ -95,6 +97,7 @@ int main() {
     ResourceLoader::createShader("Basics/QuadShader");
     ResourceLoader::createShader("Basics/PBRShader");
     ResourceLoader::createShader("Basics/UIShader");
+    ResourceLoader::createShader("Basics/TextShader");
     // cube
     /*Primative::Mesh* m = new Primative::Mesh();
     Primative::Vertex v1({ -0.5, -0.5, -0.5 }, { 0, 0 });
@@ -224,26 +227,31 @@ int main() {
     scene.setPostProcShader(ResourceLoader::getShader(PBRen ? "PBRShader" : "DefaultShder")); // PBRShader
     scene.addObject(gun);
 
+    // TEXT //
+    UI::TextRenderer::setShader(ResourceLoader::getShader("TextShader"));
+    UI::TextRenderer textR({ 800, 600 });
+    // TEXT //
+
     // UI //
     UI::Renderer::init(ResourceLoader::getShader("UIShader"), { 800, 600 });
 
-    UI::Element element;
+    UI::TextBox element;
+    element.setText("Hello World");
+    element.setBackgroundColor({ 1, 1, 0 });
     element.setPos({ 400, 300 });
-    element.setWidth(400);
-    element.setHeight(300);
-    element.mouseEnter = [](const UI::Element* sender) {
-        std::cout << "mouse entered\n";
+    element.setWidth(250);
+    element.setHeight(40);
+    element.mouseDown = [](const UI::Element* sender) {
+        std::cout << "mouse down\n";
     };
-
-    UI::Element element2;
-    element2.setPos({ 600, 450 });
-    element2.setWidth(10);
-    element2.setHeight(10);
+    element.mouseUp = [](const UI::Element* sender) {
+        std::cout << "mouse up\n";
+    };
 
     UI::Pane pane;
     pane.addElement(&element);
-    pane.addElement(&element2);
     // UI //
+
 
     Events::Handler::init(window);
 
@@ -268,7 +276,9 @@ int main() {
         UI::Renderer::render(&pane);
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_CULL_FACE);
-        pane.update();
+        pane.update(); // events check
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        textR.drawText("Hello", 25, 25, 1, { 0, 1, 0 });
 
         glfwSwapBuffers(window);
         Events::Handler::pollEvents();
@@ -276,7 +286,7 @@ int main() {
     delete r;
     delete mat;
     ResourceLoader::cleanUp(); 
-    // frameBuffer.cleanUp();
+    UI::TextRenderer::cleanUpStatic();
     glfwTerminate();
     // delete window;
     return 0;

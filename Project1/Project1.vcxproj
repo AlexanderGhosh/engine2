@@ -116,14 +116,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\ASSIMP\include;C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\GLM\glm;C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\GLFW\include;C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\GLEW\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\FREETYPE\include;C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\ASSIMP\include;C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\GLM\glm;C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\GLFW\include;C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\GLEW\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\ASSIMP\lib;C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\GLFW\lib-vc2019;C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\GLEW\lib\Release\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>assimp-vc142-mt.lib;opengl32.lib;glew32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\FREETYPE\release dll\win64;C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\ASSIMP\lib;C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\GLFW\lib-vc2019;C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\GLEW\lib\Release\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>freetype.lib;assimp-vc142-mt.lib;opengl32.lib;glew32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -145,9 +145,11 @@
   <ItemGroup>
     <ClCompile Include="Componets\Light.cpp" />
     <ClCompile Include="EventSystem\Handler.cpp" />
+    <ClCompile Include="UI\TextRenderer.cpp" />
+    <ClCompile Include="UI\Elements\TextBox.cpp" />
     <ClCompile Include="UI\Renderer.cpp" />
-    <ClCompile Include="UI\Pane.cpp" />
-    <ClCompile Include="UI\Elements.cpp" />
+    <ClCompile Include="UI\Panes\Pane.cpp" />
+    <ClCompile Include="UI\Elements\Element.cpp" />
     <ClCompile Include="GameObject\GameScene.cpp" />
     <ClCompile Include="Primatives\Material.cpp" />
     <ClCompile Include="Utils\AssimpWrapper.cpp" />
@@ -168,9 +170,11 @@
   <ItemGroup>
     <ClInclude Include="Componets\Light.h" />
     <ClInclude Include="EventSystem\Handler.h" />
+    <ClInclude Include="UI\TextRenderer.h" />
+    <ClInclude Include="UI\Elements\TextBox.h" />
     <ClInclude Include="UI\Renderer.h" />
-    <ClInclude Include="UI\Pane.h" />
-    <ClInclude Include="UI\Elements.h" />
+    <ClInclude Include="UI\Panes\Pane.h" />
+    <ClInclude Include="UI\Elements\Element.h" />
     <ClInclude Include="GameObject\GameScene.h" />
     <ClInclude Include="Primatives\Material.h" />
     <ClInclude Include="Utils\AssimpWrapper.h" />
@@ -204,6 +208,9 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="Basics\Textures\default.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="Basics\Fonts\arial.ttf" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
