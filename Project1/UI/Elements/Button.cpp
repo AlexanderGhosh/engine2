@@ -1,7 +1,7 @@
 #include "Button.h"
 
 UI::Button::Button() : clickTimer(0), clicking(0) {
-	click = [](const Element* sender) {
+	click = [](Element* sender) {
 
 	};
 }
@@ -11,7 +11,7 @@ void UI::Button::checkEvents()
 	TextBlock::Element::checkEvents();
 	if (clicking)
 		this->clickTimer++;
-	if (this->mDown) {
+	if (this->mDown && !clicking) {
 		clicking = true;
 		this->clickTimer = 0;
 	}

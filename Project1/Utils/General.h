@@ -43,15 +43,30 @@ namespace Utils {
         return glm::all(glm::greaterThanEqual(pos, bound[0]) && glm::lessThanEqual(pos, bound[1]));
     }
 
-    /*template<typename T, typename U>
-    inline std::tuple<bool, U> get(std::unordered_map<T, U>& a, const T& b) {
-        unsigned s = a.size();
-        const U& r = a[b];
-        bool b = true;
-        if (s < a.size()) {
-            a.erase(r);
-            b = false;
+    inline std::string toUTF8(unsigned int codepoint)
+    {
+        std::string out;
+
+        if (codepoint <= 0x7f)
+            out.append(1, static_cast<char>(codepoint));
+        else if (codepoint <= 0x7ff)
+        {
+            out.append(1, static_cast<char>(0xc0 | ((codepoint >> 6) & 0x1f)));
+            out.append(1, static_cast<char>(0x80 | (codepoint & 0x3f)));
         }
-        return std::tuple<bool, U>(b, r);
-    }*/
+        else if (codepoint <= 0xffff)
+        {
+            out.append(1, static_cast<char>(0xe0 | ((codepoint >> 12) & 0x0f)));
+            out.append(1, static_cast<char>(0x80 | ((codepoint >> 6) & 0x3f)));
+            out.append(1, static_cast<char>(0x80 | (codepoint & 0x3f)));
+        }
+        else
+        {
+            out.append(1, static_cast<char>(0xf0 | ((codepoint >> 18) & 0x07)));
+            out.append(1, static_cast<char>(0x80 | ((codepoint >> 12) & 0x3f)));
+            out.append(1, static_cast<char>(0x80 | ((codepoint >> 6) & 0x3f)));
+            out.append(1, static_cast<char>(0x80 | (codepoint & 0x3f)));
+        }
+        return out;
+    }
 }

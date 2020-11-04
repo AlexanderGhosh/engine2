@@ -16,7 +16,7 @@
 #include "UI/Renderer.h"
 #include "EventSystem/Handler.h"
 #include "UI/TextRenderer.h"
-#include "UI/Elements/ImageBox.h"
+#include "UI/Elements/TextField.h"
 
 #define PBRen 1
 
@@ -235,9 +235,11 @@ int main() {
     // UI //
     UI::Renderer::init(ResourceLoader::getShader("UIShader"), { 800, 600 });
 
-    UI::ImageBox element;
-    // element.setText("Hello World");
-    element.setBackgroundImage(1);
+    UI::TextField element;
+    element.setText("Hello World");
+    element.setForgroundColor({ 1, 1, 0 });
+    // element.toggleSelected();
+    // element.setBackgroundImage(1);
     element.setPos({ 400, 300 });
     element.setWidth(250);
     element.setHeight(40);
@@ -245,10 +247,10 @@ int main() {
     /*element.click = [](const UI::Element* sender) {
         std::cout << "click\n";
     };*/
-    element.mouseDown = [](const UI::Element* sender) {
+    element.mouseDown = [](UI::Element* sender) {
         std::cout << "mouse down\n";
     };
-    element.mouseUp = [](const UI::Element* sender) {
+    element.mouseUp = [](UI::Element* sender) {
         std::cout << "mouse up\n";
     };
 

@@ -24,7 +24,7 @@ namespace UI {
 		inline const glm::vec3& getForgroundColor() const { return forgroundColor; };
 		inline void setForgroundColor(const glm::vec3& col) { forgroundColor = col; };
 
-		void drawContent() const;
+		virtual void drawContent() const;
 	};
 };
 

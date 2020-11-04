@@ -1,6 +1,10 @@
 #include "Handler.h"
+#include "../Utils/General.h"
+#include <iostream>
+
 
 GLFWwindow* Events::Handler::window = nullptr;
+std::string Events::Handler::lastChar = "";
 
 void Events::Handler::init(GLFWwindow* window)
 {
@@ -8,6 +12,7 @@ void Events::Handler::init(GLFWwindow* window)
 	glfwSetKeyCallback(window, Events::Handler::keyCallBack);
 	glfwSetCursorPosCallback(window, Events::Handler::mouseCallback);
 	glfwSetMouseButtonCallback(window, Events::Handler::mouseButtonCallback);
+	glfwSetCharCallback(window, Events::Handler::characterCallBack);
 	// glfwSetKeyCallback(window, NULL);
 }
 
@@ -50,9 +55,11 @@ void Events::Handler::mouseCallback(GLFWwindow* window, double xpos, double ypos
 
 void Events::Handler::mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 {
-	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
-		int t = glfwGetMouseButton(Events::Handler::window, GLFW_MOUSE_BUTTON_LEFT);
-		int h = static_cast<int>(GLFW_MOUSE_BUTTON_LEFT);
-		h += 0;
-	}
+
+}
+
+void Events::Handler::characterCallBack(GLFWwindow* window, unsigned int codePoint)
+{
+	Events::Handler::lastChar = Utils::toUTF8(codePoint);
+	std::cout << Events::Handler::lastChar << std::endl;
 }

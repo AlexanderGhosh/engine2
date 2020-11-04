@@ -9,8 +9,8 @@ namespace UI {
 		bool clicking;
 	public:
 		Button();
-		void checkEvents();
-		void (*click)(const Element*);
+		virtual void checkEvents();
+		void (*click)(Element*);
 	};
 };
 

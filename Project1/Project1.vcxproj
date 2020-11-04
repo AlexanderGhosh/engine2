@@ -143,6 +143,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="UI\Elements\TextField.cpp" />
     <ClCompile Include="UI\Elements\ImageBox.cpp" />
     <ClCompile Include="UI\Elements\Button.cpp" />
     <ClCompile Include="Componets\Light.cpp" />
@@ -170,6 +171,7 @@
     <ClCompile Include="Primatives\Vertex.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="UI\Elements\TextField.h" />
     <ClInclude Include="UI\Elements\ImageBox.h" />
     <ClInclude Include="UI\Elements\Button.h" />
     <ClInclude Include="Componets\Light.h" />

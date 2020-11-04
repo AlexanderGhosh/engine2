@@ -1,6 +1,7 @@
 #pragma once
 #include <GLFW/glfw3.h>
 #include <glm.hpp>
+#include <string>
 namespace Events {
 	enum class Action {
 		Up = GLFW_RELEASE,
@@ -55,11 +56,13 @@ namespace Events {
 		static bool getKey(const Key& key, const Action& action);
 		static bool getCursor(const Cursor& button, const Action& state);
 		static const glm::vec2& getCursorPos();
+		static std::string lastChar;
 	private:
 		static GLFWwindow* window;
 		static void keyCallBack(GLFWwindow* window, int key, int scancode, int action, int mode); 
 		static void mouseCallback(GLFWwindow* window, double xpos, double ypos);
 		static void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
+		static void characterCallBack(GLFWwindow* window, unsigned int codePoint);
 	};
 };
 

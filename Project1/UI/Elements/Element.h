@@ -33,12 +33,12 @@ namespace UI {
 		std::array<glm::vec2, 2> getCorners() const;
 		virtual void checkEvents();
 
-		void (*mouseEnter)(const Element*);
-		void (*mouseLeave)(const Element*);
-		void (*mouseHover)(const Element*);
+		void (*mouseEnter)(Element*);
+		void (*mouseLeave)(Element*);
+		void (*mouseHover)(Element*);
 			  
-		void (*mouseDown)(const Element*);
-		void (*mouseUp)(const Element*);
+		void (*mouseDown)(Element*);
+		void (*mouseUp)(Element*);
 
 		glm::mat4 getModel() const;
 

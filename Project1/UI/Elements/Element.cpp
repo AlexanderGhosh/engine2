@@ -4,7 +4,7 @@
 
 UI::Element::Element() : screenPos(0), width(0), height(0), name(""), cursorOver(0), mDown(0)
 {
-	auto event = [](const Element* sender) { };
+	auto event = [](Element* sender) { };
 	mouseEnter = event;
 	mouseLeave = event;
 	mouseHover = event;
