@@ -16,7 +16,7 @@
 #include "UI/Renderer.h"
 #include "EventSystem/Handler.h"
 #include "UI/TextRenderer.h"
-#include "UI/Elements/TextBox.h"
+#include "UI/Elements/ImageBox.h"
 
 #define PBRen 1
 
@@ -164,7 +164,7 @@ int main() {
     // ResourceLoader::createTexture("Basics/Textures/NazghulGreatsword_AmbientOcclusion.png", TextureType::AOMap, 0); // ao
     // ResourceLoader::createTexture("Basics/Textures/NazghulGreatsword_Roughness.png", TextureType::RoughnessMap, 0); // roughness
 
-    ResourceLoader::createTexture("Basics/Textures/Base_color 1.jpg", TextureType::AlbedoMap, 0); // albedo
+    auto tjiol = ResourceLoader::createTexture("Basics/Textures/Base_color 1.jpg", TextureType::AlbedoMap, 0); // albedo
     ResourceLoader::createTexture("Basics/Textures/metal.jpg", TextureType::MetalicMap, 0); // metalic
     ResourceLoader::createTexture("Basics/Textures/handgun_N.jpg", TextureType::NormalMap, 0); // norm
     ResourceLoader::createTexture("Basics/Textures/gloss.jpg", TextureType::AOMap, 0); // ao
@@ -235,12 +235,16 @@ int main() {
     // UI //
     UI::Renderer::init(ResourceLoader::getShader("UIShader"), { 800, 600 });
 
-    UI::TextBox element;
-    element.setText("Hello World");
-    element.setBackgroundColor({ 1, 1, 0 });
+    UI::ImageBox element;
+    // element.setText("Hello World");
+    element.setBackgroundImage(1);
     element.setPos({ 400, 300 });
     element.setWidth(250);
     element.setHeight(40);
+
+    /*element.click = [](const UI::Element* sender) {
+        std::cout << "click\n";
+    };*/
     element.mouseDown = [](const UI::Element* sender) {
         std::cout << "mouse down\n";
     };
@@ -278,7 +282,7 @@ int main() {
         glEnable(GL_CULL_FACE);
         pane.update(); // events check
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        textR.drawText("Hello", 25, 25, 1, { 0, 1, 0 });
+        textR.drawText("Hello", 25, 25, 1, { 1, 0, 0 });
 
         glfwSwapBuffers(window);
         Events::Handler::pollEvents();

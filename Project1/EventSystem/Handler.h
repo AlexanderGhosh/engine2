@@ -3,8 +3,8 @@
 #include <glm.hpp>
 namespace Events {
 	enum class Action {
-		Down = GLFW_PRESS,
 		Up = GLFW_RELEASE,
+		Down = GLFW_PRESS,
 		Repeat = GLFW_REPEAT
 	};
 	enum class Key {
@@ -38,10 +38,10 @@ namespace Events {
 		Y = GLFW_KEY_Y, Z = GLFW_KEY_Z,
 	};
 	enum class Cursor {
-		M1 = GLFW_MOUSE_BUTTON_1, 
+		/*M1 = GLFW_MOUSE_BUTTON_1, 
 		M2 = GLFW_MOUSE_BUTTON_2, 
 		M3 = GLFW_MOUSE_BUTTON_3, 
-		M4 = GLFW_MOUSE_BUTTON_4,
+		M4 = GLFW_MOUSE_BUTTON_4,*/
 		Left = GLFW_MOUSE_BUTTON_LEFT,
 		Right = GLFW_MOUSE_BUTTON_RIGHT,
 		Middle = GLFW_MOUSE_BUTTON_MIDDLE,
@@ -58,7 +58,8 @@ namespace Events {
 	private:
 		static GLFWwindow* window;
 		static void keyCallBack(GLFWwindow* window, int key, int scancode, int action, int mode); 
-		static void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+		static void mouseCallback(GLFWwindow* window, double xpos, double ypos);
+		static void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
 	};
 };
 

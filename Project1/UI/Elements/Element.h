@@ -3,15 +3,16 @@
 #include <string>
 #include <array>
 #include <functional>
+#include "../../Primatives/Material.h"
 namespace UI {
 	class Element
 	{
-	private:
+	protected:
 		glm::vec2 screenPos; // center of the object
 		float width, height;
 		std::string name;
-		bool cursorOver;
-		glm::vec3 backgroundColor;
+		bool cursorOver, mDown;
+		Materials::MatItem backgroundColor;
 	public:
 		Element();
 		inline const glm::vec2& getPos() const { return screenPos; };
@@ -23,12 +24,14 @@ namespace UI {
 		inline const float& getHeight() const { return height; };
 		inline void setHeight(const float& height) { this->height = height; };
 
-		inline const glm::vec3& getBackgroundColor() const { return backgroundColor; };
-		inline void setBackgroundColor(const glm::vec3& backgroundColor) { this->backgroundColor = backgroundColor; };
-		
+		inline const Materials::MatItem& getBackgroundColor() const { return backgroundColor; };
+		inline void setBackgroundColor(const glm::vec3& backgroundColor) 
+		{ 
+			this->backgroundColor(backgroundColor);
+		};
 
 		std::array<glm::vec2, 2> getCorners() const;
-		void checkEvents();
+		virtual void checkEvents();
 
 		void (*mouseEnter)(const Element*);
 		void (*mouseLeave)(const Element*);
@@ -39,7 +42,7 @@ namespace UI {
 
 		glm::mat4 getModel() const;
 
-		virtual void drawContent() const { };
+		virtual void drawContent() const = 0;
 	};
 };
 

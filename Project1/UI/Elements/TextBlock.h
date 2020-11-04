@@ -3,13 +3,14 @@
 #include <string>
 #include "../TextRenderer.h"
 namespace UI {
-	class TextBox : public Element
+	class TextBlock : public Element
 	{
 	private:
 		std::string text, font;
 		TextRenderer* textRenderer;
+		glm::vec3 forgroundColor;
 	public:
-		TextBox();
+		TextBlock();
 		inline const std::string& getText() const { return text; };
 		inline void setText(const std::string& text) { this->text = text; };
 
@@ -19,6 +20,9 @@ namespace UI {
 			this->font = font; 
 			textRenderer = TextRenderer::getFont(font);
 		};
+
+		inline const glm::vec3& getForgroundColor() const { return forgroundColor; };
+		inline void setForgroundColor(const glm::vec3& col) { forgroundColor = col; };
 
 		void drawContent() const;
 	};

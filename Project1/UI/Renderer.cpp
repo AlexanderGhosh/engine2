@@ -10,10 +10,10 @@ void UI::Renderer::init(const unsigned& shaderId, const glm::vec2& screenDim)
 {
 	UI::Renderer::shaderId = shaderId; 
 	Primative::Mesh mesh;
-	mesh.verts.push_back({ { 1, 1, 0 } });
-	mesh.verts.push_back({ { -1, 1, 0 } });
-	mesh.verts.push_back({ { 1, -1, 0 } });
-	mesh.verts.push_back({ { -1, -1, 0 } });
+	mesh.verts.push_back({ { 1, 1, 0 }, { 1, 1 } });
+	mesh.verts.push_back({ { -1, 1, 0 }, { 0, 1 } });
+	mesh.verts.push_back({ { 1, -1, 0 }, { 1, 0 } });
+	mesh.verts.push_back({ { -1, -1, 0 }, { 0, 0 } });
 	mesh.indices = {
 		0, 1, 2,
 		3, 2, 1
@@ -25,13 +25,24 @@ void UI::Renderer::init(const unsigned& shaderId, const glm::vec2& screenDim)
 	uiBuffer.fill(0, sizeof(glm::mat4), glm::value_ptr(proj));
 }
 
-void UI::Renderer::render(const UI::Pane* pane)
+void UI::Renderer::render(const UI::Pane* pane) // draws the quads
 {
 	quadBuffer.bind();
 	for (const UI::Element* element : pane->getElements()) {
 		Render::Shading::Manager::setActive(shaderId);
 		const glm::mat4 model = element->getModel();
-		Render::Shading::Manager::setValue("model", model);
+		Render::Shading::Manager::setValue("model", model); 
+
+		const Materials::MatItem& bg = element->getBackgroundColor();
+		if (!bg.hasTex()) {
+			Render::Shading::Manager::setValue("col_vec", glm::vec4(bg.getRaw(), 1));
+		}
+		else {
+			glBindTexture(GL_TEXTURE_2D, bg.getId());
+			bool res = Render::Shading::Manager::setValue("col_vec", glm::vec4(bg.getRaw(), 0));
+			res = Render::Shading::Manager::setValue("col_id", 0); // set to texture unit
+		}
+
 		quadBuffer.draw();
 		element->drawContent();
 	}

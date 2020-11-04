@@ -6,8 +6,8 @@ void Events::Handler::init(GLFWwindow* window)
 {
 	Events::Handler::window = window;
 	glfwSetKeyCallback(window, Events::Handler::keyCallBack);
-	glfwSetCursorPosCallback(window, Events::Handler::mouse_callback);
-	// glfwSetKeyCallback(window, NULL);
+	glfwSetCursorPosCallback(window, Events::Handler::mouseCallback);
+	glfwSetMouseButtonCallback(window, Events::Handler::mouseButtonCallback);
 	// glfwSetKeyCallback(window, NULL);
 }
 
@@ -43,7 +43,16 @@ void Events::Handler::keyCallBack(GLFWwindow* window, int key, int scancode, int
 
 }
 
-void Events::Handler::mouse_callback(GLFWwindow* window, double xpos, double ypos)
+void Events::Handler::mouseCallback(GLFWwindow* window, double xpos, double ypos)
 {
 
+}
+
+void Events::Handler::mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
+{
+	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+		int t = glfwGetMouseButton(Events::Handler::window, GLFW_MOUSE_BUTTON_LEFT);
+		int h = static_cast<int>(GLFW_MOUSE_BUTTON_LEFT);
+		h += 0;
+	}
 }

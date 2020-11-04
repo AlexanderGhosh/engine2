@@ -143,10 +143,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="UI\Elements\ImageBox.cpp" />
+    <ClCompile Include="UI\Elements\Button.cpp" />
     <ClCompile Include="Componets\Light.cpp" />
     <ClCompile Include="EventSystem\Handler.cpp" />
     <ClCompile Include="UI\TextRenderer.cpp" />
-    <ClCompile Include="UI\Elements\TextBox.cpp" />
+    <ClCompile Include="UI\Elements\TextBlock.cpp" />
     <ClCompile Include="UI\Renderer.cpp" />
     <ClCompile Include="UI\Panes\Pane.cpp" />
     <ClCompile Include="UI\Elements\Element.cpp" />
@@ -168,10 +170,12 @@
     <ClCompile Include="Primatives\Vertex.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="UI\Elements\ImageBox.h" />
+    <ClInclude Include="UI\Elements\Button.h" />
     <ClInclude Include="Componets\Light.h" />
     <ClInclude Include="EventSystem\Handler.h" />
     <ClInclude Include="UI\TextRenderer.h" />
-    <ClInclude Include="UI\Elements\TextBox.h" />
+    <ClInclude Include="UI\Elements\TextBlock.h" />
     <ClInclude Include="UI\Renderer.h" />
     <ClInclude Include="UI\Panes\Pane.h" />
     <ClInclude Include="UI\Elements\Element.h" />

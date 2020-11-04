@@ -2,7 +2,7 @@
 #include "../../EventSystem/Handler.h"
 #include "../../Utils/General.h"
 
-UI::Element::Element() : screenPos(0), width(0), height(0), name(""), cursorOver(0)
+UI::Element::Element() : screenPos(0), width(0), height(0), name(""), cursorOver(0), mDown(0)
 {
 	auto event = [](const Element* sender) { };
 	mouseEnter = event;
@@ -48,14 +48,19 @@ void UI::Element::checkEvents()
 	}
 
 	if (this->cursorOver) { // should do for all mouse buttons
-		if (Events::Handler::getCursor(Events::Cursor::Any, Events::Action::Down)) {
+		if (Events::Handler::getCursor(Events::Cursor::Left, Events::Action::Down) && !this->mDown) {
 			// mouse down
 			this->mouseDown(this);
+			this->mDown = true;
 		}
-		if (Events::Handler::getCursor(Events::Cursor::Any, Events::Action::Up)) {
+		if (Events::Handler::getCursor(Events::Cursor::Left, Events::Action::Up) && this->mDown) {
 			// mouse up
 			this->mouseUp(this);
+			this->mDown = false;
 		}
+	}
+	else {
+		this->mDown = false;
 	}
 }
 
