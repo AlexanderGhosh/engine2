@@ -1,7 +1,8 @@
 #include "GameObject.h"
 
-GameObject::GameObject() : componets(), enabled() {
-	this->addComponet(new Componet::Transform());
+GameObject::GameObject() : componets(), enabled(), transform(new Componet::Transform()) {
+	// this->addComponet(new Componet::Transform());
+	enabled.push_back(1);
 }
 
 void GameObject::tick(short currentTick)

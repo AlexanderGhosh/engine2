@@ -145,3 +145,43 @@ const unsigned& Primative::FrameBuffer::getTextureId(const std::string& name)
 		return r;
 	return 0;
 }
+
+Primative::SoundBuffer::SoundBuffer(const char* soundData, const int& len, const unsigned& channel, const int& sampleRate, const unsigned& bitDepth) : SoundBuffer()
+{
+	alGenBuffers(1, &SBO);
+	ALenum format = AL_FORMAT_MONO8; // 0x1100
+	char channels[] = {
+		1, 2 
+	};
+	char bitDepths[] = {
+		8, 16
+	};
+
+	bool found = 0;
+	for (char i = 0; i < 2; i++) {
+		for (char j = 0; j < 2; j++) {
+			if (channels[i] == channel && bitDepths[j] == bitDepth) {
+				found = 1;
+				break;
+			}
+			format++;
+		}
+	}
+
+	if(!found)
+	{
+		std::cerr
+			<< "ERROR: unrecognised wave format: "
+			<< channels << " channels, "
+			<< bitDepth << " bps" << std::endl;
+		return;
+	}
+
+	alBufferData(SBO, format, soundData, len, sampleRate);
+
+}
+
+void Primative::SoundBuffer::cleanUp()
+{
+	alDeleteBuffers(1, &SBO);
+}

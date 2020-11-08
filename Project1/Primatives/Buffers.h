@@ -1,6 +1,9 @@
 #pragma once
 #include <GL/glew.h>
 #include <unordered_map>
+#include <string>
+#include <vector>
+#include <al.h>
 #include "Mesh.h"
 namespace Primative {
 	class Buffers
@@ -53,6 +56,17 @@ namespace Primative {
 			glDeleteFramebuffers(1, &FBO);
 		};
 		const unsigned& getTextureId(const std::string& name);
+	};
+	class SoundBuffer {
+	private:
+		unsigned SBO; // sound buffer object
+		std::string name;
+		float bitDepth, sampleRate, dataSize;
+	public:
+		inline SoundBuffer() : SBO(0), name(), bitDepth(0), sampleRate(0), dataSize() { };
+		SoundBuffer(const char* soundData, const int& len, const unsigned& channels, const int& sampleRate, const unsigned& bitDepth);
+		void cleanUp();
+		inline const unsigned& getSBO() const { return SBO; };
 	};
 }
 

@@ -17,6 +17,8 @@
 #include "EventSystem/Handler.h"
 #include "UI/TextRenderer.h"
 #include "UI/Elements/TextField.h"
+#include "SoundManager.h"
+#include "Componets/AudioSource.h"
 
 #define PBRen 1
 
@@ -258,6 +260,14 @@ int main() {
     pane.addElement(&element);
     // UI //
 
+    // SOUNDS //
+
+    SoundManager::init();
+    // Sound* sound = SoundManager::createSoundSource("C:/Users/AGWDW/Desktop/07057080.wav");
+    const auto buffer = SoundManager::createBuffer("C:/Users/AGWDW/Desktop/iamtheprotectorofthissystem.wav");
+    Componet::AudioSource* audio = new Componet::AudioSource(
+        SoundManager::createSoundSource());
+    audio->addBuffer(buffer);
 
     Events::Handler::init(window);
 
@@ -277,14 +287,22 @@ int main() {
         // scene.preProcess(); // shadows
         scene.postProcess();// render to screen
 
-        glDisable(GL_DEPTH_TEST);
+        /*glDisable(GL_DEPTH_TEST);
         glDisable(GL_CULL_FACE);
         UI::Renderer::render(&pane);
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_CULL_FACE);
         pane.update(); // events check
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        textR.drawText("Hello", 25, 25, 1, { 1, 0, 0 });
+        textR.drawText("Hello", 25, 25, 1, { 1, 0, 0 });*/
+
+        if (Events::Handler::getKey(Events::Key::Space, Events::Action::Down)) {
+            audio->play();
+        }
+        if (Events::Handler::getKey(Events::Key::R_Shift, Events::Action::Down)) {
+            audio->pause();
+        }
+        // sound->update();
 
         glfwSwapBuffers(window);
         Events::Handler::pollEvents();
@@ -293,6 +311,10 @@ int main() {
     delete mat;
     ResourceLoader::cleanUp(); 
     UI::TextRenderer::cleanUpStatic();
+    // SoundManager::cleanUp();
+    // sound->cleanUp();
+    // delete sound;
+    glfwMakeContextCurrent(nullptr);
     glfwTerminate();
     // delete window;
     return 0;

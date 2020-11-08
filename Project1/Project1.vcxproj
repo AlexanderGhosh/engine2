@@ -116,14 +116,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\FREETYPE\include;C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\ASSIMP\include;C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\GLM\glm;C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\GLFW\include;C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\GLEW\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\File Readers;C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\OPENAL\include;C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\FREETYPE\include;C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\ASSIMP\include;C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\GLM\glm;C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\GLFW\include;C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\GLEW\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\FREETYPE\release dll\win64;C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\ASSIMP\lib;C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\GLFW\lib-vc2019;C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\GLEW\lib\Release\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>freetype.lib;assimp-vc142-mt.lib;opengl32.lib;glew32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\OPENAL\libs\Win64;C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\FREETYPE\release dll\win64;C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\ASSIMP\lib;C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\GLFW\lib-vc2019;C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\GLEW\lib\Release\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>OpenAL32.lib;freetype.lib;assimp-vc142-mt.lib;opengl32.lib;glew32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -143,6 +143,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Componets\AudioSource.cpp" />
+    <ClCompile Include="SoundManager.cpp" />
     <ClCompile Include="UI\Elements\TextField.cpp" />
     <ClCompile Include="UI\Elements\ImageBox.cpp" />
     <ClCompile Include="UI\Elements\Button.cpp" />
@@ -171,6 +173,8 @@
     <ClCompile Include="Primatives\Vertex.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Componets\AudioSource.h" />
+    <ClInclude Include="SoundManager.h" />
     <ClInclude Include="UI\Elements\TextField.h" />
     <ClInclude Include="UI\Elements\ImageBox.h" />
     <ClInclude Include="UI\Elements\Button.h" />

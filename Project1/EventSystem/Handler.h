@@ -28,6 +28,7 @@ namespace Events {
 		Num_4 = GLFW_KEY_KP_4, Num_5 = GLFW_KEY_KP_5, Num_6 = GLFW_KEY_KP_6, 
 		Num_7 = GLFW_KEY_KP_7, Num_8 = GLFW_KEY_KP_8, Num_9 = GLFW_KEY_KP_9,
 
+		Space = GLFW_KEY_SPACE,
 		A = GLFW_KEY_A, B = GLFW_KEY_B, C = GLFW_KEY_C,
 		D = GLFW_KEY_D, E = GLFW_KEY_E, F = GLFW_KEY_F,
 		G = GLFW_KEY_G, H = GLFW_KEY_H, I = GLFW_KEY_I,

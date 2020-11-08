@@ -19,8 +19,4 @@ namespace Componet {
 		const glm::mat4 getModel() const;
 		inline Transform(glm::vec3 p = { 0, 0, -5 }, glm::vec3 s = { 1, 1, 1 }, glm::vec3 r = { 0, 0, 0 }) : Position(p), Scale(s), Rotation(r), Base() { };
 	};
-
-	struct Ridgbody : public Base {
-		glm::vec3 Velocity;
-	};
 }

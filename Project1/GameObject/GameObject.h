@@ -6,6 +6,7 @@ class GameObject
 {
 private:
 	std::vector<Componet::Base*> componets;
+	Componet::Transform* transform;
 	std::vector<bool> enabled;
 public:
 	GameObject();
@@ -15,7 +16,8 @@ public:
 		componet->setParent(this);
 	};
 	void tick(short currentTick);
-	inline Componet::Transform* getTransform() const { return dynamic_cast<Componet::Transform*>(componets[0]); };
+	inline Componet::Transform* getTransform() const { return transform; };
+	Componet::Base* getRigidbody() { return nullptr; };
 	void cleanUp();
 };
 

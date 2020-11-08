@@ -69,4 +69,16 @@ namespace Utils {
         }
         return out;
     }
+    inline glm::vec3 xAxis(float mag = 1) {
+        return glm::vec3(1, 0, 0) * mag;
+    }
+    inline glm::vec3 yAxis(float mag = 1) {
+        return glm::vec3(0, 1, 0) * mag;
+    }
+    inline glm::vec3 zAxis(float mag = 1) {
+        return glm::vec3(0, 0, 1) * mag;
+    }
+    inline glm::vec3 zero() {
+        return glm::vec3(0);
+    }
 }
