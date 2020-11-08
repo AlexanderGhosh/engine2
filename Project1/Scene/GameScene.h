@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include <unordered_map>
-#include "GameObject.h"
+#include "../GameObject/GameObject.h"
 #include "../Primatives/Buffers.h"
 class GameScene
 {

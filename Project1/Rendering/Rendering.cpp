@@ -33,16 +33,19 @@ void Render::RenderMesh::update()
 	else
 		succ = Shading::Manager::setValue("material", *dynamic_cast<Materials::PBR*>(this->material));
 	this->material->activateTextures();
-	for (const Primative::Buffers& buffer : buffers) {
-		buffer.bind();
-		buffer.draw();
-		buffer.unBind();
+	for (const Primative::VertexBuffer* buffer : buffers) {
+		buffer->bind();
+		buffer->draw();
+		buffer->unBind();
 	}
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
-
-void Render::RenderMesh::addMesh(Primative::Mesh* m, GLenum draw_type)
+void Render::RenderMesh::addMesh(std::vector<Primative::VertexBuffer*>& buffers, const GLenum draw_type)
 {
-	buffers.emplace_back(*m, draw_type);
+	this->buffers = buffers;
+	for (Primative::VertexBuffer* buffer : buffers) {
+		buffer->setDrawType(draw_type);
+	}
+	buffers.clear();
 }
 

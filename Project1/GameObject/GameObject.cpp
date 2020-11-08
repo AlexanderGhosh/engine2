@@ -24,4 +24,8 @@ void GameObject::cleanUp()
 		delete componet;
 		componet = nullptr;
 	}
+	componets.clear();
+	transform->cleanUp();
+	delete transform;
+	transform = nullptr;
 }

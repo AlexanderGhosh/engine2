@@ -148,28 +148,25 @@
     <ClCompile Include="UI\Elements\TextField.cpp" />
     <ClCompile Include="UI\Elements\ImageBox.cpp" />
     <ClCompile Include="UI\Elements\Button.cpp" />
-    <ClCompile Include="Componets\Light.cpp" />
     <ClCompile Include="EventSystem\Handler.cpp" />
     <ClCompile Include="UI\TextRenderer.cpp" />
     <ClCompile Include="UI\Elements\TextBlock.cpp" />
     <ClCompile Include="UI\Renderer.cpp" />
     <ClCompile Include="UI\Panes\Pane.cpp" />
     <ClCompile Include="UI\Elements\Element.cpp" />
-    <ClCompile Include="GameObject\GameScene.cpp" />
+    <ClCompile Include="Scene\GameScene.cpp" />
     <ClCompile Include="Primatives\Material.cpp" />
     <ClCompile Include="Utils\AssimpWrapper.cpp" />
     <ClCompile Include="Componets\Componets.cpp" />
     <ClCompile Include="GameObject\GameObject.cpp" />
-    <ClCompile Include="Utils\Camera.cpp" />
+    <ClCompile Include="Componets\Camera.cpp" />
     <ClCompile Include="Rendering\Shading\Manager.cpp" />
     <ClCompile Include="Primatives\Buffers.cpp" />
     <ClCompile Include="Rendering\Animation\Animation.cpp" />
     <ClCompile Include="Primatives\Mesh.cpp" />
     <ClCompile Include="Rendering\Rendering.cpp" />
-    <ClCompile Include="Rendering\Engine.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Utils\ResourceLoader.cpp" />
-    <ClCompile Include="Scene\Scene.cpp" />
     <ClCompile Include="Primatives\Vertex.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -178,28 +175,25 @@
     <ClInclude Include="UI\Elements\TextField.h" />
     <ClInclude Include="UI\Elements\ImageBox.h" />
     <ClInclude Include="UI\Elements\Button.h" />
-    <ClInclude Include="Componets\Light.h" />
     <ClInclude Include="EventSystem\Handler.h" />
     <ClInclude Include="UI\TextRenderer.h" />
     <ClInclude Include="UI\Elements\TextBlock.h" />
     <ClInclude Include="UI\Renderer.h" />
     <ClInclude Include="UI\Panes\Pane.h" />
     <ClInclude Include="UI\Elements\Element.h" />
-    <ClInclude Include="GameObject\GameScene.h" />
+    <ClInclude Include="Scene\GameScene.h" />
     <ClInclude Include="Primatives\Material.h" />
     <ClInclude Include="Utils\AssimpWrapper.h" />
     <ClInclude Include="Componets\Componets.h" />
     <ClInclude Include="GameObject\GameObject.h" />
-    <ClInclude Include="Utils\Camera.h" />
+    <ClInclude Include="Componets\Camera.h" />
     <ClInclude Include="Rendering\Shading\Manager.h" />
     <ClInclude Include="Primatives\Buffers.h" />
     <ClInclude Include="Rendering\Animation\Animation.h" />
     <ClInclude Include="Primatives\Mesh.h" />
     <ClInclude Include="Rendering\Rendering.h" />
-    <ClInclude Include="Rendering\Engine.h" />
     <ClInclude Include="Utils\General.h" />
     <ClInclude Include="Utils\ResourceLoader.h" />
-    <ClInclude Include="Scene\Scene.h" />
     <ClInclude Include="Primatives\Vertex.h" />
   </ItemGroup>
   <ItemGroup>

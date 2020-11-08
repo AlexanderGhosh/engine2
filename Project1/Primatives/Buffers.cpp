@@ -3,10 +3,11 @@
 #include <iostream>
 #include "../Utils/General.h"
 
-short Primative::StaticBuffer::usedBindingPoint = -1;
+char Primative::StaticBuffer::usedBindingPoint = -1;
 
-Primative::Buffers::Buffers(const Mesh& mesh, GLenum shape_type) : Buffers()
+Primative::VertexBuffer::VertexBuffer(const Mesh& mesh, GLenum shape_type, GLenum draw_type) : VertexBuffer()
 {
+	this->drawType = draw_type;
 	this->shape_type = shape_type;
 	num_indices = static_cast<int>(mesh.indices.size());
 
@@ -36,7 +37,61 @@ Primative::Buffers::Buffers(const Mesh& mesh, GLenum shape_type) : Buffers()
 	glBindVertexArray(0);
 }
 
-const unsigned short Primative::StaticBuffer::init(unsigned dataSize, short bindingPoint)
+void Primative::VertexBuffer::cleanUp()
+{
+	glDeleteVertexArrays(1, &VAO);
+	glDeleteBuffers(1, &VBO);
+	glDeleteBuffers(1, &EBO);
+}
+
+Primative::StaticBuffer::StaticBuffer(const std::vector<std::string>& types, char bindingPoint) : StaticBuffer() {
+	unsigned len = 0, prev = 0;;
+	for (const std::string& type : types) {
+		// floats
+		if (type == "f") {
+			len = sizeof(float);
+		}
+		else if (type == "f2") {
+			len = sizeof(glm::vec2);
+		}
+		else if (type == "f3") {
+			len = sizeof(glm::vec3);
+		}
+		else if (type == "f4") {
+			len = sizeof(glm::vec4);
+		}
+		// ints
+		else if (type == "i") {
+			len = sizeof(int);
+		}
+		else if (type == "i2") {
+			len = sizeof(glm::ivec2);
+		}
+		else if (type == "i3") {
+			len = sizeof(glm::ivec3);
+		}
+		else if (type == "i4") {
+			len = sizeof(glm::ivec4);
+		}
+		// matrices
+		else if (type == "m2") {
+			len = sizeof(glm::mat2);
+		}
+		else if (type == "m3") {
+			len = sizeof(glm::mat3);
+		}
+		else if (type == "m4") {
+			len = sizeof(glm::mat4);
+		}
+		positions.push_back({ prev, len });
+		prev += len;
+	}
+	init(prev, bindingPoint);
+}
+Primative::StaticBuffer::StaticBuffer(const std::string& types, char bindingPoint) : StaticBuffer(Utils::split(types, ", "), bindingPoint)
+{
+}
+const void Primative::StaticBuffer::init(unsigned dataSize, short bindingPoint)
 {
 	this->bindingPoint = (bindingPoint < 0) ? Primative::StaticBuffer::usedBindingPoint + 1 : bindingPoint;
 	this->bindingPoint %= GL_MAX_UNIFORM_BUFFER_BINDINGS;
@@ -48,13 +103,53 @@ const unsigned short Primative::StaticBuffer::init(unsigned dataSize, short bind
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 	glBindBufferRange(GL_UNIFORM_BUFFER, this->bindingPoint, UBO, 0, dataSize);
-	return 0;
 }
 void Primative::StaticBuffer::fill(unsigned offset, unsigned size, const void* data) const
 {
 	this->bind();
 	glBufferSubData(GL_UNIFORM_BUFFER, offset, size, data);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+}
+
+void Primative::StaticBuffer::fill(unsigned position, const void* data) const
+{
+	const std::pair<unsigned, unsigned>& pair = positions[position];
+	fill(pair.first, pair.second, data);
+}
+
+void Primative::StaticBuffer::cleanUp()
+{
+	glDeleteBuffers(1, &UBO);
+}
+
+const std::tuple<GLenum, int, std::string> Primative::FrameBuffer::getTexType(const std::string& t, char& colTypes)
+{
+	std::tuple<GLenum, int, std::string> res;
+	GLenum& attachmentType = std::get<GLenum>(res) = 0;
+	int& type = std::get<int>(res) = -1;
+	std::string& t_ = std::get<std::string>(res) = t;
+
+	if (t == "col") {
+		attachmentType = GL_COLOR_ATTACHMENT0 + colTypes;
+		type = GL_RGB;
+		t_ += std::to_string(colTypes++);
+	}
+	else if (t == "depth") {
+		attachmentType = GL_DEPTH_ATTACHMENT;
+		type = GL_DEPTH_COMPONENT;
+	}
+	else if (t == "stencil") {
+		attachmentType = GL_STENCIL_ATTACHMENT;
+		type = GL_FLOAT;
+	}
+	else if (t == "dep_sten") {
+		attachmentType = GL_DEPTH_STENCIL_ATTACHMENT;
+		type = GL_DEPTH24_STENCIL8;
+	}
+	else {
+		t_ = "failed";
+	}
+	return res;
 }
 
 Primative::FrameBuffer::FrameBuffer(std::vector<std::string> textureTypes, glm::ivec2 dimentions) : FrameBuffer()
@@ -67,11 +162,18 @@ Primative::FrameBuffer::FrameBuffer(std::vector<std::string> textureTypes, glm::
 		textureTypes.push_back("col");
 	}
 
-	unsigned colTypes = 0;
+	char colTypes = 0;
+	// char colTypes_ = 0;
 	for (short i = 0; i < textureTypes.size(); i++) {
-		GLenum attachmentType, type;
 		std::string t = textureTypes[i];
-		if (t == "col") {
+		const auto r = getTexType(t, colTypes);
+		GLenum attachmentType = std::get<GLenum>(r);
+		GLenum type = std::get<int>(r);
+		if (t == "failed") {
+			continue;
+		}
+		t = std::get<std::string>(r);
+		/*if (t == "col") {
 			attachmentType = GL_COLOR_ATTACHMENT0 + colTypes;
 			type = GL_RGB;
 			t += std::to_string(colTypes++);
@@ -90,7 +192,8 @@ Primative::FrameBuffer::FrameBuffer(std::vector<std::string> textureTypes, glm::
 		}
 		else {
 			continue;
-		}
+		}*/
+
 
 		textures.insert({ t, 0 });
 		unsigned& tex = textures[t];
@@ -127,10 +230,35 @@ Primative::FrameBuffer::FrameBuffer(std::vector<std::string> textureTypes, glm::
 		renderBuffers.push_back(rbo);
 	}*/
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-		std::cout << "error\n";
+		std::cout << "FBO failed to complete\n";
 	}
 	this->unBind();
 }
+
+void Primative::FrameBuffer::cleanUp()
+{
+	if (FBO == 0)
+		return;
+	this->unBind();
+	for (auto& pair : textures) {
+		unsigned& id = pair.second; 
+		const std::string& t = pair.first;
+		char f = 0;
+		const auto r = getTexType(t, f);
+		GLenum attachmentType = std::get<GLenum>(r);
+		// GLenum type = std::get<int>(r);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, attachmentType, GL_TEXTURE_2D, 0, 0);
+		glDeleteTextures(1, &id);
+	}
+	textures.clear();
+
+	for (unsigned& rbo : renderBuffers) {
+		glDeleteRenderbuffers(1, &rbo);
+	}
+	renderBuffers.clear();
+
+	glDeleteFramebuffers(1, &FBO);
+};
 
 const unsigned& Primative::FrameBuffer::getTextureId(const std::string& name)
 {

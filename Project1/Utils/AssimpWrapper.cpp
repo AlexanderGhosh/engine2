@@ -1,6 +1,6 @@
 #include "AssimpWrapper.h"
 
-const std::vector<Primative::Mesh*> AssimpWrapper::loadModel(std::string path)
+const std::vector<Primative::Mesh*> FileReaders::AssimpWrapper::loadModel(std::string path)
 {
     std::vector<Primative::Mesh*> meshes;
     Assimp::Importer import;
@@ -18,7 +18,7 @@ const std::vector<Primative::Mesh*> AssimpWrapper::loadModel(std::string path)
     return meshes;
 }
 
-void AssimpWrapper::processNode(aiNode* node, const aiScene* scene, std::vector<Primative::Mesh*>& meshes)
+void FileReaders::AssimpWrapper::processNode(aiNode* node, const aiScene* scene, std::vector<Primative::Mesh*>& meshes)
 {
     // process all the node's meshes (if any)
     for (unsigned int i = 0; i < node->mNumMeshes; i++)
@@ -33,7 +33,7 @@ void AssimpWrapper::processNode(aiNode* node, const aiScene* scene, std::vector<
     }
 }
 
-Primative::Mesh* AssimpWrapper::processMesh(aiMesh* mesh, const aiScene* scene)
+Primative::Mesh* FileReaders::AssimpWrapper::processMesh(aiMesh* mesh, const aiScene* scene)
 {
     // data to fill
     std::vector<Primative::Vertex> vertices;

@@ -4,7 +4,7 @@
 #include <bit>
 #include <alc.h>
 #include <al.h>
-#include <AudioReader.h>
+#include <Audio/AudioReader.h>
 #define NUM_BUFFERS 1
 
 ALCdevice* SoundManager::device = nullptr;
@@ -33,6 +33,7 @@ bool SoundManager::init()
 		return false;
 	}
 	alcMakeContextCurrent(contex);
+	setRecieverInfo();
 	return true;
 }
 

@@ -12,10 +12,10 @@ namespace Render {
 	public:
 		RenderMesh();
 		virtual void update();
-		void addMesh(Primative::Mesh* m, GLenum draw_type = GL_TRIANGLES);
+		void addMesh(std::vector<Primative::VertexBuffer*>& buffers, const GLenum draw_type = GL_TRIANGLES);
 		inline void setMaterial(Materials::Base* mat) { material = mat; };
 	private:
-		std::vector<Primative::Buffers> buffers;
+		std::vector<Primative::VertexBuffer*> buffers;
 		GameObject* parent;
 		Materials::Base* material;
 	};

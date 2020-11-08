@@ -21,6 +21,7 @@ namespace Componet {
             return res == AL_PLAYING;
         }
         void addBuffer(Primative::SoundBuffer* buffer) const;
+        void cleanUp();
     };
 };
 

@@ -83,4 +83,9 @@ unsigned Render::Shading::Manager::active = 0;
 	 Manager::active = shaderId;
 	 glUseProgram(shaderId);
  }
+
+ void Render::Shading::Manager::cleanUp()
+ {
+	 glUseProgram(0);
+ }
  

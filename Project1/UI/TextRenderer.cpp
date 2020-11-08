@@ -1,6 +1,7 @@
 #include "TextRenderer.h"
 #include <GL/glew.h>
 #include <iostream>
+#include <GLFW/glfw3.h>
 
 #include "../Rendering/Shading/Manager.h"
 
@@ -190,7 +191,10 @@ void UI::TextRenderer::cleanUpStatic()
 
 void UI::TextRenderer::cleanUp()
 {
+    for (auto& pair : chars) {
+        glDeleteTextures(1, &pair.second.texId);
+    }
     chars.clear();
-    glDeleteBuffers(1, &VAO);
+    glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
 }

@@ -17,3 +17,9 @@ void Componet::AudioSource::addBuffer(Primative::SoundBuffer* buffer) const
 {
 	alSourcei(source, AL_BUFFER, buffer->getSBO());
 }
+
+void Componet::AudioSource::cleanUp()
+{
+	Base::cleanUp();
+	alDeleteSources(1, &source);
+}

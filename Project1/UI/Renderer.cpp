@@ -3,7 +3,7 @@
 #include "../Rendering/Shading/Manager.h"
 
 unsigned UI::Renderer::shaderId = 0;
-Primative::Buffers UI::Renderer::quadBuffer = { };
+Primative::VertexBuffer UI::Renderer::quadBuffer = { };
 Primative::StaticBuffer UI::Renderer::uiBuffer = { };
 
 void UI::Renderer::init(const unsigned& shaderId, const glm::vec2& screenDim)
@@ -18,11 +18,12 @@ void UI::Renderer::init(const unsigned& shaderId, const glm::vec2& screenDim)
 		0, 1, 2,
 		3, 2, 1
 	};
-	quadBuffer = Primative::Buffers(mesh, GL_TRIANGLES);
+	quadBuffer = Primative::VertexBuffer(mesh, GL_TRIANGLES);
 
-	uiBuffer.init(sizeof(glm::mat4), 1);
+	uiBuffer = Primative::StaticBuffer("m4", 1);
+	// uiBuffer.init(sizeof(glm::mat4), 1);
 	glm::mat4 proj = glm::ortho(0.0f, screenDim.x, 0.0f, screenDim.y);
-	uiBuffer.fill(0, sizeof(glm::mat4), glm::value_ptr(proj));
+	uiBuffer.fill(0, glm::value_ptr(proj));
 }
 
 void UI::Renderer::render(const UI::Pane* pane) // draws the quads
@@ -47,4 +48,10 @@ void UI::Renderer::render(const UI::Pane* pane) // draws the quads
 		element->drawContent();
 	}
 	quadBuffer.unBind();
+}
+
+void UI::Renderer::cleanUp()
+{
+	uiBuffer.cleanUp();
+	quadBuffer.cleanUp();
 }

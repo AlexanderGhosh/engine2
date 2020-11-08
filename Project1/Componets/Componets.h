@@ -9,6 +9,7 @@ namespace Componet {
 		virtual void fixedUpdate() { }; // every x ticks
 		virtual void cleanUp() { parent = nullptr; };
 		inline void setParent(GameObject* parent) { this->parent = parent; };
+		inline const GameObject* getParent(GameObject* parent) const { return parent; };
 	protected:
 		inline Base() : parent(nullptr) { };
 		GameObject* parent;
@@ -17,6 +18,6 @@ namespace Componet {
 	struct Transform : public Base {
 		glm::vec3 Position, Scale, Rotation;
 		const glm::mat4 getModel() const;
-		inline Transform(glm::vec3 p = { 0, 0, -5 }, glm::vec3 s = { 1, 1, 1 }, glm::vec3 r = { 0, 0, 0 }) : Position(p), Scale(s), Rotation(r), Base() { };
+		inline Transform(glm::vec3 p = Utils::zero(), glm::vec3 s = Utils::fill(1), glm::vec3 r = Utils::zero()) : Position(p), Scale(s), Rotation(r), Base() { };
 	};
 }

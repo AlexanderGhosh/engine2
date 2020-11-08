@@ -60,6 +60,14 @@ void GameScene::cleanUp()
 		delete obj;
 		obj = nullptr;
 	}
+	objects.clear();
+	for (auto& pair : FBOs) {
+		Primative::FrameBuffer*& fbo = pair.second;
+		fbo->cleanUp();
+		delete fbo;
+		fbo = nullptr;
+	}
+	FBOs.clear();
 }
 
 void GameScene::addPreProcLayer(const std::string& name, const unsigned& shaderId)

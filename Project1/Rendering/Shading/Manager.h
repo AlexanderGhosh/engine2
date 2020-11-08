@@ -20,6 +20,7 @@ namespace Render {
 			static bool setValue(const std::string& name, Materials::Forward& fwd);
 			static bool setValue(const std::string& name, Materials::PBR& mat);
 			static void setActive(const unsigned& shaderId);
+			static void cleanUp();
 		private:
 			static unsigned active;
 		};

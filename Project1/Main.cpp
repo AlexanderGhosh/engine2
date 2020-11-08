@@ -7,22 +7,23 @@
 #include <glm.hpp>
 #include <gtc/matrix_transform.hpp>
 
-#include "Rendering/Engine.h"
+#include "Rendering/Rendering.h"
 #include "Rendering/Shading/Manager.h"
+#include "SoundManager.h"
 #include "Utils/ResourceLoader.h"
-#include "Utils/Camera.h"
-#include "GameObject/GameScene.h"
+#include "GameObject/GameObject.h"
+#include "Scene/GameScene.h"
 #include "Utils/AssimpWrapper.h"
 #include "UI/Renderer.h"
 #include "EventSystem/Handler.h"
 #include "UI/TextRenderer.h"
 #include "UI/Elements/TextField.h"
-#include "SoundManager.h"
 #include "Componets/AudioSource.h"
+#include "Componets/Camera.h"
 
 #define PBRen 1
 
-Utils::Camera cam;
+Componet::Camera cam;
 bool firstMouse = 1;
 float lastX = 0, lastY = 0;
 void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
@@ -43,7 +44,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
 void saveScreenshotToFile(std::string filename, int windowWidth, int windowHeight, unsigned depthMap);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode) {
     if (key == GLFW_KEY_W){
-        cam.pos += cam.fwd * 0.1f;
+        cam.setPos(cam.getForward() * 0.1f + cam.getForward());
     }
 }
 
@@ -92,7 +93,7 @@ int main() {
     glViewport(0, 0, 800, 600);
     glewInit();
 
-    cam.pos = { 0, 200, 700 };
+    cam.setPos({ 0, 200, 700 });
 
     ResourceLoader::createShader("Basics/DefaultShader");
     ResourceLoader::createShader("Basics/ShadowShader");
@@ -151,10 +152,10 @@ int main() {
         2, 4, 3
     };*/
 
-    AssimpWrapper w;
     // auto t = w.loadModel("C:/Users/AGWDW/Desktop/blend/Handgun_Game_Blender Gamer Engine.obj");
     // auto t = w.loadModel("Basics/Models/sword.obj");
-    auto t = w.loadModel("Basics/Models/pistol.obj");
+    auto pistolBuffers = ResourceLoader::createModel("Basics/Models/pistol.obj");
+    // auto t = FileReaders::AssimpWrapper::loadModel("Basics/Models/pistol.obj");
 
     // ResourceLoader::createTexture("Basics/Textures/handgun_C.jpg", TextureType::DiffuseMap, 0); // diff
     // ResourceLoader::createTexture("Basics/Textures/handgun_S.jpg", TextureType::SpecularMap, 0); // spec
@@ -176,11 +177,7 @@ int main() {
     // unsigned tex = ResourceLoader::createTexture("Basics/Textures/wood.jpg", TextureType::DiffuseMap);
 
     Render::RenderMesh* r = new Render::RenderMesh();
-    for (auto& m : t) {
-        r->addMesh(m);
-        delete m;
-        m = nullptr;
-    }
+    r->addMesh(pistolBuffers);
     Materials::Base* mat = new Materials::PBR({ 1 }, { 3 }, { 2 }, { 5 }, { 4 }); // new Materials::PBR({ 1 }, { 3 }, { 2 }, { 5 }, { 4 });
     if (!PBRen) {
         mat = new Materials::Forward({ 1 }, { 2 }, { 3 }, 32);
@@ -191,21 +188,19 @@ int main() {
     gun->getTransform()->Position = { 0, 0, 0 };
     gun->addComponet(r);
 
-    Primative::StaticBuffer b;
-    // view    | matrix
-    // proj    | matrix
-    // viewPos | vec
-    // gamma   | float
-    b.init(3 * sizeof(mat4) + sizeof(vec3) + sizeof(float), 0);
-
+    Primative::StaticBuffer b("m4, m4, v3, f, m4", 0);
+    // view    | matrix 4
+    // proj    | matrix 4
+    // viewPos | vector 3
+    // gamma   | scalar f
+    // lspaceM | matrix 4
 
     mat4 projection = perspective(glm::radians(cam.getFOV()), 800.0f / 600.0f, 0.01f, 1000.0f);
 
-    b.fill(sizeof(mat4), sizeof(mat4), value_ptr(projection));
+    b.fill(1, value_ptr(projection));
 
     float gamma = 2.2f;
-    b.fill(sizeof(mat4) * 2 + sizeof(vec3), sizeof(float), &gamma);
-
+    b.fill(3, &gamma);
 
     glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 0.1f, 100.0f);
 
@@ -213,7 +208,8 @@ int main() {
         glm::vec3(0.0f, 0.0f, 0.0f),
         glm::vec3(0.0f, 1.0f, 0.0f));
     glm::mat4 lightSpaceMatrix = lightProjection * lightView;
-    b.fill(sizeof(mat4) * 2, sizeof(vec3) + sizeof(float), value_ptr(lightSpaceMatrix));
+   
+    b.fill(4, value_ptr(lightSpaceMatrix));
 
     short tick = 0;
     float lastTime = glfwGetTime();
@@ -222,17 +218,11 @@ int main() {
 
     Primative::FrameBuffer* frameBuffer = new Primative::FrameBuffer({ "depth" }, { 800, 600 });
 
-
     GameScene scene;
     scene.addFBO("shadows", frameBuffer);
     scene.addPreProcLayer("shadows", ResourceLoader::getShader("ShadowShader"));
     scene.setPostProcShader(ResourceLoader::getShader(PBRen ? "PBRShader" : "DefaultShder")); // PBRShader
     scene.addObject(gun);
-
-    // TEXT //
-    UI::TextRenderer::setShader(ResourceLoader::getShader("TextShader"));
-    UI::TextRenderer textR({ 800, 600 });
-    // TEXT //
 
     // UI //
     UI::Renderer::init(ResourceLoader::getShader("UIShader"), { 800, 600 });
@@ -246,9 +236,6 @@ int main() {
     element.setWidth(250);
     element.setHeight(40);
 
-    /*element.click = [](const UI::Element* sender) {
-        std::cout << "click\n";
-    };*/
     element.mouseDown = [](UI::Element* sender) {
         std::cout << "mouse down\n";
     };
@@ -261,9 +248,7 @@ int main() {
     // UI //
 
     // SOUNDS //
-
     SoundManager::init();
-    // Sound* sound = SoundManager::createSoundSource("C:/Users/AGWDW/Desktop/07057080.wav");
     const auto buffer = SoundManager::createBuffer("C:/Users/AGWDW/Desktop/iamtheprotectorofthissystem.wav");
     Componet::AudioSource* audio = new Componet::AudioSource(
         SoundManager::createSoundSource());
@@ -280,8 +265,8 @@ int main() {
 
         // std::cout << fps << std::endl; // FPS Count
 
-        b.fill(0, sizeof(mat4), value_ptr(cam.getView()));
-        b.fill(sizeof(mat4) * 2, sizeof(vec3), value_ptr(cam.getPos())); // viewPos
+        b.fill(0, value_ptr(cam.getView()));
+        b.fill(2, value_ptr(cam.getPos()));
 
 
         // scene.preProcess(); // shadows
@@ -302,20 +287,28 @@ int main() {
         if (Events::Handler::getKey(Events::Key::R_Shift, Events::Action::Down)) {
             audio->pause();
         }
+        if (Events::Handler::getKey(Events::Key::Escape, Events::Action::Down)) {
+            break;
+        }
         // sound->update();
 
         glfwSwapBuffers(window);
         Events::Handler::pollEvents();
     }
-    delete r;
+    Render::Shading::Manager::cleanUp(); // deactivats shdaer
+
     delete mat;
-    ResourceLoader::cleanUp(); 
-    UI::TextRenderer::cleanUpStatic();
-    // SoundManager::cleanUp();
-    // sound->cleanUp();
-    // delete sound;
+
+    scene.cleanUp(); // removes and destrys all componets and fbos (destroysing comonets doesnt destry buffers(except audio source))
+
+    b.cleanUp(); // destroys UBO 0
+    UI::TextRenderer::cleanUpStatic(); // destroys char buffers and char textures for all fonts
+    UI::Renderer::cleanUp(); // destroys quadbuffer and UBO 1
+    SoundManager::cleanUp(); // destroys sound buffers
+    ResourceLoader::cleanUp(); // destroys textures shaders and models(buffers)
+
+
     glfwMakeContextCurrent(nullptr);
     glfwTerminate();
-    // delete window;
     return 0;
 }

@@ -35,6 +35,16 @@ namespace Utils {
         auto found = std::find(a.begin(), a.end(), b);
         return found != a.end();
     }
+    inline bool contains(const std::string& a, const std::string& b) {
+        const short s = b.size();
+        for (short i = 0; i < a.size() - b.size(); i++) {
+            const std::string& sub = a.substr(i, s);
+            if (sub == b) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     inline bool contained(std::array<glm::vec2, 2> bound, glm::vec2 pos) {
         return glm::all(glm::greaterThanEqual(pos, bound[0]) && glm::lessThanEqual(pos, bound[1]));
@@ -80,5 +90,27 @@ namespace Utils {
     }
     inline glm::vec3 zero() {
         return glm::vec3(0);
+    }
+    inline glm::vec3 fill(const float& num) {
+        return glm::vec3(num);
+    }
+    inline const std::string getFileName(const std::string& filePath, const bool& includeExtension = false) {
+        std::string dilimeter = "/";
+        std::array<std::string, 2> possible = {
+            "/", "\\"
+        };
+        for (const std::string& pos : possible) {
+            if (contains(filePath, pos)) {
+                dilimeter = pos;
+                break;
+            }
+        }
+        auto s = split(filePath, dilimeter);
+        std::string res = s.back();
+        if (!includeExtension) {
+            s = split(res, ".");
+            res = s[0];
+        }
+        return res;
     }
 }

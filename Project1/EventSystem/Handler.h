@@ -14,7 +14,7 @@ namespace Events {
 		Four = GLFW_KEY_4, Five = GLFW_KEY_5, Six = GLFW_KEY_6, 
 		Seven = GLFW_KEY_7, Eight = GLFW_KEY_8, Nine = GLFW_KEY_9,
 		Grave = GLFW_KEY_GRAVE_ACCENT, Tab = GLFW_KEY_TAB, CpsLock = GLFW_KEY_CAPS_LOCK, 
-		Esc = GLFW_KEY_ESCAPE, UnderScore = GLFW_KEY_MINUS, Equal = GLFW_KEY_EQUAL, 
+		Escape = GLFW_KEY_ESCAPE, UnderScore = GLFW_KEY_MINUS, Equal = GLFW_KEY_EQUAL, 
 		Backspace = GLFW_KEY_BACKSPACE, Enter = GLFW_KEY_ENTER, SemiColon = GLFW_KEY_SEMICOLON,
 		Apostrophe = GLFW_KEY_APOSTROPHE, Fdw_Slash = GLFW_KEY_SLASH, Bck_Slash = GLFW_KEY_BACKSLASH, 
 		Comma = GLFW_KEY_COMMA, Period = GLFW_KEY_PERIOD,

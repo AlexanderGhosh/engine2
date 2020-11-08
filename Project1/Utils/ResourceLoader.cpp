@@ -3,11 +3,15 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#define STB_IMAGE_IMPLEMENTATION
-#include "../stb_image.h"
+#include <Images/STBImage.h>
+#include "AssimpWrapper.h"
+
 
 std::string ResourceLoader::defaultShaderName = "";
 std::unordered_map<std::string, unsigned> ResourceLoader::shaders = { };
+std::unordered_map<std::string, unsigned> ResourceLoader::textures = { };
+std::vector<Primative::VertexBuffer> ResourceLoader::buffers = { };
+std::unordered_map<std::string, std::vector<unsigned>> ResourceLoader::models = { };
 
 std::string ResourceLoader::createShader(const std::string& filePath)
 {
@@ -16,7 +20,6 @@ std::string ResourceLoader::createShader(const std::string& filePath)
     std::ifstream streams[] = { { }, { } };
     const GLenum types[] = { GL_VERTEX_SHADER, GL_FRAGMENT_SHADER };
     unsigned shaders[] = { 0, 0 };
-
 
     int success;
     char infoLog[512];
@@ -76,8 +79,8 @@ std::string ResourceLoader::createShader(const std::string& filePath)
     glDeleteShader(shaders[1]);
     glUseProgram(0);
 
-    auto shader_s = Utils::split(filePath, "/");
-    std::string name = shader_s.back();
+    // auto shader_s = Utils::split(filePath, "/");
+    const std::string name = Utils::getFileName(filePath);
     
     ResourceLoader::shaders[name] = shaderProgram;
 
@@ -139,19 +142,73 @@ const unsigned ResourceLoader::createTexture(const std::string& filePath, const 
     {
         std::cout << "Failed to load texture: " << filePath << std::endl;
     }
-    // stbi_image_free(data);
+    stbi_image_free(data);
     glBindTexture(GL_TEXTURE_2D, 0);
-
+    textures.emplace(Utils::getFileName(filePath, 1), tex);
     return tex;
+}
+
+const unsigned ResourceLoader::getTexture(const std::string& name)
+{
+    auto& texs = ResourceLoader::textures;
+    unsigned s = texs.size();
+    unsigned r = texs[name];
+    if (s < texs.size()) {
+        r = 1;
+        texs.erase(name);
+    }
+    return r;
 }
 
 void ResourceLoader::cleanUp()
 {
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, 0);
     for (const auto& item : shaders) {
         glDeleteShader(item.second);
     }
+    shaders.clear();
+    for (const auto& item : textures) {
+        glDeleteTextures(1, &item.second);
+    }
+    textures.clear();
+    for (auto& item : buffers) {
+        item.cleanUp();
+    }
+    buffers.clear();
+    models.clear();
 }
 
-void ResourceLoader::createModel(const std::string& filePath)
+const std::vector<Primative::VertexBuffer*> ResourceLoader::createModel(const std::string& filePath, GLenum draw_type)
 {
+    std::vector<Primative::VertexBuffer*> res;
+    std::vector<Primative::Mesh*> data = FileReaders::AssimpWrapper::loadModel(filePath);
+    if (data.empty()) {
+        return res;
+    }
+    const std::string name = Utils::getFileName(filePath, 1);
+    auto model = models[name];
+    for (auto& m : data) {
+        buffers.emplace_back(*m, draw_type);
+        res.push_back(&buffers.back());
+        model.push_back(buffers.size() - 1);
+        delete m;
+        m = nullptr;
+    }
+    data.clear();
+    return res;
+}
+
+const const std::vector<Primative::VertexBuffer*> ResourceLoader::getModel(const std::string& name)
+{
+    unsigned s = models.size();
+    const auto& r = models[name];
+    if (s < models.size()) {
+        models.erase(name);
+    }
+    std::vector<Primative::VertexBuffer*> res;
+    for (const unsigned& i : r) {
+        res.push_back(&buffers[i]);
+    }
+    return res;
 }

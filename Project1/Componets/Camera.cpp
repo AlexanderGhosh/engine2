@@ -2,11 +2,11 @@
 #include <iostream>
 #include <gtx/string_cast.hpp>
 
-const glm::mat4 Utils::Camera::getView() const
+const glm::mat4 Componet::Camera::getView() const
 {
 	return glm::lookAt(pos, pos + fwd, up);
 }
-void Utils::Camera::ProcessMouseMovement(float xOffset, float yOffset, bool constrainPitch) {
+void Componet::Camera::ProcessMouseMovement(float xOffset, float yOffset, bool constrainPitch) {
 	xOffset *= 0.25;
 	yOffset *= 0.25;
 
@@ -21,17 +21,15 @@ void Utils::Camera::ProcessMouseMovement(float xOffset, float yOffset, bool cons
 			pitch = -89.0f;
 		}
 	}
-	// this->position = glm::vec3(0);
-
-	this->updateCameraVectors();
+	this->update();
 }
-void Utils::Camera::updateCameraVectors() {
+void Componet::Camera::update() {
 	glm::vec3 front;
 	front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
 	front.y = sin(glm::radians(pitch));
 	front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
 
 	fwd = glm::normalize(front);
-	right = glm::normalize(glm::cross(fwd, { 0, 1, 0 }));
+	right = glm::normalize(glm::cross(fwd, Utils::yAxis()));
 	up = glm::normalize(glm::cross(right, fwd));
 }
