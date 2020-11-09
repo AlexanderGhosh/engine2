@@ -2,7 +2,7 @@
 #include "../../EventSystem/Handler.h"
 #include "../../Utils/General.h"
 
-UI::Element::Element() : screenPos(0), width(0), height(0), name(""), cursorOver(0), mDown(0)
+UI::Element::Element() : screenPos(0), width(0), height(0), name(""), cursorOver(0), mDown(0), margin(0)
 {
 	auto event = [](Element* sender) { };
 	mouseEnter = event;
@@ -18,7 +18,12 @@ std::array<glm::vec2, 2> UI::Element::getCorners() const
 	glm::vec2 min = screenPos;
 	min.x -= width / 2.0f;
 	min.y -= height / 2.0f;
+	min += glm::vec2(margin);
+
 	glm::vec2 max = min + glm::vec2(width, height);
+	max.x -= margin.z;
+	max.y -= margin.w;
+
 	return { min, max };
 }
 

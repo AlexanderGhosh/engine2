@@ -113,4 +113,9 @@ namespace Utils {
         }
         return res;
     }
+    template<class T>
+    inline const unsigned& findIndex(std::vector<T>& a, T& b) {
+        auto c = std::find(a.begin(), a.end(), b);
+        return std::distance(a.begin(), c);
+    }
 }

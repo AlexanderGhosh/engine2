@@ -144,6 +144,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Componets\AudioSource.cpp" />
+    <ClCompile Include="UI\Panes\Grid.cpp" />
+    <ClCompile Include="MainWindow.cpp" />
+    <ClCompile Include="UI\Page.cpp" />
     <ClCompile Include="SoundManager.cpp" />
     <ClCompile Include="UI\Elements\TextField.cpp" />
     <ClCompile Include="UI\Elements\ImageBox.cpp" />
@@ -171,6 +174,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Componets\AudioSource.h" />
+    <ClInclude Include="UI\Panes\Grid.h" />
+    <ClInclude Include="MainWindow.h" />
+    <ClInclude Include="UI\Page.h" />
     <ClInclude Include="SoundManager.h" />
     <ClInclude Include="UI\Elements\TextField.h" />
     <ClInclude Include="UI\Elements\ImageBox.h" />

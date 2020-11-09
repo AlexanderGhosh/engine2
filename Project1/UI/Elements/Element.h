@@ -10,11 +10,16 @@ namespace UI {
 	protected:
 		glm::vec2 screenPos; // center of the object
 		float width, height;
+		glm::vec4 margin;
 		std::string name;
 		bool cursorOver, mDown;
 		Materials::MatItem backgroundColor;
 	public:
 		Element();
+
+		inline const glm::vec4& getMargin() const { return margin; };
+		inline void setMargin(const glm::vec4& margin) { this->margin = margin; };
+
 		inline const glm::vec2& getPos() const { return screenPos; };
 		inline void setPos(const glm::vec2& pos) { screenPos = pos; };
 

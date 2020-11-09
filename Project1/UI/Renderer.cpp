@@ -28,6 +28,7 @@ void UI::Renderer::init(const unsigned& shaderId, const glm::vec2& screenDim)
 
 void UI::Renderer::render(const UI::Pane* pane) // draws the quads
 {
+	glDisable(GL_DEPTH_TEST);
 	quadBuffer.bind();
 	for (const UI::Element* element : pane->getElements()) {
 		Render::Shading::Manager::setActive(shaderId);
@@ -39,6 +40,7 @@ void UI::Renderer::render(const UI::Pane* pane) // draws the quads
 			Render::Shading::Manager::setValue("col_vec", glm::vec4(bg.getRaw(), 1));
 		}
 		else {
+			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, bg.getId());
 			bool res = Render::Shading::Manager::setValue("col_vec", glm::vec4(bg.getRaw(), 0));
 			res = Render::Shading::Manager::setValue("col_id", 0); // set to texture unit
@@ -47,7 +49,8 @@ void UI::Renderer::render(const UI::Pane* pane) // draws the quads
 		quadBuffer.draw();
 		element->drawContent();
 	}
-	quadBuffer.unBind();
+	quadBuffer.unBind(); 
+	glEnable(GL_DEPTH_TEST);
 }
 
 void UI::Renderer::cleanUp()

@@ -20,6 +20,8 @@
 #include "UI/Elements/TextField.h"
 #include "Componets/AudioSource.h"
 #include "Componets/Camera.h"
+#include "UI/Panes/Grid.h"
+#include "UI/Elements/ImageBox.h"
 
 #define PBRen 1
 
@@ -86,7 +88,8 @@ int main() {
     // glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
-    glEnable(GL_MULTISAMPLE);
+    glEnable(GL_MULTISAMPLE); 
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetKeyCallback(window, key_callback);
 
@@ -217,24 +220,33 @@ int main() {
     unsigned fps = 0;
 
     Primative::FrameBuffer* frameBuffer = new Primative::FrameBuffer({ "depth" }, { 800, 600 });
+    Primative::FrameBuffer* finalQB = new Primative::FrameBuffer({ "col" }, { 800, 600 });
+    unsigned sceneTex = finalQB->getTextureId("col0");
 
     GameScene scene;
     scene.addFBO("shadows", frameBuffer);
+    scene.addFBO("final", finalQB);
     scene.addPreProcLayer("shadows", ResourceLoader::getShader("ShadowShader"));
+    scene.addPreProcLayer("final", ResourceLoader::getShader(PBRen ? "PBRShader" : "DefaultShder"));
     scene.setPostProcShader(ResourceLoader::getShader(PBRen ? "PBRShader" : "DefaultShder")); // PBRShader
     scene.addObject(gun);
 
+
+    UI::TextRenderer font = UI::TextRenderer({ 800, 600 }); // creates arial Font
+    UI::TextRenderer::setShader(ResourceLoader::getShader("TextShader"));
     // UI //
     UI::Renderer::init(ResourceLoader::getShader("UIShader"), { 800, 600 });
 
-    UI::TextField element;
-    element.setText("Hello World");
-    element.setForgroundColor({ 1, 1, 0 });
+    UI::ImageBox element;
+    // element.setText("Hello World");
+    // element.setForgroundColor({ 1, 1, 0 });
+    element.setBackgroundImage(sceneTex);
     // element.toggleSelected();
-    // element.setBackgroundImage(1);
-    element.setPos({ 400, 300 });
-    element.setWidth(250);
-    element.setHeight(40);
+    // element.setBackgroundColor({ 1, 0, 0 }); // forces the use of a solid color
+    element.setPos({ 0, 0 });
+    element.setWidth(80);
+    element.setHeight(60);
+    element.setMargin({ 100, 0, 0, 0 });
 
     element.mouseDown = [](UI::Element* sender) {
         std::cout << "mouse down\n";
@@ -243,8 +255,12 @@ int main() {
         std::cout << "mouse up\n";
     };
 
-    UI::Pane pane;
+    UI::Grid pane(800, 600);
+    pane.setColumnCount(10);
+    pane.setRowCount(10);
     pane.addElement(&element);
+    pane.setColumn(&element, 5);
+    pane.setRow(&element, 5);
     // UI //
 
     // SOUNDS //
@@ -255,6 +271,7 @@ int main() {
     audio->addBuffer(buffer);
 
     Events::Handler::init(window);
+    glfwSetCursorPosCallback(window, mouse_callback);
 
     while (!glfwWindowShouldClose(window))
     {
@@ -269,17 +286,14 @@ int main() {
         b.fill(2, value_ptr(cam.getPos()));
 
 
-        // scene.preProcess(); // shadows
+        scene.preProcess(); // shadows and scene quad
         scene.postProcess();// render to screen
 
-        /*glDisable(GL_DEPTH_TEST);
-        glDisable(GL_CULL_FACE);
-        UI::Renderer::render(&pane);
-        glEnable(GL_DEPTH_TEST);
-        glEnable(GL_CULL_FACE);
+
         pane.update(); // events check
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        textR.drawText("Hello", 25, 25, 1, { 1, 0, 0 });*/
+        UI::Renderer::render(&pane);
+
+        // textR.drawText("Hello", 25, 25, 1, { 1, 0, 0 });
 
         if (Events::Handler::getKey(Events::Key::Space, Events::Action::Down)) {
             audio->play();
