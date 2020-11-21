@@ -10,8 +10,11 @@ namespace UI {
 	public:
 		inline Pane(unsigned width = 0, unsigned height = 0) : elements(), width(width), height(height) { };
 		virtual inline void addElement(Element* element) { elements.push_back(element); };
+		virtual inline void addElement(Element& element) { elements.push_back(&element); };
+
 		virtual void update();
 		inline const std::vector<Element*>& getElements() const { return elements; };
+		inline const glm::ivec2 getDimentions() const { return { width, height }; };
 	};
 };
 

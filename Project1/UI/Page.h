@@ -3,11 +3,15 @@
 namespace UI {
 	class Page
 	{
-	private:
+	protected:
 		Page() : root(nullptr) { };
 		Pane* root;
 	public:
-		virtual void init() = 0;
+		inline const Pane* getRoot() const { return root; };
+		inline void update() 
+		{ 
+			root->update(); 
+		};
 	};
 };
 

@@ -1,4 +1,5 @@
 #pragma once
+#include <gtx/quaternion.hpp>
 #include "../Utils/General.h"
 
 class GameObject;
@@ -16,7 +17,8 @@ namespace Componet {
 	};
 
 	struct Transform : public Base {
-		glm::vec3 Position, Scale, Rotation;
+		glm::vec3 Position, Scale;
+		glm::quat Rotation;
 		const glm::mat4 getModel() const;
 		inline Transform(glm::vec3 p = Utils::zero(), glm::vec3 s = Utils::fill(1), glm::vec3 r = Utils::zero()) : Position(p), Scale(s), Rotation(r), Base() { };
 	};

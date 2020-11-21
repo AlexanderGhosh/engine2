@@ -143,10 +143,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Physics\Collision\Broadphase\NSquared.cpp" />
+    <ClCompile Include="Physics\Collision\CollisionDetection.cpp" />
+    <ClCompile Include="Physics\Collision\Collider.cpp" />
     <ClCompile Include="Componets\AudioSource.cpp" />
+    <ClCompile Include="Physics\Engine.cpp" />
+    <ClCompile Include="Componets\RigidBody.cpp" />
+    <ClCompile Include="UI\Elements\ListBox.cpp" />
     <ClCompile Include="UI\Panes\Grid.cpp" />
     <ClCompile Include="MainWindow.cpp" />
-    <ClCompile Include="UI\Page.cpp" />
     <ClCompile Include="SoundManager.cpp" />
     <ClCompile Include="UI\Elements\TextField.cpp" />
     <ClCompile Include="UI\Elements\ImageBox.cpp" />
@@ -173,7 +178,14 @@
     <ClCompile Include="Primatives\Vertex.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Physics\Collision\Broadphase\NSquared.h" />
+    <ClInclude Include="Physics\Collision\Broadphase\Base.h" />
+    <ClInclude Include="Physics\Collision\CollisionDetection.h" />
+    <ClInclude Include="Physics\Collision\Collider.h" />
     <ClInclude Include="Componets\AudioSource.h" />
+    <ClInclude Include="Physics\Engine.h" />
+    <ClInclude Include="Componets\RigidBody.h" />
+    <ClInclude Include="UI\Elements\ListBox.h" />
     <ClInclude Include="UI\Panes\Grid.h" />
     <ClInclude Include="MainWindow.h" />
     <ClInclude Include="UI\Page.h" />

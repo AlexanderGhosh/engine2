@@ -4,6 +4,7 @@
 #include <string>
 #include <glm.hpp>
 #include <gtc/matrix_transform.hpp>
+#include <gtc/quaternion.hpp>
 namespace Utils {
     inline std::vector<std::string> split(const std::string& str, const std::string& delim)
     {
@@ -30,6 +31,9 @@ namespace Utils {
         }
         return matrix;*/
     };
+    inline glm::mat4 rotate(glm::mat4 matrix, const glm::quat& vec) {
+        return matrix * glm::toMat4(vec);
+    }
     template<class T>
     inline bool contains(const std::vector<T>& a, const T& b) {
         auto found = std::find(a.begin(), a.end(), b);

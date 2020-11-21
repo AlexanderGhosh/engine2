@@ -166,6 +166,7 @@ Primative::FrameBuffer::FrameBuffer(std::vector<std::string> textureTypes, glm::
 	// char colTypes_ = 0;
 	for (short i = 0; i < textureTypes.size(); i++) {
 		std::string t = textureTypes[i];
+
 		const auto r = getTexType(t, colTypes);
 		GLenum attachmentType = std::get<GLenum>(r);
 		GLenum type = std::get<int>(r);
@@ -173,27 +174,6 @@ Primative::FrameBuffer::FrameBuffer(std::vector<std::string> textureTypes, glm::
 			continue;
 		}
 		t = std::get<std::string>(r);
-		/*if (t == "col") {
-			attachmentType = GL_COLOR_ATTACHMENT0 + colTypes;
-			type = GL_RGB;
-			t += std::to_string(colTypes++);
-		}
-		else if (t == "depth") {
-			attachmentType = GL_DEPTH_ATTACHMENT;
-			type = GL_DEPTH_COMPONENT;
-		}
-		else if (t == "stencil") {
-			attachmentType = GL_STENCIL_ATTACHMENT;
-			type = GL_FLOAT;
-		}
-		else if (t == "dep_sten") {
-			attachmentType = GL_DEPTH_STENCIL_ATTACHMENT;
-			type = GL_DEPTH24_STENCIL8;
-		}
-		else {
-			continue;
-		}*/
-
 
 		textures.insert({ t, 0 });
 		unsigned& tex = textures[t];
@@ -202,6 +182,7 @@ Primative::FrameBuffer::FrameBuffer(std::vector<std::string> textureTypes, glm::
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexImage2D(GL_TEXTURE_2D, 0, type, dimentions.x, dimentions.y, 0, type, GL_UNSIGNED_BYTE, NULL);
+		
 		glBindTexture(GL_TEXTURE_2D, 0);
 
 		glFramebufferTexture2D(GL_FRAMEBUFFER, attachmentType, GL_TEXTURE_2D, tex, 0);
@@ -264,14 +245,11 @@ const unsigned& Primative::FrameBuffer::getTextureId(const std::string& name)
 {
 	unsigned s = textures.size();
 	const unsigned& r = textures[name];
-	bool b = true;
 	if (s < textures.size()) {
 		textures.erase(name);
-		b = false;
+		return 0;
 	}
-	if (b) 
-		return r;
-	return 0;
+	return r;
 }
 
 Primative::SoundBuffer::SoundBuffer(const char* soundData, const int& len, const unsigned& channel, const int& sampleRate, const unsigned& bitDepth) : SoundBuffer()
@@ -312,4 +290,125 @@ Primative::SoundBuffer::SoundBuffer(const char* soundData, const int& len, const
 void Primative::SoundBuffer::cleanUp()
 {
 	alDeleteBuffers(1, &SBO);
+}
+
+Primative::MSAABuffer::MSAABuffer(std::vector<std::string> textureTypes, glm::ivec2 dimentions) : FrameBuffer(), middleMan(new FrameBuffer(textureTypes, dimentions))
+{
+	this->dimentions = dimentions;
+	glGenFramebuffers(1, &FBO);
+	this->bind();
+
+	if (textureTypes.size() < 0) {
+		textureTypes.push_back("col");
+	}
+
+	char colTypes = 0;
+	// char colTypes_ = 0;
+	for (short i = 0; i < textureTypes.size(); i++) {
+		std::string t = textureTypes[i];
+
+		const auto r = getTexType(t, colTypes);
+		GLenum attachmentType = std::get<GLenum>(r);
+		GLenum type = std::get<int>(r);
+		if (t == "failed") {
+			continue;
+		}
+		t = std::get<std::string>(r);
+
+		textures.insert({ t, 0 });
+		unsigned& tex = textures[t];
+		glGenTextures(1, &tex);
+		glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, tex);
+		// glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		// glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 8, type, dimentions.x, dimentions.y, GL_TRUE);
+
+		glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
+
+		glFramebufferTexture2D(GL_FRAMEBUFFER, attachmentType, GL_TEXTURE_2D_MULTISAMPLE, tex, 0);
+	}
+
+	if (!Utils::contains(textureTypes, { "col" })) {
+		glDrawBuffer(GL_NONE);
+		glReadBuffer(GL_NONE);
+	}
+	if (!Utils::contains(textureTypes, { "depth" })) {
+		unsigned rbo = 0;
+		glGenRenderbuffers(1, &rbo);
+		glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+		glRenderbufferStorageMultisample(GL_RENDERBUFFER, 8, GL_DEPTH_COMPONENT, dimentions.x, dimentions.y);
+		glBindRenderbuffer(GL_RENDERBUFFER, 0);
+		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_COMPONENT, GL_RENDERBUFFER, rbo);
+		renderBuffers.push_back(rbo);
+	}
+	/*if (!Utils::contains(textureTypes, { "stencil" })) {
+		unsigned rbo = 0;
+		glGenRenderbuffers(1, &rbo);
+		glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_UNSIGNED_BYTE, dimentions.x, dimentions.y);
+		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+		glBindRenderbuffer(GL_RENDERBUFFER, 0);
+		renderBuffers.push_back(rbo);
+	}*/
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+		std::cout << "FBO failed to complete\n";
+	}
+	this->unBind();
+}
+
+void Primative::MSAABuffer::bind() const
+{
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, FBO);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, middleMan->getFBO());
+	glBlitFramebuffer(0, 0, dimentions.x, dimentions.y, 0, 0, dimentions.x, dimentions.y, GL_COLOR_BUFFER_BIT, GL_LINEAR); // GL_NEAREST
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	FrameBuffer::bind();
+};
+
+void Primative::MSAABuffer::unBind() const
+{
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	middleMan->unBind();
+}
+
+void Primative::MSAABuffer::cleanUp()
+{
+	middleMan->cleanUp();
+	delete middleMan;
+	middleMan = nullptr;
+	if (FBO == 0)
+		return;
+	this->unBind();
+	for (auto& pair : textures) {
+		unsigned& id = pair.second;
+		const std::string& t = pair.first;
+		char f = 0;
+		const auto r = getTexType(t, f);
+		GLenum attachmentType = std::get<GLenum>(r);
+		// GLenum type = std::get<int>(r);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, attachmentType, GL_TEXTURE_2D, 0, 0);
+		glDeleteTextures(1, &id);
+	}
+	textures.clear();
+
+	for (unsigned& rbo : renderBuffers) {
+		glDeleteRenderbuffers(1, &rbo);
+	}
+	renderBuffers.clear();
+
+	glDeleteFramebuffers(1, &FBO);
+}
+
+const unsigned& Primative::MSAABuffer::getTextureId(const std::string& name)
+{
+	/*if (Utils::contains(name, "col")) {
+		glViewport(0, 0, dimentions.x, dimentions.y);
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, FBO);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, middleMan->getFBO());
+		glBlitFramebuffer(0, 0, dimentions.x, dimentions.y, 0, 0, dimentions.x, dimentions.y, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+		unBind();
+	}*/
+	return middleMan->getTextureId(name);
 }

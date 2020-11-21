@@ -23,7 +23,11 @@ public:
 	const Primative::FrameBuffer* getFBO(const std::string& name);
 	void cleanUp();
 	void addPreProcLayer(const std::string& name, const unsigned& shaderId);
-	inline void addFBO(const std::string& layerName, Primative::FrameBuffer*& fbo) { FBOs.insert({ layerName, fbo }); fbo = nullptr; };
+	inline void addFBO(const std::string& layerName, Primative::FrameBuffer* fbo) 
+	{ 
+		FBOs.insert({ layerName, fbo }); 
+		fbo = nullptr; 
+	};
 	inline void setPostProcShader(const unsigned& shaderId) { postProcShaderId = shaderId; };
 };
 

@@ -44,23 +44,35 @@ namespace Primative {
 		void cleanUp();
 	};
 	class FrameBuffer {
-	private:
+	protected:
 		unsigned FBO;
 		glm::ivec2 dimentions;
 		std::unordered_map<std::string, unsigned> textures;
 		std::vector<unsigned> renderBuffers;
 		const std::tuple<GLenum, int, std::string> getTexType(const std::string& type, char& colTypes);
 	public:
-		inline FrameBuffer() : textures(), FBO(0) { };
+		inline FrameBuffer() : textures(), FBO(0), dimentions(0), renderBuffers() { };
 		FrameBuffer(std::vector<std::string> textuers, glm::ivec2 dimentions);
-		inline void bind() const 
+		virtual inline void bind() const
 		{ 
 			glViewport(0, 0, dimentions.x, dimentions.y);
 			glBindFramebuffer(GL_FRAMEBUFFER, FBO);
 		};
-		inline void unBind() const { glBindFramebuffer(GL_FRAMEBUFFER, 0); };
-		void cleanUp();
-		const unsigned& getTextureId(const std::string& name);
+		virtual inline void unBind() const { glBindFramebuffer(GL_FRAMEBUFFER, 0); };
+		virtual void cleanUp();
+		inline const unsigned& getFBO() const { return FBO; };
+		virtual const unsigned& getTextureId(const std::string& name);
+	};
+	class MSAABuffer : public FrameBuffer {
+	private:
+		FrameBuffer* middleMan;
+	public:
+		inline MSAABuffer() : FrameBuffer(), middleMan(nullptr) { };
+		MSAABuffer(std::vector<std::string> textuers, glm::ivec2 dimentions);
+		virtual void bind() const;
+		virtual void unBind() const;
+		virtual void cleanUp(); 
+		virtual const unsigned& getTextureId(const std::string& name);
 	};
 	class SoundBuffer {
 	private:

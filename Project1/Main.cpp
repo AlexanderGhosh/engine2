@@ -23,6 +23,8 @@
 #include "UI/Panes/Grid.h"
 #include "UI/Elements/ImageBox.h"
 
+#include "MainWindow.h"
+
 #define PBRen 1
 
 Componet::Camera cam;
@@ -43,31 +45,10 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
 
     cam.ProcessMouseMovement(xoffset, yoffset);
 }
-void saveScreenshotToFile(std::string filename, int windowWidth, int windowHeight, unsigned depthMap);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode) {
     if (key == GLFW_KEY_W){
         cam.setPos(cam.getForward() * 0.1f + cam.getForward());
     }
-}
-
-void saveScreenshotToFile(std::string filename, int windowWidth, int windowHeight, unsigned depthMap) {
-    const int numberOfPixels = windowWidth * windowHeight * 3;
-    std::vector<unsigned char> pixels;
-    pixels.reserve(numberOfPixels);
-
-    glPixelStorei(GL_PACK_ALIGNMENT, 1);
-    glReadBuffer(GL_FRONT);
-    // glReadPixels(0, 0, windowWidth, windowHeight, GL_BGR_EXT, GL_UNSIGNED_BYTE, pixels.data());
-    glGetTexImage(1, 0, GL_RGB_INTEGER, GL_UNSIGNED_BYTE, pixels.data());
-
-    FILE* outputFile = fopen(filename.c_str(), "w");
-    short header[] = { 0, 2, 0, 0, 0, 0, (short)windowWidth, (short)windowHeight, 24 };
-
-    fwrite(&header, sizeof(header), 1, outputFile);
-    fwrite(pixels.data(), numberOfPixels, 1, outputFile);
-    fclose(outputFile);
-
-    printf("Finish writing to file.\n");
 }
 
 int main() {
@@ -100,7 +81,6 @@ int main() {
 
     ResourceLoader::createShader("Basics/DefaultShader");
     ResourceLoader::createShader("Basics/ShadowShader");
-    ResourceLoader::createShader("Basics/QuadShader");
     ResourceLoader::createShader("Basics/PBRShader");
     ResourceLoader::createShader("Basics/UIShader");
     ResourceLoader::createShader("Basics/TextShader");
@@ -220,7 +200,7 @@ int main() {
     unsigned fps = 0;
 
     Primative::FrameBuffer* frameBuffer = new Primative::FrameBuffer({ "depth" }, { 800, 600 });
-    Primative::FrameBuffer* finalQB = new Primative::FrameBuffer({ "col" }, { 800, 600 });
+    Primative::MSAABuffer* finalQB = new Primative::MSAABuffer({ "col" }, { 800, 600 });
     unsigned sceneTex = finalQB->getTextureId("col0");
 
     GameScene scene;
@@ -231,36 +211,10 @@ int main() {
     scene.setPostProcShader(ResourceLoader::getShader(PBRen ? "PBRShader" : "DefaultShder")); // PBRShader
     scene.addObject(gun);
 
-
+    // UI //
     UI::TextRenderer font = UI::TextRenderer({ 800, 600 }); // creates arial Font
     UI::TextRenderer::setShader(ResourceLoader::getShader("TextShader"));
-    // UI //
     UI::Renderer::init(ResourceLoader::getShader("UIShader"), { 800, 600 });
-
-    UI::ImageBox element;
-    // element.setText("Hello World");
-    // element.setForgroundColor({ 1, 1, 0 });
-    element.setBackgroundImage(sceneTex);
-    // element.toggleSelected();
-    // element.setBackgroundColor({ 1, 0, 0 }); // forces the use of a solid color
-    element.setPos({ 0, 0 });
-    element.setWidth(80);
-    element.setHeight(60);
-    element.setMargin({ 100, 0, 0, 0 });
-
-    element.mouseDown = [](UI::Element* sender) {
-        std::cout << "mouse down\n";
-    };
-    element.mouseUp = [](UI::Element* sender) {
-        std::cout << "mouse up\n";
-    };
-
-    UI::Grid pane(800, 600);
-    pane.setColumnCount(10);
-    pane.setRowCount(10);
-    pane.addElement(&element);
-    pane.setColumn(&element, 5);
-    pane.setRow(&element, 5);
     // UI //
 
     // SOUNDS //
@@ -271,7 +225,10 @@ int main() {
     audio->addBuffer(buffer);
 
     Events::Handler::init(window);
-    glfwSetCursorPosCallback(window, mouse_callback);
+    // glfwSetCursorPosCallback(window, mouse_callback);
+
+
+    MainWindow win(sceneTex, 8.f/6.f);
 
     while (!glfwWindowShouldClose(window))
     {
@@ -287,20 +244,23 @@ int main() {
 
 
         scene.preProcess(); // shadows and scene quad
-        scene.postProcess();// render to screen
-
-
-        pane.update(); // events check
-        UI::Renderer::render(&pane);
+        if(Events::Handler::getKey(Events::Key::Space, Events::Action::Down)){
+            scene.postProcess();// render to screen
+        }
+        else{
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+            win.update(); // events check
+            UI::Renderer::render(&win);
+        }
 
         // textR.drawText("Hello", 25, 25, 1, { 1, 0, 0 });
 
-        if (Events::Handler::getKey(Events::Key::Space, Events::Action::Down)) {
+        /*if (Events::Handler::getKey(Events::Key::Space, Events::Action::Down)) {
             audio->play();
         }
         if (Events::Handler::getKey(Events::Key::R_Shift, Events::Action::Down)) {
             audio->pause();
-        }
+        }*/
         if (Events::Handler::getKey(Events::Key::Escape, Events::Action::Down)) {
             break;
         }

@@ -1,6 +1,7 @@
 #include "Renderer.h"
 #include <gtc/matrix_transform.hpp>
 #include "../Rendering/Shading/Manager.h"
+#include "Panes/Grid.h"
 
 unsigned UI::Renderer::shaderId = 0;
 Primative::VertexBuffer UI::Renderer::quadBuffer = { };
@@ -32,7 +33,8 @@ void UI::Renderer::render(const UI::Pane* pane) // draws the quads
 	quadBuffer.bind();
 	for (const UI::Element* element : pane->getElements()) {
 		Render::Shading::Manager::setActive(shaderId);
-		const glm::mat4 model = element->getModel();
+		glm::mat4 model = element->getModel();
+		model[3][1] = pane->getDimentions().y - model[3][1];
 		Render::Shading::Manager::setValue("model", model); 
 
 		const Materials::MatItem& bg = element->getBackgroundColor();
@@ -51,6 +53,11 @@ void UI::Renderer::render(const UI::Pane* pane) // draws the quads
 	}
 	quadBuffer.unBind(); 
 	glEnable(GL_DEPTH_TEST);
+}
+
+void UI::Renderer::render(const Page* pane)
+{
+	render(pane->getRoot());
 }
 
 void UI::Renderer::cleanUp()

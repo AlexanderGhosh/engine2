@@ -61,5 +61,5 @@ void Events::Handler::mouseButtonCallback(GLFWwindow* window, int button, int ac
 void Events::Handler::characterCallBack(GLFWwindow* window, unsigned int codePoint)
 {
 	Events::Handler::lastChar = Utils::toUTF8(codePoint);
-	std::cout << Events::Handler::lastChar << std::endl;
+	// std::cout << Events::Handler::lastChar << std::endl;
 }
