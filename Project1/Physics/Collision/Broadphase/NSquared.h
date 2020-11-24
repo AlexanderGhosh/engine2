@@ -5,18 +5,15 @@ namespace Physics {
     class NSquared : public Broadphase {
     public:
 
-        inline virtual void Add(AABB* aabb) { aabbs.push_back(aabb); };
+        inline virtual void add(AABB* aabb) { };
 
-        inline virtual void Update(void) { };
+        inline virtual void update(void) { };
 
-        virtual const ColliderPairList& ComputePairs();
-        virtual Collider* Pick(const glm::vec3& point) const;
-        virtual void Query(const AABB& aabb, ColliderList& out) const;
-        virtual RayCastResult RayCast(const Ray3& ray) const;
-
+        virtual const ColliderPairList& computePairs();
+        virtual Collider* pick(const glm::vec3& point) const;
+        virtual void query(const AABB& aabb, ColliderList& out) const;
+        virtual RayCastResult rayCast(const Ray3& ray) const;
     private:
-
-        std::vector<AABB*> aabbs;
         ColliderPairList pairs;
     };
 };

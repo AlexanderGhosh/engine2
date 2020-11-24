@@ -22,24 +22,29 @@ namespace Physics {
     class Broadphase {
     public:
         // adds a new AABB to the broadphase
-        virtual void Add(AABB* aabb) = 0;
+        virtual void add(AABB* aabb) = 0;
 
         // updates broadphase to react to changes to AABB
-        virtual void Update(void) = 0;
+        virtual void update(void) = 0;
 
         // returns a list of possibly colliding colliders
-        virtual const ColliderPairList& ComputePairs(void) = 0;
+        virtual const ColliderPairList& computePairs(void) = 0;
 
         // returns a collider that collides with a point
         // returns null if no such collider exists
-        virtual Collider* Pick(const glm::vec3& point) const = 0;
+        virtual Collider* pick(const glm::vec3& point) const = 0;
 
         // returns a list of colliders whose AABBs collide 
         // with a query AABB
-        virtual void Query(const AABB& aabb, ColliderList& output) const = 0;
+        virtual void query(const AABB& aabb, ColliderList& output) const = 0;
 
         // result contains the first collider the ray hits
         // result contains null if no collider is hit
-        virtual RayCastResult RayCast(const Ray3& ray) const = 0;
+        virtual RayCastResult rayCast(const Ray3& ray) const = 0;
+
+        virtual void cleanUp() { };
+        std::vector<Collider*>* colliders;
+    protected:
+        Broadphase();
     };
 };

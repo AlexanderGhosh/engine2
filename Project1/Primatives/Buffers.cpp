@@ -370,7 +370,8 @@ void Primative::MSAABuffer::unBind() const
 {
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-	middleMan->unBind();
+	if(middleMan)
+		middleMan->unBind();
 }
 
 void Primative::MSAABuffer::cleanUp()

@@ -4,7 +4,7 @@
 #include "../Componets/Componets.h"
 #include "../GameObject/GameObject.h"
 
-Render::RenderMesh::RenderMesh() : buffers(), parent(nullptr), material(), Componet::Base()
+Render::RenderMesh::RenderMesh() : buffers(), parent(nullptr), material(), Component::Base()
 {
 	/*Materials::Forward* fwd = new Materials::Forward();
 	fwd->getDiffuse()(1); // set to the texture id
@@ -26,7 +26,7 @@ Render::RenderMesh::RenderMesh() : buffers(), parent(nullptr), material(), Compo
 
 void Render::RenderMesh::update()
 {
-	const glm::mat4 m = Componet::Base::parent->getTransform()->getModel();
+	const glm::mat4 m = Component::Base::parent->getTransform()->getModel();
 	bool succ = Shading::Manager::setValue("model", m);
 	if(this->material->getType() == Materials::Type::Forward)
 		succ = Shading::Manager::setValue("material", *dynamic_cast<Materials::Forward*>(this->material));
@@ -40,7 +40,7 @@ void Render::RenderMesh::update()
 	}
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
-void Render::RenderMesh::addMesh(std::vector<Primative::VertexBuffer*>& buffers, const GLenum draw_type)
+void Render::RenderMesh::addBuffers(std::vector<Primative::VertexBuffer*>& buffers, const GLenum draw_type)
 {
 	this->buffers = buffers;
 	for (Primative::VertexBuffer* buffer : buffers) {

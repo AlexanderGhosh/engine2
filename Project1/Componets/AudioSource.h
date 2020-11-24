@@ -3,7 +3,7 @@
 #include "../Primatives/Buffers.h"
 #include <al.h>
 
-namespace Componet {
+namespace Component {
     class AudioSource : public Base
     {
     private:
@@ -22,6 +22,7 @@ namespace Componet {
         }
         void addBuffer(Primative::SoundBuffer* buffer) const;
         void cleanUp();
+        inline Type getType() const { return Type::AudioSource; };
     };
 };
 

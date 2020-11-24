@@ -7,13 +7,16 @@
 #include "../Componets/Componets.h"
 #include "../Primatives/Material.h"
 namespace Render {
-	class RenderMesh : public Animation::Animation, public Componet::Base // special case of animation with only one frame
+	class RenderMesh : public Animation::Animation, public Component::Base // special case of animation with only one frame
 	{
 	public:
 		RenderMesh();
 		virtual void update();
-		void addMesh(std::vector<Primative::VertexBuffer*>& buffers, const GLenum draw_type = GL_TRIANGLES);
+		void addBuffers(std::vector<Primative::VertexBuffer*>& buffers, const GLenum draw_type = GL_TRIANGLES);
 		inline void setMaterial(Materials::Base* mat) { material = mat; };
+		inline Component::Type getType() const {
+			return Component::Type::RenderMesh;
+		}
 	private:
 		std::vector<Primative::VertexBuffer*> buffers;
 		GameObject* parent;

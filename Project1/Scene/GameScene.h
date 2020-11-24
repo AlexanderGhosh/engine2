@@ -16,7 +16,7 @@ private:
 	}
 public:
 	inline GameScene() : objects(), preProcessingLayers(), currentTick(0), postProcShaderId(0), FBOs() { };
-	inline void addObject(GameObject*& obj) { objects.push_back(obj); obj = nullptr; };
+	inline void addObject(GameObject*& obj) { objects.push_back(obj); };
 	void preProcess();
 	void postProcess();
 	void renderObjects();

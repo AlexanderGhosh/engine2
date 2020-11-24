@@ -1,22 +1,19 @@
 #include "NSquared.h"
 #include <algorithm>
-const Physics::ColliderPairList& Physics::NSquared::ComputePairs()
+const Physics::ColliderPairList& Physics::NSquared::computePairs()
 {
     pairs.clear();
 
-    // outer loop
-    auto end = aabbs.end();
-    for (auto i = aabbs.begin(); i != end; ++i)
+    auto end = colliders->end();
+    for (auto i = colliders->begin(); i != end; ++i)
     {
-
-        // inner loop
         auto jStart = i;
         for (auto j = ++jStart; j != end; ++j)
         {
-            AABB* aabbA = *i;
-            AABB* aabbB = *j;
-            Collider* colliderA = aabbA->getCollider();
-            Collider* colliderB = aabbB->getCollider();
+            const AABB* aabbA = (*i)->constructAABB();
+            const AABB* aabbB = (*j)->constructAABB();
+            // Collider* colliderA = aabbA->getCollider();
+            // Collider* colliderB = aabbB->getCollider();
             /*RigidBody* bodyA = colliderA->Body();
             RigidBody* bodyB = colliderB->Body();
 
@@ -26,7 +23,7 @@ const Physics::ColliderPairList& Physics::NSquared::ComputePairs()
 
                 // add collider pair
             if (CollisionDetection::checkCollision(aabbA, aabbB))
-                pairs.emplace_back(colliderA, colliderB);
+                pairs.emplace_back(*i, *j);
 
         }
     }
@@ -34,30 +31,30 @@ const Physics::ColliderPairList& Physics::NSquared::ComputePairs()
     return pairs;
 }
 
-Physics::Collider* Physics::NSquared::Pick(const glm::vec3& point) const
+Physics::Collider* Physics::NSquared::pick(const glm::vec3& point) const
 {
-    for (const auto& aabb : aabbs)
-        if (CollisionDetection::checkCollision(aabb, point))
-            return reinterpret_cast<Collider*>(aabb);
+    for (auto& collider : *colliders)
+        if (CollisionDetection::checkCollision(collider->constructAABB(), point))
+            return reinterpret_cast<Collider*>(collider);
     return nullptr;
 }
 
-void Physics::NSquared::Query(const AABB& aabb, ColliderList& out) const
+void Physics::NSquared::query(const AABB& aabb, ColliderList& out) const
 {
-    for (AABB* colliderAABB : aabbs)
-        if (CollisionDetection::checkCollision(colliderAABB, &aabb))
-            out.push_back(colliderAABB->getCollider());
+    for (auto& collider : *colliders)
+        if (CollisionDetection::checkCollision(collider->constructAABB(), &aabb))
+            out.push_back(collider->getCollider());
 }
 
-Physics::RayCastResult Physics::NSquared::RayCast(const Ray3& ray) const
+Physics::RayCastResult Physics::NSquared::rayCast(const Ray3& ray) const
 {
     return { };
-
+    /*
     // test AABBs for candidates
     std::vector<Collider*> candidateList;
-    candidateList.reserve(aabbs.size());
+    candidateList.reserve(colliders->size());
     for (AABB* aabb : aabbs)
-        if (false) // aabb->TestRay(ray)
+        if (false) // collider->TestRay(ray)
             candidateList.push_back(aabb->getCollider());
 
     // struct for storing ray-collider test results
@@ -107,6 +104,5 @@ Physics::RayCastResult Physics::NSquared::RayCast(const Ray3& ray) const
     else
         result.hit = false;
 
-    return result;
+    return result;*/
 }
-

@@ -8,43 +8,33 @@
 
 namespace Physics {
     class Broadphase;
+    class Narrowphase;
     struct CollisionManfold {
         bool collided;
         glm::vec3 normal;
-        glm::vec3 pointsOfCollision[2];
-        float minmumTranslation;
-        Collider* bodies[2];
-        CollisionManfold() : collided(0), normal(0), pointsOfCollision{ Utils::zero(), Utils::zero() }, minmumTranslation(0), bodies{ nullptr, nullptr } { };
+        std::array<glm::vec3, 2> points;
+        float penertraion;
+        std::array<Collider*, 2> bodies;
+        CollisionManfold() : collided(0), normal(0), points{ Utils::zero(), Utils::zero() }, penertraion(0), bodies{ nullptr, nullptr } { };
         inline void cleanUp() {
             for (char i = 0; i < 2; i++) {
-                delete &pointsOfCollision[i];
                 bodies[i] = nullptr;
             }
-            delete pointsOfCollision;
-            delete bodies;
-            *bodies = nullptr;
         };
-        inline ~CollisionManfold() { cleanUp(); };
+        // inline ~CollisionManfold() { cleanUp(); };
     };
     class CollisionDetection {
     private:
-        static std::vector<Collider*> allColliders;
         static Broadphase* broadphase;
+        static Narrowphase* narrowphase;
     public:
-        static const std::vector<CollisionManfold>& getCollisions();
+        static const std::vector<CollisionManfold> getCollisions();
         static inline void setBroadphase(Broadphase* algo) { broadphase = algo; };
+        static inline void setNarrowphase(Narrowphase* algo) { narrowphase = algo; };
         static bool checkCollision(const AABB* a, const AABB* b);
         static bool checkCollision(const AABB* a, const glm::vec3 b);
         static CollisionManfold getCollisionData(AABB* a, AABB* b);
-        inline static void cleanUp() {
-            auto it = allColliders.end();
-            for (auto it = allColliders.end(); it != allColliders.begin();) {
-                auto collider = *it;
-                collider->cleanUp();
-                delete collider;
-                allColliders.erase(it);
-            }
-        };
+        static void cleanUp();
     };
 };
 

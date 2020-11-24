@@ -1,16 +1,18 @@
 #include "RigidBody.h"
+#include "../Physics/Engine.h"
+#include "../GameObject/GameObject.h"
 
-void Componet::RigidBody::updateGlobalCentroidFromPosition()
+void Component::RigidBody::updateGlobalCentroidFromPosition()
 {
 	globalCentroid = getRotation() * localCentroid + *position;
 }
 
-void Componet::RigidBody::updatePositionFromGlobalCentroid()
+void Component::RigidBody::updatePositionFromGlobalCentroid()
 {
 	*position = getRotation() * -localCentroid + globalCentroid;
 }
 
-void Componet::RigidBody::updateOrientation()
+void Component::RigidBody::updateOrientation()
 {
     *rotation = glm::normalize(*rotation);
     globlaInverseIntertiaTensor =
@@ -19,7 +21,7 @@ void Componet::RigidBody::updateOrientation()
         * glm::inverse(getRotation());
 }
 
-void Componet::RigidBody::addCollider(Physics::Collider& collider)
+void Component::RigidBody::addCollider(Physics::Collider& collider)
 {
     // add collider to collider list
     colliders.push_back(&collider);
@@ -65,33 +67,42 @@ void Componet::RigidBody::addCollider(Physics::Collider& collider)
     localInverseIntertiaTensor = glm::inverse(localInertiaTensor);
 }
 
-const glm::vec3 Componet::RigidBody::localToGlobal(const glm::vec3& p) const
+const glm::vec3 Component::RigidBody::localToGlobal(const glm::vec3& p) const
 {
     return getRotation() * p + *position;
 }
 
-const glm::vec3 Componet::RigidBody::globalToLocal(const glm::vec3& p) const
+const glm::vec3 Component::RigidBody::globalToLocal(const glm::vec3& p) const
 {
     return glm::inverse(getRotation()) * (p - *position);
 }
 
-const glm::vec3 Componet::RigidBody::localToGlobalVec(const glm::vec3& v) const
+const glm::vec3 Component::RigidBody::localToGlobalVec(const glm::vec3& v) const
 {
     return getRotation() * v;
 }
 
-const glm::vec3 Componet::RigidBody::globalToLocalVec(const glm::vec3& v) const
+const glm::vec3 Component::RigidBody::globalToLocalVec(const glm::vec3& v) const
 {
     return glm::inverse(getRotation()) * v;
 }
 
-void Componet::RigidBody::applyForce(const glm::vec3& f, const glm::vec3& at)
+void Component::RigidBody::applyForce(const glm::vec3& f, const glm::vec3& at)
 {
     forceAccumulator += f;
     torqueAccumulator += glm::cross(at - globalCentroid, f);
 }
 
-void Componet::RigidBody::fixedUpdate()
+Component::RigidBody::RigidBody() : Base(), mass(0), inverseMass(0),
+globlaInverseIntertiaTensor(0), 
+localInverseIntertiaTensor(0), globalCentroid(0), localCentroid(0),
+position(nullptr), rotation(nullptr), linearVelocity(0), angularVelocity(0),
+colliders(), forceAccumulator(0), torqueAccumulator(0)
+{
+    Physics::Engine::addRigidBody(this);
+}
+
+void Component::RigidBody::fixedUpdate()
 {
     const float dt = 1.0f / 60.0f;
     linearVelocity += inverseMass * forceAccumulator * dt;
@@ -109,4 +120,12 @@ void Componet::RigidBody::fixedUpdate()
     // update physical properties
     updateOrientation();
     updatePositionFromGlobalCentroid();
+}
+
+void Component::RigidBody::setParent(GameObject* parent)
+{
+    Base::setParent(parent);
+    Component::Transform* trans = parent->getTransform();
+    position = &trans->Position;
+    rotation = &trans->Rotation;
 }

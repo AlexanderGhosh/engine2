@@ -1,7 +1,7 @@
 #include "GameObject.h"
 
-GameObject::GameObject() : componets(), enabled(), transform(new Componet::Transform()) {
-	// this->addComponet(new Componet::Transform());
+GameObject::GameObject() : componets(), enabled(), transform(new Component::Transform()) {
+	// this->addComponet(new Component::Transform());
 	enabled.push_back(1);
 }
 
@@ -9,7 +9,7 @@ void GameObject::tick(short currentTick)
 {
 	for (unsigned i = 0; i < componets.size(); i++) {
 		if (!enabled[i]) continue;
-		Componet::Base*& comp = componets[i];
+		Component::Base*& comp = componets[i];
 		comp->update();
 		if (currentTick == FIXED_UPDATE_RATE) {
 			comp->fixedUpdate();
@@ -19,7 +19,7 @@ void GameObject::tick(short currentTick)
 
 void GameObject::cleanUp()
 {
-	for (Componet::Base*& componet : componets) {
+	for (Component::Base*& componet : componets) {
 		componet->cleanUp();
 		delete componet;
 		componet = nullptr;

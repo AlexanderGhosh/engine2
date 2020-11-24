@@ -5,6 +5,8 @@
 #include <glm.hpp>
 #include <gtc/matrix_transform.hpp>
 #include <gtc/quaternion.hpp>
+#include <list>
+#include <iterator>
 namespace Utils {
     inline std::vector<std::string> split(const std::string& str, const std::string& delim)
     {
@@ -32,7 +34,7 @@ namespace Utils {
         return matrix;*/
     };
     inline glm::mat4 rotate(glm::mat4 matrix, const glm::quat& vec) {
-        return matrix * glm::toMat4(vec);
+        return matrix * glm::mat4_cast(vec);
     }
     template<class T>
     inline bool contains(const std::vector<T>& a, const T& b) {
@@ -121,5 +123,18 @@ namespace Utils {
     inline const unsigned& findIndex(std::vector<T>& a, T& b) {
         auto c = std::find(a.begin(), a.end(), b);
         return std::distance(a.begin(), c);
+    }
+    template<class T>
+    inline T& elementAt(std::list<T>& list, const int& index) {
+        auto s = list.begin();
+        std::advance(s, index);
+        return *s;
+    }
+    inline glm::vec3 map(const glm::vec3& x, const glm::vec2& from, const glm::vec2& to) {
+        float a = from.x;
+        float b = from.y;
+        float c = to.x;
+        float d = to.y;
+        return ((c + d) + (d - c) * ((2.0f * x - (a + b)) / (b - a))) / 2.0f;
     }
 }

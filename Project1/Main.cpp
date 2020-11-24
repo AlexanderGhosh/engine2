@@ -22,12 +22,15 @@
 #include "Componets/Camera.h"
 #include "UI/Panes/Grid.h"
 #include "UI/Elements/ImageBox.h"
+#include "Physics/Engine.h"
+#include "Physics/Collision/Broadphase/NSquared.h"
+#include "Physics/Collision/Narrowphase/GJK.h"
 
 #include "MainWindow.h"
 
 #define PBRen 1
 
-Componet::Camera cam;
+Component::Camera cam;
 bool firstMouse = 1;
 float lastX = 0, lastY = 0;
 void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
@@ -66,26 +69,24 @@ int main() {
     }
     glfwMakeContextCurrent(window);
 
-    // glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glEnable(GL_MULTISAMPLE); 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glfwSetCursorPosCallback(window, mouse_callback);
-    glfwSetKeyCallback(window, key_callback);
 
     glViewport(0, 0, 800, 600);
     glewInit();
 
-    cam.setPos({ 0, 200, 700 });
+    cam.setPos({ 0, 0, 0 }); // 200, 700
 
     ResourceLoader::createShader("Basics/DefaultShader");
     ResourceLoader::createShader("Basics/ShadowShader");
     ResourceLoader::createShader("Basics/PBRShader");
     ResourceLoader::createShader("Basics/UIShader");
     ResourceLoader::createShader("Basics/TextShader");
-    // cube
-    /*Primative::Mesh* m = new Primative::Mesh();
+    // cube1
+    Primative::Mesh* cubeMesh = new Primative::Mesh();
     Primative::Vertex v1({ -0.5, -0.5, -0.5 }, { 0, 0 });
     Primative::Vertex v2({ 0.5, -0.5, -0.5 }, { 1, 0 });
     Primative::Vertex v3({ 0.5, 0.5, -0.5 }, { 1, 1 });
@@ -95,23 +96,24 @@ int main() {
     Primative::Vertex v7({ 0.5, 0.5, 0.5 }, { 1, 1 });
     Primative::Vertex v8({ -0.5, 0.5, 0.5 }, { 0, 1 });
 
-    m->verts.push_back(v1);
-    m->verts.push_back(v2);
-    m->verts.push_back(v3);
-    m->verts.push_back(v4);
-    m->verts.push_back(v5);
-    m->verts.push_back(v6);
-    m->verts.push_back(v7);
-    m->verts.push_back(v8);
-
-    m->indices = {
+    cubeMesh->verts.push_back(v1);
+    cubeMesh->verts.push_back(v2);
+    cubeMesh->verts.push_back(v3);
+    cubeMesh->verts.push_back(v4);
+    cubeMesh->verts.push_back(v5);
+    cubeMesh->verts.push_back(v6);
+    cubeMesh->verts.push_back(v7);
+    cubeMesh->verts.push_back(v8);
+    
+    cubeMesh->indices = {
         0, 1, 3, 3, 1, 2,
         1, 5, 2, 2, 5, 6,
         5, 4, 6, 6, 4, 7,
         4, 0, 7, 7, 0, 3,
         3, 2, 7, 7, 2, 6,
         4, 5, 0, 0, 5, 1
-    };*/
+    };
+    std::vector<Primative::VertexBuffer*> cubeBuffers = ResourceLoader::createModel(cubeMesh, "cube", GL_TRIANGLE_STRIP);
 
     // pyramid
     /*Primative::Mesh* m = new Primative::Mesh();
@@ -137,7 +139,7 @@ int main() {
 
     // auto t = w.loadModel("C:/Users/AGWDW/Desktop/blend/Handgun_Game_Blender Gamer Engine.obj");
     // auto t = w.loadModel("Basics/Models/sword.obj");
-    auto pistolBuffers = ResourceLoader::createModel("Basics/Models/pistol.obj");
+    std::vector<Primative::VertexBuffer*> pistolBuffers = ResourceLoader::createModel("Basics/Models/pistol.obj");
     // auto t = FileReaders::AssimpWrapper::loadModel("Basics/Models/pistol.obj");
 
     // ResourceLoader::createTexture("Basics/Textures/handgun_C.jpg", TextureType::DiffuseMap, 0); // diff
@@ -160,7 +162,7 @@ int main() {
     // unsigned tex = ResourceLoader::createTexture("Basics/Textures/wood.jpg", TextureType::DiffuseMap);
 
     Render::RenderMesh* r = new Render::RenderMesh();
-    r->addMesh(pistolBuffers);
+    r->addBuffers(pistolBuffers);
     Materials::Base* mat = new Materials::PBR({ 1 }, { 3 }, { 2 }, { 5 }, { 4 }); // new Materials::PBR({ 1 }, { 3 }, { 2 }, { 5 }, { 4 });
     if (!PBRen) {
         mat = new Materials::Forward({ 1 }, { 2 }, { 3 }, 32);
@@ -170,6 +172,35 @@ int main() {
     GameObject* gun = new GameObject();
     gun->getTransform()->Position = { 0, 0, 0 };
     gun->addComponet(r);
+
+    Render::RenderMesh* cubeR = new Render::RenderMesh();
+    cubeR->addBuffers(cubeBuffers);
+    Materials::Base* cubeMat = new Materials::PBR({ { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } });
+    cubeR->setMaterial(cubeMat);
+
+    GameObject* cube1 = new GameObject();
+    cube1->getTransform()->Position = { 0, 0, -3 };
+    cube1->addComponet(cubeR);
+
+    Physics::AABB* collider1 = new Physics::AABB(Utils::fill(-0.5), Utils::fill(0.5), Utils::zero());
+    cube1->addComponet(collider1);
+
+
+    Render::RenderMesh* cubeR2 = new Render::RenderMesh();
+    auto model = ResourceLoader::getModel("cube");
+    cubeR2->addBuffers(model, GL_TRIANGLE_STRIP);
+    Materials::Base* cubeMat2 = new Materials::PBR({ { 0, 100, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } });
+    cubeR2->setMaterial(cubeMat2);
+
+    GameObject* cube2 = new GameObject();
+    cube2->getTransform()->Position = { 0, 2, -3 };
+    cube2->addComponet(cubeR2);
+
+    Physics::AABB* collider2 = new Physics::AABB(Utils::fill(-0.5), Utils::fill(0.5), Utils::zero());
+    cube2->addComponet(collider2);
+
+
+
 
     Primative::StaticBuffer b("m4, m4, v3, f, m4", 0);
     // view    | matrix 4
@@ -210,6 +241,8 @@ int main() {
     scene.addPreProcLayer("final", ResourceLoader::getShader(PBRen ? "PBRShader" : "DefaultShder"));
     scene.setPostProcShader(ResourceLoader::getShader(PBRen ? "PBRShader" : "DefaultShder")); // PBRShader
     scene.addObject(gun);
+    scene.addObject(cube1);
+    scene.addObject(cube2);
 
     // UI //
     UI::TextRenderer font = UI::TextRenderer({ 800, 600 }); // creates arial Font
@@ -220,15 +253,18 @@ int main() {
     // SOUNDS //
     SoundManager::init();
     const auto buffer = SoundManager::createBuffer("C:/Users/AGWDW/Desktop/iamtheprotectorofthissystem.wav");
-    Componet::AudioSource* audio = new Componet::AudioSource(
+    Component::AudioSource* audio = new Component::AudioSource(
         SoundManager::createSoundSource());
     audio->addBuffer(buffer);
 
     Events::Handler::init(window);
-    // glfwSetCursorPosCallback(window, mouse_callback);
+    glfwSetCursorPosCallback(window, mouse_callback);
 
 
     MainWindow win(sceneTex, 8.f/6.f);
+
+    Physics::CollisionDetection::setBroadphase(new Physics::NSquared());
+    Physics::CollisionDetection::setNarrowphase(new Physics::GJK());
 
     while (!glfwWindowShouldClose(window))
     {
@@ -242,25 +278,27 @@ int main() {
         b.fill(0, value_ptr(cam.getView()));
         b.fill(2, value_ptr(cam.getPos()));
 
-
+        glDisable(GL_CULL_FACE);
         scene.preProcess(); // shadows and scene quad
-        if(Events::Handler::getKey(Events::Key::Space, Events::Action::Down)){
+        if(!Events::Handler::getKey(Events::Key::Space, Events::Action::Down)){
             scene.postProcess();// render to screen
         }
         else{
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
             win.update(); // events check
-            UI::Renderer::render(&win);
+            //UI::Renderer::render(&win);
         }
+        cube2->getTransform()->Position.y -= 0.5f * deltaTime;
 
-        // textR.drawText("Hello", 25, 25, 1, { 1, 0, 0 });
+        // std::cout << Physics::CollisionDetection::checkCollision(collider1, collider2) << "\r";
+        Physics::Engine::update();
 
-        /*if (Events::Handler::getKey(Events::Key::Space, Events::Action::Down)) {
-            audio->play();
+        if (Events::Handler::getKey(Events::Key::W, Events::Action::Down)) {
+            cam.setPos(cam.getPos() + cam.getForward() * deltaTime);
         }
-        if (Events::Handler::getKey(Events::Key::R_Shift, Events::Action::Down)) {
-            audio->pause();
-        }*/
+        if (Events::Handler::getKey(Events::Key::S, Events::Action::Down)) {
+            cam.setPos(cam.getPos() - cam.getForward() * deltaTime);
+        }
         if (Events::Handler::getKey(Events::Key::Escape, Events::Action::Down)) {
             break;
         }

@@ -4,7 +4,7 @@
 #include "Componets.h"
 #include "../Physics/Collision/Collider.h"
 
-namespace Componet {
+namespace Component {
 	class RigidBody : public Base
 	{
 	private:
@@ -36,9 +36,11 @@ namespace Componet {
 		void applyForce(const glm::vec3& f, const glm::vec3& at);
 
 		inline glm::mat3 getRotation() const { return glm::toMat3(*rotation); };
-
+		inline Type getType() const { return Type::Rigidbody; };
 	public:
+		RigidBody();
 		void fixedUpdate();
+		void setParent(GameObject* parent);
 	};
 };
 
