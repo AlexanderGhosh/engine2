@@ -15,7 +15,7 @@ namespace Physics {
 			SupportPoint a, b, c;
 			glm::vec3 n;
 			Triangle(const SupportPoint& a, const SupportPoint& b, const SupportPoint& c) : a(a), b(b), c(c) {
-				n = glm::normalize(glm::cross((b.v - a.v), (c.v - a.v)));
+				n = glm::normalize(glm::cross(b.v - a.v, c.v - a.v));
 			}
 			inline const std::vector<const SupportPoint*> all() const { return { &a, &b, &c }; };
 		};
@@ -45,6 +45,7 @@ namespace Physics {
 			}
 		};
 		void EPA(CollisionManfold& info, Simplex& simplex);
+		void ClipFunc(const Triangle& triangle, CollisionManfold& info);
 		void extrapolateContactInformation(const Triangle& triangle, CollisionManfold& info);
 		bool gjk_simtest(const glm::vec3& a, const glm::vec3& b) {
 			return glm::dot(a, b) > 0;
@@ -62,4 +63,3 @@ namespace Physics {
 		};
 	};
 };
-

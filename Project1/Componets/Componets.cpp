@@ -9,8 +9,3 @@ const glm::mat4 Component::Transform::getModel() const
     model = glm::scale(model, Scale);
     return model;
 }
-
-const glm::vec3 Component::Base::getCenter() const
-{
-    return parent->getTransform()->Position;
-}

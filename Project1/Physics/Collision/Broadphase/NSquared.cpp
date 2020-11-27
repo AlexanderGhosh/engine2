@@ -1,4 +1,5 @@
 #include "NSquared.h"
+#include "../../../Componets/RigidBody.h"
 #include <algorithm>
 const Physics::ColliderPairList& Physics::NSquared::computePairs()
 {
@@ -12,14 +13,10 @@ const Physics::ColliderPairList& Physics::NSquared::computePairs()
         {
             const AABB* aabbA = (*i)->constructAABB();
             const AABB* aabbB = (*j)->constructAABB();
-            // Collider* colliderA = aabbA->getCollider();
-            // Collider* colliderB = aabbB->getCollider();
-            /*RigidBody* bodyA = colliderA->Body();
-            RigidBody* bodyB = colliderB->Body();
 
             // skip same-body collision
-            if (bodyA == bodyB)
-                continue;*/
+            if (aabbA == aabbB)
+                continue;
 
                 // add collider pair
             if (CollisionDetection::checkCollision(aabbA, aabbB))

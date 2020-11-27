@@ -15,8 +15,7 @@ namespace Component {
 		virtual void fixedUpdate() { }; // every x ticks
 		virtual void cleanUp() { parent = nullptr; };
 		virtual void setParent(GameObject* parent) { this->parent = parent; };
-		inline const GameObject* getParent(GameObject* parent) const { return parent; };
-		virtual const glm::vec3 getCenter() const;
+		inline GameObject* getParent() { return parent; };
 		virtual inline Type getType() const = 0;
 	protected:
 		inline Base() : parent(nullptr) { };

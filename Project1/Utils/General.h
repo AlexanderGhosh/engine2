@@ -137,4 +137,138 @@ namespace Utils {
         float d = to.y;
         return ((c + d) + (d - c) * ((2.0f * x - (a + b)) / (b - a))) / 2.0f;
     }
+    template<class T>
+    bool find(const std::list<T>& a, T& b) {
+        auto it = std::find(a.begin(), a.end(), b);
+        bool res = it != a.end();
+        if (res) 
+            b = *it;
+        return res;
+    }
+
+    inline bool nan_inf(const glm::mat3& a) {
+        for (char i = 0; i < 3; i++) {
+            for (char j = 0; j < 3; j++) {
+                if (glm::isnan(a[i][j]) || glm::isinf(a[i][j]) || glm::isinf(-a[i][j]))
+                    return true;
+            }
+        }
+        return false;
+    }
+    inline glm::vec3 tripCross(const glm::vec3& a, const glm::vec3& b, const glm::vec3& c) {
+        return glm::cross(glm::cross(a, b), c);
+    }
+    namespace BigMaths {
+        using Vector6 = std::array<float, 6>;
+        using Vector12 = std::array<float, 12>;
+        using MassMatrix6 = std::array<std::array<float, 6>, 6>;
+        using Matrix12 = std::array<std::array<float, 12>, 12>;
+
+        inline const Vector12 combine(const Vector6& a, const Vector6& b)
+        {
+            Vector12 res{};
+            res[0] = a[0];
+            res[1] = a[1];
+            res[2] = a[2];
+            res[3] = a[3];
+            res[4] = a[4];
+            res[5] = a[5];
+
+            res[6] =  b[0];
+            res[7] =  b[1];
+            res[8] =  b[2];
+            res[9] =  b[3];
+            res[10] = b[4];
+            res[11] = b[5];
+            return res;
+        }
+
+        inline const Matrix12 combine(const MassMatrix6& a, const MassMatrix6& b)
+        {
+            Matrix12 res{};
+            for (char i = 0; i < 6; i++) {
+                for (char j = 0; j < 6; j++) {
+                    res[i][j] = a[i][j];
+                    res[i + 6][j + 6] = b[i][j];
+                }
+            }
+            return res;
+        }
+        // 1/n element wise
+        inline const Matrix12 inverse(const Matrix12& m)
+        {
+            Matrix12 res{};
+            for (char i = 0; i < 12; i++) {
+                for (char j = 0; j < 12; j++) {
+                    if (m[i][j] == 0) {
+                        res[i][j] = 0;
+                    }
+                    else {
+                        res[i][j] = 1.0f / m[i][j];
+                    }
+                }
+            }
+            return res;
+        }
+    };
+}
+
+// dot product [1 x 1]
+inline float operator * (const Utils::BigMaths::Vector12& a, const Utils::BigMaths::Vector12& b)
+{
+    float res = 0;
+    for (char i = 0; i < 12; i++) {
+        res += a[i] * b[i];
+    }
+    return res;
+}
+// element wise multiplication
+inline Utils::BigMaths::Vector12 operator * (const Utils::BigMaths::Vector12& a, const float& b)
+{
+    Utils::BigMaths::Vector12 res = a;
+    for (char i = 0; i < 12; i++) {
+        res[i] *= b;
+    }
+    return res;
+}
+// dot product [12 x 1]
+inline Utils::BigMaths::Vector12 operator * (const Utils::BigMaths::Matrix12& a, const Utils::BigMaths::Vector12& b)
+{
+    Utils::BigMaths::Vector12 res{};
+    for (char i = 0; i < 12; i++) {
+        for (char j = 0; j < 12; j++) {
+            res[i] += a[i][j] * b[i];
+        }
+    }
+    return res;
+}
+// dot product [1 x 12]
+inline Utils::BigMaths::Vector12 operator * (const Utils::BigMaths::Vector12& a, const Utils::BigMaths::Matrix12& b)
+{
+    Utils::BigMaths::Vector12 res{};
+    for (char i = 0; i < 12; i++) {
+        for (char j = 0; j < 12; j++) {
+            res[i] += a[i] * b[i][j];
+        }
+    }
+    return res;
+}
+// dot product [3 x 1]
+inline glm::vec3 operator * (const glm::mat3& a, const glm::vec3& b)
+{
+    glm::vec3 res(0);
+    for (char i = 0; i < 3; i++) {
+        for (char j = 0; j < 3; j++) {
+            res[i] += a[i][j] * b[i];
+        }
+    }
+    return res;
+}
+// element wise addition
+inline const Utils::BigMaths::Vector12 operator +(const Utils::BigMaths::Vector12& a, const Utils::BigMaths::Vector12& b)
+{
+    Utils::BigMaths::Vector12 res{};
+    for (char i = 0; i < 12; i++)
+        res[i] = a[i] + b[i];
+    return res;
 }

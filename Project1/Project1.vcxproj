@@ -143,6 +143,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Physics\Constraints.cpp" />
     <ClCompile Include="Physics\Collision\Broadphase\BPBase.cpp" />
     <ClCompile Include="Physics\Collision\Narrowphase\NPBase.cpp" />
     <ClCompile Include="Physics\Collision\Narrowphase\GJK.cpp" />
@@ -178,9 +179,9 @@
     <ClCompile Include="Rendering\Rendering.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Utils\ResourceLoader.cpp" />
-    <ClCompile Include="Primatives\Vertex.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Physics\Constraints.h" />
     <ClInclude Include="Physics\Collision\Narrowphase\GJK.h" />
     <ClInclude Include="Physics\Collision\Broadphase\NSquared.h" />
     <ClInclude Include="Physics\Collision\Broadphase\Base.h" />
