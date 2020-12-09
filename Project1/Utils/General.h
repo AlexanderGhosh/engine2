@@ -7,6 +7,8 @@
 #include <gtc/quaternion.hpp>
 #include <list>
 #include <iterator>
+#include <chrono>
+#include <iostream>
 namespace Utils {
     inline std::vector<std::string> split(const std::string& str, const std::string& delim)
     {
@@ -156,8 +158,71 @@ namespace Utils {
         return false;
     }
     inline glm::vec3 tripProduct(const glm::vec3& a, const glm::vec3& b, const glm::vec3& c) {
-        return b * glm::dot(c, a) - a * glm::dot(c, b);
+        const float ca = glm::dot(c, a);
+        const float cb = glm::dot(c, b);
+        const glm::vec3 bca = b * ca;
+        const glm::vec3 acb = a * cb;
+        return b * glm::dot(a, c) - a * glm::dot(b, c);
     }
+    inline glm::vec3 cross(const glm::vec3& a, const glm::vec3& b) {
+        float x = a[1] * b[2] - a[2] * b[1];
+        float y = a[2] * b[0] - a[0] * b[2];
+        float z = a[0] * b[1] - a[1] * b[0];
+        return { x, y, z };
+    }
+    class Timer {
+    public:
+        inline Timer(const std::string name) : s(), e(), pausing(), name(name) {  };
+        inline Timer() : s(), e(), pausing() 
+        {
+            name = "Timer misc";
+        };
+        inline void start() { s = getNow(); };
+        inline void stop() 
+        { 
+            e = getNow(); 
+            if (pausing.size() % 2 != 0)
+                pausing.push_back(e);
+        };
+        inline bool pause() 
+        { 
+            if (pausing.size() % 2 == 0) {
+                pausing.push_back(getNow());
+                return true;
+            }
+            return false;
+        };
+        inline bool resume()
+        {
+            if (pausing.size() % 2 != 0) {
+                pausing.push_back(getNow());
+                return true;
+            }
+            return false;
+        };
+        inline void log(bool frames = 0) { 
+            stop();
+            std::cout << name << ": " << std::to_string(getDuration(frames)) << std::endl; 
+        };
+        inline const float& getDuration(bool frames = 0) 
+        {
+            float d = calcDurration(s, e);
+            assert(!(pausing.size() % 2) && "Timer pausing not working");
+            for (short i = 0; i < pausing.size(); i += 2)
+                d -= calcDurration(elementAt(pausing, i), elementAt(pausing, i + 1));
+            if (frames)
+                d = (d / 1000000.0f) * 60.0f;
+            return d;
+        };
+    private:
+        std::string name;
+        static inline const std::chrono::time_point<std::chrono::high_resolution_clock> getNow() { return std::chrono::high_resolution_clock::now(); };
+        static inline float calcDurration(const std::chrono::time_point<std::chrono::high_resolution_clock>& s, const std::chrono::time_point<std::chrono::high_resolution_clock>& e) {
+            return std::chrono::duration_cast<std::chrono::microseconds>(e - s).count();
+        }
+        std::chrono::time_point<std::chrono::high_resolution_clock> s, e;
+        std::list<std::chrono::time_point<std::chrono::high_resolution_clock>> pausing;
+    };
     namespace BigMaths {
         using Vector6 = std::array<float, 6>;
         using Vector12 = std::array<float, 12>;

@@ -20,8 +20,8 @@ void Physics::Engine::update()
 
 		auto& c_1 = b1->getConstraints();
 		auto& c_2 = b2->getConstraints();
-		for (int i = 0; i < c_1.size(); i++) {
-			Constraint* c = Utils::elementAt(c_1, i);
+		for (Constraint* c : c_1) {
+			// Constraint* c = Utils::elementAt(c_1, i);
 			if (Utils::find(c_2, c)) {
 				// std::cout << "collision detected: " << i++ << "\r";
 				Utils::BigMaths::Vector12 V;

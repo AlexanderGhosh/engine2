@@ -10,6 +10,10 @@ Physics::SupportPoint support(const Physics::Collider*& a, const Physics::Collid
 	res.a = a->support(dir);
 	res.b = b->support(-dir);
 	res.v = res.a - res.b;
+	////////////////////////////////////////////
+	res.a = a->support(-dir);
+	res.b = b->support(dir);
+	res.v = res.b - res.a;
 	return res;
 }
 Physics::GJK3D::Triangle* Physics::GJK3D::getClosest(std::list<Triangle>& faces, float& dist)
@@ -26,6 +30,31 @@ Physics::GJK3D::Triangle* Physics::GJK3D::getClosest(std::list<Triangle>& faces,
 	}
 	return closest_face;
 }
+
+glm::vec3 ClipFunc(const Physics::GJK3D::Triangle& triangle, const float& dist)
+{
+	glm::vec3 res(0);
+	const glm::vec3 p = triangle.n * dist;
+	const glm::vec3& a = triangle.a.v;
+	const glm::vec3& b = triangle.b.v;
+	const glm::vec3& c = triangle.c.v;
+	const glm::vec3 v0 = b - a,
+		v1 = c - a,
+		v2 = p - a;
+	const float d00 = glm::dot(v0, v0);
+	const float d01 = glm::dot(v0, v1);
+	const float d11 = glm::dot(v1, v1);
+	const float d20 = glm::dot(v2, v0);
+	const float d21 = glm::dot(v2, v1);
+
+	const float denom = d00 * d11 - d01 * d01;
+
+	res.x = (d11 * d20 - d01 * d21) / denom;
+	res.y = (d00 * d21 - d01 * d20) / denom;
+	res.z = 1.0f - res.y - res.z;
+	return res;
+}
+
 void Physics::GJK3D::EPA(Physics::CollisionManfold& info, Simplex& simplex) {
 #define EPA_TOLERANCE 0.0001f
 #define EPA_MAX_NUM_FACES 64
@@ -42,10 +71,12 @@ void Physics::GJK3D::EPA(Physics::CollisionManfold& info, Simplex& simplex) {
 	faces.emplace_back(a, c, d);
 	faces.emplace_back(a, d, b);
 	faces.emplace_back(b, d, c);
-
+	Triangle* closest_face = nullptr;
+	std::list<Edge> loose_edges;
 	for(short itt = 0; itt < EPA_MAX_NUM_ITERATIONS; itt++) {
-		float min = glm::dot(a.v, c.v);
-		Triangle* closest_face = getClosest(faces, min);
+		loose_edges.clear();
+		float min = glm::dot(faces.front().a.v, faces.front().c.v);
+		closest_face = getClosest(faces, min);
 
 		const glm::vec3 dir = closest_face->n;
 		const glm::vec3 p = support(info.bodies[0], info.bodies[1], dir).v;
@@ -55,9 +86,15 @@ void Physics::GJK3D::EPA(Physics::CollisionManfold& info, Simplex& simplex) {
 			info.collided = true;
 			info.normal = closest_face->n;
 			info.penertraion = glm::dot(p, dir);
+			glm::vec3 barr = ClipFunc(*closest_face, info.penertraion);
+			info.points[0] =
+				barr.x * closest_face->a.a +
+				barr.y * closest_face->b.a +
+				barr.z * closest_face->c.a;
+			
+			info.points[1] = info.points[0];
 			return;
 		}
-		std::list<Edge> loose_edges;
 		for (unsigned k = 0; k < faces.size(); k++) {
 			Triangle& face = Utils::elementAt(faces, k);
 			if (sameDirection(face.n, p - face.a.v)) {
@@ -95,14 +132,21 @@ void Physics::GJK3D::EPA(Physics::CollisionManfold& info, Simplex& simplex) {
 				back.n *= -1;
 			}
 		}
-		// EPA failed
-		info.collided = true;
-		info.normal = closest_face->n;
-		info.penertraion = glm::dot(closest_face->a.v, closest_face->n);
 	}
+	// EPA failed
+	info.collided = true;
+	info.normal = closest_face->n;
+	info.penertraion = glm::dot(closest_face->a.v, closest_face->n);
+	glm::vec3 barr = ClipFunc(*closest_face, info.penertraion);
+	info.points[0] =
+		barr.x * closest_face->a.a +
+		barr.y * closest_face->b.a +
+		barr.z * closest_face->c.a;
+	info.points[1] = info.points[0];
 }
 const Physics::CollisionManfold Physics::GJK3D::getCollisionData(Collider* a, Collider* b)
 {
+#define GJK_MAX_ITTERATION 256
 	CollisionManfold res;
 	res.collided = false;
 	res.bodies = {
@@ -113,14 +157,19 @@ const Physics::CollisionManfold Physics::GJK3D::getCollisionData(Collider* a, Co
 	glm::vec3 dir = Utils::xAxis();
 	simplex.push(support(a, b, dir));
 	dir *= -1;
-	while (true) {
+
+	unsigned counter = 0;
+	while (counter < GJK_MAX_ITTERATION) {
+		counter++;
 		simplex.push(support(a, b, dir));
 
 		const glm::vec3 ao = -simplex.a().v;
 		const glm::vec3 ab = simplex.b() - simplex.a();
 		const glm::vec3 ac = simplex.c() - simplex.a();
 		const glm::vec3 ad = simplex.d() - simplex.a();
+		
 
+		Utils::Timer cross_timer("Cross Timer");
 		switch (simplex.size)
 		{
 		case 2: // line segment
@@ -129,7 +178,14 @@ const Physics::CollisionManfold Physics::GJK3D::getCollisionData(Collider* a, Co
 				return res;
 			}
 			// simplex could contain the origin
-			dir = Utils::tripProduct(ab, ao, ab); // normal of line segment directed towards the origin
+
+			dir = Utils::tripProduct(ab, ao, ab); // normal of line segment directed towards the originart();
+			if (dir == Utils::zero()) { //origin is on this line segment
+				//Apparently any normal search vector will do?
+				dir = glm::cross(ab, Utils::xAxis()); //normal with x-axis
+				if (dir == Utils::zero())
+					dir = glm::cross(ab, Utils::zAxis(-1)); //normal with z-axis
+			}
 			break;
 		case 3: // triangle
 			glm::vec3 n = glm::cross(ab, ac);
