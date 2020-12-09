@@ -39,8 +39,8 @@ const Physics::CollisionManfold Physics::GJK::getCollisionData(Collider* a_, Col
 			return info;
 		SupportPoint a = support(a_, b_, dir);
 
-		if (glm::dot(a.v, dir) <= 0)
-			return info;
+		/*if (glm::dot(a.v, dir) <= 0)
+			return info;*/
 		sim.push(a);
 
 		const glm::vec3 ao = -sim[0].v;
@@ -53,45 +53,42 @@ const Physics::CollisionManfold Physics::GJK::getCollisionData(Collider* a_, Col
 			// the origin must be between point a_ and b_
 			// search direction is perpendicular to ab and coplanar with ao
 			// normal of line segment
-			dir = Utils::tripCross(ab, ao, ab);
+			dir = Utils::tripProduct(ab, ao, ab);
 		}
 		else if (sim.size == 3) {
 			// simplex is a_ triangle, meaning that the origin must be
 			// normal of the triangle
 			const glm::vec3 n = glm::cross(ab, ac);
-			// gjk_simtest(glm::cross(ab, n), ao)
-			if (gjk_simtest(-ac, ao)) {
+			// sameDirection(glm::cross(ab, n), ao)
+			if (sameDirection(-ac, ao)) {
 				// origin is outside the triangle, near the edge ab
 				// reset the simplex to the line ab and continue
 				// search direction is perpendicular to ab and coplanar with ao
-				sim = Simplex({ sim[0], sim[1] });
-				dir = Utils::tripCross(ab, ao, ab);
-				continue;
+				sim = Simplex({sim[0], sim[1]});
+				dir = Utils::tripProduct(ab, ao, ab);
 			}
 
-			if (gjk_simtest(-ab, ao)) {
+			else if (sameDirection(-ab, ao)) {
 				// origin is outside the triangle, near the edge ac
 				// reset the simplex to the line ac and continue
 				// search direction is perpendicular to ac and coplanar with ao
-				sim = Simplex({ sim[0], sim[2] });
-				dir = Utils::tripCross(ac, ao, ac);
-				continue;
+				sim = Simplex({sim[0], sim[2]});
+				dir = Utils::tripProduct(ac, ao, ac);
 			}
 
 			// origin is within the triangular prism defined by the triangle
 			// determine if it is above or below
-			if (gjk_simtest(n, ao)) {
+			else if (sameDirection(n, ao)) {
 				// origin is above the triangle, so the simplex is not modified,
 				// the search direction is the triangle's face normal
 				dir = n;
-				continue;
 			}
-
-			// origin is below the triangle, so the simplex is rewound the opposite direction
-			// the search direction is the new triangle's face normal
-			sim = Simplex({sim[0], sim[2], sim[1] });
-			dir = -n;
-			continue;
+			else {
+				// origin is below the triangle, so the simplex is rewound the opposite direction
+				// the search direction is the new triangle's face normal
+				sim = Simplex({ sim[0], sim[2], sim[1] });
+				dir = -n;
+			}
 		}
 		else {
 			// the simplex is a_ tetrahedron, must check if it is outside any of the side triangles, (abc, acd, adb)
@@ -103,19 +100,18 @@ const Physics::CollisionManfold Physics::GJK::getCollisionData(Collider* a_, Col
 
 			glm::vec3 ab = sim[1].v - sim[0].v;
 			glm::vec3 ac = sim[2].v - sim[0].v;
-
 			glm::vec3 ad = sim[3].v - sim[0].v;
 
-			if (gjk_simtest(glm::cross(ab, ac), ao)) {
+			if (sameDirection(glm::cross(ab, ac), ao)) {
 				// origin is in front of triangle abc, simplex is already what it needs to be
 				// go to jmp_face
 			}
-			else if (gjk_simtest(glm::cross(ac, ad), ao)) {
+			else if (sameDirection(glm::cross(ac, ad), ao)) {
 				// origin is in front of triangle acd, simplex is set to this triangle
 				// go to jmp_face
 				sim = Simplex({ sim[0], sim[2], sim[3] });
 			}
-			else if (gjk_simtest(glm::cross(ad, ab), ao)) {
+			else if (sameDirection(glm::cross(ad, ab), ao)) {
 				// origin is in front of triangle adb, simplex is set to this triangle
 				// go to jmp_face
 				sim = Simplex({ sim[0], sim[3], sim[1] });
@@ -127,15 +123,15 @@ const Physics::CollisionManfold Physics::GJK::getCollisionData(Collider* a_, Col
 			ab = sim[1].v - sim[0].v;
 			ac = sim[2].v - sim[0].v;
 
-			if (gjk_simtest(-ac, ao)) {
+			if (sameDirection(-ac, ao)) {
 				sim = Simplex({ sim[0], sim[1] });
-				dir = Utils::tripCross(ab, ao, ab);
+				dir = Utils::tripProduct(ab, ao, ab);
 				continue;
 			}
 
-			if (gjk_simtest(-ab, ao)) {
+			if (sameDirection(-ab, ao)) {
 				sim = Simplex({ sim[0], sim[2] });
-				dir = Utils::tripCross(ac, ao, ac);
+				dir = Utils::tripProduct(ac, ao, ac);
 				continue;
 			}
 
@@ -222,9 +218,28 @@ void Physics::GJK::EPA(CollisionManfold& info, Simplex& simplex)
 	return;
 }
 
-void Physics::GJK::ClipFunc(const Triangle& triangle, CollisionManfold& info)
+glm::vec3 Physics::GJK::ClipFunc(const Triangle& triangle, const float& dist)
 {
+	glm::vec3 res(0);
+	const glm::vec3 p = triangle.n * dist;
+	const glm::vec3& a = triangle.a.v;
+	const glm::vec3& b = triangle.b.v;
+	const glm::vec3& c = triangle.c.v;
+	const glm::vec3 v0 = b - a, 
+		v1 = c - a, 
+		v2 = p - a;
+	const float d00 = glm::dot(v0, v0);
+	const float d01 = glm::dot(v0, v1);
+	const float d11 = glm::dot(v1, v1);
+	const float d20 = glm::dot(v2, v0);
+	const float d21 = glm::dot(v2, v1);
 
+	const float denom = d00 * d11 - d01 * d01;
+
+	res.x = (d11 * d20 - d01 * d21) / denom;
+	res.y = (d00 * d21 - d01 * d20) / denom;
+	res.z = 1.0f - res.y - res.z;
+	return res;
 }
 
 void Physics::GJK::extrapolateContactInformation(const Triangle& triangle, CollisionManfold& info)
@@ -240,11 +255,29 @@ void Physics::GJK::extrapolateContactInformation(const Triangle& triangle, Colli
 	}
 	if (dist == INFINITY) 
 		return;
+
+
+
 	info.points[0] = closestPoint.a;
 	info.points[1] = closestPoint.b;
-	info.points[0] = { 0, 0, -5 };
-	info.points[1] = { 0, -dist, -5 };
+	info.points[0] = { 0, closestPoint.a.y, -5 };
+	info.points[1] = { 0, closestPoint.b.y, -5 };
 	info.normal = glm::normalize(info.points[0] - info.points[1]);
 	info.collided = true;
 	info.penertraion = dist;
+
+	const glm::vec3 c1 = glm::normalize(*info.bodies[0]->position);
+	const glm::vec3 c2 = glm::normalize(*info.bodies[1]->position);
+
+	const glm::vec3 s1_ = glm::normalize(closestPoint.a);
+	const glm::vec3 s2_ = glm::normalize(closestPoint.b);
+
+	const float k1 = glm::dot(info.normal, c1);
+	const float k2 = glm::dot(info.normal, c2);
+
+	const float s1 = glm::dot(info.normal, s1_);
+	const float s2 = glm::dot(info.normal, s2_);
+
+	info.points[0] = info.normal * (s2 - k1) + *info.bodies[0]->position;
+	info.points[1] = info.normal * (s1 - k2) + *info.bodies[1]->position;
 }

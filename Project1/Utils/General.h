@@ -155,8 +155,8 @@ namespace Utils {
         }
         return false;
     }
-    inline glm::vec3 tripCross(const glm::vec3& a, const glm::vec3& b, const glm::vec3& c) {
-        return glm::cross(glm::cross(a, b), c);
+    inline glm::vec3 tripProduct(const glm::vec3& a, const glm::vec3& b, const glm::vec3& c) {
+        return b * glm::dot(c, a) - a * glm::dot(c, b);
     }
     namespace BigMaths {
         using Vector6 = std::array<float, 6>;

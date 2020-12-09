@@ -72,9 +72,9 @@ const Physics::AABB* Physics::BoxCollider::constructAABB()
 
 glm::vec3 Physics::BoxCollider::support(const glm::vec3& direction) const
 {
-	glm::vec3 res = *position;
-	glm::vec3 dir = glm::rotate(-*rotation, direction);
+	glm::vec3 res(0);
+	glm::vec3 dir = glm::inverse(glm::toMat3(*rotation)) * direction;
 	for (char i = 0; i < 3; i++)
-		res[i] += dir[i] < 0 ? min[i] : max[i];
-	return glm::rotate(*rotation, res);
+		res[i] += dir[i] > 0 ? max[i] : min[i];
+	return glm::toMat3(*rotation) * res + *position;;
 }

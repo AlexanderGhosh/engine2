@@ -45,9 +45,9 @@ namespace Physics {
 			}
 		};
 		void EPA(CollisionManfold& info, Simplex& simplex);
-		void ClipFunc(const Triangle& triangle, CollisionManfold& info);
+		glm::vec3 ClipFunc(const Triangle& triangle, const float& dist);
 		void extrapolateContactInformation(const Triangle& triangle, CollisionManfold& info);
-		bool gjk_simtest(const glm::vec3& a, const glm::vec3& b) {
+		bool sameDirection(const glm::vec3& a, const glm::vec3& b) {
 			return glm::dot(a, b) > 0;
 		}; 
 		void addEdge(const SupportPoint& a, const SupportPoint& b, std::list<Edge>& lst_edges)

@@ -24,9 +24,7 @@ Utils::BigMaths::Vector12 Physics::Constraint::getDeltaV(const MATHS::Vector12& 
     h = h * lambda;
     float test = (V + h) * Jacobian + getBias(manafoild);
     test = (int)(test * 10000.0) / 10000.0;
-    if (test != 0) {
-        bool error = 0;
-    }
+    assert(test == 0);
     return Jacobian * lambda * FPS;
 };
 const float Physics::Constraint::getLagrangian(const MATHS::Vector12& V, const MATHS::Matrix12& M, const CollisionManfold& manafoild) const

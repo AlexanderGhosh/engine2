@@ -15,8 +15,6 @@ namespace Component {
 
 		glm::vec3* position;
 		glm::quat* rotation;
-		glm::vec3 linearVelocity;
-		glm::vec3 angularVelocity;
 
 		std::list<Physics::Collider*> colliders;
 		std::list<Physics::Constraint*> constraints;
@@ -35,11 +33,14 @@ namespace Component {
 		const glm::vec3 globalToLocalVec(const glm::vec3& v) const;
 
 	public:
+		glm::vec3 linearVelocity;
+		glm::vec3 angularVelocity;
 		bool kinematic;
 		RigidBody();
 		void update();
 		void setParent(GameObject* parent);
-		void applyForce(const glm::vec3& f, const glm::vec3& at);
+		void applyForce(const glm::vec3& f, const glm::vec3& ang = Utils::zero());
+		void applyAcceleration(const glm::vec3& f, const glm::vec3& at = Utils::zero());
 
 		inline glm::mat3 getRotation() const { return glm::toMat3(*rotation); };
 		inline Type getType() const { return Type::Rigidbody; };
@@ -56,7 +57,11 @@ namespace Component {
 				return;
 			constraints.push_back(constraint);
 		}
-		inline void setVelocities(const glm::vec3& vel, const glm::vec3& ang) { linearVelocity = vel; angularVelocity = ang; };
+		inline void setVelocities(const glm::vec3& vel, const glm::vec3& ang) 
+		{ 
+			linearVelocity = vel; 
+			angularVelocity = ang; 
+		};
 	};
 };
 

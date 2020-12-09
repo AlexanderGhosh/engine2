@@ -4,11 +4,15 @@ namespace Physics {
 	struct CollisionManfold;
 	struct SupportPoint {
 		glm::vec3 a, b, v;
-		SupportPoint() : a(0), b(0), v(0) { };
+		SupportPoint() : a(0), b(0), v(0) { }
+		SupportPoint(const glm::vec3& v) : a(0), b(0), v(v) { };
 		SupportPoint(const glm::vec3& a, const glm::vec3& b) : a(a), b(b), v(b - a) { };
 
-		bool operator ==(const SupportPoint& b) {
+		bool operator ==(const SupportPoint& b) const {
 			return v == b.v;
+		}
+		glm::vec3 operator -(const SupportPoint& b) {
+			return v - b.v;
 		}
 	};
 	class Narrowphase {

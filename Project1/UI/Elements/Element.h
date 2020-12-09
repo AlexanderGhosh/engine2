@@ -23,11 +23,11 @@ namespace UI {
 		const glm::vec2& getPos() const;
 		inline void setPos(const glm::vec2& pos) { screenPos = pos; };
 
-		inline const float& getWidth() const { return width; };
+		inline const float getWidth() const { return width; };
 		inline void setWidth(const float& width) { this->width = width; };
 
-		inline const float& getHeight() const { return height; };
-		inline void setHeight(const float& height) { this->height = height; };
+		virtual inline const float getHeight() const { return height; };
+		virtual inline void setHeight(const float& height) { this->height = height; };
 
 		inline const Materials::MatItem& getBackgroundColor() const { return backgroundColor; };
 		inline void setBackgroundColor(const glm::vec3& backgroundColor) 

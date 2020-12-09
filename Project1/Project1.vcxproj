@@ -143,6 +143,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Physics\Collision\Narrowphase\GJK3D.cpp" />
     <ClCompile Include="Physics\Constraints.cpp" />
     <ClCompile Include="Physics\Collision\Broadphase\BPBase.cpp" />
     <ClCompile Include="Physics\Collision\Narrowphase\NPBase.cpp" />
@@ -181,6 +182,7 @@
     <ClCompile Include="Utils\ResourceLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Physics\Collision\Narrowphase\GJK3D.h" />
     <ClInclude Include="Physics\Constraints.h" />
     <ClInclude Include="Physics\Collision\Narrowphase\GJK.h" />
     <ClInclude Include="Physics\Collision\Broadphase\NSquared.h" />

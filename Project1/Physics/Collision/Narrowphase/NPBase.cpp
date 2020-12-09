@@ -2,7 +2,7 @@
 #include "..\Broadphase\Base.h"
 #include "../../Engine.h"
 
-Physics::SupportPoint Physics::Narrowphase::support(const Collider* a, const Collider* b, const glm::vec3& dir)
+Physics::SupportPoint Physics::Narrowphase:: support(const Collider* a, const Collider* b, const glm::vec3& dir)
 {
     SupportPoint res;
     const glm::vec3 d = glm::normalize(dir);

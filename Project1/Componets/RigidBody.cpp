@@ -88,10 +88,16 @@ const glm::vec3 Component::RigidBody::globalToLocalVec(const glm::vec3& v) const
     return glm::inverse(getRotation()) * v;
 }
 
-void Component::RigidBody::applyForce(const glm::vec3& f, const glm::vec3& at)
+void Component::RigidBody::applyForce(const glm::vec3& f, const glm::vec3& ang)
 {
     forceAccumulator += f / FPS;
-    torqueAccumulator += glm::cross(at - globalCentroid, f / FPS);
+    torqueAccumulator += ang / FPS;
+}
+
+void Component::RigidBody::applyAcceleration(const glm::vec3& f, const glm::vec3& at)
+{
+    forceAccumulator += f * inverseMass;
+    // torqueAccumulator += glm::cross(at - globalCentroid, f) * globlaInverseIntertiaTensor;
 }
 
 Utils::BigMaths::MassMatrix6 Component::RigidBody::getMassMatrix() const
@@ -140,10 +146,10 @@ void Component::RigidBody::update()
 
     const glm::vec3 axis = glm::normalize(angularVelocity);
     const float angle = glm::length(angularVelocity) * dt;
-    // *rotation = glm::toMat3(glm::quat(axis.x, axis.y, axis.z, angle)) * getRotation();
+    *rotation *= glm::quat(angularVelocity * dt);
 
     // update physical properties
-    // updateOrientation();
+    updateOrientation();
     updatePositionFromGlobalCentroid();
 }
 

@@ -12,6 +12,7 @@ namespace UI {
 		static void init(const unsigned& shaderId, const glm::vec2& screenDim);
 		static void render(const Pane* pane);
 		static void render(const Page* pane);
+		static void render(const Element* element);
 		static void cleanUp();
 	};
 };

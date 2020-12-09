@@ -20,8 +20,8 @@ const std::vector<Physics::CollisionManfold> Physics::CollisionDetection::getCol
     const auto& pairs = broadphase->computePairs();
     for (const auto& pair : pairs) {
         auto t = narrowphase->getCollisionData(pair.first, pair.second);
-        /*if (!t.collided)
-            continue;*/
+        if (!t.collided)
+            continue;
         res.push_back(t);
     }
     if (res.size() > 0) {

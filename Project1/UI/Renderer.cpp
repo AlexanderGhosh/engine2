@@ -60,6 +60,33 @@ void UI::Renderer::render(const Page* pane)
 	render(pane->getRoot());
 }
 
+void UI::Renderer::render(const Element* element)
+{
+	glDisable(GL_DEPTH_TEST);
+	quadBuffer.bind();
+	Render::Shading::Manager::setActive(shaderId);
+	glm::mat4 model = element->getModel();
+	// model[3][1] = pane->getDimentions().y - model[3][1];
+	Render::Shading::Manager::setValue("model", model);
+
+	const Materials::MatItem& bg = element->getBackgroundColor();
+	if (!bg.hasTex()) {
+		Render::Shading::Manager::setValue("col_vec", glm::vec4(bg.getRaw(), 1));
+	}
+	else {
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, bg.getId());
+		bool res = Render::Shading::Manager::setValue("col_vec", glm::vec4(bg.getRaw(), 0));
+		res = Render::Shading::Manager::setValue("col_id", 0); // set to texture unit
+	}
+
+	quadBuffer.draw();
+	element->drawContent();
+
+	quadBuffer.unBind();
+	glEnable(GL_DEPTH_TEST);
+}
+
 void UI::Renderer::cleanUp()
 {
 	uiBuffer.cleanUp();

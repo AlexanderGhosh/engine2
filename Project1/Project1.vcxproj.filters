@@ -123,6 +123,9 @@
     <ClCompile Include="Physics\Constraints.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Physics\Collision\Narrowphase\GJK3D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Rendering\Rendering.h">
@@ -237,6 +240,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Physics\Constraints.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\Collision\Narrowphase\GJK3D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

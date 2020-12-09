@@ -21,6 +21,13 @@ namespace UI {
 			textRenderer = TextRenderer::getFont(font);
 		};
 
+		inline const float getWidth() const {
+			return textRenderer->getStringDimentions(text).x;
+		}
+		inline const float getHeight() const {
+			return textRenderer->getStringDimentions(text).y;
+		}
+
 		inline const glm::vec3& getForgroundColor() const { return forgroundColor; };
 		inline void setForgroundColor(const glm::vec3& col) { forgroundColor = col; };
 

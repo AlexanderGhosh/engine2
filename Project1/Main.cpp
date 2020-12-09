@@ -26,11 +26,13 @@
 #include "Physics/Engine.h"
 #include "Physics/Collision/Broadphase/NSquared.h"
 #include "Physics/Collision/Narrowphase/GJK.h"
+#include "Physics/Collision/Narrowphase/GJK3D.h"
 #include "Physics/Constraints.h"
 
 #include "MainWindow.h"
 
 #define PBRen 1
+#define PI 3.14f
 
 Component::Camera cam;
 bool firstMouse = 1;
@@ -191,7 +193,7 @@ int main() {
     cubeR->setMaterial(cubeMat);
     
     GameObject* cube1 = new GameObject();
-    cube1->getTransform()->Position = { 0, -0.5, -5 };
+    cube1->getTransform()->Position = { 0, 0, -5 };
     cube1->addComponet(cubeR);
     
     Physics::BoxCollider* collider1 = new Physics::BoxCollider(10, Utils::zero());
@@ -212,7 +214,8 @@ int main() {
     cubeR2->setMaterial(cubeMat2);
     
     GameObject* cube2 = new GameObject();
-    cube2->getTransform()->Position = { 5, 5, -5 };
+    cube2->getTransform()->Position = { -5, 0, -5 };
+    // cube2->getTransform()->Rotation *= glm::quat({ 0, 0, glm::radians(45.0f) });
     // cube2->getTransform()->Rotation = glm::rotate(cube2->getTransform()->Rotation, glm::radians(45.0f), Utils::zAxis());
     cube2->addComponet(cubeR2);
     
@@ -223,8 +226,6 @@ int main() {
     cube2->addComponet(rb2);
     
     cube2->getRigidbody()->addConstriant(constraint);
-    
-    
     
     
     Primative::StaticBuffer b("m4, m4, v3, f, m4", 0);
@@ -273,6 +274,12 @@ int main() {
     UI::TextRenderer font = UI::TextRenderer({ 800, 600 }); // creates arial Font
     UI::TextRenderer::setShader(ResourceLoader::getShader("TextShader"));
     UI::Renderer::init(ResourceLoader::getShader("UIShader"), { 800, 600 });
+
+    UI::TextBlock tb = UI::TextBlock();
+    tb.setText("FPS: 1000");
+    tb.setForgroundColor({ 0, 0, 0 });
+    tb.setPos({ 115, 575 });
+    
     // UI //
     
     // SOUNDS //
@@ -289,17 +296,39 @@ int main() {
     MainWindow win(sceneTex, 8.f/6.f);
     
     Physics::CollisionDetection::setBroadphase(new Physics::NSquared());
-    Physics::CollisionDetection::setNarrowphase(new Physics::GJK());
+    Physics::CollisionDetection::setNarrowphase(new Physics::GJK3D());
     
-   cube2->getRigidbody()->setVelocities({ -1, 0, 0 }, { 0, 0, 0 });
+    // cube2->getRigidbody()->angularVelocity.z = 36;
+    // cube2->getRigidbody()->linearVelocity.y -= 2.5f;
+    // cube2->getRigidbody()->setVelocities({ -2.5f, 0, 0 }, { 0, 0, 0 });
 
+    unsigned frameCounter = 0;
+    unsigned fps_count = 0;
+    const unsigned smapleRate = 10;
     while (!glfwWindowShouldClose(window))
     {
         float currentTime = glfwGetTime();
         deltaTime = currentTime - lastTime;
         fps = 1.0f / deltaTime;
+        fps_count += fps;
         lastTime = currentTime;
-    
+        if (frameCounter >= smapleRate) {
+            tb.setText("FPS: " + std::to_string(fps_count / frameCounter));
+            frameCounter = 0;
+            fps_count = 0;
+
+            const float w = tb.getWidth() / 2.0f;
+            const glm::vec2& p = tb.getPos();
+            const float diff = p.x - w;
+            if (diff < 5) {
+                tb.setPos({ p.x + diff, p.y });
+            }
+            else {
+                tb.setPos({ p.x - diff, p.y });
+
+            }
+        }
+        frameCounter++;
         // std::cout << fps << std::endl; // FPS Count
 
         b.fill(0, value_ptr(cam.getView()));
@@ -310,13 +339,13 @@ int main() {
         if(!Events::Handler::getKey(Events::Key::Space, Events::Action::Down)){
             scene.postProcess();// render to screen
         }
-        else{
+        /*else{
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
             win.update(); // events check
             //UI::Renderer::render(&win);
-        }
-        // cube2->getTransform()->Position.y -= 0.5f * deltaTime;
-        cube2->getRigidbody()->applyForce({ 0, -9.81, 0 }, { 0, 0, 0 });
+        }*/
+        UI::Renderer::render(&tb);
+        cube2->getRigidbody()->applyAcceleration({ 5, 0, 0 });
         Physics::Engine::update();
     
         if (Events::Handler::getKey(Events::Key::W, Events::Action::Down)) {
@@ -329,7 +358,7 @@ int main() {
             break;
         }
         // sound->update();
-    
+        glfwSwapInterval(1); // V-SYNC
         glfwSwapBuffers(window);
         Events::Handler::pollEvents();
     }
