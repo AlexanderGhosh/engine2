@@ -1,5 +1,6 @@
 #include "Collider.h"
 #include "../Engine.h"
+#include <gtx/string_cast.hpp>
 #include "../../GameObject/GameObject.h"
 
 glm::vec3 Physics::AABB::support(const glm::vec3& direction) const
@@ -73,8 +74,13 @@ const Physics::AABB* Physics::BoxCollider::constructAABB()
 glm::vec3 Physics::BoxCollider::support(const glm::vec3& direction) const
 {
 	glm::vec3 res(0);
-	glm::vec3 dir = glm::inverse(glm::toMat3(*rotation)) * direction;
-	for (char i = 0; i < 3; i++)
-		res[i] = dir[i] > 0 ? max[i] : min[i];
-	return glm::toMat3(*rotation) * res + *position;;
+	const glm::vec3 dir = direction * glm::inverse(glm::toMat3(*rotation));
+	// for (char i = 0; i < 3; i++)
+	// 	res[i] = dir[i] > 0 ? max[i] : min[i];
+
+	res = glm::sign(dir) * *scale * 0.5f;
+
+	res = glm::toMat3(*rotation) * res + *position;
+	// std::cout << glm::to_string(res) << "/#/\n";
+	return res;
 }

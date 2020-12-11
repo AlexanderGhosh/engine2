@@ -1,5 +1,6 @@
 #include "GJK3D.h"
 #include "../CollisionDetection.h"
+#include <gtx/string_cast.hpp>
 
 bool sameDirection(const glm::vec3& a, const glm::vec3& b) {
 	return glm::dot(a, b) > 0;
@@ -11,16 +12,16 @@ Physics::SupportPoint support(const Physics::Collider*& a, const Physics::Collid
 	res.b = b->support(-dir);
 	res.v = res.a - res.b;
 	////////////////////////////////////////////
-	res.a = a->support(-dir);
-	res.b = b->support(dir);
-	res.v = res.b - res.a;
+	// res.a = a->support(-dir);
+	// res.b = b->support(dir);
+	// res.v = res.b - res.a;
 	return res;
 }
 Physics::GJK3D::Triangle* Physics::GJK3D::getClosest(std::list<Triangle>& faces, float& dist)
 {
-	dist = glm::dot(faces.front().a.v, faces.front().n);
+	dist = INFINITY;
 	float d = 0;
-	Triangle* closest_face = &faces.front();;
+	Triangle* closest_face = nullptr;
 	for (Triangle& face : faces) {
 		d = glm::dot(face.a.v, face.n);
 		if (d < dist) {
@@ -31,14 +32,15 @@ Physics::GJK3D::Triangle* Physics::GJK3D::getClosest(std::list<Triangle>& faces,
 	return closest_face;
 }
 
-glm::vec3 ClipFunc(const Physics::GJK3D::Triangle& triangle, const float& dist)
+glm::vec3 ClipFunc(const Physics::GJK3D::Triangle& triangle)
 {
 	glm::vec3 res(0);
-	const glm::vec3 p = triangle.n * dist;
+	const glm::vec3 p = triangle.n * glm::dot(triangle.n, triangle.a.v);
 	const glm::vec3& a = triangle.a.v;
 	const glm::vec3& b = triangle.b.v;
 	const glm::vec3& c = triangle.c.v;
-	const glm::vec3 v0 = b - a,
+	const glm::vec3
+		v0 = b - a,
 		v1 = c - a,
 		v2 = p - a;
 	const float d00 = glm::dot(v0, v0);
@@ -49,10 +51,27 @@ glm::vec3 ClipFunc(const Physics::GJK3D::Triangle& triangle, const float& dist)
 
 	const float denom = d00 * d11 - d01 * d01;
 
-	res.x = (d11 * d20 - d01 * d21) / denom;
-	res.y = (d00 * d21 - d01 * d20) / denom;
-	res.z = 1.0f - res.y - res.z;
+	res.y = (d11 * d20 - d01 * d21) / denom;
+	res.z = (d00 * d21 - d01 * d20) / denom;
+	res.x = 1.0f - res.y - res.z;
 	return res;
+}
+void determinCollisionData(Physics::CollisionManfold& info, const Physics::GJK3D::Triangle* face, const float& penertration) {
+
+	info.collided = true;
+	info.normal = face->n;
+	info.penertraion = penertration;
+	glm::vec3 barr = ClipFunc(*face);
+	info.points[0] =
+		barr.x * face->a.a +
+		barr.y * face->b.a +
+		barr.z * face->c.a;
+
+	info.points[1] =
+		barr.x * face->a.b +
+		barr.y * face->b.b +
+		barr.z * face->c.b;
+	assert(!glm::isnan(info.penertraion) && !glm::isinf(info.penertraion) && "Cant determin collision info");
 }
 
 void Physics::GJK3D::EPA(Physics::CollisionManfold& info, Simplex& simplex) {
@@ -75,24 +94,21 @@ void Physics::GJK3D::EPA(Physics::CollisionManfold& info, Simplex& simplex) {
 	std::list<Edge> loose_edges;
 	for(short itt = 0; itt < EPA_MAX_NUM_ITERATIONS; itt++) {
 		loose_edges.clear();
-		float min = glm::dot(faces.front().a.v, faces.front().c.v);
+		float min = 0;
+		if (itt == EPA_MAX_NUM_ITERATIONS - 1) {
+			int t = 0;
+		}
 		closest_face = getClosest(faces, min);
+		if (!closest_face)
+			return;
 
 		const glm::vec3 dir = closest_face->n;
 		const glm::vec3 p = support(info.bodies[0], info.bodies[1], dir).v;
 		const SupportPoint p_raw = support(info.bodies[0], info.bodies[1], dir);
 
 		if (glm::dot(p, dir) - min < EPA_TOLERANCE) {
-			info.collided = true;
-			info.normal = closest_face->n;
-			info.penertraion = glm::dot(p, dir);
-			glm::vec3 barr = ClipFunc(*closest_face, info.penertraion);
-			info.points[0] =
-				barr.x * closest_face->a.a +
-				barr.y * closest_face->b.a +
-				barr.z * closest_face->c.a;
-			
-			info.points[1] = info.points[0];
+			determinCollisionData(info, closest_face, glm::dot(p, dir));
+			std::cout << glm::to_string(info.points[0]) << " : " << glm::to_string(info.points[1]) << /*glm::to_string(*info.bodies[1]->position) <<*/ std::endl;
 			return;
 		}
 		for (unsigned k = 0; k < faces.size(); k++) {
@@ -115,7 +131,8 @@ void Physics::GJK3D::EPA(Physics::CollisionManfold& info, Simplex& simplex) {
 						loose_edges.push_back(current_edge);
 					}
 				}
-				faces.remove(face);
+				std::swap(face, faces.back());
+				faces.pop_back();
 				k--;
 			}
 		}
@@ -124,17 +141,17 @@ void Physics::GJK3D::EPA(Physics::CollisionManfold& info, Simplex& simplex) {
 			faces.emplace_back(edge.a, edge.b, p_raw);
 			Triangle& back = faces.back();
 			back.n = glm::normalize(glm::cross(edge.a.v - edge.b.v, edge.a.v - p));
-
+			assert(!glm::any(glm::isnan(back.n)));
 			if (glm::dot(back.a.v, back.n) + EPA_BIAS < 0) {
 				const glm::vec3 t = back.a.v;
 				back.a = back.b;
-				back.b = a;
+				back.b = t;
 				back.n *= -1;
 			}
 		}
 	}
 	// EPA failed
-	info.collided = true;
+	/*info.collided = true;
 	info.normal = closest_face->n;
 	info.penertraion = glm::dot(closest_face->a.v, closest_face->n);
 	glm::vec3 barr = ClipFunc(*closest_face, info.penertraion);
@@ -142,7 +159,8 @@ void Physics::GJK3D::EPA(Physics::CollisionManfold& info, Simplex& simplex) {
 		barr.x * closest_face->a.a +
 		barr.y * closest_face->b.a +
 		barr.z * closest_face->c.a;
-	info.points[1] = info.points[0];
+	info.points[1] = info.points[0];*/
+	determinCollisionData(info, closest_face, glm::dot(closest_face->a.v, closest_face->n));
 }
 const Physics::CollisionManfold Physics::GJK3D::getCollisionData(Collider* a, Collider* b)
 {
@@ -150,7 +168,7 @@ const Physics::CollisionManfold Physics::GJK3D::getCollisionData(Collider* a, Co
 	CollisionManfold res;
 	res.collided = false;
 	res.bodies = {
-		a, b 
+		a, b
 	};
 
 	Simplex simplex;
@@ -158,18 +176,20 @@ const Physics::CollisionManfold Physics::GJK3D::getCollisionData(Collider* a, Co
 	simplex.push(support(a, b, dir));
 	dir *= -1;
 
+	glm::vec3 ao(0);
+	glm::vec3 ab(0);
+	glm::vec3 ac(0);
+	glm::vec3 ad(0);
 	unsigned counter = 0;
 	while (counter < GJK_MAX_ITTERATION) {
 		counter++;
 		simplex.push(support(a, b, dir));
 
-		const glm::vec3 ao = -simplex.a().v;
-		const glm::vec3 ab = simplex.b() - simplex.a();
-		const glm::vec3 ac = simplex.c() - simplex.a();
-		const glm::vec3 ad = simplex.d() - simplex.a();
+		ao = -simplex.a().v;
+		ab = simplex.b() - simplex.a();
+		ac = simplex.c() - simplex.a();
+		ad = simplex.d() - simplex.a();
 		
-
-		Utils::Timer cross_timer("Cross Timer");
 		switch (simplex.size)
 		{
 		case 2: // line segment

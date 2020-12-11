@@ -18,7 +18,7 @@ void Component::RigidBody::updateOrientation()
     *rotation = glm::normalize(*rotation);
     globlaInverseIntertiaTensor =
         getRotation() 
-        * glm::inverse(localInverseIntertiaTensor)
+        * localInverseIntertiaTensor
         * glm::inverse(getRotation());
 }
 
@@ -60,11 +60,10 @@ void Component::RigidBody::addCollider(Physics::Collider* collider)
         // using Parallel Axis Theorem
         localInertiaTensor +=
             collider->localInertiaTensor
-            + collider->mass * (rDotR * glm::mat3(1) - rOutR);
+            + collider->mass * rDotR * glm::mat3(1) - rOutR;
     }
 
     // compute inverse inertia tensor
-    glm::inverse(localInertiaTensor);
     localInverseIntertiaTensor = glm::inverse(localInertiaTensor);
 }
 
@@ -108,7 +107,7 @@ Utils::BigMaths::MassMatrix6 Component::RigidBody::getMassMatrix() const
     for (char i = 0; i < 3; i++) {
         for (char j = 0; j < 3; j++) {
             res[i][j] = m[i][j];
-            res[3 + i][3 + j] = 1.0f / I[i][j];
+            res[3 + i][3 + j] = I[i][j] ? 1.0f / I[i][j] : 0.0f;
         }
     }
     return res;

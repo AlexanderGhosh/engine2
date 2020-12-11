@@ -214,7 +214,7 @@ int main() {
     cubeR2->setMaterial(cubeMat2);
     
     GameObject* cube2 = new GameObject();
-    cube2->getTransform()->Position = { -5, 0, -5 };
+    cube2->getTransform()->Position = { 0, 5, -5 };
     // cube2->getTransform()->Rotation *= glm::quat({ 0, 0, glm::radians(45.0f) });
     // cube2->getTransform()->Rotation = glm::rotate(cube2->getTransform()->Rotation, glm::radians(45.0f), Utils::zAxis());
     cube2->addComponet(cubeR2);
@@ -226,6 +226,13 @@ int main() {
     cube2->addComponet(rb2);
     
     cube2->getRigidbody()->addConstriant(constraint);
+
+    const glm::vec3 dir = Utils::yAxis();
+    const glm::vec3 s1 = cube1->getComponet<Physics::Collider>()->support(dir);
+    const glm::vec3 s2 = cube2->getComponet<Physics::Collider>()->support(-dir);
+    Physics::SupportPoint point = s1 - s2;
+    point.a = s1;
+    point.b = s2;
     
     
     Primative::StaticBuffer b("m4, m4, v3, f, m4", 0);
@@ -244,7 +251,8 @@ int main() {
     
     glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 0.1f, 100.0f);
     
-    glm::mat4 lightView = glm::lookAt(glm::vec3(10, 10 ,10),
+    glm::mat4 lightView = glm::lookAt(
+        glm::vec3(10, 10 ,10),
         glm::vec3(0.0f, 0.0f, 0.0f),
         glm::vec3(0.0f, 1.0f, 0.0f));
     glm::mat4 lightSpaceMatrix = lightProjection * lightView;
@@ -345,7 +353,7 @@ int main() {
             //UI::Renderer::render(&win);
         }*/
         UI::Renderer::render(&tb);
-        cube2->getRigidbody()->applyAcceleration({ 5, 0, 0 });
+        cube2->getRigidbody()->applyAcceleration({ 0, -2, 0 });
         Physics::Engine::update();
     
         if (Events::Handler::getKey(Events::Key::W, Events::Action::Down)) {

@@ -19,9 +19,7 @@ Utils::BigMaths::Vector12 Physics::Constraint::getDeltaV(const MATHS::Vector12& 
     const auto inv_m = Utils::BigMaths::inverse(M);
 
     const float lambda = getLagrangian(V, M, manafoild);
-    auto m = inv_m;
-    MATHS::Vector12 h = m * Jacobian;
-    h = h * lambda;
+    MATHS::Vector12 h = inv_m * Jacobian * lambda;
     float test = (V + h) * Jacobian + getBias(manafoild);
     test = (int)(test * 10000.0) / 10000.0;
     assert(test == 0 && "constraint != 0");
@@ -36,13 +34,12 @@ const float Physics::Constraint::getLagrangian(const MATHS::Vector12& V, const M
 
 }
 const float Physics::Constraint::getBias(const Physics::CollisionManfold& manafold) const {
-    //return 0;
-    Component::RigidBody* a = manafold.bodies[0]->getParent()->getRigidbody();
+    /*Component::RigidBody* a = manafold.bodies[0]->getParent()->getRigidbody();
     Component::RigidBody* b = manafold.bodies[1]->getParent()->getRigidbody();
     const Utils::BigMaths::Vector6& aV = a->getVelocities();
     const Utils::BigMaths::Vector6& bV = a->getVelocities();
     auto t = manafold.getRestitution() *
         glm::dot(-glm::vec3(aV[0], aV[1], aV[2]) - glm::cross({aV[0], aV[1], aV [2] }, manafold.getDeltaA()) +
-            glm::vec3(bV[0], bV[1], bV[2]) + glm::cross(glm::vec3(bV[0], bV[1], bV[2]), manafold.getDeltaB()), manafold.normal);
+            glm::vec3(bV[0], bV[1], bV[2]) + glm::cross(glm::vec3(bV[0], bV[1], bV[2]), manafold.getDeltaB()), manafold.normal);*/
     return -(BETA * FPS) * manafold.penertraion;
 }

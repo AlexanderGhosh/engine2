@@ -12,10 +12,10 @@ void Physics::Engine::update()
 		Component::RigidBody* b1 = manafold.bodies[0]->getParent()->getRigidbody();
 		Component::RigidBody* b2 = manafold.bodies[1]->getParent()->getRigidbody();
 
-		b1->linearVelocity *= -1;
-		b2->linearVelocity *= -1;
-		return;
-		if ((unsigned)b1 + (unsigned)b2 == 0)
+		// b1->linearVelocity *= -1;
+		// b2->linearVelocity *= -1;
+		// return;
+		if ((unsigned)b1 - (unsigned)b2 == 0)
 			continue;
 
 		auto& c_1 = b1->getConstraints();
