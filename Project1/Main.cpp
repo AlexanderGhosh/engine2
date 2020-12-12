@@ -31,6 +31,16 @@
 
 #include "MainWindow.h"
 
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+
+#ifdef _DEBUG
+#define new new( _NORMAL_BLOCK , __FILE__ , __LINE__ )
+#else
+#define new new
+#endif
+
 #define PBRen 1
 #define PI 3.14f
 
@@ -59,15 +69,8 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 }
 
 int main() {
-    // glm::vec3 a = { 1, 0, 0 };
-    // glm::vec3 b = { 0, 1, 0 };
-    // // glm::vec3 c = { 0, 0, 1 };
-    // glm::vec3 c = glm::cross(a, b);
-    // std::cout << glm::to_string(c) << std::endl; // should be c
-    // std::cout << glm::to_string(glm::cross(c, b)) << std::endl; // should be -b
-    // return 0;
-    
 
+    _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -175,17 +178,17 @@ int main() {
     
     // unsigned tex = ResourceLoader::createTexture("Basics/Textures/wood.jpg", TextureType::DiffuseMap);
     
-    Render::RenderMesh* r = new Render::RenderMesh();
-    r->addBuffers(pistolBuffers);
-    Materials::Base* mat = new Materials::PBR({ 1 }, { 3 }, { 2 }, { 5 }, { 4 }); // new Materials::PBR({ 1 }, { 3 }, { 2 }, { 5 }, { 4 });
-    if (!PBRen) {
-        mat = new Materials::Forward({ 1 }, { 2 }, { 3 }, 32);
-    }
-    r->setMaterial(mat);
+    // Render::RenderMesh* r = new Render::RenderMesh();
+    // r->addBuffers(pistolBuffers);
+    // Materials::Base* mat = new Materials::PBR({ 1 }, { 3 }, { 2 }, { 5 }, { 4 }); // new Materials::PBR({ 1 }, { 3 }, { 2 }, { 5 }, { 4 });
+    // if (!PBRen) {
+    //     mat = new Materials::Forward({ 1 }, { 2 }, { 3 }, 32);
+    // }
+    // r->setMaterial(mat);
     
-    GameObject* gun = new GameObject();
-    gun->getTransform()->Position = { 0, 0, 0 };
-    gun->addComponet(r);
+    // GameObject* gun = new GameObject();
+    // gun->getTransform()->Position = { 0, 0, 0 };
+    // gun->addComponet(r);
     
     Render::RenderMesh* cubeR = new Render::RenderMesh();
     cubeR->addBuffers(cubeBuffers);
@@ -303,8 +306,9 @@ int main() {
     
     MainWindow win(sceneTex, 8.f/6.f);
     
-    Physics::CollisionDetection::setBroadphase(new Physics::NSquared());
-    Physics::CollisionDetection::setNarrowphase(new Physics::GJK3D());
+    // Physics::CollisionDetection::setBroadphase(new Physics::NSquared
+    Physics::CollisionDetection::setBroadphase<Physics::NSquared>();
+    Physics::CollisionDetection::setNarrowphase< Physics::GJK3D>();
     
     // cube2->getRigidbody()->angularVelocity.z = 36;
     // cube2->getRigidbody()->linearVelocity.y -= 2.5f;
@@ -372,7 +376,10 @@ int main() {
     }
     Render::Shading::Manager::cleanUp(); // deactivats shdaer
     
-    delete mat;
+    audio->cleanUp();
+    delete audio;
+    audio = nullptr;
+
     delete constraint;
     
     scene.cleanUp(); // removes and destrys all componets and fbos (destroysing comonets doesnt destry buffers(except audio source))

@@ -32,8 +32,10 @@ namespace Physics {
         static Narrowphase* narrowphase;
     public:
         static const std::vector<CollisionManfold> getCollisions();
-        static inline void setBroadphase(Broadphase* algo) { broadphase = algo; };
-        static inline void setNarrowphase(Narrowphase* algo) { narrowphase = algo; };
+        template<class T>
+        static inline void setBroadphase() { broadphase = new T(); };
+        template<class T>
+        static inline void setNarrowphase() { narrowphase = new T(); };
         static bool checkCollision(const AABB* a, const AABB* b);
         static bool checkCollision(const AABB* a, const glm::vec3 b);
         static CollisionManfold getCollisionData(AABB* a, AABB* b);
