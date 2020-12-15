@@ -6,7 +6,7 @@ bool sameDirection(const glm::vec3& a, const glm::vec3& b) {
 	return glm::dot(a, b) > 0;
 }
 
-Physics::SupportPoint support(const Physics::Collider*& a, const Physics::Collider*& b, const glm::vec3& dir) {
+Physics::SupportPoint support(const Physics::Collider* a, const Physics::Collider* b, const glm::vec3& dir) {
 	Physics::SupportPoint res;
 	res.a = a->support(dir);
 	res.b = b->support(-dir);
@@ -60,7 +60,7 @@ void determinCollisionData(Physics::CollisionManfold& info, const Physics::GJK3D
 
 	info.collided = true;
 	info.normal = face->n;
-	info.penertraion = penertration;
+	info.penetration = penertration;
 	glm::vec3 barr = ClipFunc(*face);
 	info.points[0] =
 		barr.x * face->a.a +
@@ -71,7 +71,7 @@ void determinCollisionData(Physics::CollisionManfold& info, const Physics::GJK3D
 		barr.x * face->a.b +
 		barr.y * face->b.b +
 		barr.z * face->c.b;
-	assert(!glm::isnan(info.penertraion) && !glm::isinf(info.penertraion) && "Cant determin collision info");
+	assert(!glm::isnan(info.penetration) && !glm::isinf(info.penetration) && "Cant determin collision info");
 }
 
 void Physics::GJK3D::EPA(Physics::CollisionManfold& info, Simplex& simplex) {
@@ -245,7 +245,8 @@ const Physics::CollisionManfold Physics::GJK3D::getCollisionData(Collider* a, Co
 				dir = adb;
 			}
 			else {
-				EPA(res, simplex);
+				// EPA(res, simplex);
+				res.collided = true;
 				return res;
 			}
 			break;
