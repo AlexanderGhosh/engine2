@@ -75,12 +75,13 @@ glm::vec3 Physics::BoxCollider::support(const glm::vec3& direction) const
 {
 	glm::vec3 res(0);
 	const glm::vec3 dir = direction * glm::inverse(glm::toMat3(*rotation));
-	// for (char i = 0; i < 3; i++)
-	// 	res[i] = dir[i] > 0 ? max[i] : min[i];
 
 	res = glm::sign(dir) * *scale * 0.5f;
+	for (char i = 0; i < 3; i++) {
+		res[i] = dir[i] > 0 ? max[i] : min[i];
+	}
 
-	res = glm::toMat3(*rotation) * res + *position;
+	res = (res * glm::toMat3(*rotation)) + *position;
 	// std::cout << glm::to_string(res) << "/#/\n";
 	return res;
 }

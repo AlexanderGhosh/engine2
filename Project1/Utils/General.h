@@ -164,11 +164,9 @@ namespace Utils {
         const glm::vec3 acb = a * cb;
         return b * glm::dot(a, c) - a * glm::dot(b, c);
     }
-    inline glm::vec3 cross(const glm::vec3& a, const glm::vec3& b) {
-        float x = a[1] * b[2] - a[2] * b[1];
-        float y = a[2] * b[0] - a[0] * b[2];
-        float z = a[0] * b[1] - a[1] * b[0];
-        return { x, y, z };
+    // a x b x a
+    inline glm::vec3 tripProduct(const glm::vec3& a, const glm::vec3& b) {
+        return tripProduct(a, b, a);
     }
     class Timer {
     public:

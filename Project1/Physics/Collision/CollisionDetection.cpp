@@ -19,6 +19,8 @@ const std::vector<Physics::CollisionManfold> Physics::CollisionDetection::getCol
     std::vector<CollisionManfold> res;
     const auto& pairs = broadphase->computePairs();
     for (const auto& pair : pairs) {
+        if ((unsigned)pair.first - (unsigned)pair.second == 0)
+            continue;
         auto t = narrowphase->getCollisionData(pair.first, pair.second);
         if (!t.collided)
             continue;
@@ -46,7 +48,7 @@ Physics::CollisionManfold Physics::CollisionDetection::getCollisionData(AABB* a,
     res.collided = true;
     res.bodies[0] = a;
     res.bodies[1] = b;
-    res.penertraion = 0;
+    res.penetration = 0;
     res.normal = glm::normalize(*a->position - *b->position);
     res.points[0] = *a->position + res.normal * a->getMaxRaw() * *a->scale;
     res.points[0] = *b->position + res.normal * b->getMinRaw() * *b->scale;

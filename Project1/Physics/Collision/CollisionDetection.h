@@ -13,9 +13,9 @@ namespace Physics {
         bool collided;
         glm::vec3 normal;
         std::array<glm::vec3, 2> points;
-        float penertraion;
+        float penetration;
         std::array<Collider*, 2> bodies;
-        CollisionManfold() : collided(0), normal(0), points{ Utils::zero(), Utils::zero() }, penertraion(0), bodies{ nullptr, nullptr } { };
+        CollisionManfold() : collided(0), normal(0), points{ Utils::zero(), Utils::zero() }, penetration(0), bodies{ nullptr, nullptr } { };
         inline void cleanUp() {
             for (char i = 0; i < 2; i++) {
                 bodies[i] = nullptr;

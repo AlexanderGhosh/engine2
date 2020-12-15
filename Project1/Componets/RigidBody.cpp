@@ -96,7 +96,7 @@ void Component::RigidBody::applyForce(const glm::vec3& f, const glm::vec3& ang)
 void Component::RigidBody::applyAcceleration(const glm::vec3& f, const glm::vec3& at)
 {
     forceAccumulator += f * inverseMass;
-    // torqueAccumulator += glm::cross(at - globalCentroid, f) * globlaInverseIntertiaTensor;
+    torqueAccumulator += glm::cross(at - globalCentroid, f) * globlaInverseIntertiaTensor;
 }
 
 Utils::BigMaths::MassMatrix6 Component::RigidBody::getMassMatrix() const

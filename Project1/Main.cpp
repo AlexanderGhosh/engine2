@@ -25,9 +25,10 @@
 #include "UI/Elements/ImageBox.h"
 #include "Physics/Engine.h"
 #include "Physics/Collision/Broadphase/NSquared.h"
-#include "Physics/Collision/Narrowphase/GJK.h"
 #include "Physics/Collision/Narrowphase/GJK3D.h"
 #include "Physics/Constraints.h"
+#include "Physics/Resolution/ConstraintsBased.h"
+#include "gjk.h"
 
 #include "MainWindow.h"
 
@@ -35,11 +36,11 @@
 #include <stdlib.h>
 #include <crtdbg.h>
 
-#ifdef _DEBUG
-#define new new( _NORMAL_BLOCK , __FILE__ , __LINE__ )
-#else
-#define new new
-#endif
+// #ifdef _DEBUG
+// #define new new( _NORMAL_BLOCK , __FILE__ , __LINE__ )
+// #else
+// #define new new
+// #endif
 
 #define PBRen 1
 #define PI 3.14f
@@ -77,7 +78,7 @@ int main() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_SAMPLES, 4);
-    GLFWwindow* window = glfwCreateWindow(800, 600, "LearnOpenGL", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(800, 600, "Engine 2", NULL, NULL);
     if (!window)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
@@ -217,9 +218,8 @@ int main() {
     cubeR2->setMaterial(cubeMat2);
     
     GameObject* cube2 = new GameObject();
-    cube2->getTransform()->Position = { 0, 5, -5 };
-    // cube2->getTransform()->Rotation *= glm::quat({ 0, 0, glm::radians(45.0f) });
-    // cube2->getTransform()->Rotation = glm::rotate(cube2->getTransform()->Rotation, glm::radians(45.0f), Utils::zAxis());
+    cube2->getTransform()->Position = { 0.75, 5, -5 };
+    cube2->getTransform()->Rotation *= glm::quat({ 0, 0, 0 });
     cube2->addComponet(cubeR2);
     
     Physics::BoxCollider* collider2 = new Physics::BoxCollider(10, Utils::zero());
@@ -230,12 +230,29 @@ int main() {
     
     cube2->getRigidbody()->addConstriant(constraint);
 
-    const glm::vec3 dir = Utils::yAxis();
+    cube2->getRigidbody()->kinematic = 0;
+
+
+    Render::RenderMesh* cubeR3 = new Render::RenderMesh();
+    model = ResourceLoader::getModel("cube");
+    cubeR3->addBuffers(model, GL_TRIANGLE_STRIP);
+    Materials::Base* cubeMat3 = new Materials::PBR({ { 1, 1, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } });
+    cubeR3->setMaterial(cubeMat3);
+
+    GameObject* cube3 = new GameObject();
+    cube3->getTransform()->Position = { 0, 5, -5 };
+    cube3->getTransform()->Scale *= 0.5f;
+    cube3->addComponet(cubeR3);
+
+
+    const glm::vec3 dir = { 1, 1, 0 };
     const glm::vec3 s1 = cube1->getComponet<Physics::Collider>()->support(dir);
     const glm::vec3 s2 = cube2->getComponet<Physics::Collider>()->support(-dir);
     Physics::SupportPoint point = s1 - s2;
     point.a = s1;
     point.b = s2;
+
+    // std::cout << glm::to_string(s1) << " : " << glm::to_string(s2) << std::endl;
     
     
     Primative::StaticBuffer b("m4, m4, v3, f, m4", 0);
@@ -280,6 +297,7 @@ int main() {
     // scene.addObject(gun);
     scene.addObject(cube1);
     scene.addObject(cube2);
+    scene.addObject(cube3);
     
     // UI //
     UI::TextRenderer font = UI::TextRenderer({ 800, 600 }); // creates arial Font
@@ -309,6 +327,7 @@ int main() {
     // Physics::CollisionDetection::setBroadphase(new Physics::NSquared
     Physics::CollisionDetection::setBroadphase<Physics::NSquared>();
     Physics::CollisionDetection::setNarrowphase< Physics::GJK3D>();
+    Physics::Engine::setResolution<Physics::ConstraintsBased>();
     
     // cube2->getRigidbody()->angularVelocity.z = 36;
     // cube2->getRigidbody()->linearVelocity.y -= 2.5f;
@@ -317,8 +336,13 @@ int main() {
     unsigned frameCounter = 0;
     unsigned fps_count = 0;
     const unsigned smapleRate = 10;
+
+
+    gjk GJK;
+
     while (!glfwWindowShouldClose(window))
     {
+        // FPS--------------------------------------------------------------------------------------------------------------------------------------------------
         float currentTime = glfwGetTime();
         deltaTime = currentTime - lastTime;
         fps = 1.0f / deltaTime;
@@ -343,23 +367,29 @@ int main() {
         frameCounter++;
         // std::cout << fps << std::endl; // FPS Count
 
+        // RENDERING--------------------------------------------------------------------------------------------------------------------------------------------
+        glDisable(GL_CULL_FACE);
         b.fill(0, value_ptr(cam.getView()));
         b.fill(2, value_ptr(cam.getPos())); 
     
-        glDisable(GL_CULL_FACE);
         scene.preProcess(); // shadows and scene quad
-        if(!Events::Handler::getKey(Events::Key::Space, Events::Action::Down)){
-            scene.postProcess();// render to screen
-        }
-        /*else{
-            glBindFramebuffer(GL_FRAMEBUFFER, 0);
-            win.update(); // events check
-            //UI::Renderer::render(&win);
-        }*/
+        scene.postProcess();// render to screen
         UI::Renderer::render(&tb);
+
+        // PHYSICS-----------------------------------------------------------------------------------------------------------------------------------------------
         cube2->getRigidbody()->applyAcceleration({ 0, -2, 0 });
+
         Physics::Engine::update();
+
+        bool collided = GJK.intersect(cube1->getComponet<Physics::BoxCollider>(), cube2->getComponet<Physics::BoxCollider>());
+        // std::cout << collided << "\r";;
+        if (collided && false) {
+            // cube2->getRigidbody()->linearVelocity *= -1;
+            glm::vec3 mtv = GJK.epa(cube1->getComponet<Physics::BoxCollider>(), cube2->getComponet<Physics::BoxCollider>());
+            std::cout << glm::to_string(glm::normalize(mtv)) << " : " << glm::length(mtv) << std::endl;
+        }
     
+        // EVENTS-----------------------------------------------------------------------------------------------------------------------------------------------
         if (Events::Handler::getKey(Events::Key::W, Events::Action::Down)) {
             cam.setPos(cam.getPos() + cam.getForward() * deltaTime);
         }
@@ -369,6 +399,7 @@ int main() {
         if (Events::Handler::getKey(Events::Key::Escape, Events::Action::Down)) {
             break;
         }
+        // COLOR BUFFERS----------------------------------------------------------------------------------------------------------------------------------------
         // sound->update();
         glfwSwapInterval(1); // V-SYNC
         glfwSwapBuffers(window);

@@ -1,8 +1,12 @@
 #include "Engine.h"
 #include <iostream>
+#include <gtx/string_cast.hpp>
 #include "../GameObject/GameObject.h"
+#include "Resolution/ResolutionBase.h"
+
 std::vector<Component::RigidBody*> Physics::Engine::rigidbodies = { };
-std::vector<Physics::Collider*> Physics::Engine::colliders = { };
+std::vector<Physics::Collider*> Physics::Engine::colliders = { }; 
+Physics::Resolution* Physics::Engine::resolution = nullptr;
 
 void Physics::Engine::update()
 {
@@ -12,35 +16,14 @@ void Physics::Engine::update()
 		Component::RigidBody* b1 = manafold.bodies[0]->getParent()->getRigidbody();
 		Component::RigidBody* b2 = manafold.bodies[1]->getParent()->getRigidbody();
 
-		// b1->linearVelocity *= -1;
-		// b2->linearVelocity *= -1;
+		std::cout << glm::to_string(manafold.normal) << " : " << std::to_string(manafold.penetration) << " GJK3D\n";
+		
+		// b1->linearVelocity *= -1.0f;
+		// b2->linearVelocity *= -1.0f;
 		// return;
-		if ((unsigned)b1 - (unsigned)b2 == 0)
-			continue;
 
-		auto& c_1 = b1->getConstraints();
-		auto& c_2 = b2->getConstraints();
-		for (Constraint* c : c_1) {
-			// Constraint* c = Utils::elementAt(c_1, i);
-			if (Utils::find(c_2, c)) {
-				// std::cout << "collision detected: " << i++ << "\r";
-				Utils::BigMaths::Vector12 V;
-				Utils::BigMaths::Matrix12 M;
-
-				V = Utils::BigMaths::combine(b1->getVelocities(), b2->getVelocities());
-				M = Utils::BigMaths::combine(b1->getMassMatrix(), b2->getMassMatrix());
-				const Utils::BigMaths::Vector12 delta = c->getDeltaV(V, M, manafold);
-				b1->applyForce({ delta[0], delta[1], delta[2] }, { delta[3], delta[4], delta[5] });
-				b2->applyForce({ delta[6], delta[7], delta[8] }, { delta[9], delta[10], delta[11] });
-			}
-		}
-		for (Component::RigidBody* rb : rigidbodies) {
-			// rb->update();
-		}
-
+		resolution->resolve(b1, b2, manafold);
 	}
-	// if(!collisions.empty())
-		// std::cout << std::endl;
 }
 
 void Physics::Engine::cleanUp()

@@ -143,11 +143,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Physics\Resolution\ConstraintsBased.cpp" />
     <ClCompile Include="Physics\Collision\Narrowphase\GJK3D.cpp" />
     <ClCompile Include="Physics\Constraints.cpp" />
     <ClCompile Include="Physics\Collision\Broadphase\BPBase.cpp" />
     <ClCompile Include="Physics\Collision\Narrowphase\NPBase.cpp" />
-    <ClCompile Include="Physics\Collision\Narrowphase\GJK.cpp" />
     <ClCompile Include="Physics\Collision\Broadphase\NSquared.cpp" />
     <ClCompile Include="Physics\Collision\Collider.cpp" />
     <ClCompile Include="Physics\Collision\CollisionDetection.cpp" />
@@ -182,9 +182,10 @@
     <ClCompile Include="Utils\ResourceLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="gjk.h" />
+    <ClInclude Include="Physics\Resolution\ConstraintsBased.h" />
     <ClInclude Include="Physics\Collision\Narrowphase\GJK3D.h" />
     <ClInclude Include="Physics\Constraints.h" />
-    <ClInclude Include="Physics\Collision\Narrowphase\GJK.h" />
     <ClInclude Include="Physics\Collision\Broadphase\NSquared.h" />
     <ClInclude Include="Physics\Collision\Broadphase\Base.h" />
     <ClInclude Include="Physics\Collision\CollisionDetection.h" />
@@ -193,6 +194,7 @@
     <ClInclude Include="Physics\Collision\Narrowphase\Base.h" />
     <ClInclude Include="Physics\Engine.h" />
     <ClInclude Include="Componets\RigidBody.h" />
+    <ClInclude Include="Physics\Resolution\ResolutionBase.h" />
     <ClInclude Include="UI\Elements\ListBox.h" />
     <ClInclude Include="UI\Panes\Grid.h" />
     <ClInclude Include="MainWindow.h" />

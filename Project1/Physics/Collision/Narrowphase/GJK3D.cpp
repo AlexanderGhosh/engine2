@@ -62,7 +62,18 @@ void determinCollisionData(Physics::CollisionManfold& info, const Physics::GJK3D
 	info.normal = face->n;
 	info.penetration = penertration;
 	glm::vec3 barr = ClipFunc(*face);
+	const Physics::Collider* a = info.bodies[0];
+	const Physics::Collider* b = info.bodies[1];
 	info.points[0] =
+		barr.x * ((glm::sign(face->a.dir) * *a->scale) + *a->position) +
+		barr.y * ((glm::sign(face->b.dir) * *a->scale) + *a->position) +
+		barr.z * ((glm::sign(face->c.dir) * *a->scale) + *a->position);
+
+	info.points[1] =
+		barr.x * ((glm::sign(-face->a.dir) * *b->scale) + *b->position) +
+		barr.y * ((glm::sign(-face->b.dir) * *b->scale) + *b->position) +
+		barr.z * ((glm::sign(-face->c.dir) * *b->scale) + *b->position);
+	/*info.points[0] =
 		barr.x * face->a.a +
 		barr.y * face->b.a +
 		barr.z * face->c.a;
@@ -70,7 +81,7 @@ void determinCollisionData(Physics::CollisionManfold& info, const Physics::GJK3D
 	info.points[1] =
 		barr.x * face->a.b +
 		barr.y * face->b.b +
-		barr.z * face->c.b;
+		barr.z * face->c.b;*/
 	assert(!glm::isnan(info.penetration) && !glm::isinf(info.penetration) && "Cant determin collision info");
 }
 
@@ -108,7 +119,7 @@ void Physics::GJK3D::EPA(Physics::CollisionManfold& info, Simplex& simplex) {
 
 		if (glm::dot(p, dir) - min < EPA_TOLERANCE) {
 			determinCollisionData(info, closest_face, glm::dot(p, dir));
-			std::cout << glm::to_string(info.points[0]) << " : " << glm::to_string(info.points[1]) << /*glm::to_string(*info.bodies[1]->position) <<*/ std::endl;
+			// std::cout << glm::to_string(info.points[0]) << " : " << glm::to_string(info.points[1]) << /*glm::to_string(*info.bodies[1]->position) <<*/ std::endl;
 			return;
 		}
 		for (unsigned k = 0; k < faces.size(); k++) {
@@ -245,8 +256,8 @@ const Physics::CollisionManfold Physics::GJK3D::getCollisionData(Collider* a, Co
 				dir = adb;
 			}
 			else {
-				// EPA(res, simplex);
-				res.collided = true;
+				EPA(res, simplex);
+				// res.collided = true;
 				return res;
 			}
 			break;

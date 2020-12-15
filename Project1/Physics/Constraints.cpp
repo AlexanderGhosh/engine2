@@ -41,5 +41,5 @@ const float Physics::Constraint::getBias(const Physics::CollisionManfold& manafo
     auto t = manafold.getRestitution() *
         glm::dot(-glm::vec3(aV[0], aV[1], aV[2]) - glm::cross({aV[0], aV[1], aV [2] }, manafold.getDeltaA()) +
             glm::vec3(bV[0], bV[1], bV[2]) + glm::cross(glm::vec3(bV[0], bV[1], bV[2]), manafold.getDeltaB()), manafold.normal);*/
-    return -(BETA * FPS) * manafold.penertraion;
+    return -(BETA * FPS) * manafold.penetration;
 }

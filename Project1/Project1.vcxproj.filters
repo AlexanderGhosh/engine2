@@ -111,9 +111,6 @@
     <ClCompile Include="Physics\Collision\Collider.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Physics\Collision\Narrowphase\GJK.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Physics\Collision\Broadphase\BPBase.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -124,6 +121,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Physics\Collision\Narrowphase\GJK3D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\Resolution\ConstraintsBased.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -236,13 +236,19 @@
     <ClInclude Include="Physics\Collision\Narrowphase\Base.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Physics\Collision\Narrowphase\GJK.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Physics\Constraints.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Physics\Collision\Narrowphase\GJK3D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\Resolution\ResolutionBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\Resolution\ConstraintsBased.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gjk.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
