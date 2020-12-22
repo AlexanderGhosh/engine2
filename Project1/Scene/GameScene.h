@@ -14,12 +14,13 @@ private:
 		glClearColor(0.5, 0.5, 0.5, 1);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
+	void renderObjects(); // just moved
 public:
 	inline GameScene() : objects(), preProcessingLayers(), currentTick(0), postProcShaderId(0), FBOs() { };
 	inline void addObject(GameObject*& obj) { objects.push_back(obj); };
 	void preProcess();
 	void postProcess();
-	void renderObjects();
+	void updateScene();
 	const Primative::FrameBuffer* getFBO(const std::string& name);
 	void cleanUp();
 	void addPreProcLayer(const std::string& name, const unsigned& shaderId);

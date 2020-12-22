@@ -17,7 +17,6 @@ const Physics::ColliderPairList& Physics::NSquared::computePairs()
             // skip same-body collision
             if (aabbA == aabbB)
                 continue;
-
                 // add collider pair
             if (CollisionDetection::checkCollision(aabbA, aabbB))
                 pairs.emplace_back(*i, *j);

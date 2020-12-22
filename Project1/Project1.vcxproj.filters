@@ -114,9 +114,6 @@
     <ClCompile Include="Physics\Collision\Broadphase\BPBase.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Physics\Collision\Narrowphase\NPBase.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Physics\Constraints.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -124,6 +121,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Physics\Resolution\ConstraintsBased.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\Resolution\ImpulseBased.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\Collision\Narrowphase\SAT3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -249,6 +252,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="gjk.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\Resolution\ImpulseBased.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\Collision\Narrowphase\SAT3D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

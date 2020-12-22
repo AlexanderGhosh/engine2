@@ -143,17 +143,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Physics\Resolution\ImpulseBased.cpp" />
     <ClCompile Include="Physics\Resolution\ConstraintsBased.cpp" />
     <ClCompile Include="Physics\Collision\Narrowphase\GJK3D.cpp" />
     <ClCompile Include="Physics\Constraints.cpp" />
     <ClCompile Include="Physics\Collision\Broadphase\BPBase.cpp" />
-    <ClCompile Include="Physics\Collision\Narrowphase\NPBase.cpp" />
     <ClCompile Include="Physics\Collision\Broadphase\NSquared.cpp" />
     <ClCompile Include="Physics\Collision\Collider.cpp" />
     <ClCompile Include="Physics\Collision\CollisionDetection.cpp" />
     <ClCompile Include="Componets\AudioSource.cpp" />
     <ClCompile Include="Physics\Engine.cpp" />
     <ClCompile Include="Componets\RigidBody.cpp" />
+    <ClCompile Include="Physics\Collision\Narrowphase\SAT3D.cpp" />
     <ClCompile Include="UI\Elements\ListBox.cpp" />
     <ClCompile Include="UI\Panes\Grid.cpp" />
     <ClCompile Include="MainWindow.cpp" />
@@ -183,6 +184,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gjk.h" />
+    <ClInclude Include="Physics\Resolution\ImpulseBased.h" />
     <ClInclude Include="Physics\Resolution\ConstraintsBased.h" />
     <ClInclude Include="Physics\Collision\Narrowphase\GJK3D.h" />
     <ClInclude Include="Physics\Constraints.h" />
@@ -195,6 +197,7 @@
     <ClInclude Include="Physics\Engine.h" />
     <ClInclude Include="Componets\RigidBody.h" />
     <ClInclude Include="Physics\Resolution\ResolutionBase.h" />
+    <ClInclude Include="Physics\Collision\Narrowphase\SAT3D.h" />
     <ClInclude Include="UI\Elements\ListBox.h" />
     <ClInclude Include="UI\Panes\Grid.h" />
     <ClInclude Include="MainWindow.h" />

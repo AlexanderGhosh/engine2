@@ -26,9 +26,6 @@ const std::vector<Physics::CollisionManfold> Physics::CollisionDetection::getCol
             continue;
         res.push_back(t);
     }
-    if (res.size() > 0) {
-        bool i = 0;
-    }
     return res;
 }
 
@@ -68,11 +65,13 @@ void Physics::CollisionDetection::cleanUp()
 
 glm::vec3 Physics::CollisionManfold::getDeltaA() const
 {
+    // return points[0]  - *bodies[0]->position;
     return *bodies[0]->position - points[0];
 }
 
 glm::vec3 Physics::CollisionManfold::getDeltaB() const
 {
+    // return points[1] - *bodies[1]->position;
     return *bodies[1]->position - points[1];
 }
 

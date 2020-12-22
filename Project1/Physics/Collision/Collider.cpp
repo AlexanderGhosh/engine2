@@ -85,3 +85,34 @@ glm::vec3 Physics::BoxCollider::support(const glm::vec3& direction) const
 	// std::cout << glm::to_string(res) << "/#/\n";
 	return res;
 }
+
+const Physics::AABB* Physics::BoxColliderSAT::constructAABB()
+{
+	glm::vec3 mi = Utils::fill(-0.5f), ma = Utils::fill(0.5f);
+	std::array<glm::vec3, 8> translated = {
+		mi, ma,
+		{mi.x, ma.y, ma.z},
+		{mi.x, mi.y, ma.z},
+		{mi.x, ma.y, mi.z},
+
+		{ma.x, mi.y, mi.z},
+		{ma.x, ma.y, mi.z},
+		{ma.x, mi.y, ma.z},
+	};
+	glm::vec3 min(INFINITY);
+	glm::vec3 max(-INFINITY);
+	for (glm::vec3& tra : translated) {
+		tra *= *scale;
+		tra = glm::rotate(*rotation, tra);
+		tra += *position;
+		for (char i = 0; i < 3; i++) {
+			if (tra[i] < min[i]) {
+				min[i] = tra[i];
+			}
+			if (tra[i] > max[i]) {
+				max[i] = tra[i];
+			}
+		}
+	}
+	return new AABB(min - *position, max - *position, false, parent);
+}

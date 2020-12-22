@@ -13,6 +13,7 @@ public:
 	GameObject();
 	void addComponet(Component::Base* componet);
 	void tick(short currentTick);
+	void tryDraw();
 	inline Component::Transform* getTransform() const { return transform; };
 	Component::RigidBody* getRigidbody();
 	template<class T>

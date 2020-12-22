@@ -3,16 +3,6 @@
 #include "../GameObject/GameObject.h"
 #include "..\Physics\Constraints.h"
 
-void Component::RigidBody::updateGlobalCentroidFromPosition()
-{
-	globalCentroid = getRotation() * localCentroid + *position;
-}
-
-void Component::RigidBody::updatePositionFromGlobalCentroid()
-{
-	// *position = getRotation() * -localCentroid + globalCentroid;
-}
-
 void Component::RigidBody::updateOrientation()
 {
     *rotation = glm::normalize(*rotation);
@@ -26,7 +16,6 @@ void Component::RigidBody::addCollider(Physics::Collider* collider)
 {
     // add collider to collider list
     colliders.push_back(collider);
-
     // reset local centroid & mass
     localCentroid = Utils::zero();
     mass = 0.0f;
@@ -67,6 +56,8 @@ void Component::RigidBody::addCollider(Physics::Collider* collider)
     localInverseIntertiaTensor = glm::inverse(localInertiaTensor);
 }
 
+
+
 const glm::vec3 Component::RigidBody::localToGlobal(const glm::vec3& p) const
 {
     return getRotation() * p + *position;
@@ -87,16 +78,28 @@ const glm::vec3 Component::RigidBody::globalToLocalVec(const glm::vec3& v) const
     return glm::inverse(getRotation()) * v;
 }
 
-void Component::RigidBody::applyForce(const glm::vec3& f, const glm::vec3& ang)
+void Component::RigidBody::applyForceAt(const glm::vec3& f, const glm::vec3& location)
 {
-    forceAccumulator += f / FPS;
-    torqueAccumulator += ang / FPS;
+    forceAccumulator += f;
+    torqueAccumulator += glm::cross(f, location - *position);
 }
 
-void Component::RigidBody::applyAcceleration(const glm::vec3& f, const glm::vec3& at)
+void Component::RigidBody::applyForce(const glm::vec3& f, const glm::vec3& ang)
 {
-    forceAccumulator += f * inverseMass;
-    torqueAccumulator += glm::cross(at - globalCentroid, f) * globlaInverseIntertiaTensor;
+    forceAccumulator += f;
+    torqueAccumulator += -ang;
+}
+
+void Component::RigidBody::applyAccAt(const glm::vec3& f, const glm::vec3& at)
+{
+    forceAccumulator += inverseMass * f;
+    torqueAccumulator += globlaInverseIntertiaTensor * glm::cross(f, at - *position);
+}
+
+void Component::RigidBody::applyAcceleration(const glm::vec3& f, const glm::vec3& ang)
+{
+    forceAccumulator += inverseMass * f;
+    torqueAccumulator += globlaInverseIntertiaTensor * ang;
 }
 
 Utils::BigMaths::MassMatrix6 Component::RigidBody::getMassMatrix() const
@@ -131,8 +134,12 @@ colliders(), forceAccumulator(0), torqueAccumulator(0)
 
 void Component::RigidBody::update()
 {
-    if (kinematic)
-        return;
+    if (isKinimatic) {
+        forceAccumulator = Utils::zero();
+        torqueAccumulator= Utils::zero();
+        linearVelocity = Utils::zero();
+        angularVelocity = Utils::zero();
+    }
     const float dt = 1.0f / 60.0f;
     linearVelocity += inverseMass * forceAccumulator;
     angularVelocity += globlaInverseIntertiaTensor * torqueAccumulator;
@@ -143,13 +150,11 @@ void Component::RigidBody::update()
     globalCentroid += linearVelocity * dt;
     *position += linearVelocity * dt;
 
-    const glm::vec3 axis = glm::normalize(angularVelocity);
-    const float angle = glm::length(angularVelocity) * dt;
     *rotation *= glm::quat(angularVelocity * dt);
 
     // update physical properties
     updateOrientation();
-    updatePositionFromGlobalCentroid();
+    // updatePositionFromGlobalCentroid();
 }
 
 void Component::RigidBody::setParent(GameObject* parent)

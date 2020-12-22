@@ -11,6 +11,7 @@ Physics::SupportPoint support(const Physics::Collider* a, const Physics::Collide
 	res.a = a->support(dir);
 	res.b = b->support(-dir);
 	res.v = res.a - res.b;
+	res.dir = dir;
 	////////////////////////////////////////////
 	// res.a = a->support(-dir);
 	// res.b = b->support(dir);
@@ -32,7 +33,7 @@ Physics::GJK3D::Triangle* Physics::GJK3D::getClosest(std::list<Triangle>& faces,
 	return closest_face;
 }
 
-glm::vec3 ClipFunc(const Physics::GJK3D::Triangle& triangle)
+glm::vec3 barycentricCoords(const Physics::GJK3D::Triangle& triangle)
 {
 	glm::vec3 res(0);
 	const glm::vec3 p = triangle.n * glm::dot(triangle.n, triangle.a.v);
@@ -61,7 +62,7 @@ void determinCollisionData(Physics::CollisionManfold& info, const Physics::GJK3D
 	info.collided = true;
 	info.normal = face->n;
 	info.penetration = penertration;
-	glm::vec3 barr = ClipFunc(*face);
+	glm::vec3 barr = barycentricCoords(*face);
 	const Physics::Collider* a = info.bodies[0];
 	const Physics::Collider* b = info.bodies[1];
 	info.points[0] =
@@ -165,7 +166,7 @@ void Physics::GJK3D::EPA(Physics::CollisionManfold& info, Simplex& simplex) {
 	/*info.collided = true;
 	info.normal = closest_face->n;
 	info.penertraion = glm::dot(closest_face->a.v, closest_face->n);
-	glm::vec3 barr = ClipFunc(*closest_face, info.penertraion);
+	glm::vec3 barr = barycentricCoords(*closest_face, info.penertraion);
 	info.points[0] =
 		barr.x * closest_face->a.a +
 		barr.y * closest_face->b.a +

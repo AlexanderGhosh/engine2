@@ -168,6 +168,14 @@ namespace Utils {
     inline glm::vec3 tripProduct(const glm::vec3& a, const glm::vec3& b) {
         return tripProduct(a, b, a);
     }
+    inline bool isParallel(const glm::vec3& a, const glm::vec3& b) {
+        float d = fabsf(glm::dot(a, b));
+        float t = glm::length(a) * glm::length(b);
+        return d == t;
+    }
+    inline bool isPerpendicular(const glm::vec3& a, glm::vec3& b) {
+        return !glm::dot(a, b);
+    }
     class Timer {
     public:
         inline Timer(const std::string name) : s(), e(), pausing(), name(name) {  };

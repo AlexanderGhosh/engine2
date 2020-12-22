@@ -26,8 +26,10 @@
 #include "Physics/Engine.h"
 #include "Physics/Collision/Broadphase/NSquared.h"
 #include "Physics/Collision/Narrowphase/GJK3D.h"
+#include "Physics/Collision/Narrowphase/SAT3D.h"
 #include "Physics/Constraints.h"
 #include "Physics/Resolution/ConstraintsBased.h"
+#include "Physics/Resolution/ImpulseBased.h"
 #include "gjk.h"
 
 #include "MainWindow.h"
@@ -148,7 +150,8 @@ int main() {
     m->verts.push_back(v5);
     
     m->indices = {
-        0, 1, 3, 3, 1, 2,
+        0, 1, 3, 
+        3, 1, 2,
         0, 4, 1,
         0, 4, 3,
         2, 4, 1,
@@ -204,11 +207,12 @@ int main() {
     cube1->addComponet(collider1);
     
     Component::RigidBody* rb1 = new Component::RigidBody();
-    rb1->kinematic = true;
+    rb1->isKinimatic = true;
     cube1->addComponet(rb1);
     
     Physics::Constraint* constraint = new Physics::Constraint();
     cube1->getRigidbody()->addConstriant(constraint);
+    // cube1->getRigidbody()->getMass() = 1.66;
     
     
     Render::RenderMesh* cubeR2 = new Render::RenderMesh();
@@ -218,8 +222,8 @@ int main() {
     cubeR2->setMaterial(cubeMat2);
     
     GameObject* cube2 = new GameObject();
-    cube2->getTransform()->Position = { 0.75, 5, -5 };
-    cube2->getTransform()->Rotation *= glm::quat({ 0, 0, 0 });
+    cube2->getTransform()->Position = { 0, 5, -5 };
+    cube2->getTransform()->Rotation *= glm::quat({ 0, 0, glm::radians(45.0f) });
     cube2->addComponet(cubeR2);
     
     Physics::BoxCollider* collider2 = new Physics::BoxCollider(10, Utils::zero());
@@ -230,7 +234,8 @@ int main() {
     
     cube2->getRigidbody()->addConstriant(constraint);
 
-    cube2->getRigidbody()->kinematic = 0;
+    //cube2->getRigidbody()->isKinimatic = 0;
+    // cube2->getRigidbody()->getMass() = 1.66;
 
 
     Render::RenderMesh* cubeR3 = new Render::RenderMesh();
@@ -243,14 +248,6 @@ int main() {
     cube3->getTransform()->Position = { 0, 5, -5 };
     cube3->getTransform()->Scale *= 0.5f;
     cube3->addComponet(cubeR3);
-
-
-    const glm::vec3 dir = { 1, 1, 0 };
-    const glm::vec3 s1 = cube1->getComponet<Physics::Collider>()->support(dir);
-    const glm::vec3 s2 = cube2->getComponet<Physics::Collider>()->support(-dir);
-    Physics::SupportPoint point = s1 - s2;
-    point.a = s1;
-    point.b = s2;
 
     // std::cout << glm::to_string(s1) << " : " << glm::to_string(s2) << std::endl;
     
@@ -326,19 +323,16 @@ int main() {
     
     // Physics::CollisionDetection::setBroadphase(new Physics::NSquared
     Physics::CollisionDetection::setBroadphase<Physics::NSquared>();
-    Physics::CollisionDetection::setNarrowphase< Physics::GJK3D>();
+    Physics::CollisionDetection::setNarrowphase< Physics::SAT3D>();
     Physics::Engine::setResolution<Physics::ConstraintsBased>();
-    
-    // cube2->getRigidbody()->angularVelocity.z = 36;
-    // cube2->getRigidbody()->linearVelocity.y -= 2.5f;
-    // cube2->getRigidbody()->setVelocities({ -2.5f, 0, 0 }, { 0, 0, 0 });
+    //0.032438
 
     unsigned frameCounter = 0;
     unsigned fps_count = 0;
     const unsigned smapleRate = 10;
 
 
-    gjk GJK;
+    // cube2->getRigidbody()->angularVelocity += glm::vec3(0, 0, 45);
 
     while (!glfwWindowShouldClose(window))
     {
@@ -367,6 +361,9 @@ int main() {
         frameCounter++;
         // std::cout << fps << std::endl; // FPS Count
 
+        // UPDATES----------------------------------------------------------------------------------------------------------------------------------------------
+        scene.updateScene();
+
         // RENDERING--------------------------------------------------------------------------------------------------------------------------------------------
         glDisable(GL_CULL_FACE);
         b.fill(0, value_ptr(cam.getView()));
@@ -377,17 +374,11 @@ int main() {
         UI::Renderer::render(&tb);
 
         // PHYSICS-----------------------------------------------------------------------------------------------------------------------------------------------
-        cube2->getRigidbody()->applyAcceleration({ 0, -2, 0 });
 
         Physics::Engine::update();
+        cube2->getRigidbody()->applyAccAt({ 0, -2, 0 }, cube2->getTransform()->Position);
+        // cube2->getTransform()->Position.y = 3;
 
-        bool collided = GJK.intersect(cube1->getComponet<Physics::BoxCollider>(), cube2->getComponet<Physics::BoxCollider>());
-        // std::cout << collided << "\r";;
-        if (collided && false) {
-            // cube2->getRigidbody()->linearVelocity *= -1;
-            glm::vec3 mtv = GJK.epa(cube1->getComponet<Physics::BoxCollider>(), cube2->getComponet<Physics::BoxCollider>());
-            std::cout << glm::to_string(glm::normalize(mtv)) << " : " << glm::length(mtv) << std::endl;
-        }
     
         // EVENTS-----------------------------------------------------------------------------------------------------------------------------------------------
         if (Events::Handler::getKey(Events::Key::W, Events::Action::Down)) {

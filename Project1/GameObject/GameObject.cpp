@@ -29,12 +29,21 @@ void GameObject::addComponet(Component::Base* componet)
 void GameObject::tick(short currentTick)
 {
 	for (unsigned i = 0; i < componets.size(); i++) {
-		if (!enabled[i]) continue;
+		if (!enabled[i] || componets[i]->getType() == Component::Type::RenderMesh) continue;
 		Component::Base*& comp = componets[i];
 		comp->update();
 		if (currentTick == FIXED_UPDATE_RATE) {
 			comp->fixedUpdate();
 		}
+	}
+}
+
+void GameObject::tryDraw()
+{
+	for (unsigned i = 0; i < componets.size(); i++) {
+		if (!enabled[i] || componets[i]->getType() != Component::Type::RenderMesh) continue;
+		Component::Base*& comp = componets[i];
+		comp->update();
 	}
 }
 

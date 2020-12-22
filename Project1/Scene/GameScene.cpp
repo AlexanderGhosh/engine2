@@ -15,7 +15,7 @@ void GameScene::preProcess()
 			glCullFace(GL_FRONT);
 		}
 
-		renderObjects();
+		renderObjects(); // calles update but shouldnt
 		glCullFace(GL_BACK);
 	}
 }
@@ -32,10 +32,17 @@ void GameScene::postProcess()
 	renderObjects();
 }
 
+void GameScene::updateScene()
+{
+	for (GameObject*& obj : objects) {
+		obj->tick(currentTick++ % FIXED_UPDATE_RATE);
+	}
+}
+
 void GameScene::renderObjects()
 {
-	for (GameObject* obj : objects) {
-		obj->tick(currentTick++ % FIXED_UPDATE_RATE); // should just draw not tick
+	for (GameObject*& obj : objects) {
+		obj->tryDraw();
 	}
 }
 

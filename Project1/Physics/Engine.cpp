@@ -17,12 +17,11 @@ void Physics::Engine::update()
 		Component::RigidBody* b2 = manafold.bodies[1]->getParent()->getRigidbody();
 
 		std::cout << glm::to_string(manafold.normal) << " : " << std::to_string(manafold.penetration) << " GJK3D\n";
-		
-		// b1->linearVelocity *= -1.0f;
-		// b2->linearVelocity *= -1.0f;
-		// return;
+		b1->linearVelocity *= -1.0f;
+		b2->linearVelocity *= -1.0f;
+		return;
 
-		resolution->resolve(b1, b2, manafold);
+        resolution->resolve(b1, b2, manafold);
 	}
 }
 

@@ -35,12 +35,15 @@ namespace Component {
 	public:
 		glm::vec3 linearVelocity;
 		glm::vec3 angularVelocity;
-		bool kinematic;
+		bool isKinimatic;
 		RigidBody();
 		void update();
 		void setParent(GameObject* parent);
-		void applyForce(const glm::vec3& f, const glm::vec3& ang = Utils::zero());
-		void applyAcceleration(const glm::vec3& f, const glm::vec3& at = Utils::zero());
+		void applyForceAt(const glm::vec3& f, const glm::vec3& location);
+		void applyForce(const glm::vec3& f, const glm::vec3& ang);
+		void applyAccAt(const glm::vec3& f, const glm::vec3& at);
+		void applyAcceleration(const glm::vec3& f, const glm::vec3& ang);
+
 
 		inline glm::mat3 getRotation() const { return glm::toMat3(*rotation); };
 		inline Type getType() const { return Type::Rigidbody; };
@@ -62,6 +65,13 @@ namespace Component {
 			linearVelocity = vel; 
 			angularVelocity = ang; 
 		};
+
+		inline glm::vec3& getPosition() { return *position; };
+		inline float& getMass() { return mass; };
+		inline float getInverseMass() { return 1.0f / mass; };
+		inline glm::vec3& getVelocity() { return linearVelocity; };
+		inline glm::vec3& getAngularVelocity() { return angularVelocity; };
+		inline const glm::mat3& getGlobalInverseInertiaTensor() const { return globlaInverseIntertiaTensor; };
 	};
 };
 
