@@ -83,10 +83,8 @@ namespace Physics {
 			Collider::cleanUp();
 		};
 		inline glm::vec3 getVertex(const unsigned& index, const bool useIndices = true) const { return vertices[useIndices ? indices[index % indices.size()] : index % vertices.size()]; };
-		inline glm::vec3 getNormal(unsigned index, const bool useIndices = true, const bool rectified = false) const {
-			if (!rectified)
-				index /= faceSize;
-			return normals[useIndices ? indices[index % indices.size()] : index % normals.size()];
+		inline glm::vec3 getNormal(unsigned index, const bool useIndices = true) const {
+			return normals[useIndices ? indices[index % faceSize] : index % normals.size()];
 		};
 		virtual glm::vec3 getFarthest(const glm::vec3& dir, unsigned& indexRaw) const {
 			float proj = 0, max = -INFINITY;
@@ -126,7 +124,7 @@ namespace Physics {
 			assert(norms.size() <= normals.size() && "added to the normals");
 			return norms;
 		}
-		void setCache(const glm::vec3& toCache) { cachedNormal = toCache; };
+		inline void setCache(const glm::vec3& toCache) { cachedNormal = toCache; };
 		virtual std::array<float, 2> project(const glm::vec3& axis) const {
 			std::array<float, 2> res = {
 				INFINITY, -INFINITY
@@ -138,6 +136,11 @@ namespace Physics {
 			}
 			return res;
 		};
+
+		virtual std::list<glm::vec3> getAllFaces(const glm::vec3& vertex, bool localSpace = false, bool getIndices = false) const;
+		virtual std::list<glm::vec3> getAllFaces(const unsigned& vertexIndex, bool localSpace = false, bool getIndices = false) const;
+
+		virtual std::list<std::list<glm::vec3>> getAdjacentFaces(const std::list<glm::vec3>& face) const;
 	};
 	class BoxColliderSAT : public ColliderSAT {
 	public:

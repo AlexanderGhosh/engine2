@@ -116,3 +116,53 @@ const Physics::AABB* Physics::BoxColliderSAT::constructAABB()
 	}
 	return new AABB(min - *position, max - *position, false, parent);
 }
+
+std::list<glm::vec3> Physics::ColliderSAT::getAllFaces(const glm::vec3& vertex, bool localSpace, bool getIndices) const
+{
+	std::list<glm::vec3> res;
+	auto transform = [&](glm::vec3 v)->glm::vec3 {
+		if (localSpace)
+			return v;
+		return v * *scale * glm::toMat3(*rotation) + *position;
+	};
+	for (unsigned i = 0; i < indices.size(); i++) {
+		const unsigned& index = indices[i];
+		if (vertices[index] == vertex) {
+			unsigned j = i % faceSize;
+			j = i - j;
+			for (char k = 0; k < faceSize; k++) {
+				if (!getIndices)
+					res.push_back(transform(vertices[indices[j + k]]));
+				else
+					res.push_back(Utils::fill(j + k));
+			}
+		}
+	}
+	return res;
+}
+
+std::list<glm::vec3> Physics::ColliderSAT::getAllFaces(const unsigned& vertexIndex, bool localSpace, bool getIndices) const
+{
+	return getAllFaces(vertices[vertexIndex], localSpace, getIndices);
+}
+
+std::list<std::list<glm::vec3>> Physics::ColliderSAT::getAdjacentFaces(const std::list<glm::vec3>& face) const
+{
+	std::vector<unsigned> indicesAdded;
+	std::list<std::list<glm::vec3>> res;
+	for (const glm::vec3& v : face) {
+		for (unsigned i = 0; i < indices.size(); i++) {
+			const glm::vec3 vert = vertices[indices[i]] * *scale * *rotation + *position;
+			if (vert == v && !Utils::contains(indicesAdded, indices[i])) {
+				indicesAdded.push_back(indices[i]);
+				int faceIndex = i % 4;
+				std::list<glm::vec3> f;
+				for (char j = 0; j < 4; j++)
+					f.push_back(vertices[indices[faceIndex + j]] * *scale * *rotation + *position);
+				res.push_back(f);
+				break;
+			}
+		}
+	}
+	return res;
+}

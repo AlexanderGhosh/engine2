@@ -9,7 +9,9 @@
 #include <iterator>
 #include <chrono>
 #include <iostream>
+#include "Shapes.h"
 namespace Utils {
+
     inline std::vector<std::string> split(const std::string& str, const std::string& delim)
     {
         std::vector<std::string> tokens;
@@ -88,13 +90,13 @@ namespace Utils {
         return out;
     }
     inline glm::vec3 xAxis(float mag = 1) {
-        return glm::vec3(1, 0, 0) * mag;
+        return glm::vec3(mag, 0, 0);
     }
     inline glm::vec3 yAxis(float mag = 1) {
-        return glm::vec3(0, 1, 0) * mag;
+        return glm::vec3(0, mag, 0);
     }
     inline glm::vec3 zAxis(float mag = 1) {
-        return glm::vec3(0, 0, 1) * mag;
+        return glm::vec3(0, 0, mag);
     }
     inline glm::vec3 zero() {
         return glm::vec3(0);
@@ -176,6 +178,20 @@ namespace Utils {
     inline bool isPerpendicular(const glm::vec3& a, glm::vec3& b) {
         return !glm::dot(a, b);
     }
+    inline glm::vec3 linePlaneIntersection(const glm::vec3& rayVector, const glm::vec3& rayPoint, const glm::vec3& planeNormal, const glm::vec3& planePoint) {
+        const glm::vec3 diff = rayPoint - planePoint;
+        const float prod1 = glm::dot(diff, planeNormal);
+        const float prod2 = glm::dot(rayVector, planeNormal);
+        const float prod3 = prod1 / prod2;
+        return rayPoint - rayVector * prod3;
+    }
+    inline bool isInFront(const glm::vec3& p1, const glm::vec3& p2, const glm::vec3& planeNormal) {
+        return glm::dot(glm::normalize(planeNormal), p1 - p2);
+    }
+    inline glm::vec3 projectPointPlane(const glm::vec3& n, const glm::vec3& o, const glm::vec3& p) {
+        return p - (glm::dot(n, p - o)) * n;
+    }
+
     class Timer {
     public:
         inline Timer(const std::string name) : s(), e(), pausing(), name(name) {  };

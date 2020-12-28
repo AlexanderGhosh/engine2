@@ -129,6 +129,9 @@
     <ClCompile Include="Physics\Collision\Narrowphase\SAT3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Utils\Shapes.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Rendering\Rendering.h">
@@ -258,6 +261,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Physics\Collision\Narrowphase\SAT3D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\Shapes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -155,6 +155,7 @@
     <ClCompile Include="Physics\Engine.cpp" />
     <ClCompile Include="Componets\RigidBody.cpp" />
     <ClCompile Include="Physics\Collision\Narrowphase\SAT3D.cpp" />
+    <ClCompile Include="Utils\Shapes.cpp" />
     <ClCompile Include="UI\Elements\ListBox.cpp" />
     <ClCompile Include="UI\Panes\Grid.cpp" />
     <ClCompile Include="MainWindow.cpp" />
@@ -198,6 +199,7 @@
     <ClInclude Include="Componets\RigidBody.h" />
     <ClInclude Include="Physics\Resolution\ResolutionBase.h" />
     <ClInclude Include="Physics\Collision\Narrowphase\SAT3D.h" />
+    <ClInclude Include="Utils\Shapes.h" />
     <ClInclude Include="UI\Elements\ListBox.h" />
     <ClInclude Include="UI\Panes\Grid.h" />
     <ClInclude Include="MainWindow.h" />

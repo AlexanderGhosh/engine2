@@ -203,7 +203,7 @@ int main() {
     cube1->getTransform()->Position = { 0, 0, -5 };
     cube1->addComponet(cubeR);
     
-    Physics::BoxCollider* collider1 = new Physics::BoxCollider(10, Utils::zero());
+    Physics::BoxColliderSAT* collider1 = new Physics::BoxColliderSAT(10);
     cube1->addComponet(collider1);
     
     Component::RigidBody* rb1 = new Component::RigidBody();
@@ -226,7 +226,7 @@ int main() {
     cube2->getTransform()->Rotation *= glm::quat({ 0, 0, glm::radians(45.0f) });
     cube2->addComponet(cubeR2);
     
-    Physics::BoxCollider* collider2 = new Physics::BoxCollider(10, Utils::zero());
+    Physics::BoxColliderSAT* collider2 = new Physics::BoxColliderSAT(10);
     cube2->addComponet(collider2);
     
     Component::RigidBody* rb2 = new Component::RigidBody();

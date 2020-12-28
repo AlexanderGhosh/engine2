@@ -16,7 +16,7 @@ void Physics::Engine::update()
 		Component::RigidBody* b1 = manafold.bodies[0]->getParent()->getRigidbody();
 		Component::RigidBody* b2 = manafold.bodies[1]->getParent()->getRigidbody();
 
-		std::cout << glm::to_string(manafold.normal) << " : " << std::to_string(manafold.penetration) << " GJK3D\n";
+		// std::cout << glm::to_string(manafold.normal) << " : " << std::to_string(manafold.penetration) << " GJK3D\n";
 		b1->linearVelocity *= -1.0f;
 		b2->linearVelocity *= -1.0f;
 		return;

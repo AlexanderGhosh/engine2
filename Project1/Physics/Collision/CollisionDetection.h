@@ -2,6 +2,7 @@
 #include "Collider.h"
 #include <unordered_map>
 #include <list>
+#include <vector>
 #include <glm.hpp>
 #include "../../Utils/General.h"
 
@@ -12,7 +13,7 @@ namespace Physics {
     struct CollisionManfold {
         bool collided;
         glm::vec3 normal;
-        std::array<glm::vec3, 2> points;
+        std::vector<glm::vec3> points;
         float penetration;
         std::array<Collider*, 2> bodies;
         CollisionManfold() : collided(0), normal(0), points{ Utils::zero(), Utils::zero() }, penetration(0), bodies{ nullptr, nullptr } { };
