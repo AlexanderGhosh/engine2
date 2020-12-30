@@ -10,6 +10,13 @@
 #include <chrono>
 #include <iostream>
 #include "Shapes.h"
+
+#define NOT !
+#define AND &&
+#define OR ||
+#define EQ ==
+#define NEQ !=
+
 namespace Utils {
 
     inline std::vector<std::string> split(const std::string& str, const std::string& delim)
@@ -185,13 +192,18 @@ namespace Utils {
         const float prod3 = prod1 / prod2;
         return rayPoint - rayVector * prod3;
     }
-    inline bool isInFront(const glm::vec3& p1, const glm::vec3& p2, const glm::vec3& planeNormal) {
+    inline float isInFront(const glm::vec3& p1, const glm::vec3& p2, const glm::vec3& planeNormal) {
         return glm::dot(glm::normalize(planeNormal), p1 - p2);
     }
     inline glm::vec3 projectPointPlane(const glm::vec3& n, const glm::vec3& o, const glm::vec3& p) {
         return p - (glm::dot(n, p - o)) * n;
     }
-
+    template<class T>
+    inline void removeAt(T& a, const unsigned& i) {
+        auto t = a.begin();
+        std::advance(t, i);
+        a.erase(t);
+    }
     class Timer {
     public:
         inline Timer(const std::string name) : s(), e(), pausing(), name(name) {  };

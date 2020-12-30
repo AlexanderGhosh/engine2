@@ -146,21 +146,29 @@ std::list<glm::vec3> Physics::ColliderSAT::getAllFaces(const unsigned& vertexInd
 	return getAllFaces(vertices[vertexIndex], localSpace, getIndices);
 }
 
-std::list<std::list<glm::vec3>> Physics::ColliderSAT::getAdjacentFaces(const std::list<glm::vec3>& face) const
+std::list<std::list<glm::vec3>> Physics::ColliderSAT::getAdjacentFaces(std::list<glm::vec3>& face) const
 {
-	std::vector<unsigned> indicesAdded;
+	std::vector<char> facesAdded;
 	std::list<std::list<glm::vec3>> res;
 	for (const glm::vec3& v : face) {
 		for (unsigned i = 0; i < indices.size(); i++) {
 			const glm::vec3 vert = vertices[indices[i]] * *scale * *rotation + *position;
-			if (vert == v && !Utils::contains(indicesAdded, indices[i])) {
-				indicesAdded.push_back(indices[i]);
-				int faceIndex = i % 4;
+			const char faceIndex = static_cast<int>(floor(i / 4));
+			if (vert == v AND NOT Utils::contains(facesAdded, faceIndex)) {
+				facesAdded.push_back(faceIndex);
 				std::list<glm::vec3> f;
-				for (char j = 0; j < 4; j++)
-					f.push_back(vertices[indices[faceIndex + j]] * *scale * *rotation + *position);
-				res.push_back(f);
-				break;
+				for (int j = 0; j < 4; j++) {
+					f.push_back(vertices[indices[faceIndex * faceSize + j]] * *scale * *rotation + *position);
+				}
+				if (f != face) {
+					res.push_back(f);
+					break;
+				}
+				else
+					f.clear();
+			}
+			else if (vert == v) {
+				int t = 0;
 			}
 		}
 	}

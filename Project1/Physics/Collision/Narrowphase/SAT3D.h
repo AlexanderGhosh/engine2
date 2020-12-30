@@ -20,7 +20,7 @@ namespace Physics {
 		void testNormals(ColliderSAT*& aSAT, ColliderSAT*& bSAT, std::list<glm::vec3>& normals, CollisionManfold& res) const;
 		Utils::Shapes::Face<glm::vec3, 4> bestFace(ColliderSAT* coll, const glm::vec3& n) const;
 		ClippedPoints getContactData(CollisionManfold& info) const;
-		ClippedPoints clip(Utils::Shapes::Face<glm::vec3, 4>& ref, const ClippedPoints& inc) const;
+		ClippedPoints clip(Utils::Shapes::Face<glm::vec3, 4>& ref, ClippedPoints inc) const;
 	public:
 		const CollisionManfold getCollisionData(Collider* a, Collider* b);
 	};

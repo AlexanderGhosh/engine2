@@ -43,7 +43,7 @@ namespace Utils {
 			Face(const std::list<T>& points)
 			{
 				char i = 0;
-				for(auto itt = points.begin(); itt != points.end() && i < size; itt)
+				for(auto itt = points.begin(); itt != points.end() && i < size; itt++)
 					data[i++] = *itt;
 			};
 
@@ -57,7 +57,9 @@ namespace Utils {
 			};
 
 			glm::vec3 getNormal() const {
-				return glm::normalize(glm::cross(data[1] - data[0], data[3] - data[2]));
+				const glm::vec3 n = -glm::cross(data[1] - data[0], data[2] - data[0]);
+				assert(n != glm::vec3(0));
+				return glm::normalize(n);
 			};
 
 			T& operator[](const char& index)
@@ -79,6 +81,11 @@ namespace Utils {
 			{
 				return !(this == b);
 			};
+
+			template<class U>
+			U getData() const {
+				return U(data.begin(), data.end());
+			}
 
 			std::array<T, size> getDataArray() const
 			{

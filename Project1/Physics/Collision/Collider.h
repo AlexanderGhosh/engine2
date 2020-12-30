@@ -84,18 +84,25 @@ namespace Physics {
 		};
 		inline glm::vec3 getVertex(const unsigned& index, const bool useIndices = true) const { return vertices[useIndices ? indices[index % indices.size()] : index % vertices.size()]; };
 		inline glm::vec3 getNormal(unsigned index, const bool useIndices = true) const {
-			return normals[useIndices ? indices[index % faceSize] : index % normals.size()];
+			return normals[useIndices ? floor(index / faceSize) : index % normals.size()];
 		};
-		virtual glm::vec3 getFarthest(const glm::vec3& dir, unsigned& indexRaw) const {
+		virtual glm::vec3 getFarthest(const glm::vec3& dir, unsigned& indexRaw, bool translate) const {
 			float proj = 0, max = -INFINITY;
 			for (unsigned i = 0; i < vertices.size(); i++) {
-				proj = glm::dot(dir, vertices[i]);
+				auto t = vertices[i];
+				if (translate)
+					t = t * *scale * *rotation + *position;
+				proj = glm::dot(dir, t);
 				if (proj > max) {
 					max = proj;
 					indexRaw = i;
 				}
 			}
-			return vertices[indexRaw];
+			auto x = vertices[indexRaw];
+			if (!translate)
+				return x;
+			else
+				return x * *scale * *rotation + *position;
 		}
 		// returns the index(in indices) of the first occorance found 
 		virtual unsigned rawToIndices(const unsigned& rawIndex) {
@@ -140,7 +147,7 @@ namespace Physics {
 		virtual std::list<glm::vec3> getAllFaces(const glm::vec3& vertex, bool localSpace = false, bool getIndices = false) const;
 		virtual std::list<glm::vec3> getAllFaces(const unsigned& vertexIndex, bool localSpace = false, bool getIndices = false) const;
 
-		virtual std::list<std::list<glm::vec3>> getAdjacentFaces(const std::list<glm::vec3>& face) const;
+		virtual std::list<std::list<glm::vec3>> getAdjacentFaces(std::list<glm::vec3>& face) const;
 	};
 	class BoxColliderSAT : public ColliderSAT {
 	public:

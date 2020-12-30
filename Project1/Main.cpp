@@ -223,7 +223,7 @@ int main() {
     
     GameObject* cube2 = new GameObject();
     cube2->getTransform()->Position = { 0, 5, -5 };
-    cube2->getTransform()->Rotation *= glm::quat({ 0, 0, glm::radians(45.0f) });
+    cube2->getTransform()->Rotation *= glm::quat({ 0, 0, 0 });
     cube2->addComponet(cubeR2);
     
     Physics::BoxColliderSAT* collider2 = new Physics::BoxColliderSAT(10);
