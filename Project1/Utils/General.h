@@ -16,6 +16,10 @@
 #define OR ||
 #define EQ ==
 #define NEQ !=
+#define PI 3.14159265359f
+constexpr float INV_PI = 1.0f / PI;
+#define RADIANS(x) (x * PI * 0.00555555f)
+#define DEGREES(x) (x * INV_PI * 180)
 
 namespace Utils {
 
@@ -37,12 +41,6 @@ namespace Utils {
     inline glm::mat4 rotate(glm::mat4 matrix, const glm::vec3& vec) {
         if (glm::all(glm::equal(vec, { 0, 0, 0 }))) return matrix;
         return glm::rotate(matrix, glm::radians(glm::length(vec)), glm::normalize(vec));
-        /*for (short i = 0; i < 3; i++) {
-            glm::vec3 d(0);
-            d[i] = 1;
-            matrix = glm::rotate(matrix, glm::radians(vec[0]), d);
-        }
-        return matrix;*/
     };
     inline glm::mat4 rotate(glm::mat4 matrix, const glm::quat& vec) {
         return matrix * glm::mat4_cast(vec);

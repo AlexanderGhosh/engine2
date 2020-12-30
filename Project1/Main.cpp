@@ -45,7 +45,6 @@
 // #endif
 
 #define PBRen 1
-#define PI 3.14f
 
 Component::Camera cam;
 bool firstMouse = 1;
@@ -222,8 +221,8 @@ int main() {
     cubeR2->setMaterial(cubeMat2);
     
     GameObject* cube2 = new GameObject();
-    cube2->getTransform()->Position = { 0, 5, -5 };
-    cube2->getTransform()->Rotation *= glm::quat({ 0, 0, 0 });
+    cube2->getTransform()->Position = { 0.25f , 5, -5 };
+    cube2->getTransform()->Rotation *= glm::quat({ 0, 0, RADIANS(45.f) });
     cube2->addComponet(cubeR2);
     
     Physics::BoxColliderSAT* collider2 = new Physics::BoxColliderSAT(10);
