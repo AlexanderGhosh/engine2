@@ -11,7 +11,7 @@ namespace Physics {
 		bool enabled;
 		Constraint() : Jacobian(), enabled(1), type(Type::Contact) { 
 		};
-		virtual Utils::BigMaths::Vector12 getDeltaV(const MATHS::Vector12& V, const MATHS::Matrix12& M, CollisionManfold& manafoild);
+		virtual void solve(const MATHS::Vector12& V, const MATHS::Matrix12& M, CollisionManfold& manafoild);
 		enum class Type {
 			Contact
 		};

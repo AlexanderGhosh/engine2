@@ -14,9 +14,10 @@ void Physics::ConstraintsBased::resolve(Component::RigidBody* a, Component::Rigi
 
 			V = Utils::BigMaths::combine(a->getVelocities(), b->getVelocities());
 			M = Utils::BigMaths::combine(a->getMassMatrix(), b->getMassMatrix());
-			const Utils::BigMaths::Vector12 delta = c->getDeltaV(V, M, manafold);
-			a->applyForce({ delta[0], delta[1], delta[2] }, { delta[3], delta[4], delta[5] });
-			b->applyForce({ delta[6], delta[7], delta[8] }, { delta[9], delta[10], delta[11] });
+			c->solve(V, M, manafold);
+			// const Utils::BigMaths::Vector12 delta = c->solve(V, M, manafold);
+			// a->applyForce({ delta[0], delta[1], delta[2] }, { delta[3], delta[4], delta[5] });
+			// b->applyForce({ delta[6], delta[7], delta[8] }, { delta[9], delta[10], delta[11] });
 		}
 	}
 }

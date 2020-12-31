@@ -10,7 +10,7 @@ namespace Component {
 	{
 	private:
 		float mass, inverseMass;
-		glm::mat3 globlaInverseIntertiaTensor, localInverseIntertiaTensor;
+		glm::mat3 globalInverseIntertiaTensor, localInverseIntertiaTensor;
 		glm::vec3 globalCentroid, localCentroid;
 
 		glm::vec3* position;
@@ -19,13 +19,9 @@ namespace Component {
 		std::list<Physics::Collider*> colliders;
 		std::list<Physics::Constraint*> constraints;
 
-		glm::vec3 forceAccumulator, torqueAccumulator;
-
-		void updateGlobalCentroidFromPosition();
-		void updatePositionFromGlobalCentroid();
+		glm::vec3 linearAcceleration, angularAcceleration;
 
 		void updateOrientation();
-
 
 		const glm::vec3 localToGlobal(const glm::vec3& p) const;
 		const glm::vec3 globalToLocal(const glm::vec3& p) const;
@@ -71,7 +67,7 @@ namespace Component {
 		inline float getInverseMass() { return 1.0f / mass; };
 		inline glm::vec3& getVelocity() { return linearVelocity; };
 		inline glm::vec3& getAngularVelocity() { return angularVelocity; };
-		inline const glm::mat3& getGlobalInverseInertiaTensor() const { return globlaInverseIntertiaTensor; };
+		inline const glm::mat3& getGlobalInverseInertiaTensor() const { return globalInverseIntertiaTensor; };
 	};
 };
 

@@ -4,33 +4,45 @@
 #include "../GameObject/GameObject.h"
 
 
-Utils::BigMaths::Vector12 Physics::Constraint::getDeltaV(const MATHS::Vector12& V, const MATHS::Matrix12& M, Physics::CollisionManfold& manafoild)
+void Physics::Constraint::solve(const MATHS::Vector12& V, const MATHS::Matrix12& M, Physics::CollisionManfold& manafold)
 {
-    const glm::vec3& n = manafoild.normal;
-    glm::vec3 temp1 = -glm::cross(manafoild.getDeltaA(), manafoild.normal);
-    glm::vec3 temp2 = glm::cross(manafoild.getDeltaB(), manafoild.normal);
-    Jacobian = { 
-        -n.x, -n.y, -n.z, 
-        temp1.x, temp1.y, temp1.z, 
-        n.x, n.y, n.z,
-        temp2.x, temp2.y, temp2.z 
-    };
+    MATHS::Vector12 h;
+    const float lambda = getLagrangian(V, M, manafold);
+    const glm::vec3& n = manafold.normal;
+    const auto inv_m = MATHS::inverse(M);
+    glm::vec3 acc(0);
+    for (const glm::vec3& point : manafold.points) {
+        glm::vec3 temp1 = -glm::cross(point - *manafold.bodies[0]->position, n);
+        glm::vec3 temp2 = glm::cross(point - *manafold.bodies[1]->position, n);
+        Jacobian = {
+            -n.x, -n.y, -n.z,
+            temp1.x, temp1.y, temp1.z,
+            n.x, n.y, n.z,
+            temp2.x, temp2.y, temp2.z
+        };
+        Jacobian = (inv_m * Jacobian) * lambda / static_cast<float>(manafold.points.size());
+        auto split = MATHS::split(Jacobian);
+        acc += MATHS::split(split[0])[0] / static_cast<float>(manafold.points.size());
+        // manafold.bodies[0]->getParent()->getRigidbody()->applyForceAt(-MATHS::split(split[0])[0] / static_cast<float>(manafold.points.size()), *manafold.bodies[0]->position);
+        // manafold.bodies[1]->getParent()->getRigidbody()->applyForceAt( MATHS::split(split[1])[0] / static_cast<float>(manafold.points.size()), *manafold.bodies[1]->position);
 
-    const auto inv_m = Utils::BigMaths::inverse(M);
-
-    const float lambda = getLagrangian(V, M, manafoild);
-    MATHS::Vector12 h = inv_m * Jacobian * lambda;
-    float test = (V + h) * Jacobian + getBias(manafoild);
-    test = (int)(test * 10000.0) / 10000.0;
-    assert(test == 0 && "constraint != 0");
-    return Jacobian * lambda;
+        //h = h + (inv_m * Jacobian * lambda) / manafold.points.size();
+    }
+    auto b = manafold.bodies[1]->getParent()->getRigidbody();
+    manafold.bodies[0]->getParent()->getRigidbody()->linearVelocity += (acc);
+    manafold.bodies[1]->getParent()->getRigidbody()->linearVelocity += (-acc);
+    std::cout << glm::to_string(acc) << std::endl;
+    // float test = (V + h) * Jacobian + getBias(manafold);
+    // test = (int)(test * 10000.0) / 10000.0;
+    // assert(test == 0 && "constraint != 0");
+    //return Jacobian * lambda;
 };
 const float Physics::Constraint::getLagrangian(const MATHS::Vector12& V, const MATHS::Matrix12& M, const CollisionManfold& manafoild) const
 {
-    float b = getBias(manafoild);
+    const float b = getBias(manafoild);
     const float neumerator = -((Jacobian * V) + b);
     const float denominator = (Jacobian * MATHS::inverse(M)) * Jacobian; // the effective mass
-    return neumerator / (denominator == 0 ? 1 : denominator);
+    return neumerator / (!denominator ? 1 : denominator);
 
 }
 const float Physics::Constraint::getBias(const Physics::CollisionManfold& manafold) const {

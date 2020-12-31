@@ -6,7 +6,7 @@
 void Component::RigidBody::updateOrientation()
 {
     *rotation = glm::normalize(*rotation);
-    globlaInverseIntertiaTensor =
+    globalInverseIntertiaTensor =
         getRotation() 
         * localInverseIntertiaTensor
         * glm::inverse(getRotation());
@@ -80,26 +80,26 @@ const glm::vec3 Component::RigidBody::globalToLocalVec(const glm::vec3& v) const
 
 void Component::RigidBody::applyForceAt(const glm::vec3& f, const glm::vec3& location)
 {
-    forceAccumulator += f;
-    torqueAccumulator += glm::cross(f, location - *position);
+    linearAcceleration += inverseMass * f;
+    angularAcceleration += globalInverseIntertiaTensor * glm::cross(f, location - *position);
 }
 
 void Component::RigidBody::applyForce(const glm::vec3& f, const glm::vec3& ang)
 {
-    forceAccumulator += f;
-    torqueAccumulator += -ang;
+    linearAcceleration += inverseMass * f;
+    angularAcceleration += globalInverseIntertiaTensor  * ang;
 }
 
 void Component::RigidBody::applyAccAt(const glm::vec3& f, const glm::vec3& at)
 {
-    forceAccumulator += inverseMass * f;
-    torqueAccumulator += globlaInverseIntertiaTensor * glm::cross(f, at - *position);
+    linearAcceleration += f;
+    angularAcceleration += glm::cross(f, at - *position);
 }
 
 void Component::RigidBody::applyAcceleration(const glm::vec3& f, const glm::vec3& ang)
 {
-    forceAccumulator += inverseMass * f;
-    torqueAccumulator += globlaInverseIntertiaTensor * ang;
+    linearAcceleration += f;
+    angularAcceleration += ang;
 }
 
 Utils::BigMaths::MassMatrix6 Component::RigidBody::getMassMatrix() const
@@ -124,10 +124,10 @@ Utils::BigMaths::Vector6 Component::RigidBody::getVelocities() const
 }
 
 Component::RigidBody::RigidBody() : Base(), mass(0), inverseMass(0),
-globlaInverseIntertiaTensor(0), 
+globalInverseIntertiaTensor(0), 
 localInverseIntertiaTensor(0), globalCentroid(0), localCentroid(0),
 position(nullptr), rotation(nullptr), linearVelocity(0), angularVelocity(0),
-colliders(), forceAccumulator(0), torqueAccumulator(0)
+colliders(), linearAcceleration(0), angularAcceleration(0)
 {
     Physics::Engine::addRigidBody(this);
 }
@@ -135,17 +135,17 @@ colliders(), forceAccumulator(0), torqueAccumulator(0)
 void Component::RigidBody::update()
 {
     if (isKinimatic) {
-        forceAccumulator = Utils::zero();
-        torqueAccumulator= Utils::zero();
+        linearAcceleration = Utils::zero();
+        angularAcceleration= Utils::zero();
         linearVelocity = Utils::zero();
         angularVelocity = Utils::zero();
     }
     const float dt = 1.0f / 60.0f;
-    linearVelocity += inverseMass * forceAccumulator;
-    angularVelocity += globlaInverseIntertiaTensor * torqueAccumulator;
+    linearVelocity += linearAcceleration * dt;
+    angularVelocity += angularAcceleration * dt;
 
-    forceAccumulator = Utils::zero();
-    torqueAccumulator = Utils::zero();
+    linearAcceleration = Utils::zero();
+    angularAcceleration = Utils::zero();
 
     globalCentroid += linearVelocity * dt;
     *position += linearVelocity * dt;

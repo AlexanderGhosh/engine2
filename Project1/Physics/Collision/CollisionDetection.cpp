@@ -21,7 +21,7 @@ const std::vector<Physics::CollisionManfold> Physics::CollisionDetection::getCol
     for (const auto& pair : pairs) {
         if ((unsigned)pair.first - (unsigned)pair.second == 0)
             continue;
-        auto t = narrowphase->getCollisionData(pair.first, pair.second);
+        CollisionManfold t = narrowphase->getCollisionData(pair.first, pair.second);
         if (!t.collided)
             continue;
         res.push_back(t);
@@ -61,18 +61,6 @@ void Physics::CollisionDetection::cleanUp()
     narrowphase->cleanUp();
     delete narrowphase;
     narrowphase = nullptr;
-}
-
-glm::vec3 Physics::CollisionManfold::getDeltaA() const
-{
-    // return points[0]  - *bodies[0]->position;
-    return *bodies[0]->position - points[0];
-}
-
-glm::vec3 Physics::CollisionManfold::getDeltaB() const
-{
-    // return points[1] - *bodies[1]->position;
-    return *bodies[1]->position - points[1];
 }
 
 float Physics::CollisionManfold::getRestitution() const

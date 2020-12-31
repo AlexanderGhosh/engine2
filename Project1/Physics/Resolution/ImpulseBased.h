@@ -6,7 +6,7 @@ namespace Physics {
 	public:
 		void resolve(Component::RigidBody* a, Component::RigidBody* b, Physics::CollisionManfold& manafold);
 	private:
-		float getImpuseForce(Component::RigidBody* a, Component::RigidBody* b, Physics::CollisionManfold& info);
+		void positionalCorrection(Component::RigidBody* a, Component::RigidBody* b, const Physics::CollisionManfold& info);
 	};
 };
 

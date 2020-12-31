@@ -41,9 +41,10 @@ void GameObject::tick(short currentTick)
 void GameObject::tryDraw()
 {
 	for (unsigned i = 0; i < componets.size(); i++) {
-		if (!enabled[i] || componets[i]->getType() != Component::Type::RenderMesh) continue;
-		Component::Base*& comp = componets[i];
-		comp->update();
+		if (enabled[i] && componets[i]->getType() == Component::Type::RenderMesh) {
+			Component::Base*& comp = componets[i];
+			comp->update();
+		}
 	}
 }
 

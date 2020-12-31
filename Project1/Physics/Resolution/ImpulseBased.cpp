@@ -1,16 +1,17 @@
 #include "ImpulseBased.h"
 #include "../../Componets/RigidBody.h"
 #include <glm.hpp>
+#include <gtx/string_cast.hpp>
 #include <vector>
 
+#define E 1.0f
 void Physics::ImpulseBased::resolve(Component::RigidBody* a, Component::RigidBody* b, Physics::CollisionManfold& manafold)
 {
 	const std::vector<Component::RigidBody*> rbs = { a, b };
     // const float j = getImpuseForce(b, a, manafold);
-
+    glm::vec3 im(0);
     const glm::vec3 n = glm::normalize(manafold.normal);
-
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < manafold.points.size(); i++) {
         const glm::vec3& point = manafold.points[i];
 
         const glm::vec3 ra = point - a->getPosition();
@@ -21,25 +22,38 @@ void Physics::ImpulseBased::resolve(Component::RigidBody* a, Component::RigidBod
 
         const float contactVel = glm::dot(rv, n);
 
-        if (contactVel > 0)
-            return;
+        /*if (contactVel > 0) // moving away
+            break;*/
 
-        glm::vec3 raCrossN = glm::cross(ra, n);
-        glm::vec3 rbCrossN = glm::cross(rb, n);
+        const glm::vec3 raCrossN = glm::cross(ra, n);
+        const glm::vec3 rbCrossN = glm::cross(rb, n);
 
-        float invMassSum = a->getInverseMass() + b->getInverseMass() + glm::dot(glm::sqrt(raCrossN) * a->getGlobalInverseInertiaTensor() + glm::sqrt(rbCrossN) * b->getGlobalInverseInertiaTensor(), n);
-        invMassSum = a->getInverseMass() + b->getInverseMass() + glm::dot(glm::cross((raCrossN), ra) * a->getGlobalInverseInertiaTensor() + glm::cross((rbCrossN), rb) * b->getGlobalInverseInertiaTensor(), n);
+        // float invMassSum = a->getInverseMass() + b->getInverseMass() + glm::dot(glm::sqrt(raCrossN) * a->getGlobalInverseInertiaTensor() + glm::sqrt(rbCrossN) * b->getGlobalInverseInertiaTensor(), n);
+        float invMassSum = a->getInverseMass() + b->getInverseMass() + glm::dot(glm::cross((raCrossN), ra) * a->getGlobalInverseInertiaTensor() + glm::cross((rbCrossN), rb) * b->getGlobalInverseInertiaTensor(), n);
 
-        float j = -(1.0f + 1) * contactVel;
+        float j = -(1.0f + E) * contactVel;
 
         j /= invMassSum;
-        j /= 2.0f;
+        j /= static_cast<float>(manafold.points.size());
 
-        const glm::vec3 impulse = j * manafold.normal;
 
-        a->applyAccAt(-impulse, point);
-        b->applyAccAt( impulse, point);
+        j = -(1 + E) * glm::dot(b->linearVelocity - a->linearVelocity, n);
+        auto t = glm::dot(n, n * (a->getInverseMass() + b->getInverseMass()));
+        j /= t;
+        j /= static_cast<float>(manafold.points.size());
+        const glm::vec3 impulse = j * n;
+
+        // a->applyAccAt(-impulse, point);
+        // b->applyAccAt(impulse, point);
+        //b->getAngularVelocity() += glm::cross(rb, impulse);
+
+        // b->getVelocity() = impulse * b->getInverseMass();
+        im += impulse;
+        // std::cout << glm::to_string(b->getPosition()) << std::endl;
     }
+    b->getVelocity() += im * b->getInverseMass();
+    // positionalCorrection(a, b, manafold);
+    // std::cout << glm::to_string(impulse) << "#" << std::endl;
 
     /*
 	char i = 0;
@@ -65,53 +79,12 @@ void Physics::ImpulseBased::resolve(Component::RigidBody* a, Component::RigidBod
 		// glm::vec3 deltaV1 = (j1 * info.normal) / rb->getMass();
 	}*/
 }
-float Physics::ImpulseBased::getImpuseForce(Component::RigidBody* a, Component::RigidBody* b, Physics::CollisionManfold& info)
+
+void Physics::ImpulseBased::positionalCorrection(Component::RigidBody* a, Component::RigidBody* b, const Physics::CollisionManfold& info)
 {
-    const float e = 1; // a->material.coefficientOfRestitution* b->material.coefficientOfRestitution;
-
-    const float mA = 1.0f / a->getMass();
-    const float mB = 1.0f / b->getMass();
-
-    const glm::vec3& WA = a->getAngularVelocity();
-    const glm::vec3& WB = b->getAngularVelocity();
-
-    const glm::vec3& xA = a->getPosition();
-    const glm::vec3& xB = b->getPosition();
-
-    const glm::vec3& VA = a->getVelocity();
-    const glm::vec3& VB = b->getVelocity();
-
-    const glm::mat3 IA = a->getGlobalInverseInertiaTensor();
-    const glm::mat3 IB = b->getGlobalInverseInertiaTensor();
-
-    const glm::vec3& n = info.normal;
-
-    const glm::vec3& pA = info.points[0];
-    const glm::vec3& pB = info.points[1];
-
-    // Calculated
-    const glm::vec3 rA = pA - xA;
-    const glm::vec3 rB = pB - xB;
-
-    const glm::vec3 PdotA = a->isKinimatic ? glm::vec3(0) : VA + glm::cross(WA, rA);
-    const glm::vec3 PdotB = b->isKinimatic ? glm::vec3(0) : VB + glm::cross(WB, rB);
-    const float Vrel = glm::dot(n, PdotB - PdotA);
-
-    // neumerator
-    const float neumerator = -(1.0f + e) * Vrel;
-
-    // denominator
-    glm::vec3 intemediate = glm::cross(glm::cross(rA, n), rA); // dynamic object
-    intemediate = IA * intemediate;
-    if (!b->isKinimatic || true) { // static object
-        intemediate += IB * glm::cross(glm::cross(rB, n), rB);
-    }
-    float denominator = glm::dot(intemediate, n);
-    denominator += mA;
-    if (!b->isKinimatic || true) { // static object
-        denominator += mB;
-    }
-
-    float j = neumerator / denominator;
-    return j;
+    const float k_slop = 0.05f; // Penetration allowance
+    const float percent = 0.4f; // Penetration percentage to correct
+    glm::vec3 correction = (fmaxf(info.penetration - k_slop, 0.0f) / (a->getInverseMass() + b->getInverseMass())) * info.normal * percent;
+    a->getPosition() -= correction * a->getInverseMass();
+    b->getPosition() += correction * b->getInverseMass();
 }

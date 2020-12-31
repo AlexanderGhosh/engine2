@@ -15,7 +15,7 @@ void GameScene::preProcess()
 			glCullFace(GL_FRONT);
 		}
 
-		renderObjects(); // calles update but shouldnt
+		renderObjects();
 		glCullFace(GL_BACK);
 	}
 }

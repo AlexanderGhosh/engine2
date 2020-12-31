@@ -2,14 +2,6 @@
 #include "Base.h"
 #include "../../../Utils/Shapes.h"
 
-//namespace Utils {
-//	namespace Shapes {
-//		template<class T>
-//		class Edge;
-//		template<class T, char size>
-//		class Face;
-//	}
-//}
 namespace Physics {
 	class SAT3D : public Narrowphase {
 	private:

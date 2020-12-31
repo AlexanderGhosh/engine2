@@ -22,8 +22,6 @@ namespace Physics {
                 bodies[i] = nullptr;
             }
         };
-        glm::vec3 getDeltaA() const;
-        glm::vec3 getDeltaB() const;
         float getRestitution() const;
         // inline ~CollisionManfold() { cleanUp(); };
     };

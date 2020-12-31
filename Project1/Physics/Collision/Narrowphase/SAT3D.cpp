@@ -176,8 +176,8 @@ const Physics::CollisionManfold Physics::SAT3D::getCollisionData(Collider* a, Co
 	testNormals(aSAT, bSAT, normals, res);
 
 	res.points = getContactData(res);
-	for (const glm::vec3& p : res.points)
-		std::cout << glm::to_string(p) << std::endl;
-	std::cout << "----------------------------------------------------------------------------------\n";
+	// for (const glm::vec3& p : res.points)
+	// 	std::cout << glm::to_string(p) << std::endl;
+	// std::cout << "----------------------------------------------------------------------------------\n";
 	return res;
 }

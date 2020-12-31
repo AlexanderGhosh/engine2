@@ -221,8 +221,8 @@ int main() {
     cubeR2->setMaterial(cubeMat2);
     
     GameObject* cube2 = new GameObject();
-    cube2->getTransform()->Position = { 0.25f , 5, -5 };
-    cube2->getTransform()->Rotation *= glm::quat({ 0, 0, RADIANS(45.f) });
+    cube2->getTransform()->Position = { 2 , 5, -5 };
+    cube2->getTransform()->Rotation *= glm::quat({ 0, 0, 0 });
     cube2->addComponet(cubeR2);
     
     Physics::BoxColliderSAT* collider2 = new Physics::BoxColliderSAT(10);
@@ -323,7 +323,7 @@ int main() {
     // Physics::CollisionDetection::setBroadphase(new Physics::NSquared
     Physics::CollisionDetection::setBroadphase<Physics::NSquared>();
     Physics::CollisionDetection::setNarrowphase< Physics::SAT3D>();
-    Physics::Engine::setResolution<Physics::ConstraintsBased>();
+    Physics::Engine::setResolution<Physics::ImpulseBased>();
     //0.032438
 
     unsigned frameCounter = 0;
@@ -354,7 +354,6 @@ int main() {
             }
             else {
                 tb.setPos({ p.x - diff, p.y });
-
             }
         }
         frameCounter++;
@@ -375,7 +374,7 @@ int main() {
         // PHYSICS-----------------------------------------------------------------------------------------------------------------------------------------------
 
         Physics::Engine::update();
-        cube2->getRigidbody()->applyAccAt({ 0, -2, 0 }, cube2->getTransform()->Position);
+        cube2->getRigidbody()->applyAccAt({ -0.3, -0.5, 0 }, cube2->getTransform()->Position); // gravity
         // cube2->getTransform()->Position.y = 3;
 
     

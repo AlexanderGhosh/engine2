@@ -5,6 +5,7 @@
 #include <glm.hpp>
 #include <gtc/matrix_transform.hpp>
 #include <gtc/quaternion.hpp>
+#include <gtx/string_cast.hpp>
 #include <list>
 #include <iterator>
 #include <chrono>
@@ -264,19 +265,23 @@ namespace Utils {
         inline const Vector12 combine(const Vector6& a, const Vector6& b)
         {
             Vector12 res{};
-            res[0] = a[0];
-            res[1] = a[1];
-            res[2] = a[2];
-            res[3] = a[3];
-            res[4] = a[4];
-            res[5] = a[5];
-
-            res[6] =  b[0];
-            res[7] =  b[1];
-            res[8] =  b[2];
-            res[9] =  b[3];
-            res[10] = b[4];
-            res[11] = b[5];
+            for (char i = 0; i < 6; i++) {
+                res[i] = a[i];
+                res[i + 6] = b[i];
+            }
+            // res[0] = a[0];
+            // res[1] = a[1];
+            // res[2] = a[2];
+            // res[3] = a[3];
+            // res[4] = a[4];
+            // res[5] = a[5];
+            // 
+            // res[6] =  b[0];
+            // res[7] =  b[1];
+            // res[8] =  b[2];
+            // res[9] =  b[3];
+            // res[10] = b[4];
+            // res[11] = b[5];
             return res;
         }
 
@@ -307,6 +312,23 @@ namespace Utils {
             }
             return res;
         }
+
+        inline std::array<Vector6, 2> split(const Vector12& a) {
+            Vector6 r1{}, r2{};
+            for (char i = 0; i < 6; i++) {
+                r1[i] = a[i];
+                r2[i] = a[i + 6];
+            }
+            return { r1, r2 };
+        }
+        inline std::array<glm::vec3, 2> split(const Vector6& a) {
+            glm::vec3 r1{}, r2{};
+            for (char i = 0; i < 3; i++) {
+                r1[i] = a[i];
+                r2[i] = a[i + 3];
+            }
+            return { r1, r2 };
+        }
     };
 }
 
@@ -314,40 +336,34 @@ namespace Utils {
 inline float operator * (const Utils::BigMaths::Vector12& a, const Utils::BigMaths::Vector12& b)
 {
     float res = 0;
-    for (char i = 0; i < 12; i++) {
+    for (char i = 0; i < 12; i++)
         res += a[i] * b[i];
-    }
     return res;
 }
 // element wise multiplication
 inline Utils::BigMaths::Vector12 operator * (const Utils::BigMaths::Vector12& a, const float& b)
 {
     Utils::BigMaths::Vector12 res = a;
-    for (char i = 0; i < 12; i++) {
+    for (char i = 0; i < 12; i++)
         res[i] *= b;
-    }
     return res;
 }
 // dot product [12 x 1]
 inline Utils::BigMaths::Vector12 operator * (const Utils::BigMaths::Matrix12& a, const Utils::BigMaths::Vector12& b)
 {
     Utils::BigMaths::Vector12 res{};
-    for (char i = 0; i < 12; i++) {
-        for (char j = 0; j < 12; j++) {
+    for (char i = 0; i < 12; i++)
+        for (char j = 0; j < 12; j++)
             res[i] += a[i][j] * b[i];
-        }
-    }
     return res;
 }
 // dot product [1 x 12]
 inline Utils::BigMaths::Vector12 operator * (const Utils::BigMaths::Vector12& a, const Utils::BigMaths::Matrix12& b)
 {
     Utils::BigMaths::Vector12 res{};
-    for (char i = 0; i < 12; i++) {
-        for (char j = 0; j < 12; j++) {
-            res[i] += a[i] * b[i][j];
-        }
-    }
+    for (char i = 0; i < 12; i++)
+        for (char j = 0; j < 12; j++) 
+            res[i] += a[j] * b[j][i];
     return res;
 }
 // dot product [3 x 1]
@@ -368,4 +384,8 @@ inline const Utils::BigMaths::Vector12 operator +(const Utils::BigMaths::Vector1
     for (char i = 0; i < 12; i++)
         res[i] = a[i] + b[i];
     return res;
+}
+// element wise division
+inline const Utils::BigMaths::Vector12 operator /(const Utils::BigMaths::Vector12& a, const float& b) {
+    return a * (1.0f / b);
 }
