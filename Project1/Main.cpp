@@ -30,7 +30,6 @@
 #include "Physics/Constraints.h"
 #include "Physics/Resolution/ConstraintsBased.h"
 #include "Physics/Resolution/ImpulseBased.h"
-#include "gjk.h"
 
 #include "MainWindow.h"
 

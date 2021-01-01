@@ -13,12 +13,13 @@ namespace Physics {
 		};
 		virtual void solve(const MATHS::Vector12& V, const MATHS::Matrix12& M, CollisionManfold& manafoild);
 		enum class Type {
-			Contact
+			Contact,
+			Seperation
 		};
 		Type type;
-	private:
+	protected:
 		virtual const float getLagrangian(const MATHS::Vector12& V, const MATHS::Matrix12& M, const CollisionManfold& manafoild) const;
-		const float getBias(const Physics::CollisionManfold& d) const;
+		virtual const float getBias(const Physics::CollisionManfold& d) const;
 	};
 };
 

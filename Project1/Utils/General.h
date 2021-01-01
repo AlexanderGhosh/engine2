@@ -18,9 +18,12 @@
 #define EQ ==
 #define NEQ !=
 #define PI 3.14159265359f
+constexpr float TWO_PI = 2.0f * PI;
 constexpr float INV_PI = 1.0f / PI;
 #define RADIANS(x) (x * PI * 0.00555555f)
 #define DEGREES(x) (x * INV_PI * 180)
+
+#define Vector3 const glm::vec3&
 
 namespace Utils {
 
@@ -202,6 +205,16 @@ namespace Utils {
         auto t = a.begin();
         std::advance(t, i);
         a.erase(t);
+    }
+    inline glm::mat3 inverse(const glm::mat3& a, const bool symetrical) {
+        if (symetrical) {
+            glm::mat3 res(1.0f);
+            for (char i = 0; i < 3; i++)
+                res[i][i] /= a[i][i];
+            return res;
+        }
+        else
+            return glm::inverse(a);
     }
     class Timer {
     public:

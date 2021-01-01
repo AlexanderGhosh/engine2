@@ -6,7 +6,9 @@
 
 std::vector<Component::RigidBody*> Physics::Engine::rigidbodies = { };
 std::vector<Physics::Collider*> Physics::Engine::colliders = { }; 
-Physics::Resolution* Physics::Engine::resolution = nullptr;
+Physics::Resolution* Physics::Engine::resolution = nullptr; 
+glm::vec3 Physics::Engine::gravity = { 0, -10, 0 };
+glm::vec3 Physics::Engine::dampping = { };
 
 void Physics::Engine::update()
 {

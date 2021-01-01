@@ -132,6 +132,12 @@
     <ClCompile Include="Utils\Shapes.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Componets\Rigidbody2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\SeperationConstraint.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Rendering\Rendering.h">
@@ -254,9 +260,6 @@
     <ClInclude Include="Physics\Resolution\ConstraintsBased.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="gjk.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Physics\Resolution\ImpulseBased.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -264,6 +267,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Utils\Shapes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Componets\Rigidbody2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\SeperationConstraint.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -155,6 +155,8 @@
     <ClCompile Include="Physics\Engine.cpp" />
     <ClCompile Include="Componets\RigidBody.cpp" />
     <ClCompile Include="Physics\Collision\Narrowphase\SAT3D.cpp" />
+    <ClCompile Include="Componets\Rigidbody2.cpp" />
+    <ClCompile Include="Physics\SeperationConstraint.cpp" />
     <ClCompile Include="Utils\Shapes.cpp" />
     <ClCompile Include="UI\Elements\ListBox.cpp" />
     <ClCompile Include="UI\Panes\Grid.cpp" />
@@ -184,7 +186,6 @@
     <ClCompile Include="Utils\ResourceLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="gjk.h" />
     <ClInclude Include="Physics\Resolution\ImpulseBased.h" />
     <ClInclude Include="Physics\Resolution\ConstraintsBased.h" />
     <ClInclude Include="Physics\Collision\Narrowphase\GJK3D.h" />
@@ -199,6 +200,8 @@
     <ClInclude Include="Componets\RigidBody.h" />
     <ClInclude Include="Physics\Resolution\ResolutionBase.h" />
     <ClInclude Include="Physics\Collision\Narrowphase\SAT3D.h" />
+    <ClInclude Include="Componets\Rigidbody2.h" />
+    <ClInclude Include="Physics\SeperationConstraint.h" />
     <ClInclude Include="Utils\Shapes.h" />
     <ClInclude Include="UI\Elements\ListBox.h" />
     <ClInclude Include="UI\Panes\Grid.h" />
