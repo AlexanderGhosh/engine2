@@ -1,166 +1,140 @@
-#include "RigidBody.h"
+#include "Rigidbody.h"
 #include "../Physics/Engine.h"
 #include "../GameObject/GameObject.h"
-#include "..\Physics\Constraints.h"
+#include "../Physics/Collision/Collider.h"
 
-void Component::RigidBody::updateOrientation()
+Component::RigidBody::RigidBody() : Base(), transform(nullptr), cos(0), rotation(0), velocity(0), angularVelocity(0), isKinimatic(false),
+force(0), torque(0), mass(0), invMass(0), l_inertia(1), l_invInertia(1), g_inertia(1), g_invInertia(1), colliders(), hasGravity(true)
 {
-    *rotation = glm::normalize(*rotation);
-    globalInverseIntertiaTensor =
-        getRotation() 
-        * localInverseIntertiaTensor
-        * glm::inverse(getRotation());
+	invMass = 1.0f / mass;
+	l_invInertia *= invMass;
+	g_invInertia *= invMass;
+	Physics::Engine::addRigidBody(this);
 }
 
 void Component::RigidBody::addCollider(Physics::Collider* collider)
 {
-    // add collider to collider list
-    colliders.push_back(collider);
-    // reset local centroid & mass
-    localCentroid = Utils::zero();
-    mass = 0.0f;
+	colliders.push_back(collider);
+	mass += collider->mass;
+	invMass = 1.0f / mass;
 
-    // compute local centroid & mass
-    for (const Physics::Collider* collider : colliders)
-    {
-        // accumulate mass
-        mass += collider->mass;
-
-        // accumulate weighted contribution
-        localCentroid +=
-            collider->mass * collider->localCentroid;
-    }
-
-    // compute inverse mass
-    inverseMass = 1.0f / mass;
-
-    // compute final local centroid
-    localCentroid *= inverseMass;
-
-    // compute local inertia tensor
-    glm::mat3 localInertiaTensor(0);
-    for (const Physics::Collider* collider : colliders)
-    {
-        const glm::vec3 r = localCentroid - collider->localCentroid;
-        const float rDotR = glm::dot(r, r); // magnitude squared
-        const glm::mat3 rOutR = glm::outerProduct(r, r);
-
-        // accumulate local inertia tensor contribution, 
-        // using Parallel Axis Theorem
-        localInertiaTensor +=
-            collider->localInertiaTensor
-            + collider->mass * rDotR * glm::mat3(1) - rOutR;
-    }
-
-    // compute inverse inertia tensor
-    localInverseIntertiaTensor = glm::inverse(localInertiaTensor);
+	l_inertia = collider->localInertiaTensor;
+	l_invInertia = glm::inverse(l_inertia);
+	updateInertia();
 }
 
-
-
-const glm::vec3 Component::RigidBody::localToGlobal(const glm::vec3& p) const
+void Component::RigidBody::updateInertia()
 {
-    return getRotation() * p + *position;
-}
-
-const glm::vec3 Component::RigidBody::globalToLocal(const glm::vec3& p) const
-{
-    return glm::inverse(getRotation()) * (p - *position);
-}
-
-const glm::vec3 Component::RigidBody::localToGlobalVec(const glm::vec3& v) const
-{
-    return getRotation() * v;
-}
-
-const glm::vec3 Component::RigidBody::globalToLocalVec(const glm::vec3& v) const
-{
-    return glm::inverse(getRotation()) * v;
-}
-
-void Component::RigidBody::applyForceAt(const glm::vec3& f, const glm::vec3& location)
-{
-    linearAcceleration += inverseMass * f;
-    angularAcceleration += globalInverseIntertiaTensor * glm::cross(f, location - *position);
-}
-
-void Component::RigidBody::applyForce(const glm::vec3& f, const glm::vec3& ang)
-{
-    linearAcceleration += inverseMass * f;
-    angularAcceleration += globalInverseIntertiaTensor  * ang;
-}
-
-void Component::RigidBody::applyAccAt(const glm::vec3& f, const glm::vec3& at)
-{
-    linearAcceleration += f;
-    angularAcceleration += glm::cross(f, at - *position);
-}
-
-void Component::RigidBody::applyAcceleration(const glm::vec3& f, const glm::vec3& ang)
-{
-    linearAcceleration += f;
-    angularAcceleration += ang;
-}
-
-Utils::BigMaths::MassMatrix6 Component::RigidBody::getMassMatrix() const
-{
-    Utils::BigMaths::MassMatrix6 res{};
-    const glm::mat3 m(mass);
-    const glm::mat3& I = this->localInverseIntertiaTensor;
-    for (char i = 0; i < 3; i++) {
-        for (char j = 0; j < 3; j++) {
-            res[i][j] = m[i][j];
-            res[3 + i][3 + j] = I[i][j] ? 1.0f / I[i][j] : 0.0f;
-        }
-    }
-    return res;
-}
-
-Utils::BigMaths::Vector6 Component::RigidBody::getVelocities() const
-{
-    const glm::vec3& l = this->linearVelocity;
-    const glm::vec3& a = this->angularVelocity;
-    return { l.x, l.y, l.z, a.x, a.y, a.z };
-}
-
-Component::RigidBody::RigidBody() : Base(), mass(0), inverseMass(0),
-globalInverseIntertiaTensor(0), 
-localInverseIntertiaTensor(0), globalCentroid(0), localCentroid(0),
-position(nullptr), rotation(nullptr), linearVelocity(0), angularVelocity(0),
-colliders(), linearAcceleration(0), angularAcceleration(0)
-{
-    Physics::Engine::addRigidBody(this);
-}
-
-void Component::RigidBody::update()
-{
-    if (isKinimatic) {
-        linearAcceleration = Utils::zero();
-        angularAcceleration= Utils::zero();
-        linearVelocity = Utils::zero();
-        angularVelocity = Utils::zero();
-    }
-    const float dt = 1.0f / 60.0f;
-    linearVelocity += linearAcceleration * dt;
-    angularVelocity += angularAcceleration * dt;
-
-    linearAcceleration = Utils::zero();
-    angularAcceleration = Utils::zero();
-
-    globalCentroid += linearVelocity * dt;
-    *position += linearVelocity * dt;
-
-    *rotation *= glm::quat(angularVelocity * dt);
-
-    // update physical properties
-    updateOrientation();
-    // updatePositionFromGlobalCentroid();
+	auto g = getRotationMatrix();
+	auto t = Utils::inverse(g);
+	g_inertia = l_inertia;
+	g_invInertia = Utils::inverse(g_inertia);
 }
 
 void Component::RigidBody::setParent(GameObject* parent)
 {
-    Base::setParent(parent);
-    Component::Transform* trans = parent->getTransform();
-    position = &trans->Position;
-    rotation = &trans->Rotation;
+	Base::setParent(parent);
+	transform = parent->getTransform();
+	rotation = &transform->Rotation;
+	updateInertia();
+}
+
+void Component::RigidBody::addForce(Vector3 force, Vector3 at)
+{
+	this->force += force;
+	this->torque += glm::cross(at - cos, force);
+}
+
+Vector3 Component::RigidBody::getCOS() const
+{
+	return transform->Position;
+}
+
+Quaternion Component::RigidBody::getRotation() const
+{
+	return *rotation;
+}
+
+glm::mat3 Component::RigidBody::getRotationMatrix() const
+{
+	return glm::mat3_cast(*rotation);
+}
+
+Vector3 Component::RigidBody::getVelocity() const
+{
+	return velocity;
+}
+
+Vector3 Component::RigidBody::getAngularVelocity() const
+{
+	return angularVelocity;
+}
+
+Matrix3 Component::RigidBody::getInvInertia_G() const
+{
+	return g_invInertia;
+}
+
+const float& Component::RigidBody::getInvMass() const
+{
+	return invMass;
+}
+
+void Component::RigidBody::velocityAdder(Vector3 add)
+{
+	velocity += add;
+}
+
+void Component::RigidBody::angularVelAdder(Vector3 add)
+{
+	angularVelocity += add;
+}
+
+void Component::RigidBody::cosAdder(Vector3 add)
+{
+	transform->Position += add;
+	cos += add;
+}
+
+void Component::RigidBody::intergrateForces()
+{
+	if (isKinimatic) {
+		clearForces();
+		return;
+	}
+	const float& dt = Physics::Engine::getDeltaTime();
+	if (invMass AND hasGravity)
+		velocity += Physics::Engine::getGravity() * dt;
+
+	velocity += force * invMass * dt;
+
+	velocity *= Physics::Engine::getDamppingFactor();
+
+	angularVelocity += g_invInertia * torque * dt;
+
+	angularVelocity *= Physics::Engine::getDamppingFactor();
+	clearForces();
+}
+
+void Component::RigidBody::intergrateVelocity()
+{	
+	if (isKinimatic)
+		return;
+	const float& dt = Physics::Engine::getDeltaTime();
+	transform->Position += velocity * dt * 0.5f;
+	cos += velocity * dt * 0.5f;
+
+	const glm::quat deltaQ(0.0f, angularVelocity * dt * 0.5f);
+	*rotation += deltaQ * *rotation;
+	*rotation = glm::normalize(*rotation);
+}
+
+void Component::RigidBody::clearForces()
+{
+	force = Utils::zero();
+	torque = Utils::zero();
+	if (isKinimatic) {
+		velocity = Utils::zero();
+		angularVelocity = Utils::zero();
+	}
 }

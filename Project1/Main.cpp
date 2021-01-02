@@ -27,9 +27,11 @@
 #include "Physics/Collision/Broadphase/NSquared.h"
 #include "Physics/Collision/Narrowphase/GJK3D.h"
 #include "Physics/Collision/Narrowphase/SAT3D.h"
-#include "Physics/Constraints.h"
 #include "Physics/Resolution/ConstraintsBased.h"
 #include "Physics/Resolution/ImpulseBased.h"
+#include "Componets/Rigidbody.h"
+#include "Physics/ConstraintEngine/Constraints/DistanceConstraint.h"
+#include "Physics/ConstraintEngine/ConstraitnsSolver.h"
 
 #include "MainWindow.h"
 
@@ -205,11 +207,12 @@ int main() {
     cube1->addComponet(collider1);
     
     Component::RigidBody* rb1 = new Component::RigidBody();
-    rb1->isKinimatic = true;
+    rb1->isKinimatic = false;
+    rb1->hasGravity = false;
     cube1->addComponet(rb1);
     
-    Physics::Constraint* constraint = new Physics::Constraint();
-    cube1->getRigidbody()->addConstriant(constraint);
+    //Physics::Constraint* constraint = new Physics::Constraint();
+    //cube1->getRigidbody()->addConstriant(constraint);
     // cube1->getRigidbody()->getMass() = 1.66;
     
     
@@ -220,7 +223,7 @@ int main() {
     cubeR2->setMaterial(cubeMat2);
     
     GameObject* cube2 = new GameObject();
-    cube2->getTransform()->Position = { 2 , 5, -5 };
+    cube2->getTransform()->Position = { 5, 5, -5 };
     cube2->getTransform()->Rotation *= glm::quat({ 0, 0, 0 });
     cube2->addComponet(cubeR2);
     
@@ -229,8 +232,10 @@ int main() {
     
     Component::RigidBody* rb2 = new Component::RigidBody();
     cube2->addComponet(rb2);
+    //rb2->isKinimatic = true;
+    rb2->hasGravity = false;
     
-    cube2->getRigidbody()->addConstriant(constraint);
+    //cube2->getRigidbody()->addConstriant(constraint);
 
     //cube2->getRigidbody()->isKinimatic = 0;
     // cube2->getRigidbody()->getMass() = 1.66;
@@ -315,23 +320,22 @@ int main() {
     
     Events::Handler::init(window);
     glfwSetCursorPosCallback(window, mouse_callback);
-    
-    
-    MainWindow win(sceneTex, 8.f/6.f);
-    
+        
     // Physics::CollisionDetection::setBroadphase(new Physics::NSquared
     Physics::CollisionDetection::setBroadphase<Physics::NSquared>();
     Physics::CollisionDetection::setNarrowphase< Physics::SAT3D>();
     Physics::Engine::setResolution<Physics::ImpulseBased>();
-    //0.032438
 
     unsigned frameCounter = 0;
     unsigned fps_count = 0;
     const unsigned smapleRate = 10;
 
+    // Physics::Constraints::ConstraintsSolver::addConstraint<Physics::Constraints::DistanceConstraint>(rb1, rb2, Utils::fill(0.5f), Utils::fill(-0.5f), 1.0f);
+    
+    // Physics::Constraints::ConstraintsSolver::addConstraint(new Physics::Constraints::DistanceConstraint(rb1, rb2, Utils::fill(0), Utils::fill(0), 1.5f));
 
-    // cube2->getRigidbody()->angularVelocity += glm::vec3(0, 0, 45);
-
+    cube2->getTransform()->Position = { 0, 5, -5 };
+    cube2->getRigidbody()->velocityAdder({ 0, -1, 0 });
     while (!glfwWindowShouldClose(window))
     {
         // FPS--------------------------------------------------------------------------------------------------------------------------------------------------
@@ -372,9 +376,8 @@ int main() {
 
         // PHYSICS-----------------------------------------------------------------------------------------------------------------------------------------------
 
+        // cube2->getTransform()->Position.x -= 0.01;
         Physics::Engine::update();
-        cube2->getRigidbody()->applyAccAt({ -0.3, -0.5, 0 }, cube2->getTransform()->Position); // gravity
-        // cube2->getTransform()->Position.y = 3;
 
     
         // EVENTS-----------------------------------------------------------------------------------------------------------------------------------------------
@@ -386,6 +389,9 @@ int main() {
         }
         if (Events::Handler::getKey(Events::Key::Escape, Events::Action::Down)) {
             break;
+        }
+        if (Events::Handler::getKey(Events::Key::Space, Events::Action::Down)) {
+            std::cout << glm::to_string(cube2->getRigidbody()->getInvInertia_G()) << std::endl;
         }
         // COLOR BUFFERS----------------------------------------------------------------------------------------------------------------------------------------
         // sound->update();
@@ -399,7 +405,7 @@ int main() {
     delete audio;
     audio = nullptr;
 
-    delete constraint;
+    // delete constraint;
     
     scene.cleanUp(); // removes and destrys all componets and fbos (destroysing comonets doesnt destry buffers(except audio source))
     

@@ -21,12 +21,3 @@ public:
 	void cleanUp();
 };
 
-template<class T>
-T* GameObject::getComponet()
-{
-	for (Component::Base* componet : componets) {
-		T* cast = dynamic_cast<T*>(componet);
-		if (cast)
-			return cast;
-	}
-}

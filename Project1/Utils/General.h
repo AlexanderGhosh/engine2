@@ -24,6 +24,8 @@ constexpr float INV_PI = 1.0f / PI;
 #define DEGREES(x) (x * INV_PI * 180)
 
 #define Vector3 const glm::vec3&
+#define Quaternion const glm::quat&
+#define Matrix3 const glm::mat3&
 
 namespace Utils {
 
@@ -206,7 +208,7 @@ namespace Utils {
         std::advance(t, i);
         a.erase(t);
     }
-    inline glm::mat3 inverse(const glm::mat3& a, const bool symetrical) {
+    inline glm::mat3 inverse(const glm::mat3& a, const bool symetrical = false) {
         if (symetrical) {
             glm::mat3 res(1.0f);
             for (char i = 0; i < 3; i++)
