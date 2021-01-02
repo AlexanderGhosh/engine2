@@ -8,7 +8,7 @@
 std::vector<Component::RigidBody*> Physics::Engine::rigidbodies = { };
 std::vector<Physics::Collider*> Physics::Engine::colliders = { }; 
 Physics::Resolution* Physics::Engine::resolution = nullptr; 
-glm::vec3 Physics::Engine::gravity = { 0, -9.81, 0 };
+glm::vec3 Physics::Engine::gravity = { 0, -10, 0 };
 float Physics::Engine::dampping = 1;
 
 void Physics::Engine::update()
@@ -19,8 +19,10 @@ void Physics::Engine::update()
 		Component::RigidBody* b1 = manafold.bodies[0]->getParent()->getRigidbody();
 		Component::RigidBody* b2 = manafold.bodies[1]->getParent()->getRigidbody();
 
-		*manafold.bodies[0]->position -= manafold.normal * manafold.penetration;
-		*manafold.bodies[1]->position += manafold.normal * manafold.penetration;
+		if(!b1->isKinimatic)
+			*manafold.bodies[0]->position -= manafold.normal * manafold.penetration;
+		if (!b2->isKinimatic)
+			*manafold.bodies[1]->position += manafold.normal * manafold.penetration;
 
         resolution->resolve(b1, b2, manafold);
 	}

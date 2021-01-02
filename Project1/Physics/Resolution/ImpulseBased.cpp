@@ -5,7 +5,7 @@
 #include <gtx/string_cast.hpp>
 #include <vector>
 
-#define E 1.0f
+#define E 0.0f
 void Physics::ImpulseBased::resolve(Component::RigidBody* a, Component::RigidBody* b, Physics::CollisionManfold& manafold)
 {
     const glm::vec3 n = glm::normalize(manafold.normal);

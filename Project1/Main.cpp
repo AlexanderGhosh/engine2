@@ -207,7 +207,7 @@ int main() {
     cube1->addComponet(collider1);
     
     Component::RigidBody* rb1 = new Component::RigidBody();
-    rb1->isKinimatic = false;
+    rb1->isKinimatic = true;
     rb1->hasGravity = false;
     cube1->addComponet(rb1);
     
