@@ -29,7 +29,7 @@ void GameObject::addComponet(Component::Base* componet)
 void GameObject::tick(short currentTick)
 {
 	for (unsigned i = 0; i < componets.size(); i++) {
-		if (!enabled[i] || componets[i]->getType() == Component::Type::RenderMesh) continue;
+		if (!enabled[i] OR componets[i]->getType() == Component::Type::RenderMesh OR componets[i]->getType() == Component::Type::Rigidbody) continue;
 		Component::Base*& comp = componets[i];
 		comp->update();
 		if (currentTick == FIXED_UPDATE_RATE) {
@@ -41,7 +41,7 @@ void GameObject::tick(short currentTick)
 void GameObject::tryDraw()
 {
 	for (unsigned i = 0; i < componets.size(); i++) {
-		if (enabled[i] && componets[i]->getType() == Component::Type::RenderMesh) {
+		if (enabled[i] AND componets[i]->getType() == Component::Type::RenderMesh) {
 			Component::Base*& comp = componets[i];
 			comp->update();
 		}
@@ -55,6 +55,16 @@ Component::RigidBody* GameObject::getRigidbody()
 			return reinterpret_cast<Component::RigidBody*>(comp);
 	}
 	return nullptr;
+}
+
+template<class T>
+T* GameObject::getComponet()
+{
+	for (Component::Base* componet : componets) {
+		T* cast = dynamic_cast<T*>(componet);
+		if (cast)
+			return cast;
+	}
 }
 
 void GameObject::cleanUp()

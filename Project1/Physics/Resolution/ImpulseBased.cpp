@@ -1,90 +1,80 @@
 #include "ImpulseBased.h"
 #include "../../Componets/RigidBody.h"
+#include "../Collision/CollisionDetection.h"
 #include <glm.hpp>
 #include <gtx/string_cast.hpp>
 #include <vector>
 
-#define E 1.0f
+#define E 0.0f
 void Physics::ImpulseBased::resolve(Component::RigidBody* a, Component::RigidBody* b, Physics::CollisionManfold& manafold)
 {
-	const std::vector<Component::RigidBody*> rbs = { a, b };
-    // const float j = getImpuseForce(b, a, manafold);
-    glm::vec3 im(0);
     const glm::vec3 n = glm::normalize(manafold.normal);
+    float im = 0;
     for (int i = 0; i < manafold.points.size(); i++) {
-        const glm::vec3& point = manafold.points[i];
+        Vector3 point = manafold.points[i];
 
-        const glm::vec3 ra = point - a->getPosition();
-        const glm::vec3 rb = point - b->getPosition();
+        float numerator = 0;
+        float denominator = 0;
 
-        const glm::vec3 rv = b->getVelocity() + glm::cross(b->getAngularVelocity(), rb) -
-            a->getVelocity() - glm::cross(a->getAngularVelocity(), ra);
+        glm::vec3 r1 = point - a->getCOS();
+        glm::vec3 r2 = point - b->getCOS();
 
-        const float contactVel = glm::dot(rv, n);
+        glm::vec3 vp1 = a->getVelocity() + glm::cross(a->getAngularVelocity(), r1);
+        glm::vec3 vp2 = b->getVelocity() + glm::cross(b->getAngularVelocity(), r2);
 
-        /*if (contactVel > 0) // moving away
-            break;*/
+        const auto vr = vp2 - vp1;
 
-        const glm::vec3 raCrossN = glm::cross(ra, n);
-        const glm::vec3 rbCrossN = glm::cross(rb, n);
+        numerator = glm::dot(-(1.0f + E) * vr,  n);
 
-        // float invMassSum = a->getInverseMass() + b->getInverseMass() + glm::dot(glm::sqrt(raCrossN) * a->getGlobalInverseInertiaTensor() + glm::sqrt(rbCrossN) * b->getGlobalInverseInertiaTensor(), n);
-        float invMassSum = a->getInverseMass() + b->getInverseMass() + glm::dot(glm::cross((raCrossN), ra) * a->getGlobalInverseInertiaTensor() + glm::cross((rbCrossN), rb) * b->getGlobalInverseInertiaTensor(), n);
-
-        float j = -(1.0f + E) * contactVel;
-
-        j /= invMassSum;
-        j /= static_cast<float>(manafold.points.size());
+        denominator += a->getInvMass();
+        denominator += b->getInvMass();
+        glm::vec3 temp = glm::cross(a->getInvInertia_G() * (glm::cross(r1, n)), r1) +
+            glm::cross(b->getInvInertia_G() * (glm::cross(r2, n)), r2);
+        denominator += glm::dot(temp, n);
 
 
-        j = -(1 + E) * glm::dot(b->linearVelocity - a->linearVelocity, n);
-        auto t = glm::dot(n, n * (a->getInverseMass() + b->getInverseMass()));
-        j /= t;
-        j /= static_cast<float>(manafold.points.size());
-        const glm::vec3 impulse = j * n;
+        glm::vec3 vab = a->getVelocity() - b->getVelocity();
 
-        // a->applyAccAt(-impulse, point);
-        // b->applyAccAt(impulse, point);
-        //b->getAngularVelocity() += glm::cross(rb, impulse);
+        numerator = -(1 + E) * glm::dot(vab, n);
 
-        // b->getVelocity() = impulse * b->getInverseMass();
-        im += impulse;
-        // std::cout << glm::to_string(b->getPosition()) << std::endl;
+        denominator = a->getInvMass();
+        denominator += b->getInvMass();
+        //denominator = glm::dot(n, n * denominator);
+
+        assert(denominator > 0);
+        float j = numerator / denominator;
+        im += j;
     }
-    b->getVelocity() += im * b->getInverseMass();
-    // positionalCorrection(a, b, manafold);
-    // std::cout << glm::to_string(impulse) << "#" << std::endl;
+    im /= static_cast<float>(manafold.points.size()/2);
+    // im *= 0.5f;
+    std::cout << std::to_string(im / 10.0f) << std::endl;
+    a->velocityAdder(n * im * a->getInvMass());
+    b->velocityAdder(n * im * -b->getInvMass());
+    std::cout << "---------------------------------------------------------------\n";
+}
 
-    /*
-	char i = 0;
-	for (Component::RigidBody* rb : rbs) {
-		// const glm::vec3 f = getCoulombFriction(info, j);
+float Physics::ImpulseBased::getBias(Component::RigidBody* a, Component::RigidBody* b, Physics::CollisionManfold& manafold)
+{
+    float bias = 0;
+    const float b_scalar = 0.1f;
+    const float b_slope = 0.001f;
+    const float penetration_slop = fminf(manafold.penetration + b_slope, 0.0f);
+    for (Vector3 point : manafold.points) {
+        const glm::vec3 ra = point - a->getCOS();
+        const glm::vec3 rb = point - b->getCOS();
+        bias += -(b_scalar * 60.0f) * penetration_slop;
 
+        bias += (E * glm::dot(manafold.normal, a->getVelocity() + glm::cross(ra, a->getAngularVelocity()) - b->getVelocity() - glm::cross(rb, b->getAngularVelocity()))) / manafold.points.size();
+    }
 
-        float d = glm::dot(rb->linearVelocity * rb->getMass(), manafold.normal);
-
-        float j = glm::max(-(1 + 1) * d, 0.0f);
-
-        // rb->linearVelocity += (j * manafold.normal * (i ? -1.0f : 1.0f)) / rb->getMass();
-		glm::vec3 deltaV = (j * manafold.normal * (i ? 1.0f : -1.0f)) / rb->getMass();
-		rb->getVelocity() += deltaV;
-
-		glm::vec3 r = manafold.points[i++] - rb->getPosition();
-        auto T = glm::cross(r, j * manafold.normal) * rb->getGlobalInverseInertiaTensor();
-        rb->getAngularVelocity() += -T;
-
-
-		// float d = glm::dot(rb->getVelocity() * rb->getMass(), info.normal);
-		// float j1 = glm::max(-(1.0f + 1) * d, 0.0f);
-		// glm::vec3 deltaV1 = (j1 * info.normal) / rb->getMass();
-	}*/
+    return bias;
 }
 
 void Physics::ImpulseBased::positionalCorrection(Component::RigidBody* a, Component::RigidBody* b, const Physics::CollisionManfold& info)
 {
-    const float k_slop = 0.05f; // Penetration allowance
+    /*const float k_slop = 0.05f; // Penetration allowance
     const float percent = 0.4f; // Penetration percentage to correct
     glm::vec3 correction = (fmaxf(info.penetration - k_slop, 0.0f) / (a->getInverseMass() + b->getInverseMass())) * info.normal * percent;
     a->getPosition() -= correction * a->getInverseMass();
-    b->getPosition() += correction * b->getInverseMass();
+    b->getPosition() += correction * b->getInverseMass();*/
 }

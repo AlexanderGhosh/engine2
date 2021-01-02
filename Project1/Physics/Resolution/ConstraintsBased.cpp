@@ -1,9 +1,13 @@
 #include "ConstraintsBased.h"
-#include "../../Componets/RigidBody.h"
+#include "../../Componets/Rigidbody.h"
+
+Physics::ConstraintsBased::ConstraintsBased() : Resolution(), constraints()
+{
+}
 
 void Physics::ConstraintsBased::resolve(Component::RigidBody* a, Component::RigidBody* b, Physics::CollisionManfold& manafold)
 {
-	auto& c_1 = a->getConstraints();
+	/*auto& c_1 = a->getConstraints();
 	auto& c_2 = b->getConstraints();
 	for (Constraint* c : c_1) {
 		// Constraint* c = Utils::elementAt(c_1, i);
@@ -19,5 +23,14 @@ void Physics::ConstraintsBased::resolve(Component::RigidBody* a, Component::Rigi
 			// a->applyForce({ delta[0], delta[1], delta[2] }, { delta[3], delta[4], delta[5] });
 			// b->applyForce({ delta[6], delta[7], delta[8] }, { delta[9], delta[10], delta[11] });
 		}
-	}
+	}*/
+}
+
+void Physics::ConstraintsBased::cleanUp()
+{
+	/*for (auto itt = constraints.begin(); itt != constraints.end();) {
+		(*itt)->cleanUp();
+		delete* itt;
+		itt = constraints.erase(itt);
+	}*/
 }

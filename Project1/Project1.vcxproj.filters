@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Rendering\Rendering.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -102,9 +99,6 @@
     <ClCompile Include="Physics\Collision\CollisionDetection.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Componets\RigidBody.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Physics\Collision\Broadphase\NSquared.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -112,9 +106,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Physics\Collision\Broadphase\BPBase.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Physics\Constraints.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Physics\Collision\Narrowphase\GJK3D.cpp">
@@ -132,10 +123,22 @@
     <ClCompile Include="Utils\Shapes.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Componets\Rigidbody2.cpp">
+    <ClCompile Include="Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Physics\SeperationConstraint.cpp">
+    <ClCompile Include="Physics\ConstraintEngine\ConstraitnsSolver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\ConstraintEngine\Constraints\Constraints.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\ConstraintEngine\Constraints\ContactConstraint.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\ConstraintEngine\Constraints\DistanceConstraint.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Componets\Rigidbody.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -236,9 +239,6 @@
     <ClInclude Include="Physics\Collision\CollisionDetection.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Componets\RigidBody.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Physics\Collision\Broadphase\Base.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -246,9 +246,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Physics\Collision\Narrowphase\Base.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Physics\Constraints.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Physics\Collision\Narrowphase\GJK3D.h">
@@ -269,10 +266,19 @@
     <ClInclude Include="Utils\Shapes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Componets\Rigidbody2.h">
+    <ClInclude Include="Physics\ConstraintEngine\ConstraitnsSolver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Physics\SeperationConstraint.h">
+    <ClInclude Include="Physics\ConstraintEngine\Constraints\Constraints.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\ConstraintEngine\Constraints\ContactConstraint.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\ConstraintEngine\Constraints\DistanceConstraint.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Componets\Rigidbody.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

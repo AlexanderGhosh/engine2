@@ -143,20 +143,21 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Physics\ConstraintEngine\Constraints\ContactConstraint.cpp" />
+    <ClCompile Include="Physics\ConstraintEngine\ConstraitnsSolver.cpp" />
     <ClCompile Include="Physics\Resolution\ImpulseBased.cpp" />
     <ClCompile Include="Physics\Resolution\ConstraintsBased.cpp" />
     <ClCompile Include="Physics\Collision\Narrowphase\GJK3D.cpp" />
-    <ClCompile Include="Physics\Constraints.cpp" />
+    <ClCompile Include="Physics\ConstraintEngine\Constraints\Constraints.cpp" />
     <ClCompile Include="Physics\Collision\Broadphase\BPBase.cpp" />
     <ClCompile Include="Physics\Collision\Broadphase\NSquared.cpp" />
     <ClCompile Include="Physics\Collision\Collider.cpp" />
     <ClCompile Include="Physics\Collision\CollisionDetection.cpp" />
     <ClCompile Include="Componets\AudioSource.cpp" />
     <ClCompile Include="Physics\Engine.cpp" />
-    <ClCompile Include="Componets\RigidBody.cpp" />
     <ClCompile Include="Physics\Collision\Narrowphase\SAT3D.cpp" />
-    <ClCompile Include="Componets\Rigidbody2.cpp" />
-    <ClCompile Include="Physics\SeperationConstraint.cpp" />
+    <ClCompile Include="Componets\Rigidbody.cpp" />
+    <ClCompile Include="Physics\ConstraintEngine\Constraints\DistanceConstraint.cpp" />
     <ClCompile Include="Utils\Shapes.cpp" />
     <ClCompile Include="UI\Elements\ListBox.cpp" />
     <ClCompile Include="UI\Panes\Grid.cpp" />
@@ -186,10 +187,12 @@
     <ClCompile Include="Utils\ResourceLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Physics\ConstraintEngine\Constraints\ContactConstraint.h" />
+    <ClInclude Include="Physics\ConstraintEngine\ConstraitnsSolver.h" />
     <ClInclude Include="Physics\Resolution\ImpulseBased.h" />
     <ClInclude Include="Physics\Resolution\ConstraintsBased.h" />
     <ClInclude Include="Physics\Collision\Narrowphase\GJK3D.h" />
-    <ClInclude Include="Physics\Constraints.h" />
+    <ClInclude Include="Physics\ConstraintEngine\Constraints\Constraints.h" />
     <ClInclude Include="Physics\Collision\Broadphase\NSquared.h" />
     <ClInclude Include="Physics\Collision\Broadphase\Base.h" />
     <ClInclude Include="Physics\Collision\CollisionDetection.h" />
@@ -197,11 +200,10 @@
     <ClInclude Include="Componets\AudioSource.h" />
     <ClInclude Include="Physics\Collision\Narrowphase\Base.h" />
     <ClInclude Include="Physics\Engine.h" />
-    <ClInclude Include="Componets\RigidBody.h" />
     <ClInclude Include="Physics\Resolution\ResolutionBase.h" />
     <ClInclude Include="Physics\Collision\Narrowphase\SAT3D.h" />
-    <ClInclude Include="Componets\Rigidbody2.h" />
-    <ClInclude Include="Physics\SeperationConstraint.h" />
+    <ClInclude Include="Componets\Rigidbody.h" />
+    <ClInclude Include="Physics\ConstraintEngine\Constraints\DistanceConstraint.h" />
     <ClInclude Include="Utils\Shapes.h" />
     <ClInclude Include="UI\Elements\ListBox.h" />
     <ClInclude Include="UI\Panes\Grid.h" />
