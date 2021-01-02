@@ -334,8 +334,9 @@ int main() {
     
     // Physics::Constraints::ConstraintsSolver::addConstraint(new Physics::Constraints::DistanceConstraint(rb1, rb2, Utils::fill(0), Utils::fill(0), 1.5f));
 
-    cube2->getTransform()->Position = { 0, 5, -5 };
-    cube2->getRigidbody()->velocityAdder({ 0, -1, 0 });
+    cube2->getTransform()->Position = { 0.5, 5, -5 };
+    cube2->getRigidbody()->hasGravity = true;
+    //cube2->getRigidbody()->velocityAdder({ 1, -1, 0 });
     while (!glfwWindowShouldClose(window))
     {
         // FPS--------------------------------------------------------------------------------------------------------------------------------------------------

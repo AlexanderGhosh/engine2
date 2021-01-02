@@ -121,8 +121,8 @@ void Component::RigidBody::intergrateVelocity()
 	if (isKinimatic)
 		return;
 	const float& dt = Physics::Engine::getDeltaTime();
-	transform->Position += velocity * dt * 0.5f;
-	cos += velocity * dt * 0.5f;
+	transform->Position += velocity * dt;
+	cos += velocity * dt;
 
 	const glm::quat deltaQ(0.0f, angularVelocity * dt * 0.5f);
 	*rotation += deltaQ * *rotation;

@@ -5,11 +5,12 @@
 #include <gtx/string_cast.hpp>
 #include <vector>
 
-#define E 0.0f
+#define E 1.0f
 void Physics::ImpulseBased::resolve(Component::RigidBody* a, Component::RigidBody* b, Physics::CollisionManfold& manafold)
 {
     const glm::vec3 n = glm::normalize(manafold.normal);
     float im = 0;
+    glm::vec3 ang1(0), ang2(0);
     for (int i = 0; i < manafold.points.size(); i++) {
         Vector3 point = manafold.points[i];
 
@@ -22,34 +23,44 @@ void Physics::ImpulseBased::resolve(Component::RigidBody* a, Component::RigidBod
         glm::vec3 vp1 = a->getVelocity() + glm::cross(a->getAngularVelocity(), r1);
         glm::vec3 vp2 = b->getVelocity() + glm::cross(b->getAngularVelocity(), r2);
 
-        const auto vr = vp2 - vp1;
+        const glm::vec3 vr = vp1 - (!b->isKinimatic ? vp2 : glm::vec3(0));
 
-        numerator = glm::dot(-(1.0f + E) * vr,  n);
+        numerator = -(1.0f + E) * glm::dot(vr,  n);
 
         denominator += a->getInvMass();
-        denominator += b->getInvMass();
-        glm::vec3 temp = glm::cross(a->getInvInertia_G() * (glm::cross(r1, n)), r1) +
-            glm::cross(b->getInvInertia_G() * (glm::cross(r2, n)), r2);
+        if (!b->isKinimatic) {
+            denominator += b->getInvMass();
+        }
+        glm::vec3 temp = glm::cross(a->getInvInertia_G() * glm::cross(r1, n), r1);
+        if (!b->isKinimatic) {
+            temp += glm::cross(b->getInvInertia_G() * glm::cross(r2, n), r2);
+        }
         denominator += glm::dot(temp, n);
 
 
-        glm::vec3 vab = a->getVelocity() - b->getVelocity();
+        /*glm::vec3 vab = a->getVelocity() - b->getVelocity();
 
         numerator = -(1 + E) * glm::dot(vab, n);
 
         denominator = a->getInvMass();
         denominator += b->getInvMass();
         //denominator = glm::dot(n, n * denominator);
-
+        */
         assert(denominator > 0);
         float j = numerator / denominator;
         im += j;
+
+        ang1 += glm::cross(r1, j * n);
+        ang2 += glm::cross(r2, j * n);
     }
-    im /= static_cast<float>(manafold.points.size()/2);
+    im /= static_cast<float>(manafold.points.size() ? manafold.points.size() : 1);
     // im *= 0.5f;
     std::cout << std::to_string(im / 10.0f) << std::endl;
     a->velocityAdder(n * im * a->getInvMass());
     b->velocityAdder(n * im * -b->getInvMass());
+
+    a->angularVelAdder(a->getInvInertia_G() * ang1);
+    b->angularVelAdder(b->getInvInertia_G() * -ang2);
     std::cout << "---------------------------------------------------------------\n";
 }
 
