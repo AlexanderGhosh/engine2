@@ -292,7 +292,7 @@ void Primative::SoundBuffer::cleanUp()
 	alDeleteBuffers(1, &SBO);
 }
 
-Primative::MSAABuffer::MSAABuffer(std::vector<std::string> textureTypes, glm::ivec2 dimentions) : FrameBuffer(), middleMan(new FrameBuffer(textureTypes, dimentions))
+Primative::MSAABuffer::MSAABuffer(std::vector<std::string> textureTypes, glm::ivec2 dimentions) : FrameBuffer(), middleMan(DBG_NEW FrameBuffer(textureTypes, dimentions))
 {
 	this->dimentions = dimentions;
 	glGenFramebuffers(1, &FBO);

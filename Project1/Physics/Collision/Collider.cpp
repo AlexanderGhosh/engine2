@@ -114,7 +114,7 @@ const Physics::AABB* Physics::BoxColliderSAT::constructAABB()
 			}
 		}
 	}
-	return new AABB(min - *position, max - *position, false, parent);
+	return DBG_NEW AABB(min - *position, max - *position, false, parent);
 }
 
 std::list<glm::vec3> Physics::ColliderSAT::getAllFaces(const glm::vec3& vertex, bool localSpace, bool getIndices) const

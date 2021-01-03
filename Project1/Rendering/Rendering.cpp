@@ -6,7 +6,7 @@
 
 Render::RenderMesh::RenderMesh() : buffers(), parent(nullptr), material(), Component::Base()
 {
-	/*Materials::Forward* fwd = new Materials::Forward();
+	/*Materials::Forward* fwd = DBG_NEW Materials::Forward();
 	fwd->getDiffuse()(1); // set to the texture id
 	// fwd.getDiffuse()({ 1, 0, 0 });
 	fwd->getSpecular()(2);
@@ -14,7 +14,7 @@ Render::RenderMesh::RenderMesh() : buffers(), parent(nullptr), material(), Compo
 	fwd->shininess = 32;
 	this->material = fwd;
 
-	Materials::PBR* prb = new Materials::PBR();
+	Materials::PBR* prb = DBG_NEW Materials::PBR();
 	prb->getAlbedo()(1);
 	prb->getAO()({ 1, 1, 1 });
 	prb->getNormal()(3);

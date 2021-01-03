@@ -21,7 +21,7 @@ namespace Physics {
 			rigidbodies.push_back(rigidbody);
 		};
 		template<class T>
-		static inline void setResolution() { resolution = new T(); };
+		static inline void setResolution() { resolution = DBG_NEW T(); };
 		static inline std::vector<Collider*>& getColliders() { return colliders; };
 
 		static inline glm::vec3& getGravity() { return gravity; };

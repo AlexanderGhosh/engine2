@@ -7,7 +7,7 @@ void bannerLeaveCB(UI::Element* sender);
 MainWindow::MainWindow(const unsigned& viewPortTex, const float& aspectRatio) : selected(nullptr),
 	bannerBG_top(), bannerBG_bottom(), bannerBG_right(), viewPort(), objectView()
 {
-	root = new UI::Grid(800, 600);
+	root = DBG_NEW UI::Grid(800, 600);
 	createBanners();
 	setUpViewPort(viewPortTex, aspectRatio);
 	updateObjectViewer();

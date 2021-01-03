@@ -1,7 +1,7 @@
 #include "GameObject.h"
 
-GameObject::GameObject() : componets(), enabled(), transform(new Component::Transform()) {
-	// this->addComponet(new Component::Transform());
+GameObject::GameObject() : componets(), enabled(), transform(DBG_NEW Component::Transform()) {
+	// this->addComponet(DBG_NEW Component::Transform());
 	enabled.push_back(1);
 }
 

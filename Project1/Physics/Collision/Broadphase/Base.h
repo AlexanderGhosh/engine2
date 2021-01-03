@@ -21,7 +21,7 @@ namespace Physics {
     };
     class Broadphase {
     public:
-        // adds a new AABB to the broadphase
+        // adds a DBG_NEW AABB to the broadphase
         virtual void add(AABB* aabb) = 0;
 
         // updates broadphase to react to changes to AABB

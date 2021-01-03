@@ -1,4 +1,5 @@
 #include "AssimpWrapper.h"
+#include "General.h"
 
 const std::vector<Primative::Mesh*> FileReaders::AssimpWrapper::loadModel(std::string path)
 {
@@ -116,5 +117,5 @@ Primative::Mesh* FileReaders::AssimpWrapper::processMesh(aiMesh* mesh, const aiS
 
     // return a mesh object created from the extracted mesh data
     */
-    return new Primative::Mesh(vertices, indices);
+    return DBG_NEW Primative::Mesh(vertices, indices);
 }

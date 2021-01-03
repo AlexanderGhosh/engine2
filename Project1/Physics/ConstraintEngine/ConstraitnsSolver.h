@@ -14,8 +14,6 @@ namespace Physics {
 		public:
 			static void cleanUp();
 			static void addConstraint(Constraint* c);
-			template<class T, typename... ARGS>
-			static void addConstraint(ARGS&&... args);
 			static void solveAll(const float& dt);
 			static void preSolveAll();
 		};

@@ -18,11 +18,6 @@ void Physics::Constraints::ConstraintsSolver::addConstraint(Constraint* c)
 {
 	constraints.push_back(c);
 }
-template<class T, typename... ARGS>
-void Physics::Constraints::ConstraintsSolver::addConstraint(ARGS&&... args)
-{
-	constraints.push_back(new T(std::forward<ARGS>(args)...));
-}
 void Physics::Constraints::ConstraintsSolver::solveAll(const float& dt)
 {
 	for (Constraint*& c : constraints)

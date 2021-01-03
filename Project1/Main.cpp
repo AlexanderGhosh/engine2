@@ -36,17 +36,6 @@
 #include "MainWindow.h"
 #include "Context.h"
 
-#define _CRTDBG_MAP_ALLOC
-#include <stdlib.h>
-#include <crtdbg.h>
-
-#ifdef _DEBUG
-#define DBG_NEW new ( _NORMAL_BLOCK , __FILE__ , __LINE__ )
-// Replace _NORMAL_BLOCK with _CLIENT_BLOCK if you want the
-// allocations to be of _CLIENT_BLOCK type
-#else
-#define DBG_NEW new
-#endif
 
 #define PBRen 1
 
@@ -88,7 +77,7 @@ int main() {
     ResourceLoader::createShader("Basics/UIShader");
     ResourceLoader::createShader("Basics/TextShader");
     // cube1
-    Primative::Mesh* cubeMesh = new Primative::Mesh();
+    Primative::Mesh* cubeMesh = DBG_NEW Primative::Mesh();
     Primative::Vertex v1({ -0.5, -0.5, -0.5 }, { 0, 0 });
     Primative::Vertex v2({ 0.5, -0.5, -0.5 }, { 1, 0 });
     Primative::Vertex v3({ 0.5, 0.5, -0.5 }, { 1, 1 });
@@ -118,7 +107,7 @@ int main() {
     std::vector<Primative::VertexBuffer*> cubeBuffers = ResourceLoader::createModel(cubeMesh, "cube", GL_TRIANGLE_STRIP);
     
     // pyramid
-    /*Primative::Mesh* m = new Primative::Mesh();
+    /*Primative::Mesh* m = DBG_NEW Primative::Mesh();
     Primative::Vertex v1({ -0.5, -0.5, -0.5 });
     Primative::Vertex v2({ 0.5, -0.5, -0.5 });
     Primative::Vertex v3({ 0.5, 0.5, -0.5 });
@@ -164,55 +153,55 @@ int main() {
     
     // unsigned tex = ResourceLoader::createTexture("Basics/Textures/wood.jpg", TextureType::DiffuseMap);
     
-    // Render::RenderMesh* r = new Render::RenderMesh();
+    // Render::RenderMesh* r = DBG_NEW Render::RenderMesh();
     // r->addBuffers(pistolBuffers);
-    // Materials::Material* mat = new Materials::PBR({ 1 }, { 3 }, { 2 }, { 5 }, { 4 }); // new Materials::PBR({ 1 }, { 3 }, { 2 }, { 5 }, { 4 });
+    // Materials::Material* mat = DBG_NEW Materials::PBR({ 1 }, { 3 }, { 2 }, { 5 }, { 4 }); // DBG_NEW Materials::PBR({ 1 }, { 3 }, { 2 }, { 5 }, { 4 });
     // if (!PBRen) {
-    //     mat = new Materials::Forward({ 1 }, { 2 }, { 3 }, 32);
+    //     mat = DBG_NEW Materials::Forward({ 1 }, { 2 }, { 3 }, 32);
     // }
     // r->setMaterial(mat);
     
-    // GameObject* gun = new GameObject();
+    // GameObject* gun = DBG_NEW GameObject();
     // gun->getTransform()->Position = { 0, 0, 0 };
     // gun->addComponet(r);
     
-    Render::RenderMesh* cubeR = new Render::RenderMesh();
+    Render::RenderMesh* cubeR = DBG_NEW Render::RenderMesh();
     cubeR->addBuffers(cubeBuffers);
-    Materials::Material* cubeMat = new Materials::PBR({ { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } });
+    Materials::Material* cubeMat = DBG_NEW Materials::PBR({ { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } });
     cubeR->setMaterial(cubeMat);
     
-    GameObject* cube1 = new GameObject();
+    GameObject* cube1 = DBG_NEW GameObject();
     cube1->getTransform()->Position = { 0, 0, -5 };
     cube1->addComponet(cubeR);
     
-    Physics::BoxColliderSAT* collider1 = new Physics::BoxColliderSAT(10);
+    Physics::BoxColliderSAT* collider1 = DBG_NEW Physics::BoxColliderSAT(10);
     cube1->addComponet(collider1);
     
-    Component::RigidBody* rb1 = new Component::RigidBody();
+    Component::RigidBody* rb1 = DBG_NEW Component::RigidBody();
     rb1->isKinimatic = true;
     rb1->hasGravity = false;
     cube1->addComponet(rb1);
     
-    //Physics::Constraint* constraint = new Physics::Constraint();
+    //Physics::Constraint* constraint = DBG_NEW Physics::Constraint();
     //cube1->getRigidbody()->addConstriant(constraint);
     // cube1->getRigidbody()->getMass() = 1.66;
     
     
-    Render::RenderMesh* cubeR2 = new Render::RenderMesh();
+    Render::RenderMesh* cubeR2 = DBG_NEW Render::RenderMesh();
     auto model = ResourceLoader::getModel("cube");
     cubeR2->addBuffers(model, GL_TRIANGLE_STRIP);
-    Materials::Material* cubeMat2 = new Materials::PBR({ { 0, 100, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } });
+    Materials::Material* cubeMat2 = DBG_NEW Materials::PBR({ { 0, 100, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } });
     cubeR2->setMaterial(cubeMat2);
     
-    GameObject* cube2 = new GameObject();
+    GameObject* cube2 = DBG_NEW GameObject();
     cube2->getTransform()->Position = { 5, 5, -5 };
     cube2->getTransform()->Rotation *= glm::quat({ 0, 0, 0 });
     cube2->addComponet(cubeR2);
     
-    Physics::BoxColliderSAT* collider2 = new Physics::BoxColliderSAT(10);
+    Physics::BoxColliderSAT* collider2 = DBG_NEW Physics::BoxColliderSAT(10);
     cube2->addComponet(collider2);
     
-    Component::RigidBody* rb2 = new Component::RigidBody();
+    Component::RigidBody* rb2 = DBG_NEW Component::RigidBody();
     cube2->addComponet(rb2);
     //rb2->isKinimatic = true;
     rb2->hasGravity = false;
@@ -223,13 +212,13 @@ int main() {
     // cube2->getRigidbody()->getMass() = 1.66;
 
 
-    Render::RenderMesh* cubeR3 = new Render::RenderMesh();
+    Render::RenderMesh* cubeR3 = DBG_NEW Render::RenderMesh();
     model = ResourceLoader::getModel("cube");
     cubeR3->addBuffers(model, GL_TRIANGLE_STRIP);
-    Materials::Material* cubeMat3 = new Materials::PBR({ { 1, 1, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } });
+    Materials::Material* cubeMat3 = DBG_NEW Materials::PBR({ { 1, 1, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } });
     cubeR3->setMaterial(cubeMat3);
 
-    GameObject* cube3 = new GameObject();
+    GameObject* cube3 = DBG_NEW GameObject();
     cube3->getTransform()->Position = { 0, 5, -5 };
     cube3->getTransform()->Scale *= 0.5f;
     cube3->addComponet(cubeR3);
@@ -261,8 +250,8 @@ int main() {
     
     b.fill(4, value_ptr(lightSpaceMatrix));
     
-    Primative::FrameBuffer* frameBuffer = new Primative::FrameBuffer({ "depth" }, { 800, 600 });
-    Primative::MSAABuffer* finalQB = new Primative::MSAABuffer({ "col" }, { 800, 600 });
+    Primative::FrameBuffer* frameBuffer = DBG_NEW Primative::FrameBuffer({ "depth" }, { 800, 600 });
+    Primative::MSAABuffer* finalQB = DBG_NEW Primative::MSAABuffer({ "col" }, { 800, 600 });
     unsigned sceneTex = finalQB->getTextureId("col0");
     
     GameScene scene;
@@ -290,21 +279,21 @@ int main() {
     // SOUNDS //
     SoundManager::init();
     const auto buffer = SoundManager::createBuffer("C:/Users/AGWDW/Desktop/iamtheprotectorofthissystem.wav");
-    Component::AudioSource* audio = new Component::AudioSource(
+    Component::AudioSource* audio = DBG_NEW Component::AudioSource(
         SoundManager::createSoundSource());
     audio->addBuffer(buffer);
     
     Events::Handler::init(main.getWindow());
     glfwSetCursorPosCallback(main.getWindow(), mouse_callback);
         
-    // Physics::CollisionDetection::setBroadphase(new Physics::NSquared
+    // Physics::CollisionDetection::setBroadphase(DBG_NEW Physics::NSquared
     Physics::CollisionDetection::setBroadphase<Physics::NSquared>();
     Physics::CollisionDetection::setNarrowphase< Physics::SAT3D>();
     Physics::Engine::setResolution<Physics::ImpulseBased>();
 
     // Physics::Constraints::ConstraintsSolver::addConstraint<Physics::Constraints::DistanceConstraint>(rb1, rb2, Utils::fill(0.5f), Utils::fill(-0.5f), 1.0f);
     
-    // Physics::Constraints::ConstraintsSolver::addConstraint(new Physics::Constraints::DistanceConstraint(rb1, rb2, Utils::fill(0), Utils::fill(0), 1.5f));
+    // Physics::Constraints::ConstraintsSolver::addConstraint(DBG_NEW Physics::Constraints::DistanceConstraint(rb1, rb2, Utils::fill(0), Utils::fill(0), 1.5f));
 
     cube2->getTransform()->Position = { 0.5, 5, -5 };
     cube2->getRigidbody()->hasGravity = true;
