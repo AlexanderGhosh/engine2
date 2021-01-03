@@ -39,6 +39,20 @@ void Component::RigidBody::setParent(GameObject* parent)
 	updateInertia();
 }
 
+void Component::RigidBody::cleanUp()
+{
+	parent = nullptr;
+
+	rotation = nullptr;
+
+	transform = nullptr;
+
+	for (auto itt = colliders.begin(); itt != colliders.end();) {
+		itt = colliders.erase(itt);
+	}
+
+}
+
 void Component::RigidBody::addForce(Vector3 force, Vector3 at)
 {
 	this->force += force;

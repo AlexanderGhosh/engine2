@@ -6,12 +6,13 @@ namespace Materials {
 	enum class Type {
 		Forward, PBR
 	};
-	class Base {
+	class Material {
 	protected:
 		Materials::Type type;
 	public:
 		virtual void activateTextures() const { };
 		inline const Materials::Type& getType() const { return type; };
+		virtual void cleanUp() = 0;
 	};
 	class MatItem {
 	private:
@@ -21,6 +22,7 @@ namespace Materials {
 		inline MatItem() : raw(0), texId(-1) { };
 		inline MatItem(glm::vec3 raw) : MatItem() { this->raw = raw; };
 		inline MatItem(unsigned id) : MatItem() { texId = id; };
+
 		inline const glm::vec3& getRaw() const { return raw; };
 		inline const int& getId() const { return texId; };
 
@@ -30,12 +32,13 @@ namespace Materials {
 
 		void operator()(const glm::vec3& raw);
 		void operator()(const unsigned& id);
+		void cleanUp();
 	};
-	struct Forward : public Base {
+	struct Forward : public Material {
 	private:
 		std::array<MatItem, 3> diff_spec_norm;
 	public:
-		inline Forward() : diff_spec_norm{ MatItem({1, 0, 0}), MatItem({1, 1, 1}), MatItem({1, 1, 1}) }, shininess(32), Base() { Base::type = Materials::Type::Forward; };
+		inline Forward() : diff_spec_norm{ MatItem({1, 0, 0}), MatItem({1, 1, 1}), MatItem({1, 1, 1}) }, shininess(32), Material() { Material::type = Materials::Type::Forward; };
 		Forward(const MatItem& diffuse, const MatItem& specular, const MatItem& normal, float shininess);
 		float shininess;
 		inline MatItem& getDiffuse() { return diff_spec_norm[0]; };
@@ -43,9 +46,10 @@ namespace Materials {
 		inline MatItem& getNormals() { return diff_spec_norm[2]; };
 		inline std::array<MatItem, 3>& getDiffSpecNorm() { return diff_spec_norm; };
 		void activateTextures() const;
+		void cleanUp();
 	};
 
-	struct PBR: public Base{
+	struct PBR: public Material{
 	private:
 		MatItem albedo;
 		MatItem normal;
@@ -53,7 +57,7 @@ namespace Materials {
 		MatItem roughness;
 		MatItem ao;
 	public:
-		inline PBR() : albedo({ 1, 0, 0 }), normal({ 0, 1, 0 }), metalic({ 0.5, 0, 0 }), roughness({ 0.1, 0, 0 }), ao({ 1, 0, 0 }), Base() { Base::type = Materials::Type::PBR; };
+		inline PBR() : albedo({ 1, 0, 0 }), normal({ 0, 1, 0 }), metalic({ 0.5, 0, 0 }), roughness({ 0.1, 0, 0 }), ao({ 1, 0, 0 }), Material() { Material::type = Materials::Type::PBR; };
 		PBR(const MatItem& albedo, const MatItem& normal, const MatItem& metalic, const MatItem& roughness, const MatItem& ao);
 		inline MatItem& getAlbedo() { return albedo; };
 		inline MatItem& getNormal() { return normal; };
@@ -62,6 +66,7 @@ namespace Materials {
 		inline MatItem& getAO() { return ao; };
 		inline std::array<MatItem, 5> getAll() const { return std::array<MatItem, 5>{ albedo, normal, metalic, roughness, ao }; };
 		void activateTextures() const;
+		void cleanUp();
 	};
 };
 

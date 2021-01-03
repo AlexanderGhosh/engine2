@@ -48,4 +48,13 @@ void Render::RenderMesh::addBuffers(std::vector<Primative::VertexBuffer*>& buffe
 	}
 	buffers.clear();
 }
+void Render::RenderMesh::cleanUp() {
+	parent = nullptr;
+	for (auto itt = buffers.begin(); itt != buffers.end();) {
+		itt = buffers.erase(itt);
+	}
+	material->cleanUp();
+	delete material;
+	material = nullptr;
+}
 

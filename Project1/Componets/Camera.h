@@ -15,6 +15,7 @@ namespace Component {
 		inline void setPos(const glm::vec3& pos) { this->pos = pos; };
 		inline const glm::vec3& getForward() const { return fwd; };
 		inline Type getType() const { return Type::Camera; };
+		void cleanUp() { };
 	private:
 		glm::vec3 pos, fwd;
 		float pitch, yaw, fov;

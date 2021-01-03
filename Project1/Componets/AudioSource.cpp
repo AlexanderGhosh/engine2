@@ -20,6 +20,5 @@ void Component::AudioSource::addBuffer(Primative::SoundBuffer* buffer) const
 
 void Component::AudioSource::cleanUp()
 {
-	Base::cleanUp();
 	alDeleteSources(1, &source);
 }

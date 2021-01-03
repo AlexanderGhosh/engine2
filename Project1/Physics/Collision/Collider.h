@@ -15,6 +15,7 @@ namespace Physics {
 		// inline void cleanUp() { };
 		virtual glm::vec3 support(const glm::vec3& direction) const = 0;
 		void setParent(GameObject* parent);
+		void cleanUp() {};
 		glm::vec3* position;
 		glm::quat* rotation;
 		glm::vec3* scale;

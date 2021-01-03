@@ -28,6 +28,7 @@ namespace Component {
 		void updateInertia();
 		void setParent(GameObject* parent);
 		inline Type getType() const { return Type::Rigidbody; };
+		void cleanUp();
 
 		// intergration
 		// for velocity

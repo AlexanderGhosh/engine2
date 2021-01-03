@@ -13,14 +13,15 @@ namespace Render {
 		RenderMesh();
 		virtual void update();
 		void addBuffers(std::vector<Primative::VertexBuffer*>& buffers, const GLenum draw_type = GL_TRIANGLES);
-		inline void setMaterial(Materials::Base* mat) { material = mat; };
+		inline void setMaterial(Materials::Material* mat) { material = mat; };
 		inline Component::Type getType() const {
 			return Component::Type::RenderMesh;
 		}
+		void cleanUp();
 	private:
 		std::vector<Primative::VertexBuffer*> buffers;
 		GameObject* parent;
-		Materials::Base* material;
+		Materials::Material* material;
 	};
 }
 

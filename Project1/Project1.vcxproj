@@ -143,6 +143,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Context.cpp" />
     <ClCompile Include="Physics\ConstraintEngine\Constraints\ContactConstraint.cpp" />
     <ClCompile Include="Physics\ConstraintEngine\ConstraitnsSolver.cpp" />
     <ClCompile Include="Physics\Resolution\ImpulseBased.cpp" />
@@ -187,6 +188,7 @@
     <ClCompile Include="Utils\ResourceLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Context.h" />
     <ClInclude Include="Physics\ConstraintEngine\Constraints\ContactConstraint.h" />
     <ClInclude Include="Physics\ConstraintEngine\ConstraitnsSolver.h" />
     <ClInclude Include="Physics\Resolution\ImpulseBased.h" />

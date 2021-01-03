@@ -13,7 +13,7 @@ namespace Component {
 	public:
 		virtual void update() { }; // every tick
 		virtual void fixedUpdate() { }; // every x ticks
-		virtual void cleanUp() { parent = nullptr; };
+		virtual void cleanUp() = 0;
 		virtual void setParent(GameObject* parent) { this->parent = parent; };
 		inline GameObject* getParent() { return parent; };
 		virtual inline Type getType() const = 0;
@@ -28,5 +28,6 @@ namespace Component {
 		const glm::mat4 getModel() const;
 		inline Transform(glm::vec3 p = Utils::zero(), glm::vec3 s = Utils::fill(1), glm::vec3 r = Utils::zero()) : Position(p), Scale(s), Rotation(r), Base() { };
 		inline Type getType() const { return Type::Transform; };
+		void cleanUp() { };
 	};
 }

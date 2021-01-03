@@ -34,16 +34,19 @@
 #include "Physics/ConstraintEngine/ConstraitnsSolver.h"
 
 #include "MainWindow.h"
+#include "Context.h"
 
 #define _CRTDBG_MAP_ALLOC
 #include <stdlib.h>
 #include <crtdbg.h>
 
-// #ifdef _DEBUG
-// #define new new( _NORMAL_BLOCK , __FILE__ , __LINE__ )
-// #else
-// #define new new
-// #endif
+#ifdef _DEBUG
+#define DBG_NEW new ( _NORMAL_BLOCK , __FILE__ , __LINE__ )
+// Replace _NORMAL_BLOCK with _CLIENT_BLOCK if you want the
+// allocations to be of _CLIENT_BLOCK type
+#else
+#define DBG_NEW new
+#endif
 
 #define PBRen 1
 
@@ -72,32 +75,11 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 }
 
 int main() {
-
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 
-    glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_SAMPLES, 4);
-    GLFWwindow* window = glfwCreateWindow(800, 600, "Engine 2", NULL, NULL);
-    if (!window)
-    {
-        std::cout << "Failed to create GLFW window" << std::endl;
-        glfwTerminate();
-        return -1;
-    }
-    glfwMakeContextCurrent(window);
-    
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
-    glEnable(GL_MULTISAMPLE); 
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    
-    glViewport(0, 0, 800, 600);
-    glewInit();
-    
+    Context main({ 800, 600 }, true);
+    main.init("Engine 2", { GL_DEPTH_TEST, GL_CULL_FACE, GL_MULTISAMPLE });
+
     cam.setPos({ 0, 0, 0 }); // 200, 700
     
     ResourceLoader::createShader("Basics/DefaultShader");
@@ -173,7 +155,7 @@ int main() {
     ResourceLoader::createTexture("Basics/Textures/NazghulGreatsword_AmbientOcclusion.png", TextureType::AOMap, 0); // ao
     ResourceLoader::createTexture("Basics/Textures/NazghulGreatsword_Roughness.png", TextureType::RoughnessMap, 0); // roughness
     
-    auto tjiol = ResourceLoader::createTexture("Basics/Textures/Base_color 1.jpg", TextureType::AlbedoMap, 0); // albedo
+    ResourceLoader::createTexture("Basics/Textures/Base_color 1.jpg", TextureType::AlbedoMap, 0); // albedo
     ResourceLoader::createTexture("Basics/Textures/metal.jpg", TextureType::MetalicMap, 0); // metalic
     ResourceLoader::createTexture("Basics/Textures/handgun_N.jpg", TextureType::NormalMap, 0); // norm
     ResourceLoader::createTexture("Basics/Textures/gloss.jpg", TextureType::AOMap, 0); // ao
@@ -184,7 +166,7 @@ int main() {
     
     // Render::RenderMesh* r = new Render::RenderMesh();
     // r->addBuffers(pistolBuffers);
-    // Materials::Base* mat = new Materials::PBR({ 1 }, { 3 }, { 2 }, { 5 }, { 4 }); // new Materials::PBR({ 1 }, { 3 }, { 2 }, { 5 }, { 4 });
+    // Materials::Material* mat = new Materials::PBR({ 1 }, { 3 }, { 2 }, { 5 }, { 4 }); // new Materials::PBR({ 1 }, { 3 }, { 2 }, { 5 }, { 4 });
     // if (!PBRen) {
     //     mat = new Materials::Forward({ 1 }, { 2 }, { 3 }, 32);
     // }
@@ -196,7 +178,7 @@ int main() {
     
     Render::RenderMesh* cubeR = new Render::RenderMesh();
     cubeR->addBuffers(cubeBuffers);
-    Materials::Base* cubeMat = new Materials::PBR({ { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } });
+    Materials::Material* cubeMat = new Materials::PBR({ { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } });
     cubeR->setMaterial(cubeMat);
     
     GameObject* cube1 = new GameObject();
@@ -219,7 +201,7 @@ int main() {
     Render::RenderMesh* cubeR2 = new Render::RenderMesh();
     auto model = ResourceLoader::getModel("cube");
     cubeR2->addBuffers(model, GL_TRIANGLE_STRIP);
-    Materials::Base* cubeMat2 = new Materials::PBR({ { 0, 100, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } });
+    Materials::Material* cubeMat2 = new Materials::PBR({ { 0, 100, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } });
     cubeR2->setMaterial(cubeMat2);
     
     GameObject* cube2 = new GameObject();
@@ -244,7 +226,7 @@ int main() {
     Render::RenderMesh* cubeR3 = new Render::RenderMesh();
     model = ResourceLoader::getModel("cube");
     cubeR3->addBuffers(model, GL_TRIANGLE_STRIP);
-    Materials::Base* cubeMat3 = new Materials::PBR({ { 1, 1, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } });
+    Materials::Material* cubeMat3 = new Materials::PBR({ { 1, 1, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } });
     cubeR3->setMaterial(cubeMat3);
 
     GameObject* cube3 = new GameObject();
@@ -279,11 +261,6 @@ int main() {
     
     b.fill(4, value_ptr(lightSpaceMatrix));
     
-    short tick = 0;
-    float lastTime = glfwGetTime();
-    float deltaTime = 0;
-    unsigned fps = 0;
-    
     Primative::FrameBuffer* frameBuffer = new Primative::FrameBuffer({ "depth" }, { 800, 600 });
     Primative::MSAABuffer* finalQB = new Primative::MSAABuffer({ "col" }, { 800, 600 });
     unsigned sceneTex = finalQB->getTextureId("col0");
@@ -308,8 +285,7 @@ int main() {
     tb.setText("FPS: 1000");
     tb.setForgroundColor({ 0, 0, 0 });
     tb.setPos({ 115, 575 });
-    
-    // UI //
+
     
     // SOUNDS //
     SoundManager::init();
@@ -318,17 +294,13 @@ int main() {
         SoundManager::createSoundSource());
     audio->addBuffer(buffer);
     
-    Events::Handler::init(window);
-    glfwSetCursorPosCallback(window, mouse_callback);
+    Events::Handler::init(main.getWindow());
+    glfwSetCursorPosCallback(main.getWindow(), mouse_callback);
         
     // Physics::CollisionDetection::setBroadphase(new Physics::NSquared
     Physics::CollisionDetection::setBroadphase<Physics::NSquared>();
     Physics::CollisionDetection::setNarrowphase< Physics::SAT3D>();
     Physics::Engine::setResolution<Physics::ImpulseBased>();
-
-    unsigned frameCounter = 0;
-    unsigned fps_count = 0;
-    const unsigned smapleRate = 10;
 
     // Physics::Constraints::ConstraintsSolver::addConstraint<Physics::Constraints::DistanceConstraint>(rb1, rb2, Utils::fill(0.5f), Utils::fill(-0.5f), 1.0f);
     
@@ -337,37 +309,22 @@ int main() {
     cube2->getTransform()->Position = { 0.5, 5, -5 };
     cube2->getRigidbody()->hasGravity = true;
     //cube2->getRigidbody()->velocityAdder({ 1, -1, 0 });
-    while (!glfwWindowShouldClose(window))
+    while (!main.shouldClose())
     {
         // FPS--------------------------------------------------------------------------------------------------------------------------------------------------
-        float currentTime = glfwGetTime();
-        deltaTime = currentTime - lastTime;
-        fps = 1.0f / deltaTime;
-        fps_count += fps;
-        lastTime = currentTime;
-        if (frameCounter >= smapleRate) {
-            tb.setText("FPS: " + std::to_string(fps_count / frameCounter));
-            frameCounter = 0;
-            fps_count = 0;
 
-            const float w = tb.getWidth() / 2.0f;
-            const glm::vec2& p = tb.getPos();
-            const float diff = p.x - w;
-            if (diff < 5) {
-                tb.setPos({ p.x + diff, p.y });
-            }
-            else {
-                tb.setPos({ p.x - diff, p.y });
-            }
-        }
-        frameCounter++;
-        // std::cout << fps << std::endl; // FPS Count
+        tb.setText("FPS: " + std::to_string(main.getTime().avgFPS));
+        const float w = tb.getWidth() / 2.0f;
+        const glm::vec2& p = tb.getPos();
+        float diff = p.x - w; // left edge
+        diff = 5 - diff;
+        tb.setPos({ p.x + diff, p.y });
 
         // UPDATES----------------------------------------------------------------------------------------------------------------------------------------------
         scene.updateScene();
 
         // RENDERING--------------------------------------------------------------------------------------------------------------------------------------------
-        glDisable(GL_CULL_FACE);
+        main.disable(GL_CULL_FACE);
         b.fill(0, value_ptr(cam.getView()));
         b.fill(2, value_ptr(cam.getPos())); 
     
@@ -383,10 +340,10 @@ int main() {
     
         // EVENTS-----------------------------------------------------------------------------------------------------------------------------------------------
         if (Events::Handler::getKey(Events::Key::W, Events::Action::Down)) {
-            cam.setPos(cam.getPos() + cam.getForward() * deltaTime);
+            cam.setPos(cam.getPos() + cam.getForward() * main.getTime().deltaTime);
         }
         if (Events::Handler::getKey(Events::Key::S, Events::Action::Down)) {
-            cam.setPos(cam.getPos() - cam.getForward() * deltaTime);
+            cam.setPos(cam.getPos() - cam.getForward() * main.getTime().deltaTime);
         }
         if (Events::Handler::getKey(Events::Key::Escape, Events::Action::Down)) {
             break;
@@ -396,8 +353,11 @@ int main() {
         }
         // COLOR BUFFERS----------------------------------------------------------------------------------------------------------------------------------------
         // sound->update();
-        glfwSwapInterval(1); // V-SYNC
-        glfwSwapBuffers(window);
+
+        // glfwSwapInterval(1); // V-SYNC
+        //glfwSwapBuffers(window);
+        main.update();
+
         Events::Handler::pollEvents();
     }
     Render::Shading::Manager::cleanUp(); // deactivats shdaer

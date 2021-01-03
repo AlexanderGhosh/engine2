@@ -176,6 +176,9 @@ void ResourceLoader::cleanUp()
         item.cleanUp();
     }
     buffers.clear();
+    for (auto& m : models) {
+        m.second.clear();
+    }
     models.clear();
 }
 
@@ -199,7 +202,6 @@ const std::vector<Primative::VertexBuffer*> ResourceLoader::processMeshData(std:
 
 const std::vector<Primative::VertexBuffer*> ResourceLoader::createModel(const std::string& filePath, GLenum draw_type)
 {
-    std::vector<Primative::VertexBuffer*> res;
     std::vector<Primative::Mesh*> data = FileReaders::AssimpWrapper::loadModel(filePath);
     const std::string name = Utils::getFileName(filePath, 1);
     return processMeshData(data, name, draw_type);

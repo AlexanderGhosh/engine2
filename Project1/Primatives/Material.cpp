@@ -10,10 +10,14 @@ void Materials::MatItem::operator()(const unsigned& id)
 	this->setId(id);
 }
 
-Materials::Forward::Forward(const MatItem& diffuse, const MatItem& specular, const MatItem& normal, float shininess) :
-	diff_spec_norm{ diffuse, specular, normal }, shininess(shininess), Base()
+void Materials::MatItem::cleanUp()
 {
-	Base::type = Materials::Type::Forward;
+}
+
+Materials::Forward::Forward(const MatItem& diffuse, const MatItem& specular, const MatItem& normal, float shininess) :
+	diff_spec_norm{ diffuse, specular, normal }, shininess(shininess), Material()
+{
+	Material::type = Materials::Type::Forward;
 }
 
 void Materials::Forward::activateTextures() const
@@ -26,10 +30,14 @@ void Materials::Forward::activateTextures() const
 	}
 }
 
-Materials::PBR::PBR(const MatItem& albedo, const MatItem& normal, const MatItem& metalic, const MatItem& roughness, const MatItem& ao) :
-	albedo(albedo), normal(normal), metalic(metalic), roughness(roughness), ao(ao), Base()
+void Materials::Forward::cleanUp()
 {
-	Base::type = Materials::Type::PBR;
+}
+
+Materials::PBR::PBR(const MatItem& albedo, const MatItem& normal, const MatItem& metalic, const MatItem& roughness, const MatItem& ao) :
+	albedo(albedo), normal(normal), metalic(metalic), roughness(roughness), ao(ao), Material()
+{
+	Material::type = Materials::Type::PBR;
 }
 
 void Materials::PBR::activateTextures() const
@@ -40,4 +48,8 @@ void Materials::PBR::activateTextures() const
 		glActiveTexture(GL_TEXTURE0 + i++);
 		glBindTexture(GL_TEXTURE_2D, item.getId());
 	}
+}
+
+void Materials::PBR::cleanUp()
+{
 }

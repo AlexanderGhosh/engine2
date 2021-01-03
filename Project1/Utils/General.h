@@ -404,3 +404,4 @@ inline const Utils::BigMaths::Vector12 operator +(const Utils::BigMaths::Vector1
 inline const Utils::BigMaths::Vector12 operator /(const Utils::BigMaths::Vector12& a, const float& b) {
     return a * (1.0f / b);
 }
+
