@@ -58,10 +58,9 @@ bool Context::shouldClose() const
 
 void Context::cleanUp()
 {
-	delete window;
+    glfwMakeContextCurrent(nullptr);
+    glfwTerminate();
 	window = nullptr;
-
-    delete this;
 }
 
 void Context::remove()

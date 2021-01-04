@@ -1,7 +1,11 @@
 #include "NSquared.h"
 #include "../../../Componets/RigidBody.h"
 #include <algorithm>
-const Physics::ColliderPairList& Physics::NSquared::computePairs()
+Physics::NSquared::NSquared() : Broadphase()
+{
+    pairs = std::vector<std::array<Physics::Collider*, 2>>();
+}
+const ColliderPairList& Physics::NSquared::computePairs()
 {
     pairs.clear();
 
@@ -19,7 +23,7 @@ const Physics::ColliderPairList& Physics::NSquared::computePairs()
                 continue;
                 // add collider pair
             if (CollisionDetection::checkCollision(aabbA, aabbB))
-                pairs.emplace_back(*i, *j);
+                pairs.push_back({ *i, *j });
 
         }
     }
@@ -101,4 +105,19 @@ Physics::RayCastResult Physics::NSquared::rayCast(const Ray3& ray) const
         result.hit = false;
 
     return result;*/
+}
+
+void Physics::NSquared::cleanUp()
+{
+    Broadphase::cleanUp();
+    for (auto itt = pairs.begin(); itt != pairs.end();) {
+        for (char i = 0; i < 2; i++) {
+            (*itt)[i]->cleanUp();
+            delete (*itt)[i];
+        }
+        delete[2] (*itt).data();
+        itt = pairs.erase(itt);
+    }
+    auto t = sizeof(pairs);
+    pairs.clear();
 }

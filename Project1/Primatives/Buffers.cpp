@@ -284,7 +284,7 @@ Primative::SoundBuffer::SoundBuffer(const char* soundData, const int& len, const
 	}
 
 	alBufferData(SBO, format, soundData, len, sampleRate);
-
+	delete soundData;
 }
 
 void Primative::SoundBuffer::cleanUp()

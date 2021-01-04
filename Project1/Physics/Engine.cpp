@@ -42,6 +42,12 @@ void Physics::Engine::update()
 
 void Physics::Engine::cleanUp()
 {
+	CollisionDetection::cleanUp();
+	if (resolution) {
+		resolution->cleanUp();
+		delete resolution;
+		resolution = nullptr;
+	}
 	rigidbodies.clear();
 	colliders.clear();
 }

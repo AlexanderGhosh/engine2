@@ -13,6 +13,8 @@ namespace Materials {
 		virtual void activateTextures() const { };
 		inline const Materials::Type& getType() const { return type; };
 		virtual void cleanUp() = 0;
+		Material() : type() { };
+		virtual ~Material() = default;
 	};
 	class MatItem {
 	private:

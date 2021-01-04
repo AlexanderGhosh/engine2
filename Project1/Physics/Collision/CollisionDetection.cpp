@@ -19,9 +19,9 @@ const std::vector<Physics::CollisionManfold> Physics::CollisionDetection::getCol
     std::vector<CollisionManfold> res;
     const auto& pairs = broadphase->computePairs();
     for (const auto& pair : pairs) {
-        if ((unsigned)pair.first - (unsigned)pair.second == 0)
+        if ((unsigned)pair[0] - (unsigned)pair[1] == 0)
             continue;
-        CollisionManfold t = narrowphase->getCollisionData(pair.first, pair.second);
+        CollisionManfold t = narrowphase->getCollisionData(pair[0], pair[1]);
         if (!t.collided)
             continue;
         res.push_back(t);
@@ -54,13 +54,17 @@ Physics::CollisionManfold Physics::CollisionDetection::getCollisionData(AABB* a,
 
 void Physics::CollisionDetection::cleanUp()
 {
-    broadphase->cleanUp();
-    delete broadphase;
-    broadphase = nullptr;
+    if (broadphase) {
+        broadphase->cleanUp();
+        delete broadphase;
+        broadphase = nullptr;
+    }
 
-    narrowphase->cleanUp();
-    delete narrowphase;
-    narrowphase = nullptr;
+    if (narrowphase) {
+        narrowphase->cleanUp();
+        delete narrowphase;
+        narrowphase = nullptr;
+    }
 }
 
 float Physics::CollisionManfold::getRestitution() const

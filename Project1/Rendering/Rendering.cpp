@@ -54,7 +54,7 @@ void Render::RenderMesh::cleanUp() {
 		itt = buffers.erase(itt);
 	}
 	material->cleanUp();
-	delete material;
+	// delete material;
 	material = nullptr;
 }
 

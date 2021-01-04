@@ -12,10 +12,10 @@ namespace Physics {
 		inline Collider* getCollider() { return reinterpret_cast<Collider*>(this); };
 		virtual const AABB* constructAABB() { return nullptr; };
 		inline Component::Type getType() const { return Component::Type::Collider; };
-		// inline void cleanUp() { };
 		virtual glm::vec3 support(const glm::vec3& direction) const = 0;
 		void setParent(GameObject* parent);
-		void cleanUp() {};
+		void cleanUp();
+		virtual ~Collider() = default;
 		glm::vec3* position;
 		glm::quat* rotation;
 		glm::vec3* scale;
@@ -36,6 +36,7 @@ namespace Physics {
 			this->mass = mass; 
 			localCentroid = centerOfMass;
 		};
+		virtual ~AABB() = default;
 		void setParent(GameObject* parent) {
 			Collider::setParent(parent);
 			createInertiaTensor();
@@ -60,7 +61,8 @@ namespace Physics {
 	public:
 		const AABB* constructAABB();
 		glm::vec3 support(const glm::vec3& direction) const;
-		inline BoxCollider(const float& mass, const glm::vec3& centerOfMass, bool add = true) : AABB(mass, centerOfMass, add), aabb(false), hi(0) { };
+		inline BoxCollider(const float& mass, const glm::vec3& centerOfMass, bool add = true) : AABB(mass, centerOfMass, add), aabb(false), hi(0) { }; 
+		virtual ~BoxCollider() = default;
 		void update() {
 			int i = 0;
 		}
@@ -75,6 +77,7 @@ namespace Physics {
 		char faceSize;
 		ColliderSAT() : vertices(), indices(), normals(), cachedNormal(), faceSize(3) { };
 	public:
+		virtual ~ColliderSAT() = default;
 		virtual void cleanUp() {
 			vertices.clear();
 			indices.clear();
@@ -151,8 +154,11 @@ namespace Physics {
 		virtual std::list<std::list<glm::vec3>> getAdjacentFaces(std::list<glm::vec3>& face) const;
 	};
 	class BoxColliderSAT : public ColliderSAT {
+	private:
+		AABB aabb;
 	public:
-		BoxColliderSAT(const float& mass) : ColliderSAT(){
+		~BoxColliderSAT() = default;
+		BoxColliderSAT(const float& mass) : ColliderSAT(), aabb(false) {
 			this->mass = mass;
 			faceSize = 4;
 			vertices = {

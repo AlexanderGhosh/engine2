@@ -4,9 +4,9 @@
 #include <unordered_map>
 #include <list>
 namespace Physics {
-    typedef std::pair<Collider*, Collider*> ColliderPair;
-    typedef std::list<ColliderPair> ColliderPairList;
-    typedef std::vector<Collider*> ColliderList;
+#define ColliderPair std::pair<Physics::Collider*, Physics::Collider*>
+#define ColliderPairList std::vector<std::array<Physics::Collider*, 2>>
+#define ColliderList std::vector<Physics::Collider*> 
     struct Ray3 {
         glm::vec3 pos, dir;
         inline Ray3() : pos(0), dir(0) { };
@@ -21,6 +21,7 @@ namespace Physics {
     };
     class Broadphase {
     public:
+        virtual ~Broadphase() = default;
         // adds a DBG_NEW AABB to the broadphase
         virtual void add(AABB* aabb) = 0;
 
@@ -42,7 +43,7 @@ namespace Physics {
         // result contains null if no collider is hit
         virtual RayCastResult rayCast(const Ray3& ray) const = 0;
 
-        virtual void cleanUp() { };
+        virtual void cleanUp();
         std::vector<Collider*>* colliders;
     protected:
         Broadphase();

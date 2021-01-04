@@ -65,7 +65,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
 int main() {
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-
+    // _crtBreakAlloc = 6157;
     Context main({ 800, 600 }, true);
     main.init("Engine 2", { GL_DEPTH_TEST, GL_CULL_FACE, GL_MULTISAMPLE });
 
@@ -165,46 +165,46 @@ int main() {
     // gun->getTransform()->Position = { 0, 0, 0 };
     // gun->addComponet(r);
     
-    Render::RenderMesh* cubeR = DBG_NEW Render::RenderMesh();
-    cubeR->addBuffers(cubeBuffers);
-    Materials::Material* cubeMat = DBG_NEW Materials::PBR({ { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } });
-    cubeR->setMaterial(cubeMat);
+    Render::RenderMesh cubeR = Render::RenderMesh();
+    cubeR.addBuffers(cubeBuffers);
+    Materials::PBR cubeMat = Materials::PBR({ { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } });
+    cubeR.setMaterial(&cubeMat);
     
     GameObject* cube1 = DBG_NEW GameObject();
     cube1->getTransform()->Position = { 0, 0, -5 };
-    cube1->addComponet(cubeR);
+    cube1->addComponet(&cubeR);
     
-    Physics::BoxColliderSAT* collider1 = DBG_NEW Physics::BoxColliderSAT(10);
-    cube1->addComponet(collider1);
+    Physics::BoxColliderSAT collider1 = Physics::BoxColliderSAT(10);
+    cube1->addComponet(&collider1);
     
-    Component::RigidBody* rb1 = DBG_NEW Component::RigidBody();
-    rb1->isKinimatic = true;
-    rb1->hasGravity = false;
-    cube1->addComponet(rb1);
+    Component::RigidBody rb1 = Component::RigidBody();
+    rb1.isKinimatic = true;
+    rb1.hasGravity = false;
+    cube1->addComponet(&rb1);
     
     //Physics::Constraint* constraint = DBG_NEW Physics::Constraint();
     //cube1->getRigidbody()->addConstriant(constraint);
     // cube1->getRigidbody()->getMass() = 1.66;
     
     
-    Render::RenderMesh* cubeR2 = DBG_NEW Render::RenderMesh();
+    Render::RenderMesh cubeR2 = Render::RenderMesh();
     auto model = ResourceLoader::getModel("cube");
-    cubeR2->addBuffers(model, GL_TRIANGLE_STRIP);
-    Materials::Material* cubeMat2 = DBG_NEW Materials::PBR({ { 0, 100, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } });
-    cubeR2->setMaterial(cubeMat2);
+    cubeR2.addBuffers(model, GL_TRIANGLE_STRIP);
+    Materials::PBR cubeMat2 = Materials::PBR({ { 0, 100, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } });
+    cubeR2.setMaterial(&cubeMat2);
     
     GameObject* cube2 = DBG_NEW GameObject();
     cube2->getTransform()->Position = { 5, 5, -5 };
     cube2->getTransform()->Rotation *= glm::quat({ 0, 0, 0 });
-    cube2->addComponet(cubeR2);
+    cube2->addComponet(&cubeR2);
     
-    Physics::BoxColliderSAT* collider2 = DBG_NEW Physics::BoxColliderSAT(10);
-    cube2->addComponet(collider2);
+    Physics::BoxColliderSAT collider2 = Physics::BoxColliderSAT(10);
+    cube2->addComponet(&collider2);
     
-    Component::RigidBody* rb2 = DBG_NEW Component::RigidBody();
-    cube2->addComponet(rb2);
+    Component::RigidBody rb2 = Component::RigidBody();
+    cube2->addComponet(&rb2);
     //rb2->isKinimatic = true;
-    rb2->hasGravity = false;
+    rb2.hasGravity = false;
     
     //cube2->getRigidbody()->addConstriant(constraint);
 
@@ -212,16 +212,16 @@ int main() {
     // cube2->getRigidbody()->getMass() = 1.66;
 
 
-    Render::RenderMesh* cubeR3 = DBG_NEW Render::RenderMesh();
+    Render::RenderMesh cubeR3 = Render::RenderMesh();
     model = ResourceLoader::getModel("cube");
-    cubeR3->addBuffers(model, GL_TRIANGLE_STRIP);
-    Materials::Material* cubeMat3 = DBG_NEW Materials::PBR({ { 1, 1, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } });
-    cubeR3->setMaterial(cubeMat3);
+    cubeR3.addBuffers(model, GL_TRIANGLE_STRIP);
+    Materials::PBR cubeMat3 = Materials::PBR({ { 1, 1, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } });
+    cubeR3.setMaterial(&cubeMat3);
 
     GameObject* cube3 = DBG_NEW GameObject();
     cube3->getTransform()->Position = { 0, 5, -5 };
     cube3->getTransform()->Scale *= 0.5f;
-    cube3->addComponet(cubeR3);
+    cube3->addComponet(&cubeR3);
 
     // std::cout << glm::to_string(s1) << " : " << glm::to_string(s2) << std::endl;
     
@@ -286,10 +286,9 @@ int main() {
     Events::Handler::init(main.getWindow());
     glfwSetCursorPosCallback(main.getWindow(), mouse_callback);
         
-    // Physics::CollisionDetection::setBroadphase(DBG_NEW Physics::NSquared
-    Physics::CollisionDetection::setBroadphase<Physics::NSquared>();
+    Physics::CollisionDetection::setBroadphase<Physics::NSquared>();//
     Physics::CollisionDetection::setNarrowphase< Physics::SAT3D>();
-    Physics::Engine::setResolution<Physics::ImpulseBased>();
+    Physics::Engine::setResponse<Physics::ImpulseBased>();
 
     // Physics::Constraints::ConstraintsSolver::addConstraint<Physics::Constraints::DistanceConstraint>(rb1, rb2, Utils::fill(0.5f), Utils::fill(-0.5f), 1.0f);
     
@@ -350,6 +349,7 @@ int main() {
         Events::Handler::pollEvents();
     }
     Render::Shading::Manager::cleanUp(); // deactivats shdaer
+    Physics::Engine::cleanUp();
     
     audio->cleanUp();
     delete audio;
@@ -366,7 +366,6 @@ int main() {
     ResourceLoader::cleanUp(); // destroys textures shaders and models(buffers)
     
     
-    glfwMakeContextCurrent(nullptr);
-    glfwTerminate();
+    main.cleanUp();
     return 0;
 }

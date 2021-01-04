@@ -17,6 +17,7 @@ namespace Component {
 		virtual void setParent(GameObject* parent) { this->parent = parent; };
 		inline GameObject* getParent() { return parent; };
 		virtual inline Type getType() const = 0;
+		virtual ~Base() = default;
 	protected:
 		inline Base() : parent(nullptr) { };
 		GameObject* parent;

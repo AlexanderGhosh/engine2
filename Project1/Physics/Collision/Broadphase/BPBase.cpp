@@ -1,6 +1,13 @@
 #include "Base.h"
 #include "../../Engine.h"
 
-Physics::Broadphase::Broadphase() : colliders(&Engine::getColliders())
+void Physics::Broadphase::cleanUp()
 {
+	colliders->clear();
 }
+
+Physics::Broadphase::Broadphase(){
+	colliders = &Engine::getColliders();
+}
+
+

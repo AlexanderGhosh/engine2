@@ -33,6 +33,13 @@ void Physics::Collider::setParent(GameObject* parent)
 	scale = &t->Scale;
 }
 
+void Physics::Collider::cleanUp()
+{
+	position = nullptr;
+	rotation = nullptr;
+	scale = nullptr;
+}
+
 Physics::Collider::Collider(bool add) : mass(10), localCentroid(0), localInertiaTensor(0), position(nullptr), scale(nullptr), rotation(nullptr) {
 	if(add)
 		Engine::addCollider(this);
@@ -114,7 +121,11 @@ const Physics::AABB* Physics::BoxColliderSAT::constructAABB()
 			}
 		}
 	}
-	return DBG_NEW AABB(min - *position, max - *position, false, parent);
+	aabb.setMin(min - *position);
+	aabb.setMax(max - *position);
+	aabb.setParent(this->getParent());
+	// return DBG_NEW AABB(min - *position, max - *position, false, parent); // memory leak
+	return &aabb;
 }
 
 std::list<glm::vec3> Physics::ColliderSAT::getAllFaces(const glm::vec3& vertex, bool localSpace, bool getIndices) const

@@ -69,11 +69,16 @@ T* GameObject::getComponet()
 
 void GameObject::cleanUp()
 {
-	for (Component::Base*& componet : componets) {
+	for (auto itt = componets.begin(); itt != componets.end();) {
+		(*itt)->cleanUp();
+		// delete* itt;
+		itt = componets.erase(itt);
+	}
+	/*for (Component::Base*& componet : componets) {
 		componet->cleanUp();
 		delete componet;
 		componet = nullptr;
-	}
+	}*/
 	componets.clear();
 	transform->cleanUp();
 	delete transform;

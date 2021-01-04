@@ -32,7 +32,10 @@ namespace Physics {
     public:
         static const std::vector<CollisionManfold> getCollisions();
         template<class T>
-        static inline void setBroadphase() { broadphase = DBG_NEW T(); };
+        static inline void setBroadphase() 
+        { 
+            broadphase = DBG_NEW T(); 
+        };
         template<class T>
         static inline void setNarrowphase() { narrowphase = DBG_NEW T(); };
         static bool checkCollision(const AABB* a, const AABB* b);
