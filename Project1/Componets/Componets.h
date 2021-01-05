@@ -7,9 +7,9 @@ class GameObject;
 namespace Component {
 	enum class Type
 	{
-		Transform, Camera, AudioSource, Rigidbody, Collider, RenderMesh
+		Transform, Camera, AudioSource, Rigidbody, Collider, RenderMesh, Light
 	};
-	class Base {
+	class ComponetBase {
 	public:
 		virtual void update() { }; // every tick
 		virtual void fixedUpdate() { }; // every x ticks
@@ -17,17 +17,17 @@ namespace Component {
 		virtual void setParent(GameObject* parent) { this->parent = parent; };
 		inline GameObject* getParent() { return parent; };
 		virtual inline Type getType() const = 0;
-		virtual ~Base() = default;
+		virtual ~ComponetBase() = default;
 	protected:
-		inline Base() : parent(nullptr) { };
+		inline ComponetBase() : parent(nullptr) { };
 		GameObject* parent;
 	};
 
-	struct Transform : public Base {
+	struct Transform : public ComponetBase {
 		glm::vec3 Position, Scale;
 		glm::quat Rotation;
 		const glm::mat4 getModel() const;
-		inline Transform(glm::vec3 p = Utils::zero(), glm::vec3 s = Utils::fill(1), glm::vec3 r = Utils::zero()) : Position(p), Scale(s), Rotation(r), Base() { };
+		inline Transform(glm::vec3 p = Utils::zero(), glm::vec3 s = Utils::fill(1), glm::vec3 r = Utils::zero()) : Position(p), Scale(s), Rotation(r), ComponetBase() { };
 		inline Type getType() const { return Type::Transform; };
 		void cleanUp() { };
 	};

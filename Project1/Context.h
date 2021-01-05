@@ -31,7 +31,7 @@ private:
 	short fpsLim;
 	Time time;
 public:
-	Context(const svec2& dim, const bool vsync, short fpsLim = -1);
+	Context(const svec2& dim, const bool vsync, short fpsLim = 0);
 
 	void init(const std::string& name, std::list<long> enable);
 	void enable(long a) const;

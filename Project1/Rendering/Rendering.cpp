@@ -4,7 +4,7 @@
 #include "../Componets/Componets.h"
 #include "../GameObject/GameObject.h"
 
-Render::RenderMesh::RenderMesh() : buffers(), parent(nullptr), material(), Component::Base()
+Render::RenderMesh::RenderMesh() : buffers(), parent(nullptr), material(), Component::ComponetBase()
 {
 	/*Materials::Forward* fwd = DBG_NEW Materials::Forward();
 	fwd->getDiffuse()(1); // set to the texture id
@@ -26,7 +26,7 @@ Render::RenderMesh::RenderMesh() : buffers(), parent(nullptr), material(), Compo
 
 void Render::RenderMesh::update()
 {
-	const glm::mat4 m = Component::Base::parent->getTransform()->getModel();
+	const glm::mat4 m = Component::ComponetBase::parent->getTransform()->getModel();
 	bool succ = Shading::Manager::setValue("model", m);
 	if(this->material->getType() == Materials::Type::Forward)
 		succ = Shading::Manager::setValue("material", *dynamic_cast<Materials::Forward*>(this->material));

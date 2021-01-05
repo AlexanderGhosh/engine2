@@ -10,14 +10,16 @@ private:
 	std::unordered_map<std::string, unsigned> preProcessingLayers;
 	unsigned currentTick, postProcShaderId;
 	std::unordered_map<std::string, Primative::FrameBuffer*> FBOs;
+	glm::vec3 backgroundColour;
 	inline void clearFBO() const {
-		glClearColor(0.5, 0.5, 0.5, 1);
+		glClearColor(backgroundColour.x, backgroundColour.y, backgroundColour.z, 1);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 	void renderObjects(); // just moved
 public:
-	inline GameScene() : objects(), preProcessingLayers(), currentTick(0), postProcShaderId(0), FBOs() { };
+	inline GameScene() : objects(), preProcessingLayers(), currentTick(0), postProcShaderId(0), FBOs(), backgroundColour(0) { };
 	inline void addObject(GameObject*& obj) { objects.push_back(obj); };
+	inline void setBG(Vector3 col) { backgroundColour = col; };
 	void preProcess();
 	void postProcess();
 	void updateScene();

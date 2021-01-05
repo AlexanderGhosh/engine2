@@ -6,12 +6,12 @@
 class GameObject
 {
 private:
-	std::vector<Component::Base*> componets;
+	std::vector<Component::ComponetBase*> componets;
 	Component::Transform* transform;
 	std::vector<bool> enabled;
 public:
 	GameObject();
-	void addComponet(Component::Base* componet);
+	void addComponet(Component::ComponetBase* componet);
 	void tick(short currentTick);
 	void tryDraw();
 	inline Component::Transform* getTransform() const { return transform; };

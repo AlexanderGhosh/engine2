@@ -25,7 +25,7 @@ void GameScene::postProcess()
 	glBindFramebuffer(GL_FRAMEBUFFER, 0); // default fbo
 	clearFBO();
 	Render::Shading::Manager::setActive(postProcShaderId);
-	Render::Shading::Manager::setValue("depthMap", 3); // depth map
+	//Render::Shading::Manager::setValue("depthMap", 3); // depth map
 	/*glActiveTexture(GL_TEXTURE3);
 	glBindTexture(GL_TEXTURE, FBOs["shadows"]->getTextureId("depth"));*/
 

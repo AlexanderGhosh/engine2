@@ -7,7 +7,7 @@
 #include "../Componets/Componets.h"
 #include "../Primatives/Material.h"
 namespace Render {
-	class RenderMesh : public Animation::Animation, public Component::Base // special case of animation with only one frame
+	class RenderMesh : public Animation::Animation, public Component::ComponetBase // special case of animation with only one frame
 	{
 	public:
 		RenderMesh();
@@ -18,10 +18,10 @@ namespace Render {
 			return Component::Type::RenderMesh;
 		}
 		void cleanUp();
+		Materials::Material* material;
 	private:
 		std::vector<Primative::VertexBuffer*> buffers;
 		GameObject* parent;
-		Materials::Material* material;
 	};
 }
 

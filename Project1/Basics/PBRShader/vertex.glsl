@@ -22,12 +22,11 @@ out VS_OUT{
 uniform mat4 model;
 
 void main() {
-    vs_out.worldPos = vec3(model * vec4(pos, 1));
-	
     gl_Position = projection * view * model * vec4(pos, 1);
 
-    vs_out.normals = mat3(model) * norm;
 
+    vs_out.worldPos = vec3(model * vec4(pos, 1));
+    vs_out.normals = mat3(model) * norm;
     vs_out.camPos = viewPosition;
     vs_out.texCoords = tex;
 }

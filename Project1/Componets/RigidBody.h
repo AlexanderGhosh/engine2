@@ -5,7 +5,7 @@ namespace Physics {
 }
 namespace Component {
 	struct Transform;
-	class RigidBody : public Base
+	class RigidBody : public ComponetBase
 	{
 	private:
 		Transform* transform;

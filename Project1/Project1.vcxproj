@@ -189,6 +189,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Context.h" />
+    <ClInclude Include="Componets\Lights\LightBase.h" />
     <ClInclude Include="Physics\ConstraintEngine\Constraints\ContactConstraint.h" />
     <ClInclude Include="Physics\ConstraintEngine\ConstraitnsSolver.h" />
     <ClInclude Include="Physics\Resolution\ImpulseBased.h" />

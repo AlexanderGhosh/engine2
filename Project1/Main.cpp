@@ -66,7 +66,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 int main() {
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
     // _crtBreakAlloc = 6157;
-    Context main({ 800, 600 }, true);
+    Context main({ 800, 600 }, false);
     main.init("Engine 2", { GL_DEPTH_TEST, GL_CULL_FACE, GL_MULTISAMPLE });
 
     cam.setPos({ 0, 0, 0 }); // 200, 700
@@ -76,36 +76,7 @@ int main() {
     ResourceLoader::createShader("Basics/PBRShader");
     ResourceLoader::createShader("Basics/UIShader");
     ResourceLoader::createShader("Basics/TextShader");
-    // cube1
-    Primative::Mesh* cubeMesh = DBG_NEW Primative::Mesh();
-    Primative::Vertex v1({ -0.5, -0.5, -0.5 }, { 0, 0 });
-    Primative::Vertex v2({ 0.5, -0.5, -0.5 }, { 1, 0 });
-    Primative::Vertex v3({ 0.5, 0.5, -0.5 }, { 1, 1 });
-    Primative::Vertex v4({ -0.5, 0.5, -0.5 }, { 0, 1 });
-    Primative::Vertex v5({ -0.5, -0.5, 0.5 }, { 0, 0 });
-    Primative::Vertex v6({ 0.5, -0.5, 0.5 }, { 1, 0 });
-    Primative::Vertex v7({ 0.5, 0.5, 0.5 }, { 1, 1 });
-    Primative::Vertex v8({ -0.5, 0.5, 0.5 }, { 0, 1 });
-    
-    cubeMesh->verts.push_back(v1);
-    cubeMesh->verts.push_back(v2);
-    cubeMesh->verts.push_back(v3);
-    cubeMesh->verts.push_back(v4);
-    cubeMesh->verts.push_back(v5);
-    cubeMesh->verts.push_back(v6);
-    cubeMesh->verts.push_back(v7);
-    cubeMesh->verts.push_back(v8);
-    
-    cubeMesh->indices = {
-        0, 1, 3, 3, 1, 2,
-        1, 5, 2, 2, 5, 6,
-        5, 4, 6, 6, 4, 7,
-        4, 0, 7, 7, 0, 3,
-        3, 2, 7, 7, 2, 6,
-        4, 5, 0, 0, 5, 1
-    };
-    std::vector<Primative::VertexBuffer*> cubeBuffers = ResourceLoader::createModel(cubeMesh, "cube", GL_TRIANGLE_STRIP);
-    
+        
     // pyramid
     /*Primative::Mesh* m = DBG_NEW Primative::Mesh();
     Primative::Vertex v1({ -0.5, -0.5, -0.5 });
@@ -129,91 +100,56 @@ int main() {
         2, 4, 3
     };*/
     
-    // auto t = w.loadModel("C:/Users/AGWDW/Desktop/blend/Handgun_Game_Blender Gamer Engine.obj");
-    // auto t = w.loadModel("Basics/Models/sword.obj");
-    std::vector<Primative::VertexBuffer*> pistolBuffers = ResourceLoader::createModel("Basics/Models/pistol.obj");
-    // auto t = FileReaders::AssimpWrapper::loadModel("Basics/Models/pistol.obj");
-    
-    // ResourceLoader::createTexture("Basics/Textures/handgun_C.jpg", TextureType::DiffuseMap, 0); // diff
-    ResourceLoader::createTexture("Basics/Textures/handgun_S.jpg", TextureType::SpecularMap, 0); // spec
-    ResourceLoader::createTexture("Basics/Textures/handgun_N.jpg", TextureType::NormalMap, 0); // norm
-    
-    // ResourceLoader::createTexture("Basics/Textures/NazghulGreatsword_BaseColor.png", TextureType::AlbedoMap, 0); // albedo
-    ResourceLoader::createTexture("Basics/Textures/NazghulGreatsword_Metallic.png", TextureType::MetalicMap, 0); // metalic
-    ResourceLoader::createTexture("Basics/Textures/NazghulGreatsword_NormalOpenGL.png", TextureType::NormalMap, 0); // norm
-    ResourceLoader::createTexture("Basics/Textures/NazghulGreatsword_AmbientOcclusion.png", TextureType::AOMap, 0); // ao
-    ResourceLoader::createTexture("Basics/Textures/NazghulGreatsword_Roughness.png", TextureType::RoughnessMap, 0); // roughness
-    
-    ResourceLoader::createTexture("Basics/Textures/Base_color 1.jpg", TextureType::AlbedoMap, 0); // albedo
-    ResourceLoader::createTexture("Basics/Textures/metal.jpg", TextureType::MetalicMap, 0); // metalic
-    ResourceLoader::createTexture("Basics/Textures/handgun_N.jpg", TextureType::NormalMap, 0); // norm
-    ResourceLoader::createTexture("Basics/Textures/gloss.jpg", TextureType::AOMap, 0); // ao
-    ResourceLoader::createTexture("Basics/Textures/rough.jpg", TextureType::RoughnessMap, 0); // roughness
-    
-    
-    // unsigned tex = ResourceLoader::createTexture("Basics/Textures/wood.jpg", TextureType::DiffuseMap);
-    
-    // Render::RenderMesh* r = DBG_NEW Render::RenderMesh();
-    // r->addBuffers(pistolBuffers);
-    // Materials::Material* mat = DBG_NEW Materials::PBR({ 1 }, { 3 }, { 2 }, { 5 }, { 4 }); // DBG_NEW Materials::PBR({ 1 }, { 3 }, { 2 }, { 5 }, { 4 });
-    // if (!PBRen) {
-    //     mat = DBG_NEW Materials::Forward({ 1 }, { 2 }, { 3 }, 32);
-    // }
-    // r->setMaterial(mat);
-    
-    // GameObject* gun = DBG_NEW GameObject();
-    // gun->getTransform()->Position = { 0, 0, 0 };
-    // gun->addComponet(r);
-    
+    std::vector<Primative::VertexBuffer*> sphereBuffer = ResourceLoader::createModel("Basics/Models/sphere.obj");
+    std::vector<Primative::VertexBuffer*> cubeBuffer = ResourceLoader::createModel("Basics/Models/cube.obj");
+
+ 
+    const unsigned ba = ResourceLoader::createTexture("Basics/Textures/rust base.png", TextureType::AlbedoMap);
+    const unsigned r = ResourceLoader::createTexture("Basics/Textures/rust roughness.png", TextureType::RoughnessMap);
+    const unsigned m = ResourceLoader::createTexture("Basics/Textures/rust metalic.png", TextureType::MetalicMap);
+    const unsigned n = ResourceLoader::createTexture("Basics/Textures/rust normal.png", TextureType::NormalMap);
+
+        
     Render::RenderMesh cubeR = Render::RenderMesh();
-    cubeR.addBuffers(cubeBuffers);
-    Materials::PBR cubeMat = Materials::PBR({ { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } });
-    cubeR.setMaterial(&cubeMat);
+    cubeR.addBuffers(sphereBuffer);
+    Materials::PBR cubeMat1/* = Materials::PBR({ { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 0, 0, 0 } }, { { 0.15, 0, 0 } }, { { 0, 0, 0 } })*/;
+#define MI Materials::MatItem
+    cubeMat1 = Materials::PBR(MI(ba), MI(n), MI(m), MI(r), MI(Utils::xAxis(0.2)));
+    cubeR.setMaterial(&cubeMat1);
     
     GameObject* cube1 = DBG_NEW GameObject();
     cube1->getTransform()->Position = { 0, 0, -5 };
     cube1->addComponet(&cubeR);
     
-    Physics::BoxColliderSAT collider1 = Physics::BoxColliderSAT(10);
-    cube1->addComponet(&collider1);
-    
-    Component::RigidBody rb1 = Component::RigidBody();
-    rb1.isKinimatic = true;
-    rb1.hasGravity = false;
-    cube1->addComponet(&rb1);
-    
-    //Physics::Constraint* constraint = DBG_NEW Physics::Constraint();
-    //cube1->getRigidbody()->addConstriant(constraint);
-    // cube1->getRigidbody()->getMass() = 1.66;
+    // Physics::BoxColliderSAT collider1 = Physics::BoxColliderSAT(10);
+    // cube1->addComponet(&collider1);
+    // 
+    // Component::RigidBody rb1 = Component::RigidBody();
+    // rb1.isKinimatic = true;
+    // rb1.hasGravity = false;
+    // cube1->addComponet(&rb1);
     
     
     Render::RenderMesh cubeR2 = Render::RenderMesh();
-    auto model = ResourceLoader::getModel("cube");
-    cubeR2.addBuffers(model, GL_TRIANGLE_STRIP);
-    Materials::PBR cubeMat2 = Materials::PBR({ { 0, 100, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } });
-    cubeR2.setMaterial(&cubeMat2);
+    auto model = ResourceLoader::getModel("cube.obj");
+    cubeR2.addBuffers(model);
+    Materials::PBR cubeMat2 = Materials::PBR({ { 0, 1, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } });
+    cubeR2.setMaterial(&cubeMat1);
     
     GameObject* cube2 = DBG_NEW GameObject();
-    cube2->getTransform()->Position = { 5, 5, -5 };
-    cube2->getTransform()->Rotation *= glm::quat({ 0, 0, 0 });
+    cube2->getTransform()->Position = { 0, 1, -5 };
     cube2->addComponet(&cubeR2);
     
-    Physics::BoxColliderSAT collider2 = Physics::BoxColliderSAT(10);
-    cube2->addComponet(&collider2);
-    
-    Component::RigidBody rb2 = Component::RigidBody();
-    cube2->addComponet(&rb2);
-    //rb2->isKinimatic = true;
-    rb2.hasGravity = false;
-    
-    //cube2->getRigidbody()->addConstriant(constraint);
-
-    //cube2->getRigidbody()->isKinimatic = 0;
-    // cube2->getRigidbody()->getMass() = 1.66;
+    //Physics::BoxColliderSAT collider2 = Physics::BoxColliderSAT(10);
+    //cube2->addComponet(&collider2);
+    //
+    //Component::RigidBody rb2 = Component::RigidBody();
+    //cube2->addComponet(&rb2);
+    //rb2.hasGravity = false;
 
 
     Render::RenderMesh cubeR3 = Render::RenderMesh();
-    model = ResourceLoader::getModel("cube");
+    model = ResourceLoader::getModel("cube.obj");
     cubeR3.addBuffers(model, GL_TRIANGLE_STRIP);
     Materials::PBR cubeMat3 = Materials::PBR({ { 1, 1, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } });
     cubeR3.setMaterial(&cubeMat3);
@@ -250,21 +186,23 @@ int main() {
     
     b.fill(4, value_ptr(lightSpaceMatrix));
     
-    Primative::FrameBuffer* frameBuffer = DBG_NEW Primative::FrameBuffer({ "depth" }, { 800, 600 });
+    // Primative::FrameBuffer* frameBuffer = DBG_NEW Primative::FrameBuffer({ "depth" }, { 800, 600 });
     Primative::MSAABuffer* finalQB = DBG_NEW Primative::MSAABuffer({ "col" }, { 800, 600 });
-    unsigned sceneTex = finalQB->getTextureId("col0");
-    
+
     GameScene scene;
-    scene.addFBO("shadows", frameBuffer);
+    // scene.addFBO("shadows", frameBuffer);
     scene.addFBO("final", finalQB);
-    scene.addPreProcLayer("shadows", ResourceLoader::getShader("ShadowShader"));
+    // scene.addPreProcLayer("shadows", ResourceLoader::getShader("ShadowShader"));
     scene.addPreProcLayer("final", ResourceLoader::getShader(PBRen ? "PBRShader" : "DefaultShder"));
     scene.setPostProcShader(ResourceLoader::getShader(PBRen ? "PBRShader" : "DefaultShder")); // PBRShader
     // scene.addObject(gun);
     scene.addObject(cube1);
     scene.addObject(cube2);
     scene.addObject(cube3);
+
+    //scene.setBG({ 1, 1, 1 });
     
+
     // UI //
     UI::TextRenderer font = UI::TextRenderer({ 800, 600 }); // creates arial Font
     UI::TextRenderer::setShader(ResourceLoader::getShader("TextShader"));
@@ -272,30 +210,30 @@ int main() {
 
     UI::TextBlock tb = UI::TextBlock();
     tb.setText("FPS: 1000");
-    tb.setForgroundColor({ 0, 0, 0 });
+    tb.setForgroundColor({ 1, 1, 1 });
     tb.setPos({ 115, 575 });
 
-    
+
     // SOUNDS //
-    SoundManager::init();
-    const auto buffer = SoundManager::createBuffer("C:/Users/AGWDW/Desktop/iamtheprotectorofthissystem.wav");
-    Component::AudioSource* audio = DBG_NEW Component::AudioSource(
-        SoundManager::createSoundSource());
-    audio->addBuffer(buffer);
+   //SoundManager::init();
+   //const auto buffer = SoundManager::createBuffer("C:/Users/AGWDW/Desktop/iamtheprotectorofthissystem.wav");
+   //Component::AudioSource* audio = DBG_NEW Component::AudioSource(
+   //    SoundManager::createSoundSource());
+   //audio->addBuffer(buffer);
+    // SOUNDS //
     
     Events::Handler::init(main.getWindow());
     glfwSetCursorPosCallback(main.getWindow(), mouse_callback);
         
-    Physics::CollisionDetection::setBroadphase<Physics::NSquared>();//
+    Physics::CollisionDetection::setBroadphase<Physics::NSquared>();
     Physics::CollisionDetection::setNarrowphase< Physics::SAT3D>();
     Physics::Engine::setResponse<Physics::ImpulseBased>();
 
     // Physics::Constraints::ConstraintsSolver::addConstraint<Physics::Constraints::DistanceConstraint>(rb1, rb2, Utils::fill(0.5f), Utils::fill(-0.5f), 1.0f);
-    
     // Physics::Constraints::ConstraintsSolver::addConstraint(DBG_NEW Physics::Constraints::DistanceConstraint(rb1, rb2, Utils::fill(0), Utils::fill(0), 1.5f));
 
-    cube2->getTransform()->Position = { 0.5, 5, -5 };
-    cube2->getRigidbody()->hasGravity = true;
+    // cube2->getTransform()->Position = { 0.5, 5, -5 };
+    // cube2->getRigidbody()->hasGravity = true;
     //cube2->getRigidbody()->velocityAdder({ 1, -1, 0 });
     while (!main.shouldClose())
     {
@@ -327,17 +265,32 @@ int main() {
 
     
         // EVENTS-----------------------------------------------------------------------------------------------------------------------------------------------
+        float speed = 1;
+        if(Events::Handler::getCursor(Events::Cursor::Middle, Events::Action::Down)) {
+            speed = 2;
+        }
         if (Events::Handler::getKey(Events::Key::W, Events::Action::Down)) {
-            cam.setPos(cam.getPos() + cam.getForward() * main.getTime().deltaTime);
+            cam.setPos(cam.getPos() + cam.getForward() * glm::vec3(1, 0, 1) * main.getTime().deltaTime * speed);
         }
         if (Events::Handler::getKey(Events::Key::S, Events::Action::Down)) {
-            cam.setPos(cam.getPos() - cam.getForward() * main.getTime().deltaTime);
+            cam.setPos(cam.getPos() - cam.getForward() * glm::vec3(1, 0, 1) * main.getTime().deltaTime * speed);
         }
-        if (Events::Handler::getKey(Events::Key::Escape, Events::Action::Down)) {
-            break;
+        if (Events::Handler::getKey(Events::Key::A, Events::Action::Down)) {
+            cam.setPos(cam.getPos() - cam.getRight() * main.getTime().deltaTime * speed);
+        }
+        if (Events::Handler::getKey(Events::Key::D, Events::Action::Down)) {
+            cam.setPos(cam.getPos() + cam.getRight() * main.getTime().deltaTime * speed);
         }
         if (Events::Handler::getKey(Events::Key::Space, Events::Action::Down)) {
-            std::cout << glm::to_string(cube2->getRigidbody()->getInvInertia_G()) << std::endl;
+            cam.setPos(cam.getPos() + Utils::yAxis() * main.getTime().deltaTime * speed);
+        }
+        if (Events::Handler::getKey(Events::Key::L_Shift, Events::Action::Down)) {
+            cam.setPos(cam.getPos() - Utils::yAxis() * main.getTime().deltaTime * speed);
+        }
+
+
+        if (Events::Handler::getKey(Events::Key::Escape, Events::Action::Down)) {
+            break;
         }
         // COLOR BUFFERS----------------------------------------------------------------------------------------------------------------------------------------
         // sound->update();
@@ -351,9 +304,9 @@ int main() {
     Render::Shading::Manager::cleanUp(); // deactivats shdaer
     Physics::Engine::cleanUp();
     
-    audio->cleanUp();
-    delete audio;
-    audio = nullptr;
+    //audio->cleanUp();
+    //delete audio;
+    //audio = nullptr;
 
     // delete constraint;
     
