@@ -12,7 +12,7 @@ namespace Render {
 	public:
 		RenderMesh();
 		virtual void update();
-		void addBuffers(std::vector<Primative::VertexBuffer*>& buffers, const GLenum draw_type = GL_TRIANGLES);
+		void addBuffers(std::vector<unsigned>& buffers, const GLenum draw_type = GL_TRIANGLES);
 		inline void setMaterial(Materials::Material* mat) { material = mat; };
 		inline Component::Type getType() const {
 			return Component::Type::RenderMesh;
@@ -20,8 +20,8 @@ namespace Render {
 		void cleanUp();
 		Materials::Material* material;
 	private:
-		std::vector<Primative::VertexBuffer*> buffers;
-		GameObject* parent;
+		// index of buffer in the resorce loader
+		std::vector<unsigned> buffers;
 	};
 }
 

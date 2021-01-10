@@ -14,6 +14,7 @@
 #include "Utils/ResourceLoader.h"
 #include "GameObject/GameObject.h"
 #include "Scene/GameScene.h"
+#include "Scene/SkyBox.h"
 #include "Utils/AssimpWrapper.h"
 #include "UI/Renderer.h"
 #include "EventSystem/Handler.h"
@@ -67,7 +68,7 @@ int main() {
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
     // _crtBreakAlloc = 6157;
     Context main({ 800, 600 }, false);
-    main.init("Engine 2", { GL_DEPTH_TEST, GL_CULL_FACE, GL_MULTISAMPLE });
+    main.init("Engine 2", { GL_DEPTH_TEST, GL_CULL_FACE, GL_MULTISAMPLE, GL_TEXTURE_CUBE_MAP_SEAMLESS });
 
     cam.setPos({ 0, 0, 0 }); // 200, 700
     
@@ -101,13 +102,17 @@ int main() {
     };*/
     
     std::vector<Primative::VertexBuffer*> sphereBuffer = ResourceLoader::createModel("Basics/Models/sphere.obj");
-    std::vector<Primative::VertexBuffer*> cubeBuffer = ResourceLoader::createModel("Basics/Models/cube.obj");
+    std::vector<Primative::VertexBuffer*> cubeBuffer   = ResourceLoader::createModel("Basics/Models/cube.obj");
+    std::vector<Primative::VertexBuffer*> bsgModel = ResourceLoader::createModel("Basics/Models/bsg.obj");
 
  
-    const unsigned ba = ResourceLoader::createTexture("Basics/Textures/rust base.png", TextureType::AlbedoMap);
-    const unsigned r = ResourceLoader::createTexture("Basics/Textures/rust roughness.png", TextureType::RoughnessMap);
-    const unsigned m = ResourceLoader::createTexture("Basics/Textures/rust metalic.png", TextureType::MetalicMap);
-    const unsigned n = ResourceLoader::createTexture("Basics/Textures/rust normal.png", TextureType::NormalMap);
+    const unsigned ba   = ResourceLoader::createTexture("Basics/Textures/rust base.png",      TextureType::AlbedoMap);
+    const unsigned r    = ResourceLoader::createTexture("Basics/Textures/rust roughness.png", TextureType::RoughnessMap);
+    const unsigned m    = ResourceLoader::createTexture("Basics/Textures/rust metalic.png",   TextureType::MetalicMap);
+    const unsigned n    = ResourceLoader::createTexture("Basics/Textures/rust normal.png",    TextureType::NormalMap);
+    const unsigned hdr  = ResourceLoader::createCubeMap("Basics/Textures/Galaxy hdr", ".png", 0);
+    const unsigned ibl  = ResourceLoader::createCubeMap("Basics/Textures/Galaxy ibl", ".png", 0);
+    const unsigned brdf = ResourceLoader::createTexture("Basics/Textures/ibl brdf.png", TextureType::AlbedoMap, 0);
 
         
     Render::RenderMesh cubeR = Render::RenderMesh();
@@ -115,11 +120,14 @@ int main() {
     Materials::PBR cubeMat1/* = Materials::PBR({ { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 0, 0, 0 } }, { { 0.15, 0, 0 } }, { { 0, 0, 0 } })*/;
 #define MI Materials::MatItem
     cubeMat1 = Materials::PBR(MI(ba), MI(n), MI(m), MI(r), MI(Utils::xAxis(0.2)));
+    cubeMat1.setHDRmap(hdr);
+    cubeMat1.setIBLmap(ibl);
+    cubeMat1.setBRDFtex(brdf);
     cubeR.setMaterial(&cubeMat1);
     
-    GameObject* cube1 = DBG_NEW GameObject();
-    cube1->getTransform()->Position = { 0, 0, -5 };
-    cube1->addComponet(&cubeR);
+    GameObject cube1 = GameObject();
+    cube1.getTransform()->Position = { 0, 0, -5 };
+    cube1.addComponet(&cubeR);
     
     // Physics::BoxColliderSAT collider1 = Physics::BoxColliderSAT(10);
     // cube1->addComponet(&collider1);
@@ -131,14 +139,14 @@ int main() {
     
     
     Render::RenderMesh cubeR2 = Render::RenderMesh();
-    auto model = ResourceLoader::getModel("cube.obj");
+    auto model = ResourceLoader::getModel("sphere.obj");
     cubeR2.addBuffers(model);
-    Materials::PBR cubeMat2 = Materials::PBR({ { 0, 1, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } });
-    cubeR2.setMaterial(&cubeMat1);
+    Materials::PBR cubeMat2 = Materials::PBR({ { 0, 1, 1 } }, { { 1, 0, 0 } }, { { 0.5, 0, 0 } }, { { 0.2, 0, 0 } }, { { 0.5, 0, 0 } });
+    cubeR2.setMaterial(&cubeMat2);
     
-    GameObject* cube2 = DBG_NEW GameObject();
-    cube2->getTransform()->Position = { 0, 1, -5 };
-    cube2->addComponet(&cubeR2);
+    GameObject cube2 = GameObject();
+    cube2.getTransform()->Position = { 0, 1, -5 };
+    cube2.addComponet(&cubeR2);
     
     //Physics::BoxColliderSAT collider2 = Physics::BoxColliderSAT(10);
     //cube2->addComponet(&collider2);
@@ -148,16 +156,15 @@ int main() {
     //rb2.hasGravity = false;
 
 
-    Render::RenderMesh cubeR3 = Render::RenderMesh();
-    model = ResourceLoader::getModel("cube.obj");
-    cubeR3.addBuffers(model, GL_TRIANGLE_STRIP);
-    Materials::PBR cubeMat3 = Materials::PBR({ { 1, 1, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } });
-    cubeR3.setMaterial(&cubeMat3);
+    Render::RenderMesh bsgMesh = Render::RenderMesh();
+    bsgMesh.addBuffers(bsgModel);
+    Materials::PBR bsgMaterial = Materials::PBR({ { 1, 1, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } });
+    bsgMesh.setMaterial(&bsgMaterial);
 
-    GameObject* cube3 = DBG_NEW GameObject();
-    cube3->getTransform()->Position = { 0, 5, -5 };
-    cube3->getTransform()->Scale *= 0.5f;
-    cube3->addComponet(&cubeR3);
+    GameObject bsgObject = GameObject();
+    bsgObject.getTransform()->Position = { 0, 0, -5 };
+    bsgObject.getTransform()->Scale *= 0.5f;
+    bsgObject.addComponet(&bsgMesh);
 
     // std::cout << glm::to_string(s1) << " : " << glm::to_string(s2) << std::endl;
     
@@ -196,11 +203,17 @@ int main() {
     scene.addPreProcLayer("final", ResourceLoader::getShader(PBRen ? "PBRShader" : "DefaultShder"));
     scene.setPostProcShader(ResourceLoader::getShader(PBRen ? "PBRShader" : "DefaultShder")); // PBRShader
     // scene.addObject(gun);
-    scene.addObject(cube1);
-    scene.addObject(cube2);
-    scene.addObject(cube3);
+    scene.addObject(&cube1);
+    scene.addObject(&cube2);
+    scene.addObject(&bsgObject);
 
-    //scene.setBG({ 1, 1, 1 });
+    scene.setBG({ 1, 1, 1 });
+
+    // SKYBOX //
+    ResourceLoader::createCubeMap("Basics/Textures/Galaxy", ".png", 0);
+    SkyBox sb = SkyBox("Galaxy.cm");
+    //scene.setSkyBox(&sb);
+    // SKYBOX //
     
 
     // UI //

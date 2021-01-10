@@ -7,7 +7,8 @@
 #include "../Primatives/Buffers.h"
 enum class TextureType {
 	NormalMap, SpecularMap, DiffuseMap, HeightMap,
-	AlbedoMap, MetalicMap, AOMap, RoughnessMap
+	AlbedoMap, MetalicMap, AOMap, RoughnessMap,
+	CubeMap
 };
 class ResourceLoader
 {
@@ -16,12 +17,14 @@ public:
 	static const unsigned getShader(const std::string& name);
 
 	static const unsigned createTexture(const std::string& filePath, const TextureType type, const bool& flip = 1);
+	static const unsigned createCubeMap(const std::string& dirPath, const std::string& extension, const bool& flip = 1);
 	static const unsigned getTexture(const std::string& name);
 
 	static const std::vector<Primative::VertexBuffer*> createModel(const std::string& filePath, GLenum draw_type = GL_TRIANGLES);
-	static const std::vector<Primative::VertexBuffer*> createModel(Primative::Mesh* meshes, const std::string& name, GLenum draw_type = GL_TRIANGLES);
-	static const std::vector<Primative::VertexBuffer*> createModel(std::vector<Primative::Mesh*>& meshes, const std::string& name, GLenum draw_type = GL_TRIANGLES);
+	static const std::vector<Primative::VertexBuffer*> createModel(Primative::Mesh* meshes, const std::string& name, GLenum draw_type = GL_TRIANGLES, const bool deleteAble = true);
+	static const std::vector<Primative::VertexBuffer*> createModel(std::vector<Primative::Mesh*>& meshes, const std::string& name, GLenum draw_type = GL_TRIANGLES, const bool deleteAble = true);
 	static const std::vector<Primative::VertexBuffer*> getModel(const std::string& name);
+	static const Primative::VertexBuffer* getBuffer(const unsigned& index);
 
 	static void cleanUp();
 
@@ -31,6 +34,6 @@ private:
 	static std::list<Primative::VertexBuffer> buffers;
 	static std::unordered_map<std::string, std::vector<unsigned>> models;
 	static std::string defaultShaderName;
-	static const std::vector<Primative::VertexBuffer*> processMeshData(std::vector<Primative::Mesh*>& data, const std::string& name, GLenum draw_type);
+	static const std::vector<Primative::VertexBuffer*> processMeshData(std::vector<Primative::Mesh*>& data, const std::string& name, GLenum draw_type, const bool deleteAble);
 };
 

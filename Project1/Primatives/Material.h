@@ -58,17 +58,31 @@ namespace Materials {
 		MatItem metalic;
 		MatItem roughness;
 		MatItem ao;
+		unsigned hdrMap, lbrMap, brdfTex;
 	public:
-		inline PBR() : albedo({ 1, 0, 0 }), normal({ 0, 1, 0 }), metalic({ 0.5, 0, 0 }), roughness({ 0.1, 0, 0 }), ao({ 1, 0, 0 }), Material() { Material::type = Materials::Type::PBR; };
+		inline PBR() : albedo({ 1, 0, 0 }), normal({ 0, 1, 0 }), metalic({ 0.5, 0, 0 }), roughness({ 0.1, 0, 0 }), ao({ 1, 0, 0 }), hdrMap(0), lbrMap(0), brdfTex(0), Material() { Material::type = Materials::Type::PBR; };
 		PBR(const MatItem& albedo, const MatItem& normal, const MatItem& metalic, const MatItem& roughness, const MatItem& ao);
-		inline MatItem& getAlbedo() { return albedo; };
-		inline MatItem& getNormal() { return normal; };
-		inline MatItem& getMetalic() { return metalic; };
-		inline MatItem& getRoughness() { return roughness; };
-		inline MatItem& getAO() { return ao; };
-		inline std::array<MatItem, 5> getAll() const { return std::array<MatItem, 5>{ albedo, normal, metalic, roughness, ao }; };
 		void activateTextures() const;
 		void cleanUp();
+
+		// getters
+		inline MatItem& getAlbedo()               { return albedo; };
+		inline MatItem& getNormal()               { return normal; };
+		inline MatItem& getMetalic()              { return metalic; };
+		inline MatItem& getRoughness()            { return roughness; };
+		inline MatItem& getAO()                   { return ao; };
+		inline const unsigned& getHDRmap()  const { return hdrMap; };
+		inline const unsigned& getIBLmap()  const { return lbrMap; };
+		inline const unsigned& getBRDFtex() const { return brdfTex; };
+
+		inline std::array<MatItem, 5> getAll() const { return std::array<MatItem, 5>{ albedo, normal, metalic, roughness, ao }; };
+
+		// setters
+		inline void setHDRmap(const unsigned& id)  { hdrMap = id; };
+		inline void setIBLmap(const unsigned& id)  { lbrMap = id; };
+		inline void setBRDFtex(const unsigned& id) { brdfTex= id; };
+
+
 	};
 };
 

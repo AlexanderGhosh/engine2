@@ -5,7 +5,7 @@
 #include "../Componets/RigidBody.h"
 class GameObject
 {
-private:
+protected:
 	std::vector<Component::ComponetBase*> componets;
 	Component::Transform* transform;
 	std::vector<bool> enabled;
@@ -13,7 +13,7 @@ public:
 	GameObject();
 	void addComponet(Component::ComponetBase* componet);
 	void tick(short currentTick);
-	void tryDraw();
+	virtual void tryDraw();
 	inline Component::Transform* getTransform() const { return transform; };
 	Component::RigidBody* getRigidbody();
 	template<class T>

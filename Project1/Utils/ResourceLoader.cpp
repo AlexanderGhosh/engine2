@@ -113,8 +113,8 @@ const unsigned ResourceLoader::createTexture(const std::string& filePath, const 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     
     int width, height, nrChannels;
     unsigned char* data = stbi_load(filePath.c_str(), &width, &height, &nrChannels, 0);
@@ -145,6 +145,56 @@ const unsigned ResourceLoader::createTexture(const std::string& filePath, const 
     stbi_image_free(data);
     glBindTexture(GL_TEXTURE_2D, 0);
     textures.emplace(Utils::getFileName(filePath, 1), tex);
+    return tex;
+}
+
+const unsigned ResourceLoader::createCubeMap(const std::string& dirPath, const std::string& extension, const bool& flip)
+{
+    stbi_set_flip_vertically_on_load(flip);
+    unsigned tex = 0;
+    glGenTextures(1, &tex);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, tex);
+
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+
+    static const std::array<std::string, 6> files = {
+        "/px", "/nx", "/py", "/ny", "/pz", "/nz"
+    };
+    int width, height, nrChannels;
+    for (char i = 0; i < 6; i++) {
+        std::string path = dirPath + files[i] + extension;
+        unsigned char* data = stbi_load(path.c_str(), &width, &height, &nrChannels, 0);
+        GLenum t = GL_SRGB;
+        switch (nrChannels)
+        {
+        case 1:
+            t = GL_RED;
+            break;
+        case 3:
+            t = GL_RGB;
+            break;
+        case 4:
+            t = GL_RGBA;
+            break;
+        };
+        if (data)
+        {
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, t, width, height, 0, t, GL_UNSIGNED_BYTE, data);
+            glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+        }
+        else
+        {
+            std::cout << "Failed to load cubeMap: " << path << std::endl;
+        }
+        stbi_image_free(data);
+    }
+    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+    textures.emplace(Utils::getFileName(dirPath, 0) + ".cm", tex);
     return tex;
 }
 
@@ -182,7 +232,7 @@ void ResourceLoader::cleanUp()
     models.clear();
 }
 
-const std::vector<Primative::VertexBuffer*> ResourceLoader::processMeshData(std::vector<Primative::Mesh*>& data, const std::string& name, GLenum draw_type)
+const std::vector<Primative::VertexBuffer*> ResourceLoader::processMeshData(std::vector<Primative::Mesh*>& data, const std::string& name, GLenum draw_type, const bool deleteAble)
 {
     std::vector<Primative::VertexBuffer*> res;
     if (data.empty()) {
@@ -193,7 +243,8 @@ const std::vector<Primative::VertexBuffer*> ResourceLoader::processMeshData(std:
         buffers.emplace_back(*m, draw_type);
         res.push_back(&buffers.back());
         model.push_back(buffers.size() - 1);
-        delete m;
+        if(deleteAble)
+            delete m;
         m = nullptr;
     }
     data.clear();
@@ -204,17 +255,17 @@ const std::vector<Primative::VertexBuffer*> ResourceLoader::createModel(const st
 {
     std::vector<Primative::Mesh*> data = FileReaders::AssimpWrapper::loadModel(filePath);
     const std::string name = Utils::getFileName(filePath, 1);
-    return processMeshData(data, name, draw_type);
+    return processMeshData(data, name, draw_type, true);
 }
 
-const std::vector<Primative::VertexBuffer*> ResourceLoader::createModel(Primative::Mesh* meshes, const std::string& name, GLenum draw_type)
+const std::vector<Primative::VertexBuffer*> ResourceLoader::createModel(Primative::Mesh* meshes, const std::string& name, GLenum draw_type, const bool deleteAble)
 {
     std::vector<Primative::Mesh*> data = { meshes };
-    return createModel(data, name, draw_type);
+    return createModel(data, name, draw_type, deleteAble);
 }
 
-const std::vector<Primative::VertexBuffer*> ResourceLoader::createModel(std::vector<Primative::Mesh*>& meshes, const std::string& name, GLenum draw_type) {
-    return processMeshData(meshes, name, draw_type);
+const std::vector<Primative::VertexBuffer*> ResourceLoader::createModel(std::vector<Primative::Mesh*>& meshes, const std::string& name, GLenum draw_type, const bool deleteAble) {
+    return processMeshData(meshes, name, draw_type, deleteAble);
 }
 
 const std::vector<Primative::VertexBuffer*> ResourceLoader::getModel(const std::string& name)
@@ -229,4 +280,9 @@ const std::vector<Primative::VertexBuffer*> ResourceLoader::getModel(const std::
         res.push_back(&Utils::elementAt(buffers, i));
     }
     return res;
+}
+
+const Primative::VertexBuffer* ResourceLoader::getBuffer(const unsigned& index)
+{
+    return &buffers[index];
 }

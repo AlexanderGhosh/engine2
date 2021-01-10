@@ -74,7 +74,9 @@ unsigned Render::Shading::Manager::active = 0;
 		 vals[i] = Render::Shading::Manager::setValue(name + names[i], all[i], unit);
 		 unit++;
 	 }
-
+	 setValue("hdrMap", unit++);
+	 setValue("iblMap", unit++);
+	 setValue("brdfLUT", unit);
 	 return vals[0] && vals[1] && vals[2] && vals[3] && vals[4];
  }
 

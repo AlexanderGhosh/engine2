@@ -3,9 +3,11 @@
 #include <unordered_map>
 #include "../GameObject/GameObject.h"
 #include "../Primatives/Buffers.h"
+class SkyBox;
 class GameScene
 {
 private:
+	SkyBox* skybox;
 	std::vector<GameObject*> objects;
 	std::unordered_map<std::string, unsigned> preProcessingLayers;
 	unsigned currentTick, postProcShaderId;
@@ -16,9 +18,10 @@ private:
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 	void renderObjects(); // just moved
+	void renderSkyBox();
 public:
-	inline GameScene() : objects(), preProcessingLayers(), currentTick(0), postProcShaderId(0), FBOs(), backgroundColour(0) { };
-	inline void addObject(GameObject*& obj) { objects.push_back(obj); };
+	inline GameScene() : objects(), preProcessingLayers(), currentTick(0), postProcShaderId(0), FBOs(), backgroundColour(0), skybox(nullptr) { };
+	inline void addObject(GameObject* obj) { objects.push_back(obj); };
 	inline void setBG(Vector3 col) { backgroundColour = col; };
 	void preProcess();
 	void postProcess();
@@ -31,6 +34,9 @@ public:
 		FBOs.insert({ layerName, fbo }); 
 		fbo = nullptr; 
 	};
+
+	// setters
 	inline void setPostProcShader(const unsigned& shaderId) { postProcShaderId = shaderId; };
+	void setSkyBox(SkyBox* sb);
 };
 
