@@ -103,7 +103,7 @@ int main() {
     
     std::vector<unsigned> sphereBuffer = ResourceLoader::createModel("Resources/Models/sphere.obj");
     std::vector<unsigned> cubeBuffer   = ResourceLoader::createModel("Resources/Models/cube.obj");
-    std::vector<unsigned> bsgModel     = ResourceLoader::createModel("Resources/Models/bsg.obj");
+    // std::vector<unsigned> bsgModel     = ResourceLoader::createModel("Resources/Models/bsg.obj");
 
  
     const unsigned ba   = ResourceLoader::createTexture("Resources/Textures/rust base.png",      TextureType::AlbedoMap);
@@ -156,15 +156,15 @@ int main() {
     //rb2.hasGravity = false;
 
 
-    Render::RenderMesh bsgMesh = Render::RenderMesh();
-    bsgMesh.addBuffers(bsgModel);
-    Materials::PBR bsgMaterial = Materials::PBR({ { 0.542, 0.497, 0.449 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 0.9, 0, 0 } }, { { 0, 0, 0 } });
-    bsgMesh.setMaterial({ &bsgMaterial });
+    //Render::RenderMesh bsgMesh = Render::RenderMesh();
+    //bsgMesh.addBuffers(bsgModel);
+    //Materials::PBR bsgMaterial = Materials::PBR({ { 0.542, 0.497, 0.449 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 0.9, 0, 0 } }, { { 0, 0, 0 } });
+    //bsgMesh.setMaterial({ &bsgMaterial });
 
-    GameObject bsgObject = GameObject();
-    bsgObject.getTransform()->Position = { 0, 0, -5 };
-    bsgObject.getTransform()->Scale *= 1.0f;
-    bsgObject.addComponet(&bsgMesh);
+    //GameObject bsgObject = GameObject();
+    //bsgObject.getTransform()->Position = { 0, 0, -5 };
+    //bsgObject.getTransform()->Scale *= 1.0f;
+    //bsgObject.addComponet(&bsgMesh);
 
     // std::cout << glm::to_string(s1) << " : " << glm::to_string(s2) << std::endl;
     
@@ -205,14 +205,14 @@ int main() {
     // scene.addObject(gun);
     scene.addObject(&cube1);
     scene.addObject(&cube2);
-    scene.addObject(&bsgObject);
+    //scene.addObject(&bsgObject);
 
     scene.setBG({ 1, 0, 1 });
 
     // SKYBOX //
     ResourceLoader::createCubeMap("Resources/Textures/Galaxy", ".png", 0);
     SkyBox sb = SkyBox("Galaxy.cm");
-    //scene.setSkyBox(&sb);
+    scene.setSkyBox(&sb);
     // SKYBOX //
     
 

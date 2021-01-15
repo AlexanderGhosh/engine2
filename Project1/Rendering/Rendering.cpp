@@ -30,9 +30,14 @@ void Render::RenderMesh::update()
 	if(parent)
 		m = Component::ComponetBase::parent->getTransform()->getModel();
 	Shading::Manager::setValue("model", m);
+	if (materials.size() == 1) {
+		Materials::Material* material = materials[0];
+		Shading::Manager::setValue("material", material);
+		material->activateTextures();
+	}
 	for (short i = 0; i < buffers.size(); i++) {
 		Primative::VertexBuffer& buffer = ResourceLoader::getBuffer(buffers[i]);
-		if (materials.size() > 0) {
+		if (materials.size() > 1) {
 			Materials::Material* material = materials[i % materials.size()];
 			Shading::Manager::setValue("material", material);
 			material->activateTextures();

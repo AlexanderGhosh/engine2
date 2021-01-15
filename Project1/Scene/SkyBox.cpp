@@ -15,56 +15,9 @@ SkyBox::SkyBox() : texId(0), mesh(nullptr)
 	}
 	if (!mesh) {
 		mesh = DBG_NEW Render::RenderMesh();
-        Primative::Mesh sbMesh = Primative::Mesh({
-            glm::vec3(-1.0f,  1.0f, -1.0f),
-            glm::vec3(-1.0f, -1.0f, -1.0f),
-            glm::vec3( 1.0f, -1.0f, -1.0f),
-            glm::vec3( 1.0f, -1.0f, -1.0f),
-            glm::vec3( 1.0f,  1.0f, -1.0f),
-            glm::vec3(-1.0f,  1.0f, -1.0f),
-
-            glm::vec3(-1.0f, -1.0f,  1.0f),
-            glm::vec3(-1.0f, -1.0f, -1.0f),
-            glm::vec3(-1.0f,  1.0f, -1.0f),
-            glm::vec3(-1.0f,  1.0f, -1.0f),
-            glm::vec3(-1.0f,  1.0f,  1.0f),
-            glm::vec3(-1.0f, -1.0f,  1.0f),
-
-            glm::vec3( 1.0f, -1.0f, -1.0f),
-            glm::vec3( 1.0f, -1.0f,  1.0f),
-            glm::vec3( 1.0f,  1.0f,  1.0f),
-            glm::vec3( 1.0f,  1.0f,  1.0f),
-            glm::vec3( 1.0f,  1.0f, -1.0f),
-            glm::vec3( 1.0f, -1.0f, -1.0f),
-
-            glm::vec3(-1.0f, -1.0f,  1.0f),
-            glm::vec3(-1.0f,  1.0f,  1.0f),
-            glm::vec3( 1.0f,  1.0f,  1.0f),
-            glm::vec3( 1.0f,  1.0f,  1.0f),
-            glm::vec3( 1.0f, -1.0f,  1.0f),
-            glm::vec3(-1.0f, -1.0f,  1.0f),
-
-            glm::vec3(-1.0f,  1.0f, -1.0f),
-            glm::vec3( 1.0f,  1.0f, -1.0f),
-            glm::vec3( 1.0f,  1.0f,  1.0f),
-            glm::vec3( 1.0f,  1.0f,  1.0f),
-            glm::vec3(-1.0f,  1.0f,  1.0f),
-            glm::vec3(-1.0f,  1.0f, -1.0f),
-
-            glm::vec3(-1.0f, -1.0f, -1.0f),
-            glm::vec3(-1.0f, -1.0f,  1.0f),
-            glm::vec3( 1.0f, -1.0f, -1.0f),
-            glm::vec3( 1.0f, -1.0f, -1.0f),
-            glm::vec3(-1.0f, -1.0f,  1.0f),
-            glm::vec3( 1.0f, -1.0f,  1.0f)
-            }
-		);
-        for (short i = 0; i < sbMesh.verts.size(); i++) {
-            sbMesh.indices.push_back(i);
-        }
-		auto model = ResourceLoader::createModel(&sbMesh, "skybox", GL_TRIANGLES, false);
 		// auto model = ResourceLoader::getModel("cube.obj");
-		mesh->addBuffers(model);
+		auto m = ResourceLoader::getModel("cube.obj");
+		mesh->addBuffers(m);
 	}
 }
 
