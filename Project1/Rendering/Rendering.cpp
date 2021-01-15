@@ -4,7 +4,7 @@
 #include "../Componets/Componets.h"
 #include "../GameObject/GameObject.h"
 
-Render::RenderMesh::RenderMesh() : buffers(), material(), Component::ComponetBase()
+Render::RenderMesh::RenderMesh() : buffers(), materials(), Component::ComponetBase()
 {
 	/*Materials::Forward* fwd = DBG_NEW Materials::Forward();
 	fwd->getDiffuse()(1); // set to the texture id
@@ -29,19 +29,17 @@ void Render::RenderMesh::update()
 	glm::mat4 m(1);
 	if(parent)
 		m = Component::ComponetBase::parent->getTransform()->getModel();
-	bool succ = Shading::Manager::setValue("model", m);
-	if (material) {
-		if (this->material->getType() == Materials::Type::Forward)
-			succ = Shading::Manager::setValue("material", *dynamic_cast<Materials::Forward*>(this->material));
-		else
-			succ = Shading::Manager::setValue("material", *dynamic_cast<Materials::PBR*>(this->material));
-		this->material->activateTextures();
-	}
-	for (const unsigned& index : buffers) {
-		const Primative::VertexBuffer* buffer = ResourceLoader::getBuffer(index);
-		buffer->bind();
-		buffer->draw();
-		buffer->unBind();
+	Shading::Manager::setValue("model", m);
+	for (short i = 0; i < buffers.size(); i++) {
+		Primative::VertexBuffer& buffer = ResourceLoader::getBuffer(buffers[i]);
+		if (materials.size() > 0) {
+			Materials::Material* material = materials[i % materials.size()];
+			Shading::Manager::setValue("material", material);
+			material->activateTextures();
+		}
+		buffer.bind();
+		buffer.draw();
+		buffer.unBind();
 	}
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
@@ -59,9 +57,8 @@ void Render::RenderMesh::cleanUp() {
 	for (auto itt = buffers.begin(); itt != buffers.end();) {
 		itt = buffers.erase(itt);
 	}
-	if(material)
-		material->cleanUp();
-	// delete material;
-	material = nullptr;
+	for (auto itt = materials.begin(); itt != materials.end();) {
+		itt = materials.erase(itt);
+	}
 }
 

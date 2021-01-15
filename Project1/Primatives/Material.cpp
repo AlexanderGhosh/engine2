@@ -1,4 +1,11 @@
 #include "Material.h"
+#include "../Utils/ResourceLoader.h"
+
+Materials::Material::Material() : type()
+{
+	ResourceLoader::addMaterial(this);
+}
+
 
 void Materials::MatItem::operator()(const glm::vec3& raw)
 {

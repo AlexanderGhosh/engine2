@@ -1,20 +1,26 @@
-#include "Renderer.h"
+#include "UIRenderer.h"
 #include <gtc/matrix_transform.hpp>
 #include "../Rendering/Shading/Manager.h"
 #include "Panes/Grid.h"
+#include "../Primatives/Mesh.h"
+#include "../Primatives/Vertex.h"
+#include "../Primatives/buffers.h"
 
-unsigned UI::Renderer::shaderId = 0;
-Primative::VertexBuffer UI::Renderer::quadBuffer = { };
-Primative::StaticBuffer UI::Renderer::uiBuffer = { };
+unsigned UI::UIRenderer::shaderId = 0;
+Primative::VertexBuffer UI::UIRenderer::quadBuffer = { };
+Primative::StaticBuffer UI::UIRenderer::uiBuffer = { };
 
-void UI::Renderer::init(const unsigned& shaderId, const glm::vec2& screenDim)
+void UI::UIRenderer::init(const unsigned& shaderId, const glm::vec2& screenDim)
 {
-	UI::Renderer::shaderId = shaderId; 
+	UI::UIRenderer::shaderId = shaderId; 
 	Primative::Mesh mesh;
-	mesh.verts.push_back({ { 1, 1, 0 }, { 1, 1 } });
-	mesh.verts.push_back({ { -1, 1, 0 }, { 0, 1 } });
-	mesh.verts.push_back({ { 1, -1, 0 }, { 1, 0 } });
-	mesh.verts.push_back({ { -1, -1, 0 }, { 0, 0 } });
+	mesh.verts.reserve(4);
+	mesh.indices.reserve(6);
+
+	mesh.verts.push_back(Primative::Vertex({  1,  1, 0 }, { 1, 1 }));
+	mesh.verts.push_back(Primative::Vertex({ -1,  1, 0 }, { 0, 1 }));
+	mesh.verts.push_back(Primative::Vertex({  1, -1, 0 }, { 1, 0 }));
+	mesh.verts.push_back(Primative::Vertex({ -1, -1, 0 }, { 0, 0 }));
 	mesh.indices = {
 		0, 1, 2,
 		3, 2, 1
@@ -27,7 +33,7 @@ void UI::Renderer::init(const unsigned& shaderId, const glm::vec2& screenDim)
 	uiBuffer.fill(0, glm::value_ptr(proj));
 }
 
-void UI::Renderer::render(const UI::Pane* pane) // draws the quads
+void UI::UIRenderer::render(const UI::Pane* pane) // draws the quads
 {
 	glDisable(GL_DEPTH_TEST);
 	quadBuffer.bind();
@@ -55,12 +61,12 @@ void UI::Renderer::render(const UI::Pane* pane) // draws the quads
 	glEnable(GL_DEPTH_TEST);
 }
 
-void UI::Renderer::render(const Page* pane)
+void UI::UIRenderer::render(const Page* pane)
 {
 	render(pane->getRoot());
 }
 
-void UI::Renderer::render(const Element* element)
+void UI::UIRenderer::render(const Element* element)
 {
 	glDisable(GL_DEPTH_TEST);
 	quadBuffer.bind();
@@ -87,7 +93,7 @@ void UI::Renderer::render(const Element* element)
 	glEnable(GL_DEPTH_TEST);
 }
 
-void UI::Renderer::cleanUp()
+void UI::UIRenderer::cleanUp()
 {
 	uiBuffer.cleanUp();
 	quadBuffer.cleanUp();

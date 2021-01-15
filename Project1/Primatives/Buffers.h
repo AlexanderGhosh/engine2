@@ -1,12 +1,13 @@
 #pragma once
 #include <GL/glew.h>
+#include <glm.hpp>
 #include <unordered_map>
 #include <string>
 #include <vector>
 #include <tuple>
 #include <al.h>
-#include "Mesh.h"
 namespace Primative {
+	struct Mesh;
 	class VertexBuffer
 	{
 	private:

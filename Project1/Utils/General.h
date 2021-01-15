@@ -161,6 +161,22 @@ namespace Utils {
         std::advance(s, index);
         return *s;
     }
+    template<class T>
+    inline T& getElement(std::vector<T>& list, int index) {
+        if (index < 0) {
+            index = list.size() + index;
+        }
+        index = index % list.size();
+        return list[index];
+    }
+    template<class T, size_t size>
+    inline T& getElement(std::array<T, size> list, int index) {
+        if (index < 0) {
+            index = size + index;
+        }
+        index = index % size;
+        return list[index];
+    }
     inline glm::vec3 map(const glm::vec3& x, const glm::vec2& from, const glm::vec2& to) {
         float a = from.x;
         float b = from.y;

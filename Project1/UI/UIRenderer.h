@@ -2,8 +2,12 @@
 #include "../Primatives/Buffers.h"
 #include "Panes/Pane.h"
 #include "Page.h"
+namespace  Primative {
+	class VertexBuffer;
+	class StaticBuffer;
+}
 namespace UI {
-	class Renderer
+	class UIRenderer
 	{
 		static unsigned shaderId;
 		static Primative::VertexBuffer quadBuffer;

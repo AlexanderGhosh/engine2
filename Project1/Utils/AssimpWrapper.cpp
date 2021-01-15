@@ -12,7 +12,7 @@ const std::vector<Primative::Mesh*> FileReaders::AssimpWrapper::loadModel(std::s
         std::cout << "ERROR::ASSIMP::" << import.GetErrorString() << std::endl;
         return meshes;
     }
-    std::string directory = path.substr(0, path.find_last_of('/'));
+    //std::string directory = path.substr(0, path.find_last_of('/'));
 
 
     processNode(scene->mRootNode, scene, meshes);
@@ -26,6 +26,13 @@ void FileReaders::AssimpWrapper::processNode(aiNode* node, const aiScene* scene,
     {
         aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
         meshes.push_back(processMesh(mesh, scene));
+
+        unsigned k = mesh->mMaterialIndex;
+        aiMaterial* mat = scene->mMaterials[k];
+        for (short j = 0; j < mat->mNumProperties; j++) {
+            aiMaterialProperty* propety = mat->mProperties[j];
+            int a = 0;
+        }
     }
     // then do the same for each of its children
     for (unsigned int i = 0; i < node->mNumChildren; i++)

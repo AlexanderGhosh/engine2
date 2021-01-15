@@ -171,7 +171,7 @@
     <ClCompile Include="EventSystem\Handler.cpp" />
     <ClCompile Include="UI\TextRenderer.cpp" />
     <ClCompile Include="UI\Elements\TextBlock.cpp" />
-    <ClCompile Include="UI\Renderer.cpp" />
+    <ClCompile Include="UI\UIRenderer.cpp" />
     <ClCompile Include="UI\Panes\Pane.cpp" />
     <ClCompile Include="UI\Elements\Element.cpp" />
     <ClCompile Include="Scene\GameScene.cpp" />
@@ -221,7 +221,7 @@
     <ClInclude Include="EventSystem\Handler.h" />
     <ClInclude Include="UI\TextRenderer.h" />
     <ClInclude Include="UI\Elements\TextBlock.h" />
-    <ClInclude Include="UI\Renderer.h" />
+    <ClInclude Include="UI\UIRenderer.h" />
     <ClInclude Include="UI\Panes\Pane.h" />
     <ClInclude Include="UI\Elements\Element.h" />
     <ClInclude Include="Scene\GameScene.h" />
@@ -240,24 +240,24 @@
     <ClInclude Include="Primatives\Vertex.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Basics\DefaultShader\fragment.glsl" />
-    <None Include="Basics\DefaultShader\geometry.glsl" />
-    <None Include="Basics\DefaultShader\vertex.glsl" />
-    <None Include="Basics\PBRShader\fragment.glsl" />
-    <None Include="Basics\PBRShader\geometry.glsl" />
-    <None Include="Basics\PBRShader\vertex.glsl" />
-    <None Include="Basics\ShadowShader\fragment.glsl" />
-    <None Include="Basics\ShadowShader\geometry.glsl" />
-    <None Include="Basics\ShadowShader\vertex.glsl" />
-    <None Include="Basics\UIShader\fragment.glsl" />
-    <None Include="Basics\UIShader\geometry.glsl" />
-    <None Include="Basics\UIShader\vertex.glsl" />
+    <None Include="Resources\DefaultShader\fragment.glsl" />
+    <None Include="Resources\DefaultShader\geometry.glsl" />
+    <None Include="Resources\DefaultShader\vertex.glsl" />
+    <None Include="Resources\PBRShader\fragment.glsl" />
+    <None Include="Resources\PBRShader\geometry.glsl" />
+    <None Include="Resources\PBRShader\vertex.glsl" />
+    <None Include="Resources\ShadowShader\fragment.glsl" />
+    <None Include="Resources\ShadowShader\geometry.glsl" />
+    <None Include="Resources\ShadowShader\vertex.glsl" />
+    <None Include="Resources\UIShader\fragment.glsl" />
+    <None Include="Resources\UIShader\geometry.glsl" />
+    <None Include="Resources\UIShader\vertex.glsl" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Basics\Textures\default.png" />
+    <Image Include="Resources\Textures\default.png" />
   </ItemGroup>
   <ItemGroup>
-    <Font Include="Basics\Fonts\arial.ttf" />
+    <Font Include="Resources\Fonts\arial.ttf" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

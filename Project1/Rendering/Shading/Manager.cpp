@@ -1,4 +1,5 @@
 #include "Manager.h"
+#include "../../Primatives/Material.h"
 unsigned Render::Shading::Manager::active = 0;
 
  bool Render::Shading::Manager::setValue(const std::string& name, int val) {
@@ -51,6 +52,16 @@ unsigned Render::Shading::Manager::active = 0;
 	 }
 	 Render::Shading::Manager::setValue(name + "_vec", glm::vec4(fwd.getRaw(), 0));
 	 return Render::Shading::Manager::setValue(name + "_id", texUnit); // set to texture unit
+ }
+ bool Render::Shading::Manager::setValue(const std::string& name, Materials::Material* mat)
+ {
+	 switch (mat->getType())
+	 {
+	 case Materials::Type::Forward:
+		 return setValue(name, *reinterpret_cast<Materials::Forward*>(mat));
+	 case Materials::Type::PBR:
+		 return setValue(name, *reinterpret_cast<Materials::PBR*>(mat));
+	 }
  }
  bool Render::Shading::Manager::setValue(const std::string& name, Materials::Forward& fwd)
  {

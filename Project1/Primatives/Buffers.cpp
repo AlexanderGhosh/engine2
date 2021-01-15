@@ -2,6 +2,9 @@
 #include <string>
 #include <iostream>
 #include "../Utils/General.h"
+#include "../Utils/ResourceLoader.h"
+#include "Mesh.h"
+#include "Vertex.h"
 
 char Primative::StaticBuffer::usedBindingPoint = -1;
 

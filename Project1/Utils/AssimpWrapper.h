@@ -5,10 +5,14 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+
 #include "../Primatives/Vertex.h"
 #include "../Primatives/Mesh.h"
-
 #include <GL/glew.h>
+
+namespace Primative {
+    struct Mesh;
+};
 namespace FileReaders {
     class AssimpWrapper
     {
@@ -18,9 +22,9 @@ namespace FileReaders {
         static void processNode(aiNode* node, const aiScene* scene, std::vector<Primative::Mesh*>& meshes);
         static Primative::Mesh* processMesh(aiMesh* mesh, const aiScene* scene);
 
-        /*vector<Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type, string typeName)
+        /*std::vector<Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName)
         {
-            vector<Texture> textures;
+            std::vector<Texture> textures;
             for (unsigned int i = 0; i < mat->GetTextureCount(type); i++)
             {
                 aiString str;
@@ -48,7 +52,7 @@ namespace FileReaders {
             }
             return textures;
         }*/
-
+        
         /*unsigned int TextureFromFile(const char* path, const string& directory, bool gamma)
         {
             string filename = string(path);

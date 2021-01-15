@@ -145,6 +145,7 @@ void main()
 
         float distance    = length(lightPositions[i] - fs_in.worldPos);
         float attenuation = 1.0 / (distance * distance);
+        attenuation = 1;
         vec3 radiance     = lightColors[i] * attenuation;
 
         // Cook-Torrance BRDF

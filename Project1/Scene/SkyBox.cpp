@@ -2,12 +2,15 @@
 #include "../Utils/ResourceLoader.h"
 #include "../Rendering/Shading/Manager.h"
 #include "../Rendering/Rendering.h"
+#include "../GameObject/GameObject.h"
+#include "../Primatives/Mesh.h"
+#include "../Primatives/Vertex.h"
 
 unsigned SkyBox::shaderId = 0;
 SkyBox::SkyBox() : texId(0), mesh(nullptr)
 {
 	if (!shaderId) {
-		ResourceLoader::createShader("Basics/SkyBoxShader");
+		ResourceLoader::createShader("Resources/SkyBoxShader");
 		shaderId = ResourceLoader::getShader("SkyBoxShader");
 	}
 	if (!mesh) {

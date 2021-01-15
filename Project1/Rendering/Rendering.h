@@ -13,14 +13,14 @@ namespace Render {
 		RenderMesh();
 		virtual void update();
 		void addBuffers(std::vector<unsigned>& buffers, const GLenum draw_type = GL_TRIANGLES);
-		inline void setMaterial(Materials::Material* mat) { material = mat; };
+		inline void setMaterial(const std::vector<Materials::Material*>& indices) { materials = std::vector<Materials::Material*>(indices.begin(), indices.end()); };
 		inline Component::Type getType() const {
 			return Component::Type::RenderMesh;
 		}
 		void cleanUp();
-		Materials::Material* material;
 	private:
 		// index of buffer in the resorce loader
+		std::vector<Materials::Material*> materials;
 		std::vector<unsigned> buffers;
 	};
 }

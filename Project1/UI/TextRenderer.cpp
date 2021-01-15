@@ -19,7 +19,7 @@ UI::TextRenderer::TextRenderer(const glm::vec2& screenDim, const std::string& fo
     }
 
     // find path to font
-    std::string font_name = "Basics/Fonts/" + fontName + ".ttf";
+    std::string font_name = "Resources/Fonts/" + fontName + ".ttf";
     if (font_name.empty())
     {
         std::cout << "ERROR::FREETYPE: Failed to load font_name" << std::endl;

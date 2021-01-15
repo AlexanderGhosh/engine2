@@ -1,5 +1,7 @@
 #pragma once
-#include "../GameObject/GameObject.h"
+#include <glm.hpp>
+#include <string>
+
 namespace Render {
 	class RenderMesh;
 }

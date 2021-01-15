@@ -16,7 +16,7 @@
 #include "Scene/GameScene.h"
 #include "Scene/SkyBox.h"
 #include "Utils/AssimpWrapper.h"
-#include "UI/Renderer.h"
+#include "UI/UIRenderer.h"
 #include "EventSystem/Handler.h"
 #include "UI/TextRenderer.h"
 #include "UI/Elements/TextField.h"
@@ -72,11 +72,11 @@ int main() {
 
     cam.setPos({ 0, 0, 0 }); // 200, 700
     
-    ResourceLoader::createShader("Basics/DefaultShader");
-    ResourceLoader::createShader("Basics/ShadowShader");
-    ResourceLoader::createShader("Basics/PBRShader");
-    ResourceLoader::createShader("Basics/UIShader");
-    ResourceLoader::createShader("Basics/TextShader");
+    ResourceLoader::createShader("Resources/DefaultShader");
+    ResourceLoader::createShader("Resources/ShadowShader");
+    ResourceLoader::createShader("Resources/PBRShader");
+    ResourceLoader::createShader("Resources/UIShader");
+    ResourceLoader::createShader("Resources/TextShader");
         
     // pyramid
     /*Primative::Mesh* m = DBG_NEW Primative::Mesh();
@@ -101,18 +101,18 @@ int main() {
         2, 4, 3
     };*/
     
-    std::vector<Primative::VertexBuffer*> sphereBuffer = ResourceLoader::createModel("Basics/Models/sphere.obj");
-    std::vector<Primative::VertexBuffer*> cubeBuffer   = ResourceLoader::createModel("Basics/Models/cube.obj");
-    std::vector<Primative::VertexBuffer*> bsgModel = ResourceLoader::createModel("Basics/Models/bsg.obj");
+    std::vector<unsigned> sphereBuffer = ResourceLoader::createModel("Resources/Models/sphere.obj");
+    std::vector<unsigned> cubeBuffer   = ResourceLoader::createModel("Resources/Models/cube.obj");
+    std::vector<unsigned> bsgModel     = ResourceLoader::createModel("Resources/Models/bsg.obj");
 
  
-    const unsigned ba   = ResourceLoader::createTexture("Basics/Textures/rust base.png",      TextureType::AlbedoMap);
-    const unsigned r    = ResourceLoader::createTexture("Basics/Textures/rust roughness.png", TextureType::RoughnessMap);
-    const unsigned m    = ResourceLoader::createTexture("Basics/Textures/rust metalic.png",   TextureType::MetalicMap);
-    const unsigned n    = ResourceLoader::createTexture("Basics/Textures/rust normal.png",    TextureType::NormalMap);
-    const unsigned hdr  = ResourceLoader::createCubeMap("Basics/Textures/Galaxy hdr", ".png", 0);
-    const unsigned ibl  = ResourceLoader::createCubeMap("Basics/Textures/Galaxy ibl", ".png", 0);
-    const unsigned brdf = ResourceLoader::createTexture("Basics/Textures/ibl brdf.png", TextureType::AlbedoMap, 0);
+    const unsigned ba   = ResourceLoader::createTexture("Resources/Textures/rust base.png",      TextureType::AlbedoMap);
+    const unsigned r    = ResourceLoader::createTexture("Resources/Textures/rust roughness.png", TextureType::RoughnessMap);
+    const unsigned m    = ResourceLoader::createTexture("Resources/Textures/rust metalic.png",   TextureType::MetalicMap);
+    const unsigned n    = ResourceLoader::createTexture("Resources/Textures/rust normal.png",    TextureType::NormalMap);
+    const unsigned hdr  = ResourceLoader::createCubeMap("Resources/Textures/Galaxy hdr", ".png", 0);
+    const unsigned ibl  = ResourceLoader::createCubeMap("Resources/Textures/Galaxy ibl", ".png", 0);
+    const unsigned brdf = ResourceLoader::createTexture("Resources/Textures/ibl brdf.png", TextureType::AlbedoMap, 0);
 
         
     Render::RenderMesh cubeR = Render::RenderMesh();
@@ -123,7 +123,7 @@ int main() {
     cubeMat1.setHDRmap(hdr);
     cubeMat1.setIBLmap(ibl);
     cubeMat1.setBRDFtex(brdf);
-    cubeR.setMaterial(&cubeMat1);
+    cubeR.setMaterial({ &cubeMat1 });
     
     GameObject cube1 = GameObject();
     cube1.getTransform()->Position = { 0, 0, -5 };
@@ -142,7 +142,7 @@ int main() {
     auto model = ResourceLoader::getModel("sphere.obj");
     cubeR2.addBuffers(model);
     Materials::PBR cubeMat2 = Materials::PBR({ { 0, 1, 1 } }, { { 1, 0, 0 } }, { { 0.5, 0, 0 } }, { { 0.2, 0, 0 } }, { { 0.5, 0, 0 } });
-    cubeR2.setMaterial(&cubeMat2);
+    cubeR2.setMaterial({ &cubeMat2 });
     
     GameObject cube2 = GameObject();
     cube2.getTransform()->Position = { 0, 1, -5 };
@@ -158,12 +158,12 @@ int main() {
 
     Render::RenderMesh bsgMesh = Render::RenderMesh();
     bsgMesh.addBuffers(bsgModel);
-    Materials::PBR bsgMaterial = Materials::PBR({ { 1, 1, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } });
-    bsgMesh.setMaterial(&bsgMaterial);
+    Materials::PBR bsgMaterial = Materials::PBR({ { 0.542, 0.497, 0.449 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 0.9, 0, 0 } }, { { 0, 0, 0 } });
+    bsgMesh.setMaterial({ &bsgMaterial });
 
     GameObject bsgObject = GameObject();
     bsgObject.getTransform()->Position = { 0, 0, -5 };
-    bsgObject.getTransform()->Scale *= 0.5f;
+    bsgObject.getTransform()->Scale *= 1.0f;
     bsgObject.addComponet(&bsgMesh);
 
     // std::cout << glm::to_string(s1) << " : " << glm::to_string(s2) << std::endl;
@@ -176,7 +176,7 @@ int main() {
     // gamma   | scalar f
     // lspaceM | matrix 4
     
-    glm::mat4 projection = glm::perspective(glm::radians(cam.getFOV()), 800.0f / 600.0f, 0.01f, 1000.0f);
+    glm::mat4 projection = glm::perspective(glm::radians(cam.getFOV()), 800.0f / 600.0f, 0.01f, 5000.0f);
     
     b.fill(1, glm::value_ptr(projection));
     
@@ -207,10 +207,10 @@ int main() {
     scene.addObject(&cube2);
     scene.addObject(&bsgObject);
 
-    scene.setBG({ 1, 1, 1 });
+    scene.setBG({ 1, 0, 1 });
 
     // SKYBOX //
-    ResourceLoader::createCubeMap("Basics/Textures/Galaxy", ".png", 0);
+    ResourceLoader::createCubeMap("Resources/Textures/Galaxy", ".png", 0);
     SkyBox sb = SkyBox("Galaxy.cm");
     //scene.setSkyBox(&sb);
     // SKYBOX //
@@ -219,7 +219,7 @@ int main() {
     // UI //
     UI::TextRenderer font = UI::TextRenderer({ 800, 600 }); // creates arial Font
     UI::TextRenderer::setShader(ResourceLoader::getShader("TextShader"));
-    UI::Renderer::init(ResourceLoader::getShader("UIShader"), { 800, 600 });
+    UI::UIRenderer::init(ResourceLoader::getShader("UIShader"), { 800, 600 });
 
     UI::TextBlock tb = UI::TextBlock();
     tb.setText("FPS: 1000");
@@ -269,7 +269,7 @@ int main() {
     
         scene.preProcess(); // shadows and scene quad
         scene.postProcess();// render to screen
-        UI::Renderer::render(&tb);
+        UI::UIRenderer::render(&tb);
 
         // PHYSICS-----------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -280,7 +280,7 @@ int main() {
         // EVENTS-----------------------------------------------------------------------------------------------------------------------------------------------
         float speed = 1;
         if(Events::Handler::getCursor(Events::Cursor::Middle, Events::Action::Down)) {
-            speed = 2;
+            speed = 100;
         }
         if (Events::Handler::getKey(Events::Key::W, Events::Action::Down)) {
             cam.setPos(cam.getPos() + cam.getForward() * glm::vec3(1, 0, 1) * main.getTime().deltaTime * speed);
@@ -327,7 +327,7 @@ int main() {
     
     b.cleanUp(); // destroys UBO 0
     UI::TextRenderer::cleanUpStatic(); // destroys char buffers and char textures for all fonts
-    UI::Renderer::cleanUp(); // destroys quadbuffer and UBO 1
+    UI::UIRenderer::cleanUp(); // destroys quadbuffer and UBO 1
     SoundManager::cleanUp(); // destroys sound buffers
     ResourceLoader::cleanUp(); // destroys textures shaders and models(buffers)
     
