@@ -103,6 +103,7 @@ int main() {
     
     std::vector<unsigned> sphereBuffer = ResourceLoader::createModel("Resources/Models/sphere.obj");
     std::vector<unsigned> cubeBuffer   = ResourceLoader::createModel("Resources/Models/cube.obj");
+    // std::vector<unsigned> animatedMan  = ResourceLoader::createModel("Resources/Models/man.dae");
     // std::vector<unsigned> bsgModel     = ResourceLoader::createModel("Resources/Models/bsg.obj");
 
  
@@ -116,7 +117,7 @@ int main() {
 
         
     Render::RenderMesh cubeR = Render::RenderMesh();
-    cubeR.addBuffers(sphereBuffer);
+    cubeR.addBuffers(cubeBuffer);
     Materials::PBR cubeMat1/* = Materials::PBR({ { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 0, 0, 0 } }, { { 0.15, 0, 0 } }, { { 0, 0, 0 } })*/;
 #define MI Materials::MatItem
     cubeMat1 = Materials::PBR(MI(ba), MI(n), MI(m), MI(r), MI(Utils::xAxis(0.2)));

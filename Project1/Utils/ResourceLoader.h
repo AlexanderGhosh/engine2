@@ -12,6 +12,11 @@ namespace Primative {
 	class VertexBuffer;
 	struct Mesh;
 }
+namespace Rendering {
+	namespace Animation {
+		using Bone = glm::mat4;
+	}
+}
 enum class TextureType {
 	NormalMap, SpecularMap, DiffuseMap, HeightMap,
 	AlbedoMap, MetalicMap, AOMap, RoughnessMap,
@@ -20,13 +25,14 @@ enum class TextureType {
 class ResourceLoader
 {
 public:
+	// shaders
 	static std::string createShader(const std::string& filePath);
 	static const unsigned getShader(const std::string& name);
-
+	// texturs
 	static const unsigned createTexture(const std::string& filePath, const TextureType type, const bool& flip = 1);
 	static const unsigned createCubeMap(const std::string& dirPath, const std::string& extension, const bool& flip = 1);
 	static const unsigned getTexture(const std::string& name);
-
+	// models
 	static const std::vector<unsigned> createModel(const std::string& filePath, GLenum draw_type = GL_TRIANGLES);
 	static const std::vector<unsigned> createModel(Primative::Mesh* meshes, const std::string& name, GLenum draw_type = GL_TRIANGLES, const bool deleteAble = true);
 	static const std::vector<unsigned> createModel(std::vector<Primative::Mesh*>& meshes, const std::string& name, GLenum draw_type = GL_TRIANGLES, const bool deleteAble = true);
@@ -34,12 +40,15 @@ public:
 	static Primative::VertexBuffer& getBuffer(const unsigned& index);
 	static Materials::Material* getMaterial(const int& index);
 	static void addMaterial(Materials::Material* mat);
-	static void cleanUp();
+	// animation
 
+	// general
+	static void cleanUp();
 private:
 	static std::unordered_map<std::string, unsigned> shaders;
 	static std::unordered_map<std::string, unsigned> textures;
 	static std::vector<Primative::VertexBuffer> buffers;
+	static std::vector<glm::mat4> bones;
 	static std::unordered_map<std::string, std::vector<unsigned>> models;
 	static std::string defaultShaderName;
 	static std::vector<Materials::Material*> materials;

@@ -13,6 +13,7 @@ std::string ResourceLoader::defaultShaderName = "";
 std::unordered_map<std::string, unsigned> ResourceLoader::shaders = { };
 std::unordered_map<std::string, unsigned> ResourceLoader::textures = { };
 std::vector<Primative::VertexBuffer> ResourceLoader::buffers = { };
+std::vector<glm::mat4> ResourceLoader::bones = { };
 std::vector<Materials::Material*> ResourceLoader::materials = { };
 std::unordered_map<std::string, std::vector<unsigned>> ResourceLoader::models = { };
 

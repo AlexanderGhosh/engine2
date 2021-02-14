@@ -27,7 +27,7 @@
 #endif
 
 
-
+#define MAX_BONE_WEIGHTS 4
 #define NOT !
 #define AND &&
 #define OR ||
@@ -42,6 +42,10 @@ constexpr float INV_PI = 1.0f / PI;
 #define Vector3 const glm::vec3&
 #define Quaternion const glm::quat&
 #define Matrix3 const glm::mat3&
+#define String const std::string&
+#define Float const float&
+#define Unsigned const unsigned&
+#define Int const int&
 
 namespace Utils {
 

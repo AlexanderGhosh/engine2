@@ -9,18 +9,42 @@
 #include "../Primatives/Vertex.h"
 #include "../Primatives/Mesh.h"
 #include <GL/glew.h>
+#include <list>
 
 namespace Primative {
     struct Mesh;
-};
+}; 
+namespace Render {
+    namespace Animation {
+        class Skeleton;
+        class Bone;
+        class BoneDetails;
+        class Animation;
+        class KeyFrame;
+    }
+}
+
 namespace FileReaders {
     class AssimpWrapper
     {
     public:
         static const std::vector<Primative::Mesh*> loadModel(std::string path);
     private:
-        static void processNode(aiNode* node, const aiScene* scene, std::vector<Primative::Mesh*>& meshes);
-        static Primative::Mesh* processMesh(aiMesh* mesh, const aiScene* scene);
+        // mesh for the most part
+        static void processNode(aiNode* node, const aiScene* scene, std::vector<Primative::Mesh*>& meshes, Render::Animation::Skeleton& skeleton);
+        static Primative::Mesh* processMeshVertices(aiMesh* mesh, const aiScene* scene);
+        // bones
+        static void processMeshBones(aiMesh* mesh, Primative::Mesh* currentMesh, Render::Animation::Skeleton& skeleton);
+        static void addBone(Primative::Vertex& vertex, const aiVertexWeight& weighting);
+        static void normaliseBone(Primative::Vertex& vertex);
+        // animations
+        static std::vector<Render::Animation::Animation> createAnimations(aiNode* rootNode, const aiScene* scene, const Render::Animation::Skeleton& skeleton);
+        static void processAnimNode(const aiAnimation* anim, aiNode* node,
+            const glm::mat4& parentsTransform, const glm::mat4& globalInverseTransform,
+            Render::Animation::KeyFrame& keyFrame, int frame, const std::vector<Render::Animation::Bone>& bones);
+        static int calcAnimationFrameCount(const aiAnimation* animtion);
+
+        static const glm::mat4 toMat4(const aiMatrix4x4& matrix);
 
         /*std::vector<Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName)
         {
