@@ -9,7 +9,7 @@ const std::vector<Primative::Mesh*> FileReaders::AssimpWrapper::loadModel(std::s
     Assimp::Importer import;
     const aiScene* scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
 
-    if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
+    if (NOT scene OR scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE OR NOT scene->mRootNode)
     {
         std::cout << "ERROR::ASSIMP::" << import.GetErrorString() << std::endl;
         return meshes;
@@ -19,6 +19,7 @@ const std::vector<Primative::Mesh*> FileReaders::AssimpWrapper::loadModel(std::s
     Render::Animation::Skeleton skeleton;
     processNode(scene->mRootNode, scene, meshes, skeleton);
     auto animations = createAnimations(scene->mRootNode, scene, skeleton);
+
     return meshes;
 }
 
@@ -164,17 +165,22 @@ void FileReaders::AssimpWrapper::processMeshBones(aiMesh* mesh, Primative::Mesh*
 /// <param name="weighting"></param>
 void FileReaders::AssimpWrapper::addBone(Primative::Vertex& vertex, const aiVertexWeight& weighting)
 {
-    Render::Animation::BoneDetails& min_bone = vertex.boneDetails[0];
+    Render::Animation::BoneDetails min_bone = vertex.boneDetails[0];
     float min_weight = min_bone.boneWeight;
-    for (short i = 0; i < MAX_BONE_WEIGHTS; i++) {
+    short j = 0;
+    for (short i = 1; i < MAX_BONE_WEIGHTS; i++) {
         Render::Animation::BoneDetails& bone = vertex.boneDetails[i];
-        if (min_weight > bone.boneWeight) {
+        if (bone.boneWeight < min_weight) {
             min_weight = bone.boneWeight;
             min_bone = bone;
+            j = i;
         }
     }
-    min_bone.boneIndex = weighting.mVertexId;
-    min_bone.boneWeight = weighting.mWeight;
+    if (j > 0) {
+        int g = 0;
+    }
+    vertex.boneDetails[j].boneIndex = weighting.mVertexId;
+    vertex.boneDetails[j].boneWeight = weighting.mWeight;
 }
 
 void FileReaders::AssimpWrapper::normaliseBone(Primative::Vertex& vertex)
@@ -183,7 +189,7 @@ void FileReaders::AssimpWrapper::normaliseBone(Primative::Vertex& vertex)
     for (const auto& b : vertex.boneDetails) {
         sum += powf(b.boneWeight, 2.0f);
     }
-    sum /= static_cast<float>(vertex.boneDetails.size());
+    sum = powf(sum, 0.5f);
     for (auto& b : vertex.boneDetails) {
         b.boneWeight /= sum;
     }
@@ -250,8 +256,6 @@ void FileReaders::AssimpWrapper::processAnimNode(const aiAnimation* anim, aiNode
         aiNode* n = node->mChildren[i];
         processAnimNode(anim, n, global, globalInverseTransform, keyFrame, frame, bones);
     }
-
-    
 }
 
 int FileReaders::AssimpWrapper::calcAnimationFrameCount(const aiAnimation* animtion)

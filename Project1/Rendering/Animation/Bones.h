@@ -36,7 +36,7 @@ namespace Render {
 			/// <summary>
 			/// index of the bone in the parent skeleton
 			/// </summary>
-			unsigned boneIndex;
+			float boneIndex;
 			float boneWeight;
 			const Bone& getBone() const;
 		};

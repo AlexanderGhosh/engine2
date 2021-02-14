@@ -8,12 +8,17 @@ Render::Animation::Animation::Animation(String name, Float duration) : name(name
 {
 }
 
-const void* Render::Animation::Animation::getNextFrame()
+const Render::Animation::KeyFrame& Render::Animation::Animation::getFrame(int frame) const
 {
-    return nullptr;
+    return keyFrames[frame];
 }
 
 void Render::Animation::Animation::addKeyFrame(const KeyFrame& frame)
 {
     keyFrames.push_back(frame);
+}
+
+String Render::Animation::Animation::getName() const
+{
+    return name;
 }

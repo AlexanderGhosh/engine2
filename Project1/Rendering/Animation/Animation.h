@@ -19,9 +19,10 @@ namespace Render {
 		public:
 			Animation();
 			Animation(String name, Float duration);
-			const void* getNextFrame();
+			const KeyFrame& getFrame(int frame) const;
 
 			void addKeyFrame(const KeyFrame& frame);
+			String getName() const;
 		};
 	}
 }

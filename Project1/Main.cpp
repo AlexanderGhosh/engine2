@@ -100,13 +100,15 @@ int main() {
         2, 4, 1,
         2, 4, 3
     };*/
-    
+    Utils::Timer timer("Model loading");
+    timer.start();
     std::vector<unsigned> sphereBuffer = ResourceLoader::createModel("Resources/Models/man.dae");
     std::vector<unsigned> cubeBuffer   = ResourceLoader::createModel("Resources/Models/cube.obj");
     // std::vector<unsigned> animatedMan  = ResourceLoader::createModel("Resources/Models/man.dae");
     // std::vector<unsigned> bsgModel     = ResourceLoader::createModel("Resources/Models/bsg.obj");
-
- 
+    timer.log();
+    timer.reName("Textures");
+    timer.start();
     const unsigned ba   = ResourceLoader::createTexture("Resources/Textures/rust base.png",      TextureType::AlbedoMap);
     const unsigned r    = ResourceLoader::createTexture("Resources/Textures/rust roughness.png", TextureType::RoughnessMap);
     const unsigned m    = ResourceLoader::createTexture("Resources/Textures/rust metalic.png",   TextureType::MetalicMap);
@@ -114,8 +116,10 @@ int main() {
     const unsigned hdr  = ResourceLoader::createCubeMap("Resources/Textures/Galaxy hdr", ".png", 0);
     const unsigned ibl  = ResourceLoader::createCubeMap("Resources/Textures/Galaxy ibl", ".png", 0);
     const unsigned brdf = ResourceLoader::createTexture("Resources/Textures/ibl brdf.png", TextureType::AlbedoMap, 0);
+    timer.log();
 
-        
+    timer.reName("Object 1");
+    timer.start();
     Render::RenderMesh cubeR = Render::RenderMesh();
     cubeR.addBuffers(sphereBuffer);
     Materials::PBR cubeMat1/* = Materials::PBR({ { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 0, 0, 0 } }, { { 0.15, 0, 0 } }, { { 0, 0, 0 } })*/;
@@ -129,6 +133,7 @@ int main() {
     GameObject cube1 = GameObject();
     cube1.getTransform()->Position = { 0, 0, -5 };
     cube1.addComponet(&cubeR);
+    timer.stop();
     
     // Physics::BoxColliderSAT collider1 = Physics::BoxColliderSAT(10);
     // cube1->addComponet(&collider1);
@@ -138,7 +143,9 @@ int main() {
     // rb1.hasGravity = false;
     // cube1->addComponet(&rb1);
     
-    
+
+    timer.reName("Object 2");
+    timer.start();
     Render::RenderMesh cubeR2 = Render::RenderMesh();
     auto model = ResourceLoader::getModel("sphere.obj");
     cubeR2.addBuffers(model);
@@ -148,6 +155,7 @@ int main() {
     GameObject cube2 = GameObject();
     cube2.getTransform()->Position = { 0, 1, -5 };
     cube2.addComponet(&cubeR2);
+    timer.stop();
     
     //Physics::BoxColliderSAT collider2 = Physics::BoxColliderSAT(10);
     //cube2->addComponet(&collider2);
@@ -169,7 +177,8 @@ int main() {
 
     // std::cout << glm::to_string(s1) << " : " << glm::to_string(s2) << std::endl;
     
-    
+    timer.reName("Static Buffer");
+    timer.start();
     Primative::StaticBuffer b("m4, m4, v3, f, m4", 0);
     // view    | matrix 4
     // proj    | matrix 4
@@ -193,7 +202,10 @@ int main() {
     glm::mat4 lightSpaceMatrix = lightProjection * lightView;
     
     b.fill(4, value_ptr(lightSpaceMatrix));
-    
+    timer.stop();
+
+    timer.reName("Scene");
+    timer.start();
     // Primative::FrameBuffer* frameBuffer = DBG_NEW Primative::FrameBuffer({ "depth" }, { 800, 600 });
     Primative::MSAABuffer* finalQB = DBG_NEW Primative::MSAABuffer({ "col" }, { 800, 600 });
 
@@ -209,15 +221,21 @@ int main() {
     //scene.addObject(&bsgObject);
 
     scene.setBG({ 1, 0, 1 });
+    timer.log();
 
     // SKYBOX //
+    timer.reName("Skybox");
+    timer.start();
     ResourceLoader::createCubeMap("Resources/Textures/Galaxy", ".png", 0);
     SkyBox sb = SkyBox("Galaxy.cm");
     scene.setSkyBox(&sb);
+    timer.log();
     // SKYBOX //
     
 
     // UI //
+    timer.reName("UI");
+    timer.start();
     UI::TextRenderer font = UI::TextRenderer({ 800, 600 }); // creates arial Font
     UI::TextRenderer::setShader(ResourceLoader::getShader("TextShader"));
     UI::UIRenderer::init(ResourceLoader::getShader("UIShader"), { 800, 600 });
@@ -226,7 +244,7 @@ int main() {
     tb.setText("FPS: 1000");
     tb.setForgroundColor({ 1, 1, 1 });
     tb.setPos({ 115, 575 });
-
+    timer.log();
 
     // SOUNDS //
    //SoundManager::init();
@@ -238,11 +256,13 @@ int main() {
     
     Events::Handler::init(main.getWindow());
     glfwSetCursorPosCallback(main.getWindow(), mouse_callback);
-        
+    
+    timer.reName("Physics");
+    timer.start();
     Physics::CollisionDetection::setBroadphase<Physics::NSquared>();
     Physics::CollisionDetection::setNarrowphase< Physics::SAT3D>();
     Physics::Engine::setResponse<Physics::ImpulseBased>();
-
+    timer.log();
     // Physics::Constraints::ConstraintsSolver::addConstraint<Physics::Constraints::DistanceConstraint>(rb1, rb2, Utils::fill(0.5f), Utils::fill(-0.5f), 1.0f);
     // Physics::Constraints::ConstraintsSolver::addConstraint(DBG_NEW Physics::Constraints::DistanceConstraint(rb1, rb2, Utils::fill(0), Utils::fill(0), 1.5f));
 

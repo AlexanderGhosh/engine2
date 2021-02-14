@@ -286,18 +286,22 @@ namespace Utils {
         };
         inline void log(bool frames = 0) { 
             stop();
-            std::cout << name << ": " << std::to_string(getDuration(frames)) << std::endl; 
+            std::string units = frames ? " Frames" : " Milliseconds";
+            std::cout << name << ": " << std::to_string(getDuration(frames)) << units << std::endl;
         };
         inline const float& getDuration(bool frames = 0) 
         {
-            float d = calcDurration(s, e);
+            float d = calcDurration(s, e)/1000.0f;
             assert(!(pausing.size() % 2) && "Timer pausing not working");
             for (short i = 0; i < pausing.size(); i += 2)
-                d -= calcDurration(elementAt(pausing, i), elementAt(pausing, i + 1));
+                d -= calcDurration(elementAt(pausing, i), elementAt(pausing, i + 1))/1000.0f;
             if (frames)
-                d = (d / 1000000.0f) * 60.0f;
+                d = (d / 1000.0f) * 60.0f;
             return d;
         };
+        inline void reName(String name) {
+            this->name = name;
+        }
     private:
         std::string name;
         static inline const std::chrono::time_point<std::chrono::high_resolution_clock> getNow() { return std::chrono::high_resolution_clock::now(); };
