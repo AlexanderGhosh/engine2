@@ -18,7 +18,7 @@ const std::vector<Primative::Mesh*> FileReaders::AssimpWrapper::loadModel(std::s
 
     Render::Animation::Skeleton skeleton;
     processNode(scene->mRootNode, scene, meshes, skeleton);
-    //auto animations = createAnimations(scene->mRootNode, scene, skeleton);
+    auto animations = createAnimations(scene->mRootNode, scene, skeleton);
     return meshes;
 }
 
@@ -29,11 +29,11 @@ void FileReaders::AssimpWrapper::processNode(aiNode* node, const aiScene* scene,
     {
         aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
         meshes.push_back(processMeshVertices(mesh, scene));
-        //processMeshBones(mesh, meshes.back(), skeleton);
+        processMeshBones(mesh, meshes.back(), skeleton);
 
-        /*for (Primative::Vertex& vert : meshes.back()->verts) {
+        for (Primative::Vertex& vert : meshes.back()->verts) {
             normaliseBone(vert);
-        }*/
+        }
     }
     // then do the same for each of its children
     for (unsigned int i = 0; i < node->mNumChildren; i++)
@@ -164,10 +164,6 @@ void FileReaders::AssimpWrapper::processMeshBones(aiMesh* mesh, Primative::Mesh*
 /// <param name="weighting"></param>
 void FileReaders::AssimpWrapper::addBone(Primative::Vertex& vertex, const aiVertexWeight& weighting)
 {
-    if (vertex.boneDetails.size() != MAX_BONE_WEIGHTS) {
-        vertex.boneDetails.reserve(MAX_BONE_WEIGHTS);
-        vertex.boneDetails.resize(MAX_BONE_WEIGHTS);
-    }
     Render::Animation::BoneDetails& min_bone = vertex.boneDetails[0];
     float min_weight = min_bone.boneWeight;
     for (short i = 0; i < MAX_BONE_WEIGHTS; i++) {

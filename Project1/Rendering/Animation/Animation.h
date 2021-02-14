@@ -2,7 +2,6 @@
 #include <vector>
 #include <glm.hpp>
 #include "../../Utils/General.h"
-struct aiAnimation;
 namespace Render {
 	namespace Animation {
 		struct KeyFrame {

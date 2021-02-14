@@ -1,7 +1,8 @@
 #pragma once
-#include <vector>
+#include <array>
 #include <glm.hpp>
 #include "../Rendering/Animation/Bones.h"
+#include "../Utils/General.h"
 
 namespace Primative {
 	struct Vertex
@@ -9,7 +10,7 @@ namespace Primative {
 		glm::vec3 pos;
 		glm::vec2 tex;
 		glm::vec3 norm;
-		std::vector<Render::Animation::BoneDetails> boneDetails;
+		std::array<Render::Animation::BoneDetails, MAX_BONE_WEIGHTS> boneDetails;
 		inline Vertex(glm::vec3 p, glm::vec2 t = { 0, 0 }, glm::vec3 n = { 0, 1, 0 }) : pos(p), tex(t), norm(n), boneDetails() { };
 	};
 }
