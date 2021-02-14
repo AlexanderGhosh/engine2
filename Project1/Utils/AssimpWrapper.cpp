@@ -231,7 +231,7 @@ void FileReaders::AssimpWrapper::processAnimNode(const aiAnimation* anim, aiNode
     }
     if (animNode) {
         // build matrix from animNode asine to nodeTransform
-        nodeTransform = nodeTransform;
+        nodeTransform = buildMatrix(animNode, frame);
     }
     glm::mat4 nodeGlobalTransform = parentsTransform * nodeTransform;
     // get all bones whos name == nodeName then do tranformation stuff
@@ -265,6 +265,39 @@ int FileReaders::AssimpWrapper::calcAnimationFrameCount(const aiAnimation* animt
         maxFrames = fmaxf(maxFrames, numFrames);
     }
     return maxFrames;
+}
+
+glm::mat4 FileReaders::AssimpWrapper::buildMatrix(const aiNodeAnim* node, int frame)
+{
+    aiVectorKey* positionKeys   = node->mPositionKeys;
+    aiVectorKey* scalingKeys    = node->mScalingKeys;
+    aiQuatKey* rotationKeys = node->mRotationKeys;
+
+    aiVectorKey aiVecKey;
+    aiVector3D vec;
+
+    glm::mat4 nodeTransform(1);
+    int numPositions = node->mNumPositionKeys;
+    if (numPositions > 0) {
+        aiVecKey = positionKeys[static_cast<int>(fminf(numPositions - 1, frame))];
+        vec = aiVecKey.mValue;
+        nodeTransform = glm::translate(nodeTransform, glm::vec3(vec.x, vec.y, vec.z));
+    }
+    int numRotations = node->mNumRotationKeys;
+    if (numRotations > 0) {
+        aiQuatKey quatKey = rotationKeys[static_cast<int>(fminf(numRotations - 1, frame))];
+        aiQuaternion aiQuat = quatKey.mValue;
+        glm::quat quat(aiQuat.x, aiQuat.y, aiQuat.z, aiQuat.w);
+        nodeTransform = Utils::rotate(nodeTransform, quat);
+    }
+    int numScalingKeys = node->mNumScalingKeys;
+    if (numScalingKeys > 0) {
+        aiVecKey = scalingKeys[static_cast<int>(fminf(numScalingKeys - 1, frame))];
+        vec = aiVecKey.mValue;
+        nodeTransform = glm::translate(nodeTransform, glm::vec3(vec.x, vec.y, vec.z));
+    }
+
+    return nodeTransform;
 }
 
 const glm::mat4 FileReaders::AssimpWrapper::toMat4(const aiMatrix4x4& matrix)

@@ -43,6 +43,7 @@ namespace FileReaders {
             const glm::mat4& parentsTransform, const glm::mat4& globalInverseTransform,
             Render::Animation::KeyFrame& keyFrame, int frame, const std::vector<Render::Animation::Bone>& bones);
         static int calcAnimationFrameCount(const aiAnimation* animtion);
+        static glm::mat4 buildMatrix(const aiNodeAnim* node, int frame);
 
         static const glm::mat4 toMat4(const aiMatrix4x4& matrix);
 
