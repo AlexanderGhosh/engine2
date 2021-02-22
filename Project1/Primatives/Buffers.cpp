@@ -45,22 +45,15 @@ Primative::VertexBuffer::VertexBuffer(/*const*/ Mesh& mesh, GLenum shape_type, G
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, (void*)(5 * sizeof(float)));
 	glEnableVertexAttribArray(2);
 
-	// bone weights
-	// part 1
-	glVertexAttribIPointer(3, 4, GL_FALSE, stride, (void*)(8 * sizeof(float)));
+	// ids
 	glEnableVertexAttribArray(3);
-	// part 2
-	glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, stride, (void*)(12 * sizeof(float)));
+	glVertexAttribIPointer(3, 4, GL_INT, sizeof(Vertex),
+		(void*)offsetof(Vertex, m_BoneIDs));
+
+	// weights
 	glEnableVertexAttribArray(4);
-	/*
-	// bone weights
-	// part 1
-	glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, stride, (void*)(8 * sizeof(float)));
-	glEnableVertexAttribArray(3);
-	// part 2
-	glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, stride, (void*)(12 * sizeof(float)));
-	glEnableVertexAttribArray(4);
-	*/
+	glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex),
+		(void*)offsetof(Vertex, m_Weights));
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);

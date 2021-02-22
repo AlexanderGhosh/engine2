@@ -26,8 +26,8 @@
 #define DBG_NEW new
 #endif
 
-
-#define MAX_BONE_WEIGHTS 4
+#define MAX_BONE_INFLUENCE 4
+#define MAX_BONE_WEIGHTS MAX_BONE_INFLUENCE
 #define NOT !
 #define AND &&
 #define OR ||
