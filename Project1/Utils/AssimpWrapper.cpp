@@ -2,8 +2,9 @@
 #include "../Rendering/Animation/Bones.h"
 #include "../Rendering/Animation/Animation.h"
 #include "General.h"
+#include <gtc/type_ptr.hpp>
 
-const std::vector<Primative::Mesh*> FileReaders::AssimpWrapper::loadModel(std::string path)
+const std::tuple<std::vector<Primative::Mesh*>, std::vector<Render::Animation::Animation>, Render::Animation::Skeleton> FileReaders::AssimpWrapper::loadModel(std::string path)
 {
     std::vector<Primative::Mesh*> meshes;
     Assimp::Importer import;
@@ -12,15 +13,14 @@ const std::vector<Primative::Mesh*> FileReaders::AssimpWrapper::loadModel(std::s
     if (NOT scene OR scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE OR NOT scene->mRootNode)
     {
         std::cout << "ERROR::ASSIMP::" << import.GetErrorString() << std::endl;
-        return meshes;
+        return { meshes, { }, { } };
     }
     //std::string directory = path.substr(0, path.find_last_of('/'));
 
     Render::Animation::Skeleton skeleton;
     processNode(scene->mRootNode, scene, meshes, skeleton);
     auto animations = createAnimations(scene->mRootNode, scene, skeleton);
-
-    return meshes;
+    return { meshes, animations, skeleton };
 }
 
 void FileReaders::AssimpWrapper::processNode(aiNode* node, const aiScene* scene, std::vector<Primative::Mesh*>& meshes, Render::Animation::Skeleton& skeleton)
@@ -30,7 +30,7 @@ void FileReaders::AssimpWrapper::processNode(aiNode* node, const aiScene* scene,
     {
         aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
         meshes.push_back(processMeshVertices(mesh, scene));
-        processMeshBones(mesh, meshes.back(), skeleton);
+        processMeshBones(mesh, meshes.back(), skeleton, scene);
 
         for (Primative::Vertex& vert : meshes.back()->verts) {
             normaliseBone(vert);
@@ -138,7 +138,7 @@ Primative::Mesh* FileReaders::AssimpWrapper::processMeshVertices(aiMesh* mesh, c
 /// </summary>
 /// <param name="mesh"></param>
 /// <param name="currentMesh"></param>
-void FileReaders::AssimpWrapper::processMeshBones(aiMesh* mesh, Primative::Mesh* currentMesh, Render::Animation::Skeleton& skeleton)
+void FileReaders::AssimpWrapper::processMeshBones(aiMesh* mesh, Primative::Mesh* currentMesh, Render::Animation::Skeleton& skeleton, const aiScene* scene)
 {
     if (!mesh->HasBones())
         return;
@@ -146,14 +146,14 @@ void FileReaders::AssimpWrapper::processMeshBones(aiMesh* mesh, Primative::Mesh*
         aiBone* bone = mesh->mBones[i];
         Render::Animation::Bone skel_bone;
         skel_bone.setName(bone->mName.C_Str());
-        skel_bone.setTransformation(toMat4(bone->mOffsetMatrix));
+        skel_bone.setTransformation(toMat4(scene->mRootNode->mTransformation * bone->mOffsetMatrix));
         skeleton.addBone(skel_bone);
 
-        aiMatrix4x4 transformation = bone->mOffsetMatrix;
         for (int j = 0; j < bone->mNumWeights; j++) {
             aiVertexWeight weight = bone->mWeights[j];
+            assert(weight.mVertexId < currentMesh->verts.size());
             Primative::Vertex& currVertex = currentMesh->verts[weight.mVertexId];
-            addBone(currVertex, weight);
+            addBone(currVertex, weight, skeleton.getBones().size()-1);
         }
     }
     return;
@@ -163,57 +163,64 @@ void FileReaders::AssimpWrapper::processMeshBones(aiMesh* mesh, Primative::Mesh*
 /// </summary>
 /// <param name="vertex"></param>
 /// <param name="weighting"></param>
-void FileReaders::AssimpWrapper::addBone(Primative::Vertex& vertex, const aiVertexWeight& weighting)
+void FileReaders::AssimpWrapper::addBone(Primative::Vertex& vertex, const aiVertexWeight& weighting, Unsigned boneId)
 {
-    Render::Animation::BoneDetails min_bone = vertex.boneDetails[0];
-    float min_weight = min_bone.boneWeight;
+    float min_weight = vertex.weights[0];
     short j = 0;
     for (short i = 1; i < MAX_BONE_WEIGHTS; i++) {
-        Render::Animation::BoneDetails& bone = vertex.boneDetails[i];
-        if (bone.boneWeight < min_weight) {
-            min_weight = bone.boneWeight;
-            min_bone = bone;
+        if (vertex.weights[i] < min_weight) {
+            min_weight = vertex.weights[i];
             j = i;
         }
     }
-    if (j > 0) {
-        int g = 0;
-    }
-    vertex.boneDetails[j].boneIndex = weighting.mVertexId;
-    vertex.boneDetails[j].boneWeight = weighting.mWeight;
+    vertex.ids[j] = boneId;
+    vertex.weights[j] = weighting.mWeight;
 }
 
 void FileReaders::AssimpWrapper::normaliseBone(Primative::Vertex& vertex)
 {
-    float sum = 0;
+    glm::vec4 t = vertex.weights;
+    vertex.weights = glm::normalize(t);
+    for (char i = 0; i < 4; i++) {
+        if (glm::isinf(vertex.weights[i]) OR glm::isnan(vertex.weights[i])) {
+            vertex.weights[i] = t[i];
+        }
+    }
+    /*float sum = 0;
     for (const auto& b : vertex.boneDetails) {
         sum += powf(b.boneWeight, 2.0f);
     }
     sum = powf(sum, 0.5f);
     for (auto& b : vertex.boneDetails) {
         b.boneWeight /= sum;
-    }
+    }*/
 }
 
 std::vector<Render::Animation::Animation> FileReaders::AssimpWrapper::createAnimations(aiNode* rootNode, const aiScene* scene, const Render::Animation::Skeleton& skeleton)
 {
     std::vector<Render::Animation::Animation> animations;
-    glm::mat4 globalInverseTransformation = glm::inverse(toMat4(scene->mRootNode->mTransformation));
+    glm::mat4 globalInverseTransformation = toMat4(scene->mRootNode->mTransformation.Inverse());
     // Process all animations
     for (int i = 0; i < scene->mNumAnimations; i++) {
-        aiAnimation* aiAnimation = scene->mAnimations[i];
-        int maxFrames = calcAnimationFrameCount(aiAnimation);
+        aiAnimation* currentAnimation = scene->mAnimations[i];
+        int maxFrames = calcAnimationFrameCount(currentAnimation);
 
-        Render::Animation::Animation animation(aiAnimation->mName.C_Str(), aiAnimation->mDuration);
+        Render::Animation::Animation animation(currentAnimation->mName.C_Str(), currentAnimation->mDuration);
 
-            //aiAnimation.mName().dataString(), frames, aiAnimation.mDuration();
+            //currentAnimation.mName().dataString(), frames, currentAnimation.mDuration();
 
+        float deltaTime = currentAnimation->mDuration / static_cast<float>(maxFrames);
         for (int j = 0; j < maxFrames; j++) {
             Render::Animation::KeyFrame animatedFrame;
             const int s = skeleton.getBones().size();
             animatedFrame.translations.reserve(s);
             animatedFrame.translations.resize(s);
-            processAnimNode(aiAnimation, rootNode, toMat4(scene->mRootNode->mTransformation), globalInverseTransformation, animatedFrame, j, skeleton.getBones());
+            for (int i = 0; i < s; i++) {
+                animatedFrame.translations[i] = glm::mat4(1);
+            }
+            //toMat4(scene->mRootNode->mTransformation)
+
+            processAnimNode(currentAnimation, rootNode, toMat4(scene->mRootNode->mTransformation), globalInverseTransformation, animatedFrame, j, skeleton.getBones());
             animation.addKeyFrame(animatedFrame);
         }
         animations.push_back(animation);
@@ -221,9 +228,9 @@ std::vector<Render::Animation::Animation> FileReaders::AssimpWrapper::createAnim
     return animations;
 }
 
-void FileReaders::AssimpWrapper::processAnimNode(const aiAnimation* anim, aiNode* node, 
+void FileReaders::AssimpWrapper::processAnimNode(const aiAnimation* anim, const aiNode* node, 
     const glm::mat4& parentsTransform, const glm::mat4& globalInverseTransform,
-    Render::Animation::KeyFrame& keyFrame, int frame, const std::vector<Render::Animation::Bone>& bones)
+    Render::Animation::KeyFrame& keyFrame, const int frame, const std::vector<Render::Animation::Bone>& bones)
 {
     const std::string nodeName = node->mName.C_Str();
     glm::mat4 nodeTransform = toMat4(node->mTransformation);
@@ -241,20 +248,20 @@ void FileReaders::AssimpWrapper::processAnimNode(const aiAnimation* anim, aiNode
     }
     glm::mat4 nodeGlobalTransform = parentsTransform * nodeTransform;
     // get all bones whos name == nodeName then do tranformation stuff
+    glm::mat4 git = glm::inverse(toMat4(node->mTransformation));
     for (int i = 0; i < bones.size(); i++) {
         const Render::Animation::Bone& bone = bones[i];
         if (bone.getName() == nodeName) {
             glm::mat4 boneTransform = globalInverseTransform * nodeGlobalTransform * bone.getTransformation();
+            // glm::mat4 boneTransform = bone.getTransformation() * nodeGlobalTransform * globalInverseTransform;
             keyFrame.translations[i] = boneTransform;
+            break;
         }
     }
 
-    glm::mat4 global = parentsTransform * nodeTransform;
-
     // for each child of node reccersive
     for (int i = 0; i < node->mNumChildren; i++) {
-        aiNode* n = node->mChildren[i];
-        processAnimNode(anim, n, global, globalInverseTransform, keyFrame, frame, bones);
+        processAnimNode(anim, node->mChildren[i], nodeGlobalTransform, globalInverseTransform, keyFrame, frame, bones);
     }
 }
 
@@ -271,40 +278,96 @@ int FileReaders::AssimpWrapper::calcAnimationFrameCount(const aiAnimation* animt
     return maxFrames;
 }
 
-glm::mat4 FileReaders::AssimpWrapper::buildMatrix(const aiNodeAnim* node, int frame)
+glm::mat4 FileReaders::AssimpWrapper::buildMatrix(const aiNodeAnim* node, float frame)
 {
-    aiVectorKey* positionKeys   = node->mPositionKeys;
-    aiVectorKey* scalingKeys    = node->mScalingKeys;
-    aiQuatKey* rotationKeys = node->mRotationKeys;
-
-    aiVectorKey aiVecKey;
-    aiVector3D vec;
-
-    glm::mat4 nodeTransform(1);
-    int numPositions = node->mNumPositionKeys;
+    int f = static_cast<int>(frame);
+    
+    // position
+    glm::mat4 translation(1);
+    if (node->mNumPositionKeys == 1 OR true) {
+        translation = glm::translate(translation, toVec3(node->mPositionKeys[f].mValue));
+    }
+    /*int numPositions = node->mNumPositionKeys;
     if (numPositions > 0) {
-        aiVecKey = positionKeys[static_cast<int>(fminf(numPositions - 1, frame))];
+        aiVecKey = positionKeys[numPositions - 1];
+        for (int i = 0; i < numPositions; i++) {
+            if (positionKeys[i].mTime == static_cast<double>(frame)) {
+                aiVecKey = positionKeys[i];
+                break;
+            }
+        }
+        //aiVecKey = positionKeys[static_cast<int>(fminf(numPositions - 1, frame))];
         vec = aiVecKey.mValue;
         nodeTransform = glm::translate(nodeTransform, glm::vec3(vec.x, vec.y, vec.z));
+    }*/
+    // rotation
+    glm::mat4 rotation(1);
+    if (node->mNumRotationKeys == 1 OR true) {
+        rotation = glm::mat4_cast(toQuat(node->mRotationKeys[f].mValue));
     }
-    int numRotations = node->mNumRotationKeys;
+    /*int numRotations = node->mNumRotationKeys;
     if (numRotations > 0) {
-        aiQuatKey quatKey = rotationKeys[static_cast<int>(fminf(numRotations - 1, frame))];
+        aiQuatKey quatKey = rotationKeys[numRotations - 1];
+        for (int i = 0; i < numRotations; i++) {
+            if (rotationKeys[i].mTime == static_cast<double>(frame)) {
+                quatKey = rotationKeys[i];
+                break;
+            }
+        }
+        // aiQuatKey quatKey = rotationKeys[static_cast<int>(fminf(numRotations - 1, frame))];
         aiQuaternion aiQuat = quatKey.mValue;
-        glm::quat quat(aiQuat.x, aiQuat.y, aiQuat.z, aiQuat.w);
-        nodeTransform = Utils::rotate(nodeTransform, quat);
-    }
-    int numScalingKeys = node->mNumScalingKeys;
-    if (numScalingKeys > 0) {
-        aiVecKey = scalingKeys[static_cast<int>(fminf(numScalingKeys - 1, frame))];
-        vec = aiVecKey.mValue;
-        nodeTransform = glm::translate(nodeTransform, glm::vec3(vec.x, vec.y, vec.z));
-    }
+        glm::quat quat = glm::quat(aiQuat.w, aiQuat.x, aiQuat.y, aiQuat.z);
+        // nodeTransform = Utils::rotate(nodeTransform, quat);
 
-    return nodeTransform;
+        nodeTransform = nodeTransform * glm::mat4(quat);
+    }*/
+    // scaling
+    glm::mat4 scale(1);
+    if (node->mNumScalingKeys == 1 OR true) {
+        scale = glm::scale(scale, toVec3(node->mScalingKeys[f].mValue));
+    }
+    /*int numScalingKeys = node->mNumScalingKeys;
+    if (numScalingKeys > 0) {
+        aiVecKey = scalingKeys[numScalingKeys - 1];
+        for (int i = 0; i < numScalingKeys; i++) {
+            if (scalingKeys[i].mTime == static_cast<double>(frame)) {
+                aiVecKey = scalingKeys[i];
+                break;
+            }
+        }
+        // aiVecKey = scalingKeys[static_cast<int>(fminf(numScalingKeys - 1, frame))];
+        vec = aiVecKey.mValue;
+        nodeTransform = glm::scale(nodeTransform, glm::vec3(vec.x, vec.y, vec.z));
+    }*/
+    /*for (int i = 0; i < node->mNumRotationKeys; i++) {
+        std::cout << glm::to_string(glm::transpose(glm::translate(glm::mat4(toQuat(node->mRotationKeys[i].mValue)), toVec3(node->mPositionKeys[i].mValue)))) << std::endl;
+    }
+    std::cout << "==========================\n";*/
+    scale = glm::mat4(1);
+    return  rotation * translation * scale;
 }
 
 const glm::mat4 FileReaders::AssimpWrapper::toMat4(const aiMatrix4x4& matrix)
 {
-    return glm::mat4(1);
+    // return glm::transpose(glm::make_mat4(&matrix.a1));
+    glm::mat4 res(1);
+    res[0][0] = matrix.a1; res[1][0] = matrix.a2;
+    res[2][0] = matrix.a3; res[3][0] = matrix.a4;
+    res[0][1] = matrix.b1; res[1][1] = matrix.b2;
+    res[2][1] = matrix.b3; res[3][1] = matrix.b4;
+    res[0][2] = matrix.c1; res[1][2] = matrix.c2;
+    res[2][2] = matrix.c3; res[3][2] = matrix.c4;
+    res[0][3] = matrix.d1; res[1][3] = matrix.d2;
+    res[2][3] = matrix.d3; res[3][3] = matrix.d4;
+    return res;
+}
+
+const glm::vec3 FileReaders::AssimpWrapper::toVec3(const aiVector3D& vector)
+{
+    return glm::vec3(vector.x, vector.y, vector. z);
+}
+
+const glm::quat FileReaders::AssimpWrapper::toQuat(const aiQuaternion& quat)
+{
+    return glm::normalize(glm::quat(quat.w, quat.x, quat.y, quat.z));
 }

@@ -8,7 +8,7 @@
 
 char Primative::StaticBuffer::usedBindingPoint = -1;
 
-Primative::VertexBuffer::VertexBuffer(const Mesh& mesh, GLenum shape_type, GLenum draw_type) : VertexBuffer()
+Primative::VertexBuffer::VertexBuffer(/*const*/ Mesh& mesh, GLenum shape_type, GLenum draw_type) : VertexBuffer()
 {
 	this->drawType = draw_type;
 	this->shape_type = shape_type;
@@ -20,6 +20,11 @@ Primative::VertexBuffer::VertexBuffer(const Mesh& mesh, GLenum shape_type, GLenu
 
 	this->bind();
 
+	for (int i = 0; i < mesh.verts.size(); i++) {
+		auto& v = mesh.verts[i];
+		v.ids = glm::vec4(0, 0, 0, 1);
+	}
+
 	// VBO
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, mesh.verts.size() * sizeof(Primative::Vertex), &mesh.verts[0], drawType);
@@ -28,7 +33,7 @@ Primative::VertexBuffer::VertexBuffer(const Mesh& mesh, GLenum shape_type, GLenu
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.indices.size() * sizeof(unsigned), &mesh.indices[0], GL_STATIC_DRAW);
 
-	int stride = 8 * sizeof(float) + 2 * MAX_BONE_WEIGHTS * sizeof(float);
+	int stride = 12 * sizeof(float) + 2 * sizeof(int);
 	// layouts in shader
 	// pos
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
@@ -42,11 +47,20 @@ Primative::VertexBuffer::VertexBuffer(const Mesh& mesh, GLenum shape_type, GLenu
 
 	// bone weights
 	// part 1
+	glVertexAttribIPointer(3, 4, GL_FALSE, stride, (void*)(8 * sizeof(float)));
+	glEnableVertexAttribArray(3);
+	// part 2
+	glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, stride, (void*)(12 * sizeof(float)));
+	glEnableVertexAttribArray(4);
+	/*
+	// bone weights
+	// part 1
 	glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, stride, (void*)(8 * sizeof(float)));
 	glEnableVertexAttribArray(3);
 	// part 2
 	glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, stride, (void*)(12 * sizeof(float)));
 	glEnableVertexAttribArray(4);
+	*/
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);

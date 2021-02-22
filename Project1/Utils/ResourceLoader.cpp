@@ -7,15 +7,16 @@
 #include "AssimpWrapper.h"
 #include "../Primatives/Material.h"
 #include "../Primatives/Buffers.h"
+#include "../Primatives/Model.h"
 
 
 std::string ResourceLoader::defaultShaderName = "";
 std::unordered_map<std::string, unsigned> ResourceLoader::shaders = { };
 std::unordered_map<std::string, unsigned> ResourceLoader::textures = { };
 std::vector<Primative::VertexBuffer> ResourceLoader::buffers = { };
-std::vector<glm::mat4> ResourceLoader::bones = { };
+std::unordered_map<std::string, Render::Animation::Animation> ResourceLoader::animations = { };
 std::vector<Materials::Material*> ResourceLoader::materials = { };
-std::unordered_map<std::string, std::vector<unsigned>> ResourceLoader::models = { };
+std::unordered_map<std::string, Primative::Model> ResourceLoader::models = { };
 
 std::string ResourceLoader::createShader(const std::string& filePath)
 {
@@ -231,61 +232,68 @@ void ResourceLoader::cleanUp()
     }
     buffers.clear();
     for (auto& m : models) {
-        m.second.clear();
+        m.second.cleanUp();
     }
     for (auto& m : materials) {
         m->cleanUp();
     }
     models.clear();
+    for (auto itt = animations.begin(); itt != animations.end();) {
+        (*itt).second.cleanUp();
+        itt = animations.erase(itt);
+    }
+    animations.clear();
 }
 
-const std::vector<unsigned> ResourceLoader::processMeshData(std::vector<Primative::Mesh*>& data, const std::string& name, GLenum draw_type, const bool deleteAble)
+const Primative::Model ResourceLoader::processMeshData(std::vector<Primative::Mesh*>& data, const std::string& name, GLenum draw_type, const bool deleteAble)
 {
     std::vector<unsigned> res;
     if (data.empty()) {
-        return res;
+        return Primative::Model();
     }
     auto& model = models[name];
     for (auto& m : data) {
         buffers.emplace_back(*m, draw_type);
         res.push_back(buffers.size() - 1);
-        model.push_back(buffers.size() - 1);
+        model.addBuffer(buffers.size() - 1);
         if(deleteAble)
             delete m;
         m = nullptr;
     }
-    return res;
+    return model;
 }
 
-const std::vector<unsigned> ResourceLoader::createModel(const std::string& filePath, GLenum draw_type)
+const Primative::Model ResourceLoader::createModel(const std::string& filePath, GLenum draw_type)
 {
-    std::vector<Primative::Mesh*> data = FileReaders::AssimpWrapper::loadModel(filePath);
+    auto data = FileReaders::AssimpWrapper::loadModel(filePath);
     const std::string name = Utils::getFileName(filePath, 1);
-    return processMeshData(data, name, draw_type, true);
+    for (auto itt = std::get<1>(data).begin(); itt != std::get<1>(data).end(); itt++) {
+        animations.insert({ (*itt).getName(), (*itt) });
+    }
+    Primative::Model model = processMeshData(std::get<0>(data), name, draw_type, true);
+    model.setSkeleton(std::get<2>(data));
+    return model;
 }
 
-const std::vector<unsigned> ResourceLoader::createModel(Primative::Mesh* meshes, const std::string& name, GLenum draw_type, const bool deleteAble)
+const Primative::Model ResourceLoader::createModel(Primative::Mesh* meshes, const std::string& name, GLenum draw_type, const bool deleteAble)
 {
     std::vector<Primative::Mesh*> data = { meshes };
     return createModel(data, name, draw_type, deleteAble);
 }
 
-const std::vector<unsigned> ResourceLoader::createModel(std::vector<Primative::Mesh*>& meshes, const std::string& name, GLenum draw_type, const bool deleteAble) {
+const Primative::Model ResourceLoader::createModel(std::vector<Primative::Mesh*>& meshes, const std::string& name, GLenum draw_type, const bool deleteAble) {
     return processMeshData(meshes, name, draw_type, deleteAble);
 }
 
-const std::vector<unsigned> ResourceLoader::getModel(const std::string& name)
+const Primative::Model ResourceLoader::getModel(const std::string& name)
 {
-    unsigned s = models.size();
+    const unsigned s = models.size();
     auto& r = models[name];
     if (s < models.size()) {
         models.erase(name);
+        return Primative::Model();
     }
-    std::vector<unsigned> res;
-    for (unsigned& i : r) {
-        res.push_back(i);
-    }
-    return res;
+    return r;
 }
 
 Primative::VertexBuffer& ResourceLoader::getBuffer(const unsigned& index)
@@ -301,4 +309,15 @@ Materials::Material* ResourceLoader::getMaterial(const int& index)
 void ResourceLoader::addMaterial(Materials::Material* mat)
 {
     materials.push_back(mat);
+}
+
+const Render::Animation::Animation& ResourceLoader::getAnimation(String name)
+{
+    const unsigned s = animations.size();
+    Render::Animation::Animation& res = animations[name];
+    if (s != animations.size()) {
+        animations.erase(name);
+        return Render::Animation::Animation();
+    }
+    return res;
 }

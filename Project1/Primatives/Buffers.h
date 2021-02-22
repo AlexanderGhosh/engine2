@@ -20,10 +20,11 @@ namespace Primative {
 		inline const unsigned getEBO() const { return EBO; };
 
 		inline VertexBuffer() : VBO(0), VAO(0), EBO(0), num_indices(0), shape_type(GL_TRIANGLES), drawType(GL_STATIC_DRAW) { };
-		VertexBuffer(const Mesh& mesh, GLenum shape_type = GL_TRIANGLES, GLenum draw_type = GL_STATIC_DRAW);
+		VertexBuffer(/*const*/ Mesh& mesh, GLenum shape_type = GL_TRIANGLES, GLenum draw_type = GL_STATIC_DRAW);
 		inline void bind() const { glBindVertexArray(VAO); };
 		inline void unBind() const { glBindVertexArray(0); };
-		inline void draw() const { glDrawElements(shape_type, num_indices, GL_UNSIGNED_INT, 0); };
+		inline void draw() const { 
+			glDrawElements(shape_type, num_indices, GL_UNSIGNED_INT, 0); };
 		inline void setDrawType(GLenum type) { drawType = type; };
 		void cleanUp();
 	};

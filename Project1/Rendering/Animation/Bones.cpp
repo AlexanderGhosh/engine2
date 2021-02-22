@@ -73,3 +73,8 @@ bool Render::Animation::Skeleton::hasBones() const
 {
     return !bones.empty();
 }
+
+void Render::Animation::Skeleton::cleanUp()
+{
+    bones.clear();
+}

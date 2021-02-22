@@ -8,6 +8,7 @@ in VS_OUT {
     vec2 texCoords;
     vec3 worldPos;
     vec3 camPos;
+    vec4 ws;
 } fs_in;
 
 struct Material {
@@ -108,6 +109,10 @@ vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
 // ----------------------------------------------------------------------------
 void main()
 {
+    vec3 c = fs_in.ws.xyz;
+    //c = normalize(c);
+    FragColor = vec4(c, 1);
+    return;
     vec3 albedo = pow(getData(material.albedo_vec, material.albedo_id), vec3(2.2));
     
     float metallic = getData(material.metalic_vec, material.metalic_id).r;

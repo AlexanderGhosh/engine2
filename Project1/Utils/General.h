@@ -42,6 +42,7 @@ constexpr float INV_PI = 1.0f / PI;
 #define Vector3 const glm::vec3&
 #define Quaternion const glm::quat&
 #define Matrix3 const glm::mat3&
+#define Matrix4 const glm::mat4&
 #define String const std::string&
 #define Float const float&
 #define Unsigned const unsigned&
@@ -64,11 +65,17 @@ namespace Utils {
         return tokens;
     };
 
-    inline glm::mat4 rotate(glm::mat4 matrix, const glm::vec3& vec) {
+    inline glm::mat4 translate(glm::mat4 matrix, Vector3 vec) {
+        for (char i = 0; i < 3; i++)
+            matrix[3][i] = vec[i];
+        return matrix;
+    }
+
+    inline glm::mat4 rotate(Matrix4 matrix, Vector3 vec) {
         if (glm::all(glm::equal(vec, { 0, 0, 0 }))) return matrix;
         return glm::rotate(matrix, glm::radians(glm::length(vec)), glm::normalize(vec));
     };
-    inline glm::mat4 rotate(glm::mat4 matrix, const glm::quat& vec) {
+    inline glm::mat4 rotate(Matrix4 matrix, Quaternion vec) {
         return matrix * glm::mat4_cast(vec);
     }
     template<class T>
@@ -254,6 +261,7 @@ namespace Utils {
         else
             return glm::inverse(a);
     }
+
     class Timer {
     public:
         inline Timer(const std::string name) : s(), e(), pausing(), name(name) {  };

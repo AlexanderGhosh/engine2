@@ -7,6 +7,8 @@
 #include <glm.hpp>
 #include <gtc/matrix_transform.hpp>
 #include <gtx/string_cast.hpp>
+#include <gtx/matrix_decompose.hpp>
+
 
 #include "Rendering/Rendering.h"
 #include "Rendering/Shading/Manager.h"
@@ -21,6 +23,7 @@
 #include "UI/TextRenderer.h"
 #include "UI/Elements/TextField.h"
 #include "Componets/AudioSource.h"
+#include "Componets/Animated.h"
 #include "Componets/Camera.h"
 #include "UI/Panes/Grid.h"
 #include "UI/Elements/ImageBox.h"
@@ -33,6 +36,7 @@
 #include "Componets/Rigidbody.h"
 #include "Physics/ConstraintEngine/Constraints/DistanceConstraint.h"
 #include "Physics/ConstraintEngine/ConstraitnsSolver.h"
+#include "Primatives/Model.h"
 
 #include "MainWindow.h"
 #include "Context.h"
@@ -71,42 +75,22 @@ int main() {
     main.init("Engine 2", { GL_DEPTH_TEST, GL_CULL_FACE, GL_MULTISAMPLE, GL_TEXTURE_CUBE_MAP_SEAMLESS });
 
     cam.setPos({ 0, 0, 0 }); // 200, 700
-    
+
+    Utils::Timer timer("Shaders");
+    timer.start();
     ResourceLoader::createShader("Resources/DefaultShader");
     ResourceLoader::createShader("Resources/ShadowShader");
     ResourceLoader::createShader("Resources/PBRShader");
     ResourceLoader::createShader("Resources/UIShader");
     ResourceLoader::createShader("Resources/TextShader");
-        
-    // pyramid
-    /*Primative::Mesh* m = DBG_NEW Primative::Mesh();
-    Primative::Vertex v1({ -0.5, -0.5, -0.5 });
-    Primative::Vertex v2({ 0.5, -0.5, -0.5 });
-    Primative::Vertex v3({ 0.5, 0.5, -0.5 });
-    Primative::Vertex v4({ -0.5, 0.5, -0.5 });
-    Primative::Vertex v5({ 0, 0, 0.5 });
-    
-    m->verts.push_back(v1);
-    m->verts.push_back(v2);
-    m->verts.push_back(v3);
-    m->verts.push_back(v4);
-    m->verts.push_back(v5);
-    
-    m->indices = {
-        0, 1, 3, 
-        3, 1, 2,
-        0, 4, 1,
-        0, 4, 3,
-        2, 4, 1,
-        2, 4, 3
-    };*/
-    Utils::Timer timer("Model loading");
-    timer.start();
-    std::vector<unsigned> sphereBuffer = ResourceLoader::createModel("Resources/Models/man.dae");
-    std::vector<unsigned> cubeBuffer   = ResourceLoader::createModel("Resources/Models/cube.obj");
-    // std::vector<unsigned> animatedMan  = ResourceLoader::createModel("Resources/Models/man.dae");
-    // std::vector<unsigned> bsgModel     = ResourceLoader::createModel("Resources/Models/bsg.obj");
     timer.log();
+
+    timer.reName("Models");
+    timer.start();
+    const Primative::Model manModel = ResourceLoader::createModel("Resources/Models/man.dae");
+    const Primative::Model cubeBuffer   = ResourceLoader::createModel("Resources/Models/cube.obj"); // needed for the skybox
+    timer.log();
+
     timer.reName("Textures");
     timer.start();
     const unsigned ba   = ResourceLoader::createTexture("Resources/Textures/rust base.png",      TextureType::AlbedoMap);
@@ -120,42 +104,72 @@ int main() {
 
     timer.reName("Object 1");
     timer.start();
-    Render::RenderMesh cubeR = Render::RenderMesh();
-    cubeR.addBuffers(sphereBuffer);
-    Materials::PBR cubeMat1/* = Materials::PBR({ { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 0, 0, 0 } }, { { 0.15, 0, 0 } }, { { 0, 0, 0 } })*/;
+    Component::RenderMesh manR1 = Component::RenderMesh();
+    manR1.setModel(manModel);
+    Materials::PBR manMaterial1/* = Materials::PBR({ { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 0, 0, 0 } }, { { 0.15, 0, 0 } }, { { 0, 0, 0 } })*/;
 #define MI Materials::MatItem
-    cubeMat1 = Materials::PBR(MI(ba), MI(n), MI(m), MI(r), MI(Utils::xAxis(0.2)));
-    cubeMat1.setHDRmap(hdr);
-    cubeMat1.setIBLmap(ibl);
-    cubeMat1.setBRDFtex(brdf);
-    cubeR.setMaterial({ &cubeMat1 });
-    
-    GameObject cube1 = GameObject();
-    cube1.getTransform()->Position = { 0, 0, -5 };
-    cube1.addComponet(&cubeR);
+    manMaterial1 = Materials::PBR(MI(ba), MI(n), MI(m), MI(r), MI(Utils::xAxis(0.2)));
+    manMaterial1.setHDRmap(hdr);
+    manMaterial1.setIBLmap(ibl);
+    manMaterial1.setBRDFtex(brdf);
+    manR1.setMaterial({ &manMaterial1 });
+
+    Component::Animated manAnimatedComp = Component::Animated();
+    manAnimatedComp.addAnimation(ResourceLoader::getAnimation(""));
+    manAnimatedComp.startAnimation("");
+    GameObject manObject = GameObject();
+    manObject.getTransform()->Position = { 0, 0, -5 };
+    manObject.addComponet(&manR1);
+    manObject.addComponet(&manAnimatedComp);
     timer.stop();
+
+    timer.reName("Bone Objects");
+    timer.start();
+
+    // bones
+    Materials::PBR cubeMaterial1 = Materials::PBR({ { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 0, 0, 0 } }, { { 0.15, 0, 0 } }, { { 0, 0, 0 } });
+    Component::RenderMesh boneR = Component::RenderMesh();
+    boneR.setModel(cubeBuffer);
+    boneR.setMaterial({ &cubeMaterial1 });
+    std::list<GameObject> bones;
+    std::list<Component::RenderMesh> boneMeshes;
+    // manR1.getModel().getSkeleton().getBones().size()
+   
+
+    for (int i = 0; i < manR1.getModel().getSkeleton().getBones().size(); i++) {
+        bones.push_back({});
+        GameObject& bone = bones.back();
+        boneMeshes.push_back(boneR.copy());
+        bone.addComponet(&boneMeshes.back());
+        glm::vec3 skew;
+        glm::vec4 perspective;
+        auto frame = manAnimatedComp.getCurrentFrame();
+        glm::decompose(manModel.getSkeleton().getBones()[i].getTransformation() * manObject.getTransform()->getModel(), bone.getTransform()->Scale, bone.getTransform()->Rotation, bone.getTransform()->Position, skew, perspective);
+        // bone.getTransform()->Position = { 0, 5 * (i + 1), 0 };
+        bone.getTransform()->Scale *= 0.25f;
+    }
     
     // Physics::BoxColliderSAT collider1 = Physics::BoxColliderSAT(10);
-    // cube1->addComponet(&collider1);
+    // manObject->addComponet(&collider1);
     // 
     // Component::RigidBody rb1 = Component::RigidBody();
     // rb1.isKinimatic = true;
     // rb1.hasGravity = false;
-    // cube1->addComponet(&rb1);
+    // manObject->addComponet(&rb1);
     
 
     timer.reName("Object 2");
     timer.start();
-    Render::RenderMesh cubeR2 = Render::RenderMesh();
+    /*Component::RenderMesh cubeR2 = Component::RenderMesh();
     auto model = ResourceLoader::getModel("sphere.obj");
-    cubeR2.addBuffers(model);
+    cubeR2.setModel(model);
     Materials::PBR cubeMat2 = Materials::PBR({ { 0, 1, 1 } }, { { 1, 0, 0 } }, { { 0.5, 0, 0 } }, { { 0.2, 0, 0 } }, { { 0.5, 0, 0 } });
     cubeR2.setMaterial({ &cubeMat2 });
     
     GameObject cube2 = GameObject();
     cube2.getTransform()->Position = { 0, 1, -5 };
     cube2.addComponet(&cubeR2);
-    timer.stop();
+    timer.stop();*/
     
     //Physics::BoxColliderSAT collider2 = Physics::BoxColliderSAT(10);
     //cube2->addComponet(&collider2);
@@ -166,7 +180,7 @@ int main() {
 
 
     //Render::RenderMesh bsgMesh = Render::RenderMesh();
-    //bsgMesh.addBuffers(bsgModel);
+    //bsgMesh.setModel(bsgModel);
     //Materials::PBR bsgMaterial = Materials::PBR({ { 0.542, 0.497, 0.449 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 0.9, 0, 0 } }, { { 0, 0, 0 } });
     //bsgMesh.setMaterial({ &bsgMaterial });
 
@@ -215,10 +229,11 @@ int main() {
     // scene.addPreProcLayer("shadows", ResourceLoader::getShader("ShadowShader"));
     scene.addPreProcLayer("final", ResourceLoader::getShader(PBRen ? "PBRShader" : "DefaultShder"));
     scene.setPostProcShader(ResourceLoader::getShader(PBRen ? "PBRShader" : "DefaultShder")); // PBRShader
-    // scene.addObject(gun);
-    scene.addObject(&cube1);
-    scene.addObject(&cube2);
-    //scene.addObject(&bsgObject);
+
+    for (GameObject& bone : bones) {
+        scene.addObject(&bone);
+    }
+    scene.addObject(&manObject);
 
     scene.setBG({ 1, 0, 1 });
     timer.log();
@@ -269,6 +284,8 @@ int main() {
     // cube2->getTransform()->Position = { 0.5, 5, -5 };
     // cube2->getRigidbody()->hasGravity = true;
     //cube2->getRigidbody()->velocityAdder({ 1, -1, 0 });
+
+    float counter = 0;
     while (!main.shouldClose())
     {
         // FPS--------------------------------------------------------------------------------------------------------------------------------------------------
@@ -282,6 +299,21 @@ int main() {
 
         // UPDATES----------------------------------------------------------------------------------------------------------------------------------------------
         scene.updateScene();
+
+        counter += main.getTime().deltaTime;
+        if (counter >= 0.2 AND Events::Handler::getKey(Events::Key::Num_0, Events::Action::Down)) {
+            counter = 0;
+            manAnimatedComp.nextFrame();
+            std::cout << "Next Frame\n";
+            int i = 0;
+            for (GameObject& bone : bones) {
+                auto frame = manAnimatedComp.getCurrentFrame();
+                glm::vec3 skew;
+                glm::vec4 perspective;
+                glm::decompose(frame.translations[i++], bone.getTransform()->Scale, bone.getTransform()->Rotation, bone.getTransform()->Position, skew, perspective);
+                bone.getTransform()->Scale *= 0.25f;
+            }
+        }
 
         // RENDERING--------------------------------------------------------------------------------------------------------------------------------------------
         main.disable(GL_CULL_FACE);
@@ -297,11 +329,12 @@ int main() {
         // cube2->getTransform()->Position.x -= 0.01;
         Physics::Engine::update();
 
+
     
         // EVENTS-----------------------------------------------------------------------------------------------------------------------------------------------
         float speed = 1;
         if(Events::Handler::getCursor(Events::Cursor::Middle, Events::Action::Down)) {
-            speed = 100;
+            speed = 10;
         }
         if (Events::Handler::getKey(Events::Key::W, Events::Action::Down)) {
             cam.setPos(cam.getPos() + cam.getForward() * glm::vec3(1, 0, 1) * main.getTime().deltaTime * speed);
@@ -321,6 +354,7 @@ int main() {
         if (Events::Handler::getKey(Events::Key::L_Shift, Events::Action::Down)) {
             cam.setPos(cam.getPos() - Utils::yAxis() * main.getTime().deltaTime * speed);
         }
+
 
 
         if (Events::Handler::getKey(Events::Key::Escape, Events::Action::Down)) {

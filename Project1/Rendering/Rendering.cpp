@@ -3,8 +3,9 @@
 #include "Shading/Manager.h"
 #include "../Componets/Componets.h"
 #include "../GameObject/GameObject.h"
+#include "../Componets/Animated.h"
 
-Render::RenderMesh::RenderMesh() : buffers(), materials(), Component::ComponetBase()
+Component::RenderMesh::RenderMesh() : model(), materials(), animatedComponet(nullptr), Component::ComponetBase()
 {
 	/*Materials::Forward* fwd = DBG_NEW Materials::Forward();
 	fwd->getDiffuse()(1); // set to the texture id
@@ -24,22 +25,28 @@ Render::RenderMesh::RenderMesh() : buffers(), materials(), Component::ComponetBa
 }
 
 
-void Render::RenderMesh::update()
+void Component::RenderMesh::update()
 {
 	glm::mat4 m(1);
 	if(parent)
 		m = Component::ComponetBase::parent->getTransform()->getModel();
-	Shading::Manager::setValue("model", m);
-	if (materials.size() == 1) {
+	Render::Shading::Manager::setValue("model", m);
+	/*if (materials.size() == 1) {
 		Materials::Material* material = materials[0];
-		Shading::Manager::setValue("material", material);
+		Render::Shading::Manager::setValue("material", material);
 		material->activateTextures();
+	}*/
+	if (animatedComponet) {
+		const Render::Animation::KeyFrame& frame = animatedComponet->getCurrentFrame();
+		Render::Shading::Manager::setValue("bones", frame);
 	}
+
+	const auto& buffers = model.getBuffers();
 	for (short i = 0; i < buffers.size(); i++) {
 		Primative::VertexBuffer& buffer = ResourceLoader::getBuffer(buffers[i]);
-		if (materials.size() > 1) {
+		if (materials.size() > i) {
 			Materials::Material* material = materials[i % materials.size()];
-			Shading::Manager::setValue("material", material);
+			Render::Shading::Manager::setValue("material", material);
 			material->activateTextures();
 		}
 		buffer.bind();
@@ -49,21 +56,35 @@ void Render::RenderMesh::update()
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 }
-void Render::RenderMesh::addBuffers(std::vector<unsigned>& buffers, const GLenum draw_type)
+void Component::RenderMesh::setModel(const Primative::Model model, const GLenum draw_type)
 {
-	this->buffers = buffers;
-	/*for (unsigned& index : buffers) {
+	this->model = model;
+	/*for (unsigned& index : model) {
 		auto buffer = ResourceLoader::getBuffer(index);
 		buffer->setDrawType(draw_type);
 	}*/
 }
-void Render::RenderMesh::cleanUp() {
-	parent = nullptr;
-	for (auto itt = buffers.begin(); itt != buffers.end();) {
-		itt = buffers.erase(itt);
-	}
+void Component::RenderMesh::setAnimatedComp(Component::Animated* comp)
+{
+	animatedComponet = comp;
+}
+void Component::RenderMesh::cleanUp() {
+	// Component = nullptr;
 	for (auto itt = materials.begin(); itt != materials.end();) {
 		itt = materials.erase(itt);
 	}
+}
+
+const Primative::Model& Component::RenderMesh::getModel() const
+{
+	return model;
+}
+
+Component::RenderMesh Component::RenderMesh::copy() const
+{
+	RenderMesh res = RenderMesh();
+	res.materials = materials;
+	res.model = model;
+	return res;
 }
 

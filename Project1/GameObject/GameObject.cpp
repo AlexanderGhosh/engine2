@@ -1,5 +1,6 @@
 #include "GameObject.h"
 #include "../Rendering/Rendering.h"
+#include "../Componets/Animated.h"
 
 GameObject::GameObject() : componets(), enabled(), transform(DBG_NEW Component::Transform()) {
 	// this->addComponet(DBG_NEW Component::Transform());
@@ -23,6 +24,18 @@ void GameObject::addComponet(Component::ComponetBase* componet)
 			if (comp->getType() == Component::Type::Collider) {
 				rb->addCollider(reinterpret_cast<Physics::Collider*>(comp));
 			}
+		}
+	}
+	else if (componet->getType() == Component::Type::RenderMesh) {
+		Component::Animated* comp = getComponet<Component::Animated>();
+		if (comp) {
+			reinterpret_cast<Component::RenderMesh*>(componet)->setAnimatedComp(comp);
+		}
+	}
+	else if (componet->getType() == Component::Type::Animated) {
+		Component::RenderMesh* comp = getComponet<Component::RenderMesh>();
+		if (comp) {
+			comp->setAnimatedComp(reinterpret_cast<Component::Animated*>(componet));
 		}
 	}
 }
@@ -66,6 +79,7 @@ T* GameObject::getComponet()
 		if (cast)
 			return cast;
 	}
+	return nullptr;
 }
 
 void GameObject::cleanUp()

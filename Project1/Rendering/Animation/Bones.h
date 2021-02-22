@@ -28,6 +28,8 @@ namespace Render {
 			const std::vector<Bone>& getBones() const;
 
 			bool hasBones() const;
+
+			void cleanUp();
 		};
 
 		class BoneDetails {

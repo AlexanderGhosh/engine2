@@ -2,7 +2,7 @@
 #include <glm.hpp>
 #include <string>
 
-namespace Render {
+namespace Component {
 	class RenderMesh;
 }
 class SkyBox
@@ -10,7 +10,7 @@ class SkyBox
 private:
 	static unsigned shaderId;
 	int texId;
-	Render::RenderMesh* mesh;
+	Component::RenderMesh* mesh;
 public:
 	SkyBox();
 	SkyBox(const int& texId);

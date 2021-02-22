@@ -1,5 +1,7 @@
 #include "Manager.h"
 #include "../../Primatives/Material.h"
+#include "../Animation/Animation.h"
+
 unsigned Render::Shading::Manager::active = 0;
 
  bool Render::Shading::Manager::setValue(const std::string& name, int val) {
@@ -63,6 +65,13 @@ unsigned Render::Shading::Manager::active = 0;
 		 return setValue(name, *reinterpret_cast<Materials::PBR*>(mat));
 	 }
  }
+ bool Render::Shading::Manager::setValue(const std::string& name, const Render::Animation::KeyFrame& frame)
+ {
+	 int loc = glGetUniformLocation(Render::Shading::Manager::active, name.c_str());
+	 if (loc < 0) return false;
+	 glUniformMatrix4fv(loc, frame.translations.size(), GL_FALSE, glm::value_ptr(frame.translations[0]));
+	 return true;
+ }
  bool Render::Shading::Manager::setValue(const std::string& name, Materials::Forward& fwd)
  {
 	 bool vals[] = { 0, 0, 0, 0 };
@@ -77,18 +86,18 @@ unsigned Render::Shading::Manager::active = 0;
  }
  bool Render::Shading::Manager::setValue(const std::string& name, Materials::PBR& mat)
  {
-	 bool vals[] = { 0, 0, 0, 0, 0 };
+	 bool val = 0;
 	 std::string names[] = { ".albedo", ".normal", ".metalic", ".roughness", ".ao" };
 	 const auto all = mat.getAll();
 	 short unit = 0;
 	 for (short i = 0; i < 5; i++) {
-		 vals[i] = Render::Shading::Manager::setValue(name + names[i], all[i], unit);
+		 val = val AND Render::Shading::Manager::setValue(name + names[i], all[i], unit);
 		 unit++;
 	 }
-	 setValue("hdrMap", unit++);
-	 setValue("iblMap", unit++);
-	 setValue("brdfLUT", unit);
-	 return vals[0] && vals[1] && vals[2] && vals[3] && vals[4];
+	 val = val AND setValue("hdrMap", unit++);
+	 val = val AND setValue("iblMap", unit++);
+	 val = val AND setValue("brdfLUT", unit);
+	 return val;
  }
 
  void Render::Shading::Manager::setActive(const unsigned& shaderId)

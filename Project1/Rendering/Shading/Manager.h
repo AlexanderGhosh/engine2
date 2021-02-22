@@ -10,6 +10,9 @@ namespace Materials {
 	class PBR;
 }
 namespace Render {
+	namespace Animation {
+		struct KeyFrame;
+	}
 	namespace Shading {
 		class Manager
 		{
@@ -23,6 +26,7 @@ namespace Render {
 			static bool setValue(const std::string& name, glm::mat4 val);
 			static bool setValue(const std::string& name, const Materials::MatItem& fwd, short& texUnit);
 			static bool setValue(const std::string& name, Materials::Material*mat);
+			static bool setValue(const std::string& name, const Render::Animation::KeyFrame& frame);
 			static void setActive(const unsigned& shaderId);
 			static void cleanUp();
 		private:

@@ -14,10 +14,10 @@ SkyBox::SkyBox() : texId(0), mesh(nullptr)
 		shaderId = ResourceLoader::getShader("SkyBoxShader");
 	}
 	if (!mesh) {
-		mesh = DBG_NEW Render::RenderMesh();
+		mesh = DBG_NEW Component::RenderMesh();
 		// auto model = ResourceLoader::getModel("cube.obj");
 		auto m = ResourceLoader::getModel("cube.obj");
-		mesh->addBuffers(m);
+		mesh->setModel(m);
 	}
 }
 

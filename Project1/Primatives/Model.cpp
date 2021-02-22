@@ -1,4 +1,5 @@
 #include "Model.h"
+#include "../Rendering/Shading/Manager.h"
 
 Primative::Model::Model() : name(""), buffers(), skeleton()
 {
@@ -22,4 +23,26 @@ const Render::Animation::Skeleton& Primative::Model::getSkeleton() const
 void Primative::Model::setSkeleton(const Render::Animation::Skeleton& skeleton)
 {
 	this->skeleton = skeleton;
+}
+
+void Primative::Model::cleanUp()
+{
+	name = "";
+	buffers.clear();
+	skeleton.cleanUp();
+}
+
+void Primative::Model::addBuffer(Unsigned bufferIndex)
+{
+	buffers.push_back(bufferIndex);
+}
+
+const std::vector<unsigned>& Primative::Model::getBuffers() const
+{
+	return buffers;
+}
+
+bool Primative::Model::hasMesh() const
+{
+	return !buffers.empty();
 }
