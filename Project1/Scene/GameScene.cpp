@@ -1,6 +1,7 @@
 #include "GameScene.h"
 #include "../Rendering/Shading/Manager.h"
 #include "SkyBox.h"
+#include  "../Context.h"
 
 void GameScene::preProcess()
 {
@@ -40,14 +41,14 @@ void GameScene::postProcess()
 void GameScene::updateScene()
 {
 	for (GameObject*& obj : objects) {
-		obj->tick(currentTick++ % FIXED_UPDATE_RATE);
+		obj->tick(currentTick++ % FIXED_UPDATE_RATE, mainContext->getTime().deltaTime);
 	}
 }
 
 void GameScene::renderObjects()
 {
 	for (GameObject*& obj : objects) {
-		obj->tryDraw();
+		obj->tryDraw(mainContext->getTime().deltaTime);
 	}
 }
 
@@ -102,4 +103,9 @@ void GameScene::addPreProcLayer(const std::string& name, const unsigned& shaderI
 void GameScene::setSkyBox(SkyBox* sb)
 {
 	skybox = sb;
+}
+
+void GameScene::setContext(Context* context)
+{
+	mainContext = context;
 }

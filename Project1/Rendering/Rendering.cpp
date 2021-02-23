@@ -25,7 +25,7 @@ Component::RenderMesh::RenderMesh() : model(), materials(), animatedComponet(nul
 }
 
 
-void Component::RenderMesh::update()
+void Component::RenderMesh::update(float deltaTime)
 {
 	glm::mat4 m(1);
 	if(parent)
@@ -37,7 +37,7 @@ void Component::RenderMesh::update()
 		material->activateTextures();
 	}*/
 	if (animatedComponet) {
-		const Render::Animation::KeyFrame& frame = animatedComponet->getCurrentFrame();
+		const Render::Animation::KeyFrame frame = animatedComponet->getCurrentFrame();
 		Render::Shading::Manager::setValue("bones", frame);
 	}
 

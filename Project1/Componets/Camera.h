@@ -8,8 +8,8 @@ namespace Component {
 	public:
 		const glm::mat4 getView() const;
 		void ProcessMouseMovement(float xOff, float yOff, bool constainPitch = 1);
-		void update();
-		inline Camera() : pitch(0), yaw(-90), fov(45), pos(Utils::zero()), fwd(Utils::zAxis(-1)), up(Utils::yAxis()), right(Utils::zero()) { update(); };
+		void update(float deltaTime);
+		inline Camera() : pitch(0), yaw(-90), fov(45), pos(Utils::zero()), fwd(Utils::zAxis(-1)), up(Utils::yAxis()), right(Utils::zero()) { update(0); };
 		~Camera() = default;
 		void cleanUp() { };
 

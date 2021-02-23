@@ -10,17 +10,18 @@ namespace Component {
 	private:
 		std::unordered_map<std::string, Render::Animation::Animation> animations;
 		std::string activeAnimation;
-		int currentClosestFrame;
+		float runTime;
 	public:
 		Animated();
 		~Animated() = default;
 		void startAnimation(const std::string& name);
 		const Render::Animation::KeyFrame& nextFrame();
-		const Render::Animation::KeyFrame& getCurrentFrame();
+		const Render::Animation::KeyFrame getCurrentFrame();
 		void addAnimation(const Render::Animation::Animation& animation);
 		void cleanUp();
 		inline Component::Type getType() const {
 			return Component::Type::Animated;
 		}
+		void update(float deltaTime);
 	};
 }

@@ -146,7 +146,7 @@ void FileReaders::AssimpWrapper::processMeshBones(aiMesh* mesh, Primative::Mesh*
         aiBone* bone = mesh->mBones[i];
         Render::Animation::Bone skel_bone;
         skel_bone.setName(bone->mName.C_Str());
-        skel_bone.setTransformation(toMat4(scene->mRootNode->mTransformation * bone->mOffsetMatrix));
+        skel_bone.setTransformation(toMat4(bone->mOffsetMatrix));
         skeleton.addBone(skel_bone);
 
         for (int j = 0; j < bone->mNumWeights; j++) {
@@ -199,20 +199,21 @@ void FileReaders::AssimpWrapper::normaliseBone(Primative::Vertex& vertex)
 std::vector<Render::Animation::Animation> FileReaders::AssimpWrapper::createAnimations(aiNode* rootNode, const aiScene* scene, const Render::Animation::Skeleton& skeleton)
 {
     std::vector<Render::Animation::Animation> animations;
+    if (!scene->HasAnimations())
+        return animations;
     glm::mat4 globalInverseTransformation = toMat4(scene->mRootNode->mTransformation.Inverse());
     // Process all animations
     for (int i = 0; i < scene->mNumAnimations; i++) {
         aiAnimation* currentAnimation = scene->mAnimations[i];
         int maxFrames = calcAnimationFrameCount(currentAnimation);
 
-        Render::Animation::Animation animation(currentAnimation->mName.C_Str(), currentAnimation->mDuration);
+        Render::Animation::Animation animation(currentAnimation->mName.C_Str(), currentAnimation->mDuration, currentAnimation->mTicksPerSecond);
 
             //currentAnimation.mName().dataString(), frames, currentAnimation.mDuration();
 
-        float deltaTime = currentAnimation->mDuration / static_cast<float>(maxFrames);
+        const int s = skeleton.getBones().size();
         for (int j = 0; j < maxFrames; j++) {
             Render::Animation::KeyFrame animatedFrame;
-            const int s = skeleton.getBones().size();
             animatedFrame.translations.reserve(s);
             animatedFrame.translations.resize(s);
             for (int i = 0; i < s; i++) {
@@ -225,6 +226,13 @@ std::vector<Render::Animation::Animation> FileReaders::AssimpWrapper::createAnim
         }
         animations.push_back(animation);
     }
+    /*bool t = true;
+    for (int i = 0; i < animations[0].getFrameCount(); i++) {
+        for (int j = i + 1; j < animations[0].getFrameCount(); j++) {
+            t = t AND animations[0].getFrameABS(i).translations != animations[0].getFrameABS(j).translations;
+        }
+    }
+    assert(NOT t);*/
     return animations;
 }
 
@@ -245,6 +253,7 @@ void FileReaders::AssimpWrapper::processAnimNode(const aiAnimation* anim, const 
     if (animNode) {
         // build matrix from animNode asine to nodeTransform
         nodeTransform = buildMatrix(animNode, frame);
+        keyFrame.timeStamp = animNode->mPositionKeys[frame].mTime;
     }
     glm::mat4 nodeGlobalTransform = parentsTransform * nodeTransform;
     // get all bones whos name == nodeName then do tranformation stuff
@@ -344,12 +353,11 @@ glm::mat4 FileReaders::AssimpWrapper::buildMatrix(const aiNodeAnim* node, float 
     }
     std::cout << "==========================\n";*/
     scale = glm::mat4(1);
-    return  rotation * translation * scale;
+    return  translation * rotation * scale;
 }
 
 const glm::mat4 FileReaders::AssimpWrapper::toMat4(const aiMatrix4x4& matrix)
 {
-    // return glm::transpose(glm::make_mat4(&matrix.a1));
     glm::mat4 res(1);
     res[0][0] = matrix.a1; res[1][0] = matrix.a2;
     res[2][0] = matrix.a3; res[3][0] = matrix.a4;

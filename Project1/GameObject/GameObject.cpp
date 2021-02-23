@@ -40,24 +40,24 @@ void GameObject::addComponet(Component::ComponetBase* componet)
 	}
 }
 
-void GameObject::tick(short currentTick)
+void GameObject::tick(short currentTick, float deltaTime)
 {
 	for (unsigned i = 0; i < componets.size(); i++) {
 		if (!enabled[i] OR componets[i]->getType() == Component::Type::RenderMesh OR componets[i]->getType() == Component::Type::Rigidbody) continue;
 		Component::ComponetBase*& comp = componets[i];
-		comp->update();
+		comp->update(deltaTime);
 		if (currentTick == FIXED_UPDATE_RATE) {
 			comp->fixedUpdate();
 		}
 	}
 }
 
-void GameObject::tryDraw()
+void GameObject::tryDraw(Float deltaTime)
 {
 	for (unsigned i = 0; i < componets.size(); i++) {
 		if (enabled[i] AND componets[i]->getType() == Component::Type::RenderMesh) {
 			Component::ComponetBase*& comp = componets[i];
-			comp->update();
+			comp->update(deltaTime);
 		}
 	}
 }

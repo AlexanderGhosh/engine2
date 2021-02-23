@@ -14,7 +14,7 @@ namespace Component {
 	public:
 		RenderMesh();
 		~RenderMesh() = default;
-		virtual void update();
+		virtual void update(float deltaTime);
 		void setModel(const Primative::Model model, const GLenum draw_type = GL_TRIANGLES);
 		inline void setMaterial(const std::vector<Materials::Material*>& indices) { materials = std::vector<Materials::Material*>(indices.begin(), indices.end()); };
 		inline Component::Type getType() const {

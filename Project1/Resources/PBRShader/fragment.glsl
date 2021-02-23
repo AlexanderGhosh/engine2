@@ -112,7 +112,7 @@ void main()
     vec3 c = fs_in.ws.xyz;
     //c = normalize(c);
     FragColor = vec4(c, 1);
-    return;
+    //return;
     vec3 albedo = pow(getData(material.albedo_vec, material.albedo_id), vec3(2.2));
     
     float metallic = getData(material.metalic_vec, material.metalic_id).r;
@@ -199,6 +199,7 @@ void main()
     vec3 ambient    = (kD * diffuse + specular) * ao;
 
     vec3 color = ambient + Lo;
+    color = albedo;
 
     // HDR tonemapping
     color /= color + vec3(1.0);

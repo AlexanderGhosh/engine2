@@ -1,6 +1,6 @@
 #include "Animated.h"
 
-Component::Animated::Animated() : animations(), activeAnimation(""), currentClosestFrame(0)
+Component::Animated::Animated() : animations(), activeAnimation(""), runTime(0)
 {
 }
 
@@ -11,14 +11,14 @@ void Component::Animated::startAnimation(const std::string& name)
 
 const Render::Animation::KeyFrame& Component::Animated::nextFrame()
 {
-	currentClosestFrame++;
-	currentClosestFrame %= animations[activeAnimation].getFrameCount();
+	/*runTime++;
+	runTime %= animations[activeAnimation].getFrameCount();*/
 	return getCurrentFrame();
 }
 
-const Render::Animation::KeyFrame& Component::Animated::getCurrentFrame()
+const Render::Animation::KeyFrame Component::Animated::getCurrentFrame()
 {
-	return animations[activeAnimation].getFrame(currentClosestFrame);
+	return animations[activeAnimation].getFrame(runTime);
 }
 
 void Component::Animated::addAnimation(const Render::Animation::Animation& animation)
@@ -29,4 +29,9 @@ void Component::Animated::addAnimation(const Render::Animation::Animation& anima
 void Component::Animated::cleanUp()
 {
 	animations.clear();
+}
+
+void Component::Animated::update(float deltaTime)
+{
+	runTime += deltaTime;
 }

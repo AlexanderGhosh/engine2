@@ -2,7 +2,7 @@
 layout(location = 0) in vec3 pos;
 layout(location = 1) in vec2 tex;
 layout(location = 2) in vec3 norm;
-layout(location = 3) in ivec4 ids;
+layout(location = 3) in vec4 ids;
 layout(location = 4) in vec4 weights;
 
 layout(std140, binding = 0) uniform Matrices
@@ -33,19 +33,19 @@ void main() {
     mat4 boneTransform = mat4(0);
 
     vs_out.ws = weights; 
-    if (weights.x <= 0 || weights.x >= 100){
+    if(ids[0] == -1){
         boneTransform = mat4(1);
-        vs_out.ws = vec4(1, 0, 0, 0);
+        vs_out.ws = vec4(1, 0 , 0 , 0); 
     }
     else{
         for(int i = 0; i < 4; i++){
-            int id = ids[i];
+            int id = int(ids[i]);
             float weight = weights[i];
             boneTransform += bones[id] * weight; // bones[id]
         }
-        vs_out.ws = vec4(1, 1, 0, 0);
+        vs_out.ws = vec4(1, 1 , 0 , 0); 
     }
-    // boneTransform = mat4(1);
+    //boneTransform = mat4(1);
 
     gl_Position = projection * view * model * boneTransform * vec4(pos, 1);
 

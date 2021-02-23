@@ -74,7 +74,7 @@ int main() {
     Context main({ 800, 600 }, false);
     main.init("Engine 2", { GL_DEPTH_TEST, GL_CULL_FACE, GL_MULTISAMPLE, GL_TEXTURE_CUBE_MAP_SEAMLESS });
 
-    cam.setPos({ 0, 0, 0 }); // 200, 700
+    cam.setPos({ 0, 0, 10 }); // 200, 700
 
     Utils::Timer timer("Shaders");
     timer.start();
@@ -127,7 +127,7 @@ int main() {
     timer.start();
 
     // bones
-    Materials::PBR cubeMaterial1 = Materials::PBR({ { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 0, 0, 0 } }, { { 0.15, 0, 0 } }, { { 0, 0, 0 } });
+    /*Materials::PBR cubeMaterial1 = Materials::PBR({ { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 0, 0, 0 } }, { { 0.15, 0, 0 } }, { { 0, 0, 0 } });
     Component::RenderMesh boneR = Component::RenderMesh();
     boneR.setModel(cubeBuffer);
     boneR.setMaterial({ &cubeMaterial1 });
@@ -147,7 +147,7 @@ int main() {
         glm::decompose(manModel.getSkeleton().getBones()[i].getTransformation() * manObject.getTransform()->getModel(), bone.getTransform()->Scale, bone.getTransform()->Rotation, bone.getTransform()->Position, skew, perspective);
         // bone.getTransform()->Position = { 0, 5 * (i + 1), 0 };
         bone.getTransform()->Scale *= 0.25f;
-    }
+    }*/
     
     // Physics::BoxColliderSAT collider1 = Physics::BoxColliderSAT(10);
     // manObject->addComponet(&collider1);
@@ -229,13 +229,14 @@ int main() {
     // scene.addPreProcLayer("shadows", ResourceLoader::getShader("ShadowShader"));
     scene.addPreProcLayer("final", ResourceLoader::getShader(PBRen ? "PBRShader" : "DefaultShder"));
     scene.setPostProcShader(ResourceLoader::getShader(PBRen ? "PBRShader" : "DefaultShder")); // PBRShader
+    scene.setContext(&main);
 
-    for (GameObject& bone : bones) {
+    /*for (GameObject& bone : bones) {
         scene.addObject(&bone);
-    }
+    }*/
     scene.addObject(&manObject);
 
-    scene.setBG({ 1, 0, 1 });
+    scene.setBG({ 1, 1, 0 });
     timer.log();
 
     // SKYBOX //
@@ -306,13 +307,13 @@ int main() {
             manAnimatedComp.nextFrame();
             std::cout << "Next Frame\n";
             int i = 0;
-            for (GameObject& bone : bones) {
+            /*for (GameObject& bone : bones) {
                 auto frame = manAnimatedComp.getCurrentFrame();
                 glm::vec3 skew;
                 glm::vec4 perspective;
                 glm::decompose(frame.translations[i++], bone.getTransform()->Scale, bone.getTransform()->Rotation, bone.getTransform()->Position, skew, perspective);
                 bone.getTransform()->Scale *= 0.25f;
-            }
+            }*/
         }
 
         // RENDERING--------------------------------------------------------------------------------------------------------------------------------------------

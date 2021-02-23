@@ -37,7 +37,7 @@ void SkyBox::draw()
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, texId);
 	bool t = Render::Shading::Manager::setValue("skybox", 0);
-	mesh->update();
+	mesh->update(0);
 }
 
 void SkyBox::cleanUp()

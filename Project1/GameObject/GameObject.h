@@ -12,8 +12,8 @@ protected:
 public:
 	GameObject();
 	void addComponet(Component::ComponetBase* componet);
-	void tick(short currentTick);
-	virtual void tryDraw();
+	void tick(short currentTick, float deltaTime);
+	virtual void tryDraw(Float deltaTime);
 	inline Component::Transform* getTransform() const { return transform; };
 	Component::RigidBody* getRigidbody();
 	template<class T>

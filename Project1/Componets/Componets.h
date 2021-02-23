@@ -11,7 +11,7 @@ namespace Component {
 	};
 	class ComponetBase {
 	public:
-		virtual void update() { }; // every tick
+		virtual void update(float deltaTime) { }; // every tick
 		virtual void fixedUpdate() { }; // every x ticks
 		virtual void cleanUp() = 0;
 		virtual void setParent(GameObject* parent) { this->parent = parent; };

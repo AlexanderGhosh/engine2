@@ -1,7 +1,7 @@
 #include "AudioSource.h"
 #include "../GameObject/GameObject.h"
 
-void Component::AudioSource::update()
+void Component::AudioSource::update(float deltaTime)
 {
 	// update buffers position
 	const glm::vec3& pos = parent->getTransform()->Position;

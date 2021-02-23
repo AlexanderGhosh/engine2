@@ -4,6 +4,7 @@
 #include "../GameObject/GameObject.h"
 #include "../Primatives/Buffers.h"
 class SkyBox;
+class Context;
 class GameScene
 {
 private:
@@ -13,6 +14,7 @@ private:
 	unsigned currentTick, postProcShaderId;
 	std::unordered_map<std::string, Primative::FrameBuffer*> FBOs;
 	glm::vec3 backgroundColour;
+	Context* mainContext;
 	inline void clearFBO() const {
 		glClearColor(backgroundColour.x, backgroundColour.y, backgroundColour.z, 1);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -20,7 +22,7 @@ private:
 	void renderObjects(); // just moved
 	void renderSkyBox();
 public:
-	inline GameScene() : objects(), preProcessingLayers(), currentTick(0), postProcShaderId(0), FBOs(), backgroundColour(0), skybox(nullptr) { };
+	inline GameScene() : objects(), preProcessingLayers(), currentTick(0), postProcShaderId(0), FBOs(), backgroundColour(0), skybox(nullptr), mainContext(nullptr) { };
 	inline void addObject(GameObject* obj) { objects.push_back(obj); };
 	inline void setBG(Vector3 col) { backgroundColour = col; };
 	void preProcess();
@@ -38,5 +40,6 @@ public:
 	// setters
 	inline void setPostProcShader(const unsigned& shaderId) { postProcShaderId = shaderId; };
 	void setSkyBox(SkyBox* sb);
+	void setContext(Context* context);
 };
 

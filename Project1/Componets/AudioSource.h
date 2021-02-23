@@ -11,7 +11,7 @@ namespace Component {
     public:
         AudioSource() : ComponetBase(), source(0) { };
         AudioSource(unsigned source) : ComponetBase(), source(source) { };
-        void update();
+        void update(float deltaTime);
         inline void play() const { alSourcePlay(source); };
         inline void pause() const { alSourcePause(source); };
         inline bool isPlaying() const 
