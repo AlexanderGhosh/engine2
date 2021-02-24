@@ -278,7 +278,7 @@ const Primative::Model ResourceLoader::processMeshData(std::vector<Primative::Me
     }
     auto& model = models[name];
     for (auto& mesh : data) {
-        buffers.emplace_back(*mesh, draw_type, mesh->name);
+        buffers.emplace_back(Primative::VertexBuffer(*mesh, draw_type, 35044U, mesh->name));
         res.push_back(buffers.size() - 1);
         model.addBuffer(buffers.size() - 1);
         if(deleteAble)

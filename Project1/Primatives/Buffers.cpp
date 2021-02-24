@@ -8,7 +8,7 @@
 
 char Primative::StaticBuffer::usedBindingPoint = -1;
 
-Primative::VertexBuffer::VertexBuffer(/*const*/ Mesh& mesh, GLenum shape_type, GLenum draw_type, String name = "") : VertexBuffer()
+Primative::VertexBuffer::VertexBuffer(/*const*/ Mesh& mesh, GLenum shape_type, GLenum draw_type, std::string name) : VertexBuffer()
 {
 	this->name = name;
 	this->drawType = draw_type;
