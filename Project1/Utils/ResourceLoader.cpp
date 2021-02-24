@@ -108,7 +108,32 @@ const unsigned ResourceLoader::getShader(const std::string& name)
     return r;
 }
 
-const unsigned ResourceLoader::createTexture(const std::string& filePath, const TextureType type, const bool& flip)
+const std::vector<unsigned> ResourceLoader::loadTextureFile(String dirPath, std::vector<TextureType> types, std::vector<bool> flip)
+{
+    const int s = Utils::countFiles(dirPath);
+    types.reserve(s);
+    flip.reserve(s);
+    while (types.size() != s) {
+        types.push_back(TextureType::DiffuseMap);
+    }
+    while (flip.size() != s) {
+        flip.push_back(1);
+    }
+    std::vector<unsigned> res;
+    res.reserve(s);
+
+    auto dirIter = std::filesystem::directory_iterator(dirPath);
+    unsigned i = 0;
+    for (auto& file : dirIter)
+    {
+        if (types[i] == TextureType::CubeMap)
+            continue;
+        res.push_back(loadTexture(file.path().string(), types[i], flip[i++]));
+    }
+    return res;
+}
+
+const unsigned ResourceLoader::loadTexture(const std::string& filePath, const TextureType type, const bool& flip)
 {
     stbi_set_flip_vertically_on_load(flip);
     unsigned tex = 0;
@@ -153,7 +178,7 @@ const unsigned ResourceLoader::createTexture(const std::string& filePath, const 
     return tex;
 }
 
-const unsigned ResourceLoader::createCubeMap(const std::string& dirPath, const std::string& extension, const bool& flip)
+const unsigned ResourceLoader::loadCubeMap(const std::string& dirPath, const std::string& extension, const bool& flip)
 {
     stbi_set_flip_vertically_on_load(flip);
     unsigned tex = 0;
@@ -252,13 +277,13 @@ const Primative::Model ResourceLoader::processMeshData(std::vector<Primative::Me
         return Primative::Model();
     }
     auto& model = models[name];
-    for (auto& m : data) {
-        buffers.emplace_back(*m, draw_type);
+    for (auto& mesh : data) {
+        buffers.emplace_back(*mesh, draw_type, mesh->name);
         res.push_back(buffers.size() - 1);
         model.addBuffer(buffers.size() - 1);
         if(deleteAble)
-            delete m;
-        m = nullptr;
+            delete mesh;
+        mesh = nullptr;
     }
     return model;
 }
@@ -311,13 +336,18 @@ void ResourceLoader::addMaterial(Materials::Material* mat)
     materials.push_back(mat);
 }
 
-const Render::Animation::Animation& ResourceLoader::getAnimation(String name)
+const Render::Animation::Animation& ResourceLoader::createAnimation(String filePath)
+{
+    return {};
+}
+
+Render::Animation::Animation* ResourceLoader::getAnimation(String name)
 {
     const unsigned s = animations.size();
     Render::Animation::Animation& res = animations[name];
     if (s != animations.size()) {
         animations.erase(name);
-        return Render::Animation::Animation();
+        return nullptr;
     }
-    return res;
+    return &res;
 }

@@ -18,10 +18,12 @@
 #include <stdlib.h>
 #include <crtdbg.h>
 
+#include <fstream>
+#include <iostream>
+#include <filesystem>
+
 #ifdef _DEBUG
 #define DBG_NEW new ( _NORMAL_BLOCK , __FILE__ , __LINE__ )
-// Replace _NORMAL_BLOCK with _CLIENT_BLOCK if you want the
-// allocations to be of _CLIENT_BLOCK type
 #else
 #define DBG_NEW new
 #endif
@@ -261,7 +263,30 @@ namespace Utils {
         else
             return glm::inverse(a);
     }
+    inline float round(float var, int dp)
+    {
+        float t = powf(10, dp);
+        // 37.66666 * 100 =3766.66 
+        // 3766.66 + .5 =3767.16    for rounding off value 
+        // then type cast to int so value is 3767 
+        // then divided by 100 so the value converted into 37.67 
+        float value = static_cast<int>(var * t + .5);
+        return static_cast<float>(value / t);
+    }
+    // doenst go deep
+    inline int countFiles(String dirPath) {
+        auto dirIter = std::filesystem::directory_iterator(dirPath);
+        int fileCount = 0;
 
+        for (auto& entry : dirIter)
+        {
+            if (entry.is_regular_file())
+            {
+                ++fileCount;
+            }
+        }
+        return fileCount;
+    }
     class Timer {
     public:
         inline Timer(const std::string name) : s(), e(), pausing(), name(name) {  };

@@ -16,11 +16,11 @@ Render::Animation::Animation::Animation(String name, Float duration, Float tps) 
 {
 }
 
-const Render::Animation::KeyFrame Render::Animation::Animation::getFrame(Float timeInSecconds)
+const Render::Animation::KeyFrame Render::Animation::Animation::getFrame(Float timeInSecconds) const
 {
     const float time = fmod(timeInSecconds * tps, duration);
-    Render::Animation::KeyFrame* first = &keyFrames[0];
-    Render::Animation::KeyFrame* seccond = &keyFrames[1];
+    const Render::Animation::KeyFrame* first = &keyFrames[0];
+    const Render::Animation::KeyFrame* seccond = &keyFrames[1];
     for (unsigned i = 0; i < keyFrames.size(); i++) {
         if (keyFrames[i].timeStamp > time) {
             seccond = &keyFrames[i];
@@ -29,8 +29,7 @@ const Render::Animation::KeyFrame Render::Animation::Animation::getFrame(Float t
         }
     }
     float sf = getScaleFactor(time, seccond->timeStamp, first->timeStamp);
-    auto newFrame = first->interpolate(*seccond, sf);
-    return newFrame;
+    return first->interpolate(*seccond, sf);
 }
 
 const Render::Animation::KeyFrame& Render::Animation::Animation::getFrameABS(Int frame) const
@@ -56,6 +55,11 @@ String Render::Animation::Animation::getName() const
 Float Render::Animation::Animation::getTPS() const
 {
     return (tps) ? tps : 25.0f;
+}
+
+Float Render::Animation::Animation::getDuration() const
+{
+    return duration;
 }
 
 void Render::Animation::Animation::cleanUp()

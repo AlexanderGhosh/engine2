@@ -1,5 +1,7 @@
 #include "Model.h"
 #include "../Rendering/Shading/Manager.h"
+#include "../Utils/ResourceLoader.h"
+#include "Buffers.h"
 
 Primative::Model::Model() : name(""), buffers(), skeleton()
 {
@@ -40,6 +42,17 @@ void Primative::Model::addBuffer(Unsigned bufferIndex)
 const std::vector<unsigned>& Primative::Model::getBuffers() const
 {
 	return buffers;
+}
+
+Unsigned Primative::Model::getBuffer(String meshName) const
+{
+	for (Unsigned buff : buffers) {
+		const Primative::VertexBuffer& vertexBuffer = ResourceLoader::getBuffer(buff);
+		if (vertexBuffer.getName() == meshName) {
+			return buff;
+		}
+	}
+	return buffers[0];
 }
 
 bool Primative::Model::hasMesh() const

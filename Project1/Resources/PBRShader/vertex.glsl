@@ -33,9 +33,9 @@ void main() {
     mat4 boneTransform = mat4(0);
 
     vs_out.ws = weights; 
-    if(ids[0] == -1){
+    if(ids[0] == -1 || bones[0] == mat4(0)){
         boneTransform = mat4(1);
-        vs_out.ws = vec4(1, 0 , 0 , 0); 
+        vs_out.ws = vec4(1, 0, 0 , 0); 
     }
     else{
         for(int i = 0; i < 4; i++){

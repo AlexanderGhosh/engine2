@@ -6,7 +6,7 @@ const Primative::Vertex Primative::Mesh::operator[](int index) const
     return verts.at(index);
 }
 
-Primative::Mesh::Mesh(std::vector<Vertex> verts, std::vector<unsigned> indi) : verts(verts), indices(indi)
+Primative::Mesh::Mesh(std::vector<Vertex> verts, std::vector<unsigned> indi, std::string name) : verts(verts), indices(indi), name(name)
 {
 
 }

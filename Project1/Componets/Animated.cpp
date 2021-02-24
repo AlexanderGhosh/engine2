@@ -1,12 +1,31 @@
 #include "Animated.h"
+#include "../Rendering/Animation/Animation.h"
 
-Component::Animated::Animated() : animations(), activeAnimation(""), runTime(0)
+Component::Animated::Animated() : animations(), activeAnimation(""), runTime(0), running(false)
 {
 }
 
-void Component::Animated::startAnimation(const std::string& name)
+void Component::Animated::startAnimation(const std::string& name, bool start)
 {
+	if (NOT animations.size())
+		return;
 	activeAnimation = name;
+	running = start;
+}
+
+void Component::Animated::stopAnimation()
+{
+	running = false;
+}
+
+void Component::Animated::playAnimation()
+{
+	running = false;
+}
+
+void Component::Animated::togglePlay()
+{
+	running = NOT running;
 }
 
 const Render::Animation::KeyFrame& Component::Animated::nextFrame()
@@ -18,12 +37,15 @@ const Render::Animation::KeyFrame& Component::Animated::nextFrame()
 
 const Render::Animation::KeyFrame Component::Animated::getCurrentFrame()
 {
-	return animations[activeAnimation].getFrame(runTime);
+	if (NOT running OR NOT getActiveAnimation())
+		return {};
+	return getActiveAnimation()->getFrame(runTime);
 }
 
-void Component::Animated::addAnimation(const Render::Animation::Animation& animation)
+void Component::Animated::addAnimation(Render::Animation::Animation* animation)
 {
-	animations.insert(animations.end(), { animation.getName(), animation });
+	if(animation)
+		animations.insert(animations.end(), { animation->getName(), animation });
 }
 
 void Component::Animated::cleanUp()
@@ -33,5 +55,19 @@ void Component::Animated::cleanUp()
 
 void Component::Animated::update(float deltaTime)
 {
-	runTime += deltaTime;
+	if (running AND getActiveAnimation()) {
+		runTime += deltaTime;
+		runTime = fmod(runTime, getActiveAnimation()->getDuration());
+	}
+}
+
+const Render::Animation::Animation* Component::Animated::getActiveAnimation()
+{
+	const int s = animations.size();
+	auto res = animations[activeAnimation];
+	if (s != animations.size()) {
+		animations.erase(activeAnimation);
+		return nullptr;
+	}
+	return res;
 }

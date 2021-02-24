@@ -8,8 +8,9 @@
 
 char Primative::StaticBuffer::usedBindingPoint = -1;
 
-Primative::VertexBuffer::VertexBuffer(/*const*/ Mesh& mesh, GLenum shape_type, GLenum draw_type) : VertexBuffer()
+Primative::VertexBuffer::VertexBuffer(/*const*/ Mesh& mesh, GLenum shape_type, GLenum draw_type, String name = "") : VertexBuffer()
 {
+	this->name = name;
 	this->drawType = draw_type;
 	this->shape_type = shape_type;
 	num_indices = static_cast<int>(mesh.indices.size());
@@ -64,6 +65,16 @@ Primative::VertexBuffer::VertexBuffer(/*const*/ Mesh& mesh, GLenum shape_type, G
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
+}
+
+String Primative::VertexBuffer::getName() const
+{
+	return name;
+}
+
+void Primative::VertexBuffer::setName(String name)
+{
+	this->name = name;
 }
 
 void Primative::VertexBuffer::cleanUp()

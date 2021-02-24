@@ -67,6 +67,8 @@ unsigned Render::Shading::Manager::active = 0;
  }
  bool Render::Shading::Manager::setValue(const std::string& name, const Render::Animation::KeyFrame& frame)
  {
+	 if (frame.translations.size() == 0)
+		 return true;
 	 int loc = glGetUniformLocation(Render::Shading::Manager::active, name.c_str());
 	 if (loc < 0) return false;
 	 glUniformMatrix4fv(loc, frame.translations.size(), GL_FALSE, glm::value_ptr(frame.translations[0]));

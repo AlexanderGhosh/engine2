@@ -87,19 +87,22 @@ int main() {
 
     timer.reName("Models");
     timer.start();
-    const Primative::Model manModel = ResourceLoader::createModel("Resources/Models/man.dae");
-    const Primative::Model cubeBuffer   = ResourceLoader::createModel("Resources/Models/cube.obj"); // needed for the skybox
+    const Primative::Model manModel    = ResourceLoader::createModel("Resources/Models/RFA_Model.fbx");
+    const Primative::Model cubeBuffer  = ResourceLoader::createModel("Resources/Models/cube.obj"); // needed for the skybox
     timer.log();
 
     timer.reName("Textures");
     timer.start();
-    const unsigned ba   = ResourceLoader::createTexture("Resources/Textures/rust base.png",      TextureType::AlbedoMap);
-    const unsigned r    = ResourceLoader::createTexture("Resources/Textures/rust roughness.png", TextureType::RoughnessMap);
-    const unsigned m    = ResourceLoader::createTexture("Resources/Textures/rust metalic.png",   TextureType::MetalicMap);
-    const unsigned n    = ResourceLoader::createTexture("Resources/Textures/rust normal.png",    TextureType::NormalMap);
-    const unsigned hdr  = ResourceLoader::createCubeMap("Resources/Textures/Galaxy hdr", ".png", 0);
-    const unsigned ibl  = ResourceLoader::createCubeMap("Resources/Textures/Galaxy ibl", ".png", 0);
-    const unsigned brdf = ResourceLoader::createTexture("Resources/Textures/ibl brdf.png", TextureType::AlbedoMap, 0);
+    const unsigned ba   = ResourceLoader::loadTexture("Resources/Textures/rust base.png",      TextureType::AlbedoMap);
+    const unsigned r    = ResourceLoader::loadTexture("Resources/Textures/rust roughness.png", TextureType::RoughnessMap);
+    const unsigned m    = ResourceLoader::loadTexture("Resources/Textures/rust metalic.png",   TextureType::MetalicMap);
+    const unsigned n    = ResourceLoader::loadTexture("Resources/Textures/rust normal.png",    TextureType::NormalMap);
+    const unsigned hdr  = ResourceLoader::loadCubeMap("Resources/Textures/Galaxy hdr", ".png", 0);
+    const unsigned ibl  = ResourceLoader::loadCubeMap("Resources/Textures/Galaxy ibl", ".png", 0);
+    const unsigned brdf = ResourceLoader::loadTexture("Resources/Textures/ibl brdf.png", TextureType::AlbedoMap, 0);
+    /*ResourceLoader::loadTextureFile("Resources/Textures/RFATextures/Armour", 
+        { TextureType::AlbedoMap,TextureType::RoughnessMap,TextureType::MetalicMap,TextureType::NormalMap, TextureType::CubeMap, TextureType::CubeMap, TextureType::AlbedoMap },
+        { 1, 1, 1, 1 , 0, 0, 0 });*/
     timer.log();
 
     timer.reName("Object 1");
@@ -115,12 +118,15 @@ int main() {
     manR1.setMaterial({ &manMaterial1 });
 
     Component::Animated manAnimatedComp = Component::Animated();
-    manAnimatedComp.addAnimation(ResourceLoader::getAnimation(""));
+    auto anim = ResourceLoader::getAnimation("");
+    if(anim)
+        manAnimatedComp.addAnimation(anim);
     manAnimatedComp.startAnimation("");
     GameObject manObject = GameObject();
     manObject.getTransform()->Position = { 0, 0, -5 };
     manObject.addComponet(&manR1);
     manObject.addComponet(&manAnimatedComp);
+    manObject.getTransform()->Scale *= 0.05;
     timer.stop();
 
     timer.reName("Bone Objects");
@@ -242,7 +248,7 @@ int main() {
     // SKYBOX //
     timer.reName("Skybox");
     timer.start();
-    ResourceLoader::createCubeMap("Resources/Textures/Galaxy", ".png", 0);
+    ResourceLoader::loadCubeMap("Resources/Textures/Galaxy", ".png", 0);
     SkyBox sb = SkyBox("Galaxy.cm");
     scene.setSkyBox(&sb);
     timer.log();
@@ -302,19 +308,6 @@ int main() {
         scene.updateScene();
 
         counter += main.getTime().deltaTime;
-        if (counter >= 0.2 AND Events::Handler::getKey(Events::Key::Num_0, Events::Action::Down)) {
-            counter = 0;
-            manAnimatedComp.nextFrame();
-            std::cout << "Next Frame\n";
-            int i = 0;
-            /*for (GameObject& bone : bones) {
-                auto frame = manAnimatedComp.getCurrentFrame();
-                glm::vec3 skew;
-                glm::vec4 perspective;
-                glm::decompose(frame.translations[i++], bone.getTransform()->Scale, bone.getTransform()->Rotation, bone.getTransform()->Position, skew, perspective);
-                bone.getTransform()->Scale *= 0.25f;
-            }*/
-        }
 
         // RENDERING--------------------------------------------------------------------------------------------------------------------------------------------
         main.disable(GL_CULL_FACE);
@@ -354,6 +347,11 @@ int main() {
         }
         if (Events::Handler::getKey(Events::Key::L_Shift, Events::Action::Down)) {
             cam.setPos(cam.getPos() - Utils::yAxis() * main.getTime().deltaTime * speed);
+        }
+        counter += main.getTime().deltaTime;
+        if (counter >= 0.2 AND Events::Handler::getKey(Events::Key::Enter, Events::Action::Down)) {
+            counter = 0;
+            manAnimatedComp.togglePlay();
         }
 
 

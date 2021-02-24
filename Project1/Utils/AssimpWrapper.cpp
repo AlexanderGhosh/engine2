@@ -8,7 +8,7 @@ const std::tuple<std::vector<Primative::Mesh*>, std::vector<Render::Animation::A
 {
     std::vector<Primative::Mesh*> meshes;
     Assimp::Importer import;
-    const aiScene* scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
+    const aiScene* scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_FixInfacingNormals | aiProcess_OptimizeGraph | aiProcess_OptimizeMeshes);
 
     if (NOT scene OR scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE OR NOT scene->mRootNode)
     {
@@ -131,7 +131,7 @@ Primative::Mesh* FileReaders::AssimpWrapper::processMeshVertices(aiMesh* mesh, c
 
     // return a mesh object created from the extracted mesh data
     */
-    return DBG_NEW Primative::Mesh(vertices, indices);
+    return DBG_NEW Primative::Mesh(vertices, indices, mesh->mName.C_Str());
 }
 /// <summary>
 /// populates all vertices with there bone data
@@ -179,21 +179,16 @@ void FileReaders::AssimpWrapper::addBone(Primative::Vertex& vertex, const aiVert
 
 void FileReaders::AssimpWrapper::normaliseBone(Primative::Vertex& vertex)
 {
-    glm::vec4 t = vertex.weights;
-    vertex.weights = glm::normalize(t);
+    float sum = 0;
     for (char i = 0; i < 4; i++) {
-        if (glm::isinf(vertex.weights[i]) OR glm::isnan(vertex.weights[i])) {
-            vertex.weights[i] = t[i];
-        }
+        sum += vertex.weights[i];
     }
-    /*float sum = 0;
-    for (const auto& b : vertex.boneDetails) {
-        sum += powf(b.boneWeight, 2.0f);
+    if (sum == 0) {
+        sum = 1;
     }
-    sum = powf(sum, 0.5f);
-    for (auto& b : vertex.boneDetails) {
-        b.boneWeight /= sum;
-    }*/
+    for (char i = 0; i < 4; i++) {
+        vertex.weights[i] /= sum;
+    }
 }
 
 std::vector<Render::Animation::Animation> FileReaders::AssimpWrapper::createAnimations(aiNode* rootNode, const aiScene* scene, const Render::Animation::Skeleton& skeleton)
@@ -220,7 +215,7 @@ std::vector<Render::Animation::Animation> FileReaders::AssimpWrapper::createAnim
                 animatedFrame.translations[i] = glm::mat4(1);
             }
             //toMat4(scene->mRootNode->mTransformation)
-
+            animatedFrame.timeStamp = (animation.getDuration() / static_cast<float>(maxFrames - 1)) * j;
             processAnimNode(currentAnimation, rootNode, toMat4(scene->mRootNode->mTransformation), globalInverseTransformation, animatedFrame, j, skeleton.getBones());
             animation.addKeyFrame(animatedFrame);
         }
@@ -238,7 +233,7 @@ std::vector<Render::Animation::Animation> FileReaders::AssimpWrapper::createAnim
 
 void FileReaders::AssimpWrapper::processAnimNode(const aiAnimation* anim, const aiNode* node, 
     const glm::mat4& parentsTransform, const glm::mat4& globalInverseTransform,
-    Render::Animation::KeyFrame& keyFrame, const int frame, const std::vector<Render::Animation::Bone>& bones)
+    Render::Animation::KeyFrame& keyFrame, const float frame, const std::vector<Render::Animation::Bone>& bones)
 {
     const std::string nodeName = node->mName.C_Str();
     glm::mat4 nodeTransform = toMat4(node->mTransformation);
@@ -252,8 +247,7 @@ void FileReaders::AssimpWrapper::processAnimNode(const aiAnimation* anim, const 
     }
     if (animNode) {
         // build matrix from animNode asine to nodeTransform
-        nodeTransform = buildMatrix(animNode, frame);
-        keyFrame.timeStamp = animNode->mPositionKeys[frame].mTime;
+        nodeTransform = buildMatrix(animNode, keyFrame.timeStamp);
     }
     glm::mat4 nodeGlobalTransform = parentsTransform * nodeTransform;
     // get all bones whos name == nodeName then do tranformation stuff
@@ -292,8 +286,21 @@ glm::mat4 FileReaders::AssimpWrapper::buildMatrix(const aiNodeAnim* node, float 
     int f = static_cast<int>(frame);
     
     // position
-    glm::mat4 translation(1);
-    if (node->mNumPositionKeys == 1 OR true) {
+    glm::mat4 translation(1), rotation(1), scale(1);
+    const float b = Utils::round(frame, 3);
+    for (unsigned i = 0; i < node->mNumPositionKeys; i++) {
+        auto key = node->mPositionKeys[i];
+        float a = Utils::round(key.mTime, 3);
+        if (a <= b) {
+            translation = glm::translate(glm::mat4(1), toVec3(node->mPositionKeys[i].mValue));
+            rotation = glm::mat4_cast(toQuat(node->mRotationKeys[i].mValue));
+            scale = glm::scale(glm::mat4(1), toVec3(node->mScalingKeys[i].mValue));
+        }
+        else {
+            break;
+        }
+    }
+    /*if (node->mNumPositionKeys == 1 OR true) {
         translation = glm::translate(translation, toVec3(node->mPositionKeys[f].mValue));
     }
     /*int numPositions = node->mNumPositionKeys;
@@ -308,7 +315,7 @@ glm::mat4 FileReaders::AssimpWrapper::buildMatrix(const aiNodeAnim* node, float 
         //aiVecKey = positionKeys[static_cast<int>(fminf(numPositions - 1, frame))];
         vec = aiVecKey.mValue;
         nodeTransform = glm::translate(nodeTransform, glm::vec3(vec.x, vec.y, vec.z));
-    }*/
+    }
     // rotation
     glm::mat4 rotation(1);
     if (node->mNumRotationKeys == 1 OR true) {
@@ -329,12 +336,12 @@ glm::mat4 FileReaders::AssimpWrapper::buildMatrix(const aiNodeAnim* node, float 
         // nodeTransform = Utils::rotate(nodeTransform, quat);
 
         nodeTransform = nodeTransform * glm::mat4(quat);
-    }*/
+    }
     // scaling
     glm::mat4 scale(1);
     if (node->mNumScalingKeys == 1 OR true) {
         scale = glm::scale(scale, toVec3(node->mScalingKeys[f].mValue));
-    }
+    }*/
     /*int numScalingKeys = node->mNumScalingKeys;
     if (numScalingKeys > 0) {
         aiVecKey = scalingKeys[numScalingKeys - 1];
@@ -348,11 +355,6 @@ glm::mat4 FileReaders::AssimpWrapper::buildMatrix(const aiNodeAnim* node, float 
         vec = aiVecKey.mValue;
         nodeTransform = glm::scale(nodeTransform, glm::vec3(vec.x, vec.y, vec.z));
     }*/
-    /*for (int i = 0; i < node->mNumRotationKeys; i++) {
-        std::cout << glm::to_string(glm::transpose(glm::translate(glm::mat4(toQuat(node->mRotationKeys[i].mValue)), toVec3(node->mPositionKeys[i].mValue)))) << std::endl;
-    }
-    std::cout << "==========================\n";*/
-    scale = glm::mat4(1);
     return  translation * rotation * scale;
 }
 

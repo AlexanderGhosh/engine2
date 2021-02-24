@@ -23,13 +23,15 @@ namespace Render {
 			std::vector<KeyFrame> keyFrames;
 			Animation();
 			Animation(String name, Float duration, Float tps);
-			const KeyFrame getFrame(Float timeInSecconds);
+			const KeyFrame getFrame(Float timeInSecconds) const;
 			const KeyFrame& getFrameABS(Int frame) const;
 			Unsigned getFrameCount() const;
 
 			void addKeyFrame(const KeyFrame& frame);
 			String getName() const;
 			Float getTPS() const;
+
+			Float getDuration() const;
 
 			void cleanUp();
 		};

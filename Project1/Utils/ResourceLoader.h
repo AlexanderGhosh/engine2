@@ -26,8 +26,9 @@ public:
 	static std::string createShader(const std::string& filePath);
 	static const unsigned getShader(const std::string& name);
 	// texturs
-	static const unsigned createTexture(const std::string& filePath, const TextureType type, const bool& flip = 1);
-	static const unsigned createCubeMap(const std::string& dirPath, const std::string& extension, const bool& flip = 1);
+	static const std::vector<unsigned> loadTextureFile(String dirPath, std::vector<TextureType> types, std::vector<bool> flip);
+	static const unsigned loadTexture(const std::string& filePath, const TextureType type, const bool& flip = 1);
+	static const unsigned loadCubeMap(const std::string& dirPath, const std::string& extension, const bool& flip = 1);
 	static const unsigned getTexture(const std::string& name);
 	// models
 	static const Primative::Model createModel(const std::string& filePath, GLenum draw_type = GL_TRIANGLES);
@@ -38,7 +39,8 @@ public:
 	static Materials::Material* getMaterial(const int& index);
 	static void addMaterial(Materials::Material* mat);
 	// animation
-	static const Render::Animation::Animation& getAnimation(String name);
+	static const Render::Animation::Animation& createAnimation(String filePath);
+	static Render::Animation::Animation* getAnimation(String name);
 	// general
 	static void cleanUp();
 private:

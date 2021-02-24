@@ -42,7 +42,7 @@ namespace FileReaders {
         static std::vector<Render::Animation::Animation> createAnimations(aiNode* rootNode, const aiScene* scene, const Render::Animation::Skeleton& skeleton);
         static void processAnimNode(const aiAnimation* anim, const aiNode* node,
             const glm::mat4& parentsTransform, const glm::mat4& globalInverseTransform,
-            Render::Animation::KeyFrame& keyFrame, const int frame, const std::vector<Render::Animation::Bone>& bones);
+            Render::Animation::KeyFrame& keyFrame, const float frame, const std::vector<Render::Animation::Bone>& bones);
         static int calcAnimationFrameCount(const aiAnimation* animtion);
         static glm::mat4 buildMatrix(const aiNodeAnim* node, float frame);
 

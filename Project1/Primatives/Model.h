@@ -24,6 +24,7 @@ namespace Primative {
 		
 		void addBuffer(Unsigned bufferIndex);
 		const std::vector<unsigned>& getBuffers() const;
+		Unsigned getBuffer(String meshName) const;
 
 		bool hasMesh() const;
 	};
