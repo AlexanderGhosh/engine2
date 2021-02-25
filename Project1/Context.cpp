@@ -104,6 +104,7 @@ void Time::update()
         avgFPS = fpsCount / sampleRate;
         frameCounter = 0;
         fpsCount = 0;
+        sampleRate = avgFPS * 0.5;
     }
     frameCounter++;
 }

@@ -21,9 +21,9 @@ void Component::Camera::ProcessMouseMovement(float xOffset, float yOffset, bool 
 			pitch = -89.0f;
 		}
 	}
-	this->update();
+	this->update(0);
 }
-void Component::Camera::update() {
+void Component::Camera::update(float deltaTime) {
 	glm::vec3 front;
 	front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
 	front.y = sin(glm::radians(pitch));

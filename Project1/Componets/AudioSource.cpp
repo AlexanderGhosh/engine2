@@ -1,11 +1,11 @@
 #include "AudioSource.h"
 #include "../GameObject/GameObject.h"
 
-void Component::AudioSource::update()
+void Component::AudioSource::update(float deltaTime)
 {
 	// update buffers position
 	const glm::vec3& pos = parent->getTransform()->Position;
-	const Component::Base* rb = parent->getRigidbody();
+	const Component::ComponetBase* rb = parent->getRigidbody();
 	if (rb) {
 		const glm::vec3& vel = { 0, 0, 0 };
 		alSource3f(source, AL_VELOCITY, vel.x, vel.y, vel.z);

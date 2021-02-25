@@ -4,14 +4,14 @@
 #include <al.h>
 
 namespace Component {
-    class AudioSource : public Base
+    class AudioSource : public ComponetBase
     {
     private:
         unsigned source;
     public:
-        AudioSource() : Base(), source(0) { };
-        AudioSource(unsigned source) : Base(), source(source) { };
-        void update();
+        AudioSource() : ComponetBase(), source(0) { };
+        AudioSource(unsigned source) : ComponetBase(), source(source) { };
+        void update(float deltaTime);
         inline void play() const { alSourcePlay(source); };
         inline void pause() const { alSourcePause(source); };
         inline bool isPlaying() const 

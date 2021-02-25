@@ -2,11 +2,15 @@
 #include <string>
 #include <iostream>
 #include "../Utils/General.h"
+#include "../Utils/ResourceLoader.h"
+#include "Mesh.h"
+#include "Vertex.h"
 
 char Primative::StaticBuffer::usedBindingPoint = -1;
 
-Primative::VertexBuffer::VertexBuffer(const Mesh& mesh, GLenum shape_type, GLenum draw_type) : VertexBuffer()
+Primative::VertexBuffer::VertexBuffer(/*const*/ Mesh& mesh, GLenum shape_type, GLenum draw_type, std::string name) : VertexBuffer()
 {
+	this->name = name;
 	this->drawType = draw_type;
 	this->shape_type = shape_type;
 	num_indices = static_cast<int>(mesh.indices.size());
@@ -17,6 +21,11 @@ Primative::VertexBuffer::VertexBuffer(const Mesh& mesh, GLenum shape_type, GLenu
 
 	this->bind();
 
+	/*for (int i = 0; i < mesh.verts.size(); i++) {
+		auto& v = mesh.verts[i];
+		v.ids = glm::vec4(0, 0, 0, 1);
+	}*/
+
 	// VBO
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, mesh.verts.size() * sizeof(Primative::Vertex), &mesh.verts[0], drawType);
@@ -25,16 +34,47 @@ Primative::VertexBuffer::VertexBuffer(const Mesh& mesh, GLenum shape_type, GLenu
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.indices.size() * sizeof(unsigned), &mesh.indices[0], GL_STATIC_DRAW);
 
+	int stride = sizeof(Vertex);
 	// layouts in shader
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+	// pos
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+	// tex
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(5 * sizeof(float)));
+	// norm
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, (void*)(5 * sizeof(float)));
 	glEnableVertexAttribArray(2);
+
+	// bone weights
+	// part 1
+	glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, stride, (void*)(8 * sizeof(float)));
+	glEnableVertexAttribArray(3);
+	// part 2
+	glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, stride, (void*)(12 * sizeof(float)));
+	glEnableVertexAttribArray(4);
+	/*
+	// bone weights
+	// part 1
+	glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, stride, (void*)(8 * sizeof(float)));
+	glEnableVertexAttribArray(3);
+	// part 2
+	glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, stride, (void*)(12 * sizeof(float)));
+	glEnableVertexAttribArray(4);
+	*/
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
+}
+
+String Primative::VertexBuffer::getName() const
+{
+	return name;
+}
+
+void Primative::VertexBuffer::setName(String name)
+{
+	this->name = name;
 }
 
 void Primative::VertexBuffer::cleanUp()

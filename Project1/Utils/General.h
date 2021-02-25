@@ -18,16 +18,18 @@
 #include <stdlib.h>
 #include <crtdbg.h>
 
+#include <fstream>
+#include <iostream>
+#include <filesystem>
+
 #ifdef _DEBUG
 #define DBG_NEW new ( _NORMAL_BLOCK , __FILE__ , __LINE__ )
-// Replace _NORMAL_BLOCK with _CLIENT_BLOCK if you want the
-// allocations to be of _CLIENT_BLOCK type
 #else
 #define DBG_NEW new
 #endif
 
 
-
+#define MAX_BONE_WEIGHTS 4
 #define NOT !
 #define AND &&
 #define OR ||
@@ -42,6 +44,11 @@ constexpr float INV_PI = 1.0f / PI;
 #define Vector3 const glm::vec3&
 #define Quaternion const glm::quat&
 #define Matrix3 const glm::mat3&
+#define Matrix4 const glm::mat4&
+#define String const std::string&
+#define Float const float&
+#define Unsigned const unsigned&
+#define Int const int&
 
 namespace Utils {
 
@@ -60,11 +67,17 @@ namespace Utils {
         return tokens;
     };
 
-    inline glm::mat4 rotate(glm::mat4 matrix, const glm::vec3& vec) {
+    inline glm::mat4 translate(glm::mat4 matrix, Vector3 vec) {
+        for (char i = 0; i < 3; i++)
+            matrix[3][i] = vec[i];
+        return matrix;
+    }
+
+    inline glm::mat4 rotate(Matrix4 matrix, Vector3 vec) {
         if (glm::all(glm::equal(vec, { 0, 0, 0 }))) return matrix;
         return glm::rotate(matrix, glm::radians(glm::length(vec)), glm::normalize(vec));
     };
-    inline glm::mat4 rotate(glm::mat4 matrix, const glm::quat& vec) {
+    inline glm::mat4 rotate(Matrix4 matrix, Quaternion vec) {
         return matrix * glm::mat4_cast(vec);
     }
     template<class T>
@@ -161,6 +174,22 @@ namespace Utils {
         std::advance(s, index);
         return *s;
     }
+    template<class T>
+    inline T& getElement(std::vector<T>& list, int index) {
+        if (index < 0) {
+            index = list.size() + index;
+        }
+        index = index % list.size();
+        return list[index];
+    }
+    template<class T, size_t size>
+    inline T& getElement(std::array<T, size> list, int index) {
+        if (index < 0) {
+            index = size + index;
+        }
+        index = index % size;
+        return list[index];
+    }
     inline glm::vec3 map(const glm::vec3& x, const glm::vec2& from, const glm::vec2& to) {
         float a = from.x;
         float b = from.y;
@@ -234,6 +263,30 @@ namespace Utils {
         else
             return glm::inverse(a);
     }
+    inline float round(float var, int dp)
+    {
+        float t = powf(10, dp);
+        // 37.66666 * 100 =3766.66 
+        // 3766.66 + .5 =3767.16    for rounding off value 
+        // then type cast to int so value is 3767 
+        // then divided by 100 so the value converted into 37.67 
+        float value = static_cast<int>(var * t + .5);
+        return static_cast<float>(value / t);
+    }
+    // doenst go deep
+    inline int countFiles(String dirPath) {
+        auto dirIter = std::filesystem::directory_iterator(dirPath);
+        int fileCount = 0;
+
+        for (auto& entry : dirIter)
+        {
+            if (entry.is_regular_file())
+            {
+                ++fileCount;
+            }
+        }
+        return fileCount;
+    }
     class Timer {
     public:
         inline Timer(const std::string name) : s(), e(), pausing(), name(name) {  };
@@ -266,18 +319,22 @@ namespace Utils {
         };
         inline void log(bool frames = 0) { 
             stop();
-            std::cout << name << ": " << std::to_string(getDuration(frames)) << std::endl; 
+            std::string units = frames ? " Frames" : " Milliseconds";
+            std::cout << name << ": " << std::to_string(getDuration(frames)) << units << std::endl;
         };
         inline const float& getDuration(bool frames = 0) 
         {
-            float d = calcDurration(s, e);
+            float d = calcDurration(s, e)/1000.0f;
             assert(!(pausing.size() % 2) && "Timer pausing not working");
             for (short i = 0; i < pausing.size(); i += 2)
-                d -= calcDurration(elementAt(pausing, i), elementAt(pausing, i + 1));
+                d -= calcDurration(elementAt(pausing, i), elementAt(pausing, i + 1))/1000.0f;
             if (frames)
-                d = (d / 1000000.0f) * 60.0f;
+                d = (d / 1000.0f) * 60.0f;
             return d;
         };
+        inline void reName(String name) {
+            this->name = name;
+        }
     private:
         std::string name;
         static inline const std::chrono::time_point<std::chrono::high_resolution_clock> getNow() { return std::chrono::high_resolution_clock::now(); };

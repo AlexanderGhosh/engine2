@@ -1,29 +1,35 @@
 #pragma once
 #include <GL/glew.h>
+#include <glm.hpp>
 #include <unordered_map>
 #include <string>
 #include <vector>
 #include <tuple>
 #include <al.h>
-#include "Mesh.h"
+#include "../Utils/General.h"
 namespace Primative {
+	struct Mesh;
 	class VertexBuffer
 	{
 	private:
 		unsigned VBO, VAO, EBO;
 		unsigned num_indices;
 		GLenum shape_type, drawType;
+		std::string name;
 	public:
 		inline const unsigned getVBO() const { return VBO; };
 		inline const unsigned getVAO() const { return VAO; };
 		inline const unsigned getEBO() const { return EBO; };
 
-		inline VertexBuffer() : VBO(0), VAO(0), EBO(0), num_indices(0), shape_type(GL_TRIANGLES), drawType(GL_STATIC_DRAW) { };
-		VertexBuffer(const Mesh& mesh, GLenum shape_type = GL_TRIANGLES, GLenum draw_type = GL_STATIC_DRAW);
+		inline VertexBuffer() : VBO(0), VAO(0), EBO(0), num_indices(0), shape_type(GL_TRIANGLES), drawType(GL_STATIC_DRAW), name("") { };
+		VertexBuffer(/*const*/ Mesh& mesh, GLenum shape_type = GL_TRIANGLES, GLenum draw_type = GL_STATIC_DRAW, std::string name = "");
 		inline void bind() const { glBindVertexArray(VAO); };
 		inline void unBind() const { glBindVertexArray(0); };
-		inline void draw() const { glDrawElements(shape_type, num_indices, GL_UNSIGNED_INT, 0); };
+		inline void draw() const { 
+			glDrawElements(shape_type, num_indices, GL_UNSIGNED_INT, 0); };
 		inline void setDrawType(GLenum type) { drawType = type; };
+		String getName() const;
+		void setName(String name);
 		void cleanUp();
 	};
 	class StaticBuffer {

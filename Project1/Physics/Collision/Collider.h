@@ -3,7 +3,7 @@
 #include "../../Componets/Componets.h"
 namespace Physics {
 	struct AABB;
-	class Collider : public Component::Base
+	class Collider : public Component::ComponetBase
 	{
 	public:
 		float mass;

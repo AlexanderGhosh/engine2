@@ -118,6 +118,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\File Readers;C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\OPENAL\include;C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\FREETYPE\include;C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\ASSIMP\include;C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\GLM\glm;C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\GLFW\include;C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\GLEW\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -143,6 +144,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Componets\Animated.cpp" />
+    <ClCompile Include="Primatives\Model.cpp" />
+    <ClCompile Include="Rendering\Animation\Bones.cpp" />
     <ClCompile Include="Context.cpp" />
     <ClCompile Include="Physics\ConstraintEngine\Constraints\ContactConstraint.cpp" />
     <ClCompile Include="Physics\ConstraintEngine\ConstraitnsSolver.cpp" />
@@ -159,6 +163,7 @@
     <ClCompile Include="Physics\Collision\Narrowphase\SAT3D.cpp" />
     <ClCompile Include="Componets\Rigidbody.cpp" />
     <ClCompile Include="Physics\ConstraintEngine\Constraints\DistanceConstraint.cpp" />
+    <ClCompile Include="Scene\SkyBox.cpp" />
     <ClCompile Include="Utils\Shapes.cpp" />
     <ClCompile Include="UI\Elements\ListBox.cpp" />
     <ClCompile Include="UI\Panes\Grid.cpp" />
@@ -170,7 +175,7 @@
     <ClCompile Include="EventSystem\Handler.cpp" />
     <ClCompile Include="UI\TextRenderer.cpp" />
     <ClCompile Include="UI\Elements\TextBlock.cpp" />
-    <ClCompile Include="UI\Renderer.cpp" />
+    <ClCompile Include="UI\UIRenderer.cpp" />
     <ClCompile Include="UI\Panes\Pane.cpp" />
     <ClCompile Include="UI\Elements\Element.cpp" />
     <ClCompile Include="Scene\GameScene.cpp" />
@@ -188,7 +193,11 @@
     <ClCompile Include="Utils\ResourceLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Componets\Animated.h" />
+    <ClInclude Include="Primatives\Model.h" />
+    <ClInclude Include="Rendering\Animation\Bones.h" />
     <ClInclude Include="Context.h" />
+    <ClInclude Include="Componets\Lights\LightBase.h" />
     <ClInclude Include="Physics\ConstraintEngine\Constraints\ContactConstraint.h" />
     <ClInclude Include="Physics\ConstraintEngine\ConstraitnsSolver.h" />
     <ClInclude Include="Physics\Resolution\ImpulseBased.h" />
@@ -206,6 +215,7 @@
     <ClInclude Include="Physics\Collision\Narrowphase\SAT3D.h" />
     <ClInclude Include="Componets\Rigidbody.h" />
     <ClInclude Include="Physics\ConstraintEngine\Constraints\DistanceConstraint.h" />
+    <ClInclude Include="Scene\SkyBox.h" />
     <ClInclude Include="Utils\Shapes.h" />
     <ClInclude Include="UI\Elements\ListBox.h" />
     <ClInclude Include="UI\Panes\Grid.h" />
@@ -218,7 +228,7 @@
     <ClInclude Include="EventSystem\Handler.h" />
     <ClInclude Include="UI\TextRenderer.h" />
     <ClInclude Include="UI\Elements\TextBlock.h" />
-    <ClInclude Include="UI\Renderer.h" />
+    <ClInclude Include="UI\UIRenderer.h" />
     <ClInclude Include="UI\Panes\Pane.h" />
     <ClInclude Include="UI\Elements\Element.h" />
     <ClInclude Include="Scene\GameScene.h" />
@@ -237,24 +247,24 @@
     <ClInclude Include="Primatives\Vertex.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Basics\DefaultShader\fragment.glsl" />
-    <None Include="Basics\DefaultShader\geometry.glsl" />
-    <None Include="Basics\DefaultShader\vertex.glsl" />
-    <None Include="Basics\PBRShader\fragment.glsl" />
-    <None Include="Basics\PBRShader\geometry.glsl" />
-    <None Include="Basics\PBRShader\vertex.glsl" />
-    <None Include="Basics\ShadowShader\fragment.glsl" />
-    <None Include="Basics\ShadowShader\geometry.glsl" />
-    <None Include="Basics\ShadowShader\vertex.glsl" />
-    <None Include="Basics\UIShader\fragment.glsl" />
-    <None Include="Basics\UIShader\geometry.glsl" />
-    <None Include="Basics\UIShader\vertex.glsl" />
+    <None Include="Resources\DefaultShader\fragment.glsl" />
+    <None Include="Resources\DefaultShader\geometry.glsl" />
+    <None Include="Resources\DefaultShader\vertex.glsl" />
+    <None Include="Resources\PBRShader\fragment.glsl" />
+    <None Include="Resources\PBRShader\geometry.glsl" />
+    <None Include="Resources\PBRShader\vertex.glsl" />
+    <None Include="Resources\ShadowShader\fragment.glsl" />
+    <None Include="Resources\ShadowShader\geometry.glsl" />
+    <None Include="Resources\ShadowShader\vertex.glsl" />
+    <None Include="Resources\UIShader\fragment.glsl" />
+    <None Include="Resources\UIShader\geometry.glsl" />
+    <None Include="Resources\UIShader\vertex.glsl" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Basics\Textures\default.png" />
+    <Image Include="Resources\Textures\default.png" />
   </ItemGroup>
   <ItemGroup>
-    <Font Include="Basics\Fonts\arial.ttf" />
+    <Font Include="Resources\Fonts\arial.ttf" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

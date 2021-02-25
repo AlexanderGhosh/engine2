@@ -48,9 +48,6 @@
     <ClCompile Include="EventSystem\Handler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="UI\Renderer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="UI\Panes\Pane.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -144,6 +141,21 @@
     <ClCompile Include="Context.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Scene\SkyBox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\UIRenderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\Animation\Bones.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Componets\Animated.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Primatives\Model.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Rendering\Rendering.h">
@@ -183,9 +195,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EventSystem\Handler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="UI\Renderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="UI\Panes\Pane.h">
@@ -287,27 +296,45 @@
     <ClInclude Include="Context.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Componets\Lights\LightBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\SkyBox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\UIRenderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\Animation\Bones.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Componets\Animated.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Primatives\Model.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Basics\DefaultShader\vertex.glsl" />
-    <None Include="Basics\DefaultShader\geometry.glsl" />
-    <None Include="Basics\DefaultShader\fragment.glsl" />
-    <None Include="Basics\ShadowShader\fragment.glsl" />
-    <None Include="Basics\ShadowShader\geometry.glsl" />
-    <None Include="Basics\ShadowShader\vertex.glsl" />
-    <None Include="Basics\PBRShader\fragment.glsl" />
-    <None Include="Basics\PBRShader\geometry.glsl" />
-    <None Include="Basics\PBRShader\vertex.glsl" />
-    <None Include="Basics\UIShader\fragment.glsl" />
-    <None Include="Basics\UIShader\geometry.glsl" />
-    <None Include="Basics\UIShader\vertex.glsl" />
+    <None Include="Resources\DefaultShader\fragment.glsl" />
+    <None Include="Resources\DefaultShader\geometry.glsl" />
+    <None Include="Resources\DefaultShader\vertex.glsl" />
+    <None Include="Resources\PBRShader\fragment.glsl" />
+    <None Include="Resources\PBRShader\geometry.glsl" />
+    <None Include="Resources\PBRShader\vertex.glsl" />
+    <None Include="Resources\ShadowShader\fragment.glsl" />
+    <None Include="Resources\ShadowShader\geometry.glsl" />
+    <None Include="Resources\ShadowShader\vertex.glsl" />
+    <None Include="Resources\UIShader\fragment.glsl" />
+    <None Include="Resources\UIShader\geometry.glsl" />
+    <None Include="Resources\UIShader\vertex.glsl" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Basics\Textures\default.png">
+    <Font Include="Resources\Fonts\arial.ttf" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Resources\Textures\default.png">
       <Filter>Resource Files</Filter>
     </Image>
-  </ItemGroup>
-  <ItemGroup>
-    <Font Include="Basics\Fonts\arial.ttf" />
   </ItemGroup>
 </Project>

@@ -26,7 +26,7 @@ void Physics::AABB::createInertiaTensor()
 
 void Physics::Collider::setParent(GameObject* parent)
 {
-	Base::setParent(parent);
+	ComponetBase::setParent(parent);
 	Component::Transform* t = parent->getTransform();
 	position = &t->Position;
 	rotation = &t->Rotation;

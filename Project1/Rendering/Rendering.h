@@ -3,25 +3,36 @@
 #include "../Primatives/Buffers.h"
 #include "../Utils/ResourceLoader.h"
 #include "../Primatives/Mesh.h"
+#include "../Primatives/Model.h"
 #include "Animation/Animation.h"
 #include "../Componets/Componets.h"
 #include "../Primatives/Material.h"
-namespace Render {
-	class RenderMesh : public Animation::Animation, public Component::Base // special case of animation with only one frame
+namespace Component {
+	class Animated;
+	class RenderMesh : public Component::ComponetBase // special case of animation with only one frame
 	{
 	public:
 		RenderMesh();
-		virtual void update();
-		void addBuffers(std::vector<Primative::VertexBuffer*>& buffers, const GLenum draw_type = GL_TRIANGLES);
-		inline void setMaterial(Materials::Material* mat) { material = mat; };
+		~RenderMesh() = default;
+		virtual void update(float deltaTime);
+		void setModel(const Primative::Model model, const GLenum draw_type = GL_TRIANGLES);
+		void setMaterial(Materials::Material* material);
+		void setMaterialTo(Materials::Material * material, String meshName);
 		inline Component::Type getType() const {
 			return Component::Type::RenderMesh;
 		}
+
+		void setAnimatedComp(Component::Animated* comp);
 		void cleanUp();
+
+		const Primative::Model& getModel() const;
+
+		RenderMesh copy() const;
 	private:
-		std::vector<Primative::VertexBuffer*> buffers;
-		GameObject* parent;
-		Materials::Material* material;
+		// index of buffer in the resorce loader
+		std::vector<Materials::Material*> materials;
+		Primative::Model model;
+		Animated* animatedComponet;
 	};
 }
 

@@ -3,8 +3,9 @@
 #include "Shading/Manager.h"
 #include "../Componets/Componets.h"
 #include "../GameObject/GameObject.h"
+#include "../Componets/Animated.h"
 
-Render::RenderMesh::RenderMesh() : buffers(), parent(nullptr), material(), Component::Base()
+Component::RenderMesh::RenderMesh() : model(), materials(), animatedComponet(nullptr), Component::ComponetBase()
 {
 	/*Materials::Forward* fwd = DBG_NEW Materials::Forward();
 	fwd->getDiffuse()(1); // set to the texture id
@@ -24,37 +25,86 @@ Render::RenderMesh::RenderMesh() : buffers(), parent(nullptr), material(), Compo
 }
 
 
-void Render::RenderMesh::update()
+void Component::RenderMesh::update(float deltaTime)
 {
-	const glm::mat4 m = Component::Base::parent->getTransform()->getModel();
-	bool succ = Shading::Manager::setValue("model", m);
-	if(this->material->getType() == Materials::Type::Forward)
-		succ = Shading::Manager::setValue("material", *dynamic_cast<Materials::Forward*>(this->material));
-	else
-		succ = Shading::Manager::setValue("material", *dynamic_cast<Materials::PBR*>(this->material));
-	this->material->activateTextures();
-	for (const Primative::VertexBuffer* buffer : buffers) {
-		buffer->bind();
-		buffer->draw();
-		buffer->unBind();
+	glm::mat4 m(1);
+	if(parent)
+		m = Component::ComponetBase::parent->getTransform()->getModel();
+	Render::Shading::Manager::setValue("model", m);
+	/*if (materials.size() == 1) {
+		Materials::Material* material = materials[0];
+		Render::Shading::Manager::setValue("material", material);
+		material->activateTextures();
+	}*/
+	if (animatedComponet) {
+		const Render::Animation::KeyFrame frame = animatedComponet->getCurrentFrame();
+		Render::Shading::Manager::setValue("bones", frame);
+	}
+
+	const auto& buffers = model.getBuffers();
+	for (short i = 0; i < buffers.size(); i++) {
+		Primative::VertexBuffer& buffer = ResourceLoader::getBuffer(buffers[i]);
+		const Materials::Material* material = materials[i];
+		if (material) {
+			Render::Shading::Manager::setValue("material", material);
+			material->activateTextures();
+		}
+		buffer.bind();
+		buffer.draw();
+		buffer.unBind();
 	}
 	glBindTexture(GL_TEXTURE_2D, 0);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 }
-void Render::RenderMesh::addBuffers(std::vector<Primative::VertexBuffer*>& buffers, const GLenum draw_type)
+void Component::RenderMesh::setModel(const Primative::Model model, const GLenum draw_type)
 {
-	this->buffers = buffers;
-	for (Primative::VertexBuffer* buffer : buffers) {
+	this->model = model;
+	materials.reserve(model.getBuffers().size());
+	materials.resize(model.getBuffers().size());
+	/*for (unsigned& index : model) {
+		auto buffer = ResourceLoader::getBuffer(index);
 		buffer->setDrawType(draw_type);
-	}
-	buffers.clear();
+	}*/
 }
-void Render::RenderMesh::cleanUp() {
-	parent = nullptr;
-	for (auto itt = buffers.begin(); itt != buffers.end();) {
-		itt = buffers.erase(itt);
+void Component::RenderMesh::setMaterial(Materials::Material* material)
+{
+	for (unsigned i = 0; i < materials.size(); i++) {
+		materials[i] = material;
 	}
-	material->cleanUp();
-	// delete material;
-	material = nullptr;
+}
+void Component::RenderMesh::setMaterialTo(Materials::Material* material, String meshName)
+{
+	unsigned i = 0;
+	for (Unsigned buff : model.getBuffers()) {
+		const Primative::VertexBuffer& vertexBuffer = ResourceLoader::getBuffer(buff);
+		if (vertexBuffer.getName() == meshName) {
+			materials[i] = material;
+			return;
+		}
+		i++;
+	}
+}
+void Component::RenderMesh::setAnimatedComp(Component::Animated* comp)
+{
+	animatedComponet = comp;
+}
+void Component::RenderMesh::cleanUp() {
+	// Component = nullptr;
+	for (auto itt = materials.begin(); itt != materials.end();) {
+		itt = materials.erase(itt);
+	}
+}
+
+const Primative::Model& Component::RenderMesh::getModel() const
+{
+	return model;
+}
+
+Component::RenderMesh Component::RenderMesh::copy() const
+{
+	RenderMesh res = RenderMesh();
+	res.materials = materials;
+	res.model = model;
+	return res;
 }
 

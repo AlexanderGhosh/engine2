@@ -1,5 +1,7 @@
 #include "GameScene.h"
 #include "../Rendering/Shading/Manager.h"
+#include "SkyBox.h"
+#include  "../Context.h"
 
 void GameScene::preProcess()
 {
@@ -16,6 +18,7 @@ void GameScene::preProcess()
 		}
 
 		renderObjects();
+		renderSkyBox();
 		glCullFace(GL_BACK);
 	}
 }
@@ -25,25 +28,37 @@ void GameScene::postProcess()
 	glBindFramebuffer(GL_FRAMEBUFFER, 0); // default fbo
 	clearFBO();
 	Render::Shading::Manager::setActive(postProcShaderId);
-	Render::Shading::Manager::setValue("depthMap", 3); // depth map
+	//Render::Shading::Manager::setValue("depthMap", 3); // depth map
 	/*glActiveTexture(GL_TEXTURE3);
 	glBindTexture(GL_TEXTURE, FBOs["shadows"]->getTextureId("depth"));*/
 
 	renderObjects();
+	glDisable(GL_CULL_FACE);
+	renderSkyBox();
+	glEnable(GL_CULL_FACE);
 }
 
 void GameScene::updateScene()
 {
 	for (GameObject*& obj : objects) {
-		obj->tick(currentTick++ % FIXED_UPDATE_RATE);
+		obj->tick(currentTick++ % FIXED_UPDATE_RATE, mainContext->getTime().deltaTime);
 	}
 }
 
 void GameScene::renderObjects()
 {
 	for (GameObject*& obj : objects) {
-		obj->tryDraw();
+		obj->tryDraw(mainContext->getTime().deltaTime);
 	}
+}
+
+void GameScene::renderSkyBox()
+{
+	if (!skybox)
+		return;
+	glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
+	skybox->draw();
+	glDepthFunc(GL_LESS); // set depth function back to default
 }
 
 const Primative::FrameBuffer* GameScene::getFBO(const std::string& name)
@@ -64,7 +79,7 @@ void GameScene::cleanUp()
 {
 	for (auto& obj : objects) {
 		obj->cleanUp();
-		delete obj;
+		//delete obj;
 		obj = nullptr;
 	}
 	objects.clear();
@@ -75,9 +90,22 @@ void GameScene::cleanUp()
 		fbo = nullptr;
 	}
 	FBOs.clear();
+	if(skybox)
+		skybox->cleanUp();
+	skybox = nullptr;
 }
 
 void GameScene::addPreProcLayer(const std::string& name, const unsigned& shaderId)
 {
 	this->preProcessingLayers[name] = shaderId;	
+}
+
+void GameScene::setSkyBox(SkyBox* sb)
+{
+	skybox = sb;
+}
+
+void GameScene::setContext(Context* context)
+{
+	mainContext = context;
 }

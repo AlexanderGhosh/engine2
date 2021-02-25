@@ -3,7 +3,7 @@
 #include "../GameObject/GameObject.h"
 #include "../Physics/Collision/Collider.h"
 
-Component::RigidBody::RigidBody() : Base(), transform(nullptr), cos(0), rotation(0), velocity(0), angularVelocity(0), isKinimatic(false),
+Component::RigidBody::RigidBody() : ComponetBase(), transform(nullptr), cos(0), rotation(0), velocity(0), angularVelocity(0), isKinimatic(false),
 force(0), torque(0), mass(0), invMass(0), l_inertia(1), l_invInertia(1), g_inertia(1), g_invInertia(1), colliders(), hasGravity(true)
 {
 	invMass = 1.0f / mass;
@@ -33,7 +33,7 @@ void Component::RigidBody::updateInertia()
 
 void Component::RigidBody::setParent(GameObject* parent)
 {
-	Base::setParent(parent);
+	ComponetBase::setParent(parent);
 	transform = parent->getTransform();
 	rotation = &transform->Rotation;
 	updateInertia();
