@@ -44,8 +44,8 @@ void Component::RenderMesh::update(float deltaTime)
 	const auto& buffers = model.getBuffers();
 	for (short i = 0; i < buffers.size(); i++) {
 		Primative::VertexBuffer& buffer = ResourceLoader::getBuffer(buffers[i]);
-		if (materials.size() > i) {
-			Materials::Material* material = materials[i % materials.size()];
+		const Materials::Material* material = materials[i];
+		if (material) {
 			Render::Shading::Manager::setValue("material", material);
 			material->activateTextures();
 		}
@@ -59,10 +59,30 @@ void Component::RenderMesh::update(float deltaTime)
 void Component::RenderMesh::setModel(const Primative::Model model, const GLenum draw_type)
 {
 	this->model = model;
+	materials.reserve(model.getBuffers().size());
+	materials.resize(model.getBuffers().size());
 	/*for (unsigned& index : model) {
 		auto buffer = ResourceLoader::getBuffer(index);
 		buffer->setDrawType(draw_type);
 	}*/
+}
+void Component::RenderMesh::setMaterial(Materials::Material* material)
+{
+	for (unsigned i = 0; i < materials.size(); i++) {
+		materials[i] = material;
+	}
+}
+void Component::RenderMesh::setMaterialTo(Materials::Material* material, String meshName)
+{
+	unsigned i = 0;
+	for (Unsigned buff : model.getBuffers()) {
+		const Primative::VertexBuffer& vertexBuffer = ResourceLoader::getBuffer(buff);
+		if (vertexBuffer.getName() == meshName) {
+			materials[i] = material;
+			return;
+		}
+		i++;
+	}
 }
 void Component::RenderMesh::setAnimatedComp(Component::Animated* comp)
 {

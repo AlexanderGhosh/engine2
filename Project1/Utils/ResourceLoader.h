@@ -8,6 +8,8 @@
 #include "../Rendering/Animation/Animation.h"
 namespace Materials {
 	class Material;
+	struct PBR;
+	struct Forward;
 }
 namespace Primative {
 	class VertexBuffer;
@@ -25,7 +27,10 @@ public:
 	// shaders
 	static std::string createShader(const std::string& filePath);
 	static const unsigned getShader(const std::string& name);
-	// texturs
+	// materials
+	static const Materials::PBR createPBR(String dirPath, std::vector<TextureType> types, std::vector<bool> flip);
+
+	// textures
 	static const std::vector<unsigned> loadTextureFile(String dirPath, std::vector<TextureType> types, std::vector<bool> flip);
 	static const unsigned loadTexture(const std::string& filePath, const TextureType type, const bool& flip = 1);
 	static const unsigned loadCubeMap(const std::string& dirPath, const std::string& extension, const bool& flip = 1);

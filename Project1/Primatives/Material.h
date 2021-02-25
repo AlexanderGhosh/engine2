@@ -46,7 +46,7 @@ namespace Materials {
 		inline MatItem& getDiffuse() { return diff_spec_norm[0]; };
 		inline MatItem& getSpecular() { return diff_spec_norm[1]; };
 		inline MatItem& getNormals() { return diff_spec_norm[2]; };
-		inline std::array<MatItem, 3>& getDiffSpecNorm() { return diff_spec_norm; };
+		inline const std::array<MatItem, 3>& getDiffSpecNorm() const  { return diff_spec_norm; };
 		void activateTextures() const;
 		void cleanUp();
 	};

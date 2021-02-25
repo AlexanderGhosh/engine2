@@ -9,7 +9,6 @@
 #include "../Primatives/Buffers.h"
 #include "../Primatives/Model.h"
 
-
 std::string ResourceLoader::defaultShaderName = "";
 std::unordered_map<std::string, unsigned> ResourceLoader::shaders = { };
 std::unordered_map<std::string, unsigned> ResourceLoader::textures = { };
@@ -108,27 +107,69 @@ const unsigned ResourceLoader::getShader(const std::string& name)
     return r;
 }
 
+const Materials::PBR ResourceLoader::createPBR(String dirPath, std::vector<TextureType> types, std::vector<bool> flip)
+{
+    const std::vector<unsigned> textures = loadTextureFile(dirPath, types, flip);
+    materials.push_back(new Materials::PBR());
+    materials.pop_back();
+    Materials::PBR& res = *dynamic_cast<Materials::PBR*>(materials.back());
+    unsigned i = 0;
+    for (TextureType& type : types) {
+        switch (type)
+        {
+        case TextureType::NormalMap:
+            res.getNormal() = textures[i];
+            break;
+        case TextureType::AlbedoMap:
+            res.getAlbedo() = textures[i];
+            break;
+        case TextureType::MetalicMap:
+            res.getMetalic() = textures[i];
+            break;
+        case TextureType::AOMap:
+            res.getAO() = textures[i];
+            break;
+        case TextureType::RoughnessMap:
+            res.getRoughness() = textures[i];
+            break;
+        }
+        i++;
+    }
+    return *dynamic_cast<Materials::PBR*>(materials.back());
+}
+
 const std::vector<unsigned> ResourceLoader::loadTextureFile(String dirPath, std::vector<TextureType> types, std::vector<bool> flip)
 {
-    const int s = Utils::countFiles(dirPath);
+    const int s = Utils::countFiles(dirPath) - 1;
     types.reserve(s);
     flip.reserve(s);
-    while (types.size() != s) {
+    while (types.size() < s) {
         types.push_back(TextureType::DiffuseMap);
     }
-    while (flip.size() != s) {
+    while (types.size() > s)
+    {
+        types.pop_back();
+    }
+    while (flip.size() < s) {
         flip.push_back(1);
+    }
+    while (flip.size() > s)
+    {
+        flip.pop_back();
     }
     std::vector<unsigned> res;
     res.reserve(s);
 
     auto dirIter = std::filesystem::directory_iterator(dirPath);
-    unsigned i = 0;
+    int i = 0;
     for (auto& file : dirIter)
     {
-        if (types[i] == TextureType::CubeMap)
+        i++;
+        if (i == 1)
             continue;
-        res.push_back(loadTexture(file.path().string(), types[i], flip[i++]));
+        if (types[i-2] == TextureType::CubeMap)
+            continue;
+        res.push_back(loadTexture(file.path().string(), types[i-2], flip[i-2]));
     }
     return res;
 }

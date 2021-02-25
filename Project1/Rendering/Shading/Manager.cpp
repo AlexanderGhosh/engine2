@@ -55,14 +55,14 @@ unsigned Render::Shading::Manager::active = 0;
 	 Render::Shading::Manager::setValue(name + "_vec", glm::vec4(fwd.getRaw(), 0));
 	 return Render::Shading::Manager::setValue(name + "_id", texUnit); // set to texture unit
  }
- bool Render::Shading::Manager::setValue(const std::string& name, Materials::Material* mat)
+ bool Render::Shading::Manager::setValue(const std::string& name, const Materials::Material* mat)
  {
 	 switch (mat->getType())
 	 {
 	 case Materials::Type::Forward:
-		 return setValue(name, *reinterpret_cast<Materials::Forward*>(mat));
+		 return setValue(name, *reinterpret_cast<const Materials::Forward*>(mat));
 	 case Materials::Type::PBR:
-		 return setValue(name, *reinterpret_cast<Materials::PBR*>(mat));
+		 return setValue(name, *reinterpret_cast<const Materials::PBR*>(mat));
 	 }
  }
  bool Render::Shading::Manager::setValue(const std::string& name, const Render::Animation::KeyFrame& frame)
@@ -74,7 +74,7 @@ unsigned Render::Shading::Manager::active = 0;
 	 glUniformMatrix4fv(loc, frame.translations.size(), GL_FALSE, glm::value_ptr(frame.translations[0]));
 	 return true;
  }
- bool Render::Shading::Manager::setValue(const std::string& name, Materials::Forward& fwd)
+ bool Render::Shading::Manager::setValue(const std::string& name, const Materials::Forward& fwd)
  {
 	 bool vals[] = { 0, 0, 0, 0 };
 	 std::string names[] = { ".diffuse", ".specular", ".normals" };
@@ -86,7 +86,7 @@ unsigned Render::Shading::Manager::active = 0;
 
 	 return vals[0] && vals[1] && vals[2] && vals[3];
  }
- bool Render::Shading::Manager::setValue(const std::string& name, Materials::PBR& mat)
+ bool Render::Shading::Manager::setValue(const std::string& name, const Materials::PBR& mat)
  {
 	 bool val = 0;
 	 std::string names[] = { ".albedo", ".normal", ".metalic", ".roughness", ".ao" };

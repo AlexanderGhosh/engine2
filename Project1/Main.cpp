@@ -103,6 +103,26 @@ int main() {
     /*ResourceLoader::loadTextureFile("Resources/Textures/RFATextures/Armour", 
         { TextureType::AlbedoMap,TextureType::RoughnessMap,TextureType::MetalicMap,TextureType::NormalMap, TextureType::CubeMap, TextureType::CubeMap, TextureType::AlbedoMap },
         { 1, 1, 1, 1 , 0, 0, 0 });*/
+    Materials::PBR armourMaterial = ResourceLoader::createPBR("Resources/Textures/RFATextures/Armour",
+        { TextureType::AlbedoMap, TextureType::AOMap, TextureType::MetalicMap, TextureType::NormalMap, TextureType::RoughnessMap },
+        { 0, 0, 0, 0, 0 });
+    printf("armour\n");
+    Materials::PBR clothesMaterial = ResourceLoader::createPBR("Resources/Textures/RFATextures/Clothes",
+            { TextureType::AlbedoMap, TextureType::AOMap, TextureType::MetalicMap, TextureType::NormalMap, TextureType::RoughnessMap },
+            { 0, 0, 0, 0, 0 });
+    printf("cloths\n");
+    Materials::PBR headMaterial = ResourceLoader::createPBR("Resources/Textures/RFATextures/Head",
+        { TextureType::AlbedoMap, TextureType::AOMap, TextureType::MetalicMap, TextureType::NormalMap, TextureType::RoughnessMap },
+        { 0, 0, 0, 0, 0 });
+    printf("head\n");
+    Materials::PBR hairMaterial = ResourceLoader::createPBR("Resources/Textures/RFATextures/Hair",
+        { TextureType::AlbedoMap, TextureType::AOMap, TextureType::RoughnessMap, TextureType::NormalMap },
+        { 0, 0, 0, 0, 0 });
+    printf("hair\n");
+    Materials::PBR weponMaterial = ResourceLoader::createPBR("Resources/Textures/RFATextures/Weapon",
+        { TextureType::AlbedoMap, TextureType::AOMap, TextureType::MetalicMap, TextureType::NormalMap, TextureType::RoughnessMap },
+        { 0, 0, 0, 0, 0 });
+    printf("wepon\n");
     timer.log();
 
     timer.reName("Object 1");
@@ -115,7 +135,13 @@ int main() {
     manMaterial1.setHDRmap(hdr);
     manMaterial1.setIBLmap(ibl);
     manMaterial1.setBRDFtex(brdf);
-    manR1.setMaterial({ &manMaterial1 });
+    manR1.setMaterialTo(&hairMaterial, "Hair");
+    manR1.setMaterialTo(&clothesMaterial, "Cloth");
+    manR1.setMaterialTo(&clothesMaterial, "Scarf");
+    manR1.setMaterialTo(&armourMaterial, "Armour");
+    manR1.setMaterialTo(&headMaterial, "Head");
+    manR1.setMaterialTo(&weponMaterial, "Sword");
+    manR1.setMaterialTo(&weponMaterial, "Dagger");
 
     Component::Animated manAnimatedComp = Component::Animated();
     auto anim = ResourceLoader::getAnimation("");

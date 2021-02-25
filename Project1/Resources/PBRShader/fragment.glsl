@@ -199,7 +199,6 @@ void main()
     vec3 ambient    = (kD * diffuse + specular) * ao;
 
     vec3 color = ambient + Lo;
-    color = albedo;
 
     // HDR tonemapping
     color /= color + vec3(1.0);
