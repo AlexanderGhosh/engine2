@@ -25,7 +25,7 @@ class ResourceLoader
 {
 public:
 	// shaders
-	static std::string createShader(const std::string& filePath);
+	static std::string createShader(const std::string& filePath, bool hasGeom = false);
 	static const unsigned getShader(const std::string& name);
 	// materials
 	static const Materials::PBR createPBR(String dirPath, std::vector<TextureType> types, std::vector<bool> flip);
