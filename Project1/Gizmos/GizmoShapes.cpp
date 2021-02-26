@@ -3,13 +3,8 @@
 #include "../Rendering/Shading/Manager.h"
 #include "../Utils/ResourceLoader.h"
 
-Gizmos::Gizmo::Gizmo() : position(0), colour(1, 1, 0), thickness(1), pointVAO(0), shaderID(0)
+Gizmos::Gizmo::Gizmo() : position(0), colour(1), thickness(1), pointVAO(0), shaderID(0)
 {
-	ResourceLoader::createShader("Resources/Gizmos/PointShader", true);
-	ResourceLoader::createShader("Resources/Gizmos/LineShader", true);
-	ResourceLoader::createShader("Resources/Gizmos/CubeShader");
-	ResourceLoader::createShader("Resources/Gizmos/CircleShader", true);
-
 	glm::vec3 data(0);
 	unsigned vbo;
 	glGenBuffers(1, &vbo);
@@ -121,6 +116,14 @@ Gizmos::Line::Line(Vector3 pos, Vector3 col) : Line()
 	this->colour = col;
 }
 
+Gizmos::Line::Line(Vector3 from, Vector3 to, bool over) : Line()
+{
+	const glm::vec3 half_d = (to - from) / 2.0f;
+	position = from + half_d;
+	leftOffset = -half_d;
+	rightOffset = half_d;
+}
+
 void Gizmos::Line::draw() {
 	bindShader();
 	Render::Shading::Manager::setValue("left", leftOffset);
@@ -147,7 +150,7 @@ void Gizmos::Line::setRightOffset(Vector3 right)
 	this->rightOffset = right;
 }
 
-Gizmos::Circle::Circle() : Gizmo(), radius(1), up(Utils::yAxis())
+Gizmos::Circle::Circle() : Gizmo(), radius(0.5), up(Utils::yAxis())
 {
 	shaderID = ResourceLoader::getShader("CircleShader");
 }
@@ -187,7 +190,7 @@ void Gizmos::Circle::setUp(Vector3 up)
 	this->up = up;
 }
 
-Gizmos::Cuboide::Cuboide() : Gizmo(), dimensions(1), cubeModel()
+Gizmos::Cuboide::Cuboide() : Gizmo(), dimensions(0.5), cubeModel()
 {
 	shaderID = ResourceLoader::getShader("CubeShader");
 	cubeModel = ResourceLoader::getModel("cube.obj");

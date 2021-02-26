@@ -43,6 +43,7 @@ namespace Gizmos {
 	public:
 		Line();
 		Line(Vector3 pos, Vector3 col);
+		Line(Vector3 from, Vector3 to, bool over);
 		~Line() = default;
 		void draw();
 		void cleanUp();

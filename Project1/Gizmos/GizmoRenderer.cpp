@@ -1,5 +1,6 @@
 #include "GizmoRenderer.h"
 #include "GizmoShapes.h"
+#include "../Utils/ResourceLoader.h"
 
 std::unordered_map<Gizmos::Types, std::vector<Gizmos::Gizmo*>> Gizmos::GizmoRenderer::gizmos = { };
 std::unordered_map<Gizmos::Types, std::vector<std::pair<glm::vec3, glm::vec3>>> Gizmos::GizmoRenderer::instanceData = { };
@@ -17,6 +18,14 @@ void Gizmos::GizmoRenderer::updateInstanceDate()
 			data[i] = { gizmos[type][i]->getPosition(), gizmos[type][i]->getColour() };
 		}
 	}
+}
+
+void Gizmos::GizmoRenderer::init()
+{
+	ResourceLoader::createShader("Resources/Gizmos/PointShader", true);
+	ResourceLoader::createShader("Resources/Gizmos/LineShader", true);
+	ResourceLoader::createShader("Resources/Gizmos/CubeShader");
+	ResourceLoader::createShader("Resources/Gizmos/CircleShader", true);
 }
 
 void Gizmos::GizmoRenderer::drawAll()
@@ -54,5 +63,6 @@ void Gizmos::GizmoRenderer::cleanUp()
 			(*jtt)->cleanUp();
 			jtt = (*itt).second.erase(jtt);
 		}
+		itt = gizmos.erase(itt);
 	}
 }

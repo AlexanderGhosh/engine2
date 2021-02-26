@@ -73,6 +73,8 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 int main() {
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
     // _crtBreakAlloc = 6157;
+
+
     Context main({ 800, 600 }, false);
     main.init("Engine 2", { GL_DEPTH_TEST, GL_CULL_FACE, GL_MULTISAMPLE, GL_TEXTURE_CUBE_MAP_SEAMLESS });
 
@@ -85,6 +87,7 @@ int main() {
     ResourceLoader::createShader("Resources/PBRShader");
     ResourceLoader::createShader("Resources/UIShader");
     ResourceLoader::createShader("Resources/TextShader");
+    Gizmos::GizmoRenderer::init();
     timer.log();
 
     timer.reName("Models");
@@ -270,10 +273,12 @@ int main() {
     // cube2->getRigidbody()->hasGravity = true;
     //cube2->getRigidbody()->velocityAdder({ 1, -1, 0 });
 
-    Gizmos::Sphere gizmoSphere({ 0, 0, 0 }, { 1, 0, 0 });
-    gizmoSphere.setThickness(2);
-    gizmoSphere.setRadius(2);
-    Gizmos::GizmoRenderer::addGizmo(&gizmoSphere);
+    Gizmos::Sphere gizmo1({ 0, 0, 0 }, { 1, 1, 0 });
+    gizmo1.setThickness(2);
+    Gizmos::GizmoRenderer::addGizmo(&gizmo1);
+    Gizmos::Line gizmo2({ 0, 0, 0 }, { 1, 1, 0 }, true);
+    gizmo2.setThickness(2);
+    Gizmos::GizmoRenderer::addGizmo(&gizmo2);
 
     float counter = 0;
     while (!main.shouldClose())
@@ -350,7 +355,7 @@ int main() {
     }
     Render::Shading::Manager::cleanUp(); // deactivats shdaer
     Physics::Engine::cleanUp();
-    gizmoSphere.cleanUp();
+    gizmo1.cleanUp();
     //audio->cleanUp();
     //delete audio;
     //audio = nullptr;
@@ -364,6 +369,7 @@ int main() {
     UI::UIRenderer::cleanUp(); // destroys quadbuffer and UBO 1
     SoundManager::cleanUp(); // destroys sound buffers
     ResourceLoader::cleanUp(); // destroys textures shaders and models(buffers)
+    Gizmos::GizmoRenderer::cleanUp();
     
     
     main.cleanUp();
