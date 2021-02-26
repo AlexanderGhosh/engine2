@@ -145,6 +145,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Componets\Animated.cpp" />
+    <ClCompile Include="Gizmos\GizmoShapes.cpp" />
+    <ClCompile Include="Gizmos\GizmoRenderer.cpp" />
     <ClCompile Include="Primatives\Model.cpp" />
     <ClCompile Include="Rendering\Animation\Bones.cpp" />
     <ClCompile Include="Context.cpp" />
@@ -194,6 +196,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Componets\Animated.h" />
+    <ClInclude Include="Gizmos\GizmoShapes.h" />
+    <ClInclude Include="Gizmos\GizmoRenderer.h" />
     <ClInclude Include="Primatives\Model.h" />
     <ClInclude Include="Rendering\Animation\Bones.h" />
     <ClInclude Include="Context.h" />

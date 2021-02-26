@@ -287,6 +287,16 @@ namespace Utils {
         }
         return fileCount;
     }
+    inline glm::vec3 normalize(Vector3 a) {
+        glm::vec3 res = glm::normalize(a);
+        for (char i = 0; i < 3; i++) {
+            float& x = res[i];
+            if (glm::isnan(x) OR glm::isinf(x)) {
+                x = 0;
+            }
+        }
+        return res;
+    }
     class Timer {
     public:
         inline Timer(const std::string name) : s(), e(), pausing(), name(name) {  };

@@ -136,7 +136,7 @@ void main()
     // reflectance equation
     vec3 Lo = vec3(0.0);
     vec3 lightPositions[1] = {
-        vec3(1.5, 1.5 ,-5)
+        vec3(0, 1 ,0.5)
     };
     vec3 lightColors[1] = {
         vec3(1, 1, 1)

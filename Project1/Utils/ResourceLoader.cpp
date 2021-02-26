@@ -17,17 +17,19 @@ std::unordered_map<std::string, Render::Animation::Animation> ResourceLoader::an
 std::vector<Materials::Material*> ResourceLoader::materials = { };
 std::unordered_map<std::string, Primative::Model> ResourceLoader::models = { };
 
-std::string ResourceLoader::createShader(const std::string& filePath)
+std::string ResourceLoader::createShader(const std::string& filePath, bool hasGeom)
 {
-    const std::string extensions[] = { "/vertex.glsl", "/fragment.glsl" };
-    std::string codes[] = { "", "" };
-    std::ifstream streams[] = { { }, { } };
-    const GLenum types[] = { GL_VERTEX_SHADER, GL_FRAGMENT_SHADER };
-    unsigned shaders[] = { 0, 0 };
+    const std::string extensions[] = { "/vertex.glsl", "/geometry.glsl", "/fragment.glsl" };
+    std::string codes[] = { "", "", "" };
+    std::ifstream streams[] = { { }, { }, { } };
+    const GLenum types[] = { GL_VERTEX_SHADER, GL_GEOMETRY_SHADER, GL_FRAGMENT_SHADER };
+    unsigned shaders[] = { 0, 0, 0 };
 
     int success;
     char infoLog[512];
-    for (short i = 0; i < 2; i++) {
+    for (short i = 0; i < 3; i++) {
+        if (NOT hasGeom AND i == 1)
+            continue;
         const std::string& extension = extensions[i];
         std::string& code = codes[i];
         std::ifstream& stream = streams[i];
@@ -61,14 +63,16 @@ std::string ResourceLoader::createShader(const std::string& filePath)
         if (!success)
         {
             glGetShaderInfoLog(shader, 512, NULL, infoLog);
-            std::cout << filePath + extension << " faild to compile" << infoLog << std::endl;
+            std::cout << filePath + extension << " faild to compile " << infoLog << std::endl;
         }
     }
 
     // link shaders
     int shaderProgram = glCreateProgram();
     glAttachShader(shaderProgram, shaders[0]); // vertex
-    glAttachShader(shaderProgram, shaders[1]); // fragment
+    if(hasGeom)
+        glAttachShader(shaderProgram, shaders[1]); // geometry
+    glAttachShader(shaderProgram, shaders[2]); // fragment
     glLinkProgram(shaderProgram);
     // check for linking errors
     glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
@@ -78,9 +82,12 @@ std::string ResourceLoader::createShader(const std::string& filePath)
     }
 
     glDetachShader(shaderProgram, shaders[0]);
-    glDetachShader(shaderProgram, shaders[1]);
+    if(hasGeom)
+        glDetachShader(shaderProgram, shaders[1]);
+    glDetachShader(shaderProgram, shaders[2]);
     glDeleteShader(shaders[0]);
     glDeleteShader(shaders[1]);
+    glDeleteShader(shaders[2]);
     glUseProgram(0);
 
     // auto shader_s = Utils::split(filePath, "/");

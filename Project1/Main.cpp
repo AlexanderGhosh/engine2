@@ -37,6 +37,8 @@
 #include "Physics/ConstraintEngine/Constraints/DistanceConstraint.h"
 #include "Physics/ConstraintEngine/ConstraitnsSolver.h"
 #include "Primatives/Model.h"
+#include "Gizmos/GizmoRenderer.h"
+#include "Gizmos/GizmoShapes.h"
 
 #include "MainWindow.h"
 #include "Context.h"
@@ -103,26 +105,41 @@ int main() {
     /*ResourceLoader::loadTextureFile("Resources/Textures/RFATextures/Armour", 
         { TextureType::AlbedoMap,TextureType::RoughnessMap,TextureType::MetalicMap,TextureType::NormalMap, TextureType::CubeMap, TextureType::CubeMap, TextureType::AlbedoMap },
         { 1, 1, 1, 1 , 0, 0, 0 });*/
-    Materials::PBR armourMaterial = ResourceLoader::createPBR("Resources/Textures/RFATextures/Armour",
-        { TextureType::AlbedoMap, TextureType::AOMap, TextureType::MetalicMap, TextureType::NormalMap, TextureType::RoughnessMap },
-        { 0, 0, 0, 0, 0 });
-    printf("armour\n");
-    Materials::PBR clothesMaterial = ResourceLoader::createPBR("Resources/Textures/RFATextures/Clothes",
-            { TextureType::AlbedoMap, TextureType::AOMap, TextureType::MetalicMap, TextureType::NormalMap, TextureType::RoughnessMap },
-            { 0, 0, 0, 0, 0 });
-    printf("cloths\n");
-    Materials::PBR headMaterial = ResourceLoader::createPBR("Resources/Textures/RFATextures/Head",
-        { TextureType::AlbedoMap, TextureType::AOMap, TextureType::MetalicMap, TextureType::NormalMap, TextureType::RoughnessMap },
-        { 0, 0, 0, 0, 0 });
-    printf("head\n");
-    Materials::PBR hairMaterial = ResourceLoader::createPBR("Resources/Textures/RFATextures/Hair",
-        { TextureType::AlbedoMap, TextureType::AOMap, TextureType::RoughnessMap, TextureType::NormalMap },
-        { 0, 0, 0, 0, 0 });
-    printf("hair\n");
-    Materials::PBR weponMaterial = ResourceLoader::createPBR("Resources/Textures/RFATextures/Weapon",
-        { TextureType::AlbedoMap, TextureType::AOMap, TextureType::MetalicMap, TextureType::NormalMap, TextureType::RoughnessMap },
-        { 0, 0, 0, 0, 0 });
-    printf("wepon\n");
+    // Materials::PBR armourMaterial = ResourceLoader::createPBR("Resources/Textures/RFATextures/Armour",
+    //     { TextureType::AlbedoMap, TextureType::AOMap, TextureType::MetalicMap, TextureType::NormalMap, TextureType::RoughnessMap },
+    //     { 0, 0, 0, 0, 0 });
+    // armourMaterial.setHDRmap(hdr);
+    // armourMaterial.setIBLmap(ibl);
+    // armourMaterial.setBRDFtex(brdf);
+    // printf("armour\n");
+    // Materials::PBR clothesMaterial = ResourceLoader::createPBR("Resources/Textures/RFATextures/Clothes",
+    //         { TextureType::AlbedoMap, TextureType::AOMap, TextureType::MetalicMap, TextureType::NormalMap, TextureType::RoughnessMap },
+    //         { 0, 0, 0, 0, 0 });
+    // clothesMaterial.setHDRmap(hdr);
+    // clothesMaterial.setIBLmap(ibl);
+    // clothesMaterial.setBRDFtex(brdf);
+    // printf("cloths\n");
+    // Materials::PBR headMaterial = ResourceLoader::createPBR("Resources/Textures/RFATextures/Head",
+    //     { TextureType::AlbedoMap, TextureType::AOMap, TextureType::MetalicMap, TextureType::NormalMap, TextureType::RoughnessMap },
+    //     { 0, 0, 0, 0, 0 });
+    // headMaterial.setHDRmap(hdr);
+    // headMaterial.setIBLmap(ibl);
+    // headMaterial.setBRDFtex(brdf);
+    // printf("head\n");
+    // Materials::PBR hairMaterial = ResourceLoader::createPBR("Resources/Textures/RFATextures/Hair",
+    //     { TextureType::AlbedoMap, TextureType::AOMap, TextureType::RoughnessMap, TextureType::NormalMap },
+    //     { 0, 0, 0, 0, 0 });
+    // hairMaterial.setHDRmap(hdr);
+    // hairMaterial.setIBLmap(ibl);
+    // hairMaterial.setBRDFtex(brdf);
+    // printf("hair\n");
+    // Materials::PBR weponMaterial = ResourceLoader::createPBR("Resources/Textures/RFATextures/Weapon",
+    //     { TextureType::AlbedoMap, TextureType::AOMap, TextureType::MetalicMap, TextureType::NormalMap, TextureType::RoughnessMap },
+    //     { 0, 0, 0, 0, 0 });
+    // weponMaterial.setHDRmap(hdr);
+    // weponMaterial.setIBLmap(ibl);
+    // weponMaterial.setBRDFtex(brdf);
+    // printf("weapon\n");
     timer.log();
 
     timer.reName("Object 1");
@@ -135,13 +152,14 @@ int main() {
     manMaterial1.setHDRmap(hdr);
     manMaterial1.setIBLmap(ibl);
     manMaterial1.setBRDFtex(brdf);
-    manR1.setMaterialTo(&hairMaterial, "Hair");
-    manR1.setMaterialTo(&clothesMaterial, "Cloth");
-    manR1.setMaterialTo(&clothesMaterial, "Scarf");
-    manR1.setMaterialTo(&armourMaterial, "Armour");
-    manR1.setMaterialTo(&headMaterial, "Head");
-    manR1.setMaterialTo(&weponMaterial, "Sword");
-    manR1.setMaterialTo(&weponMaterial, "Dagger");
+    manR1.setMaterial(&manMaterial1);
+    // manR1.setMaterialTo(&hairMaterial, "Hair");
+    // manR1.setMaterialTo(&clothesMaterial, "Cloth");
+    // manR1.setMaterialTo(&clothesMaterial, "Scarf");
+    // manR1.setMaterialTo(&armourMaterial, "Armour");
+    // manR1.setMaterialTo(&headMaterial, "Head");
+    // manR1.setMaterialTo(&weponMaterial, "Sword");
+    // manR1.setMaterialTo(&weponMaterial, "Dagger");
 
     Component::Animated manAnimatedComp = Component::Animated();
     auto anim = ResourceLoader::getAnimation("");
@@ -149,79 +167,12 @@ int main() {
         manAnimatedComp.addAnimation(anim);
     manAnimatedComp.startAnimation("");
     GameObject manObject = GameObject();
-    manObject.getTransform()->Position = { 0, 0, -5 };
+    manObject.getTransform()->Position = { 0, 0, 0 };
     manObject.addComponet(&manR1);
     manObject.addComponet(&manAnimatedComp);
     manObject.getTransform()->Scale *= 0.05;
     timer.stop();
 
-    timer.reName("Bone Objects");
-    timer.start();
-
-    // bones
-    /*Materials::PBR cubeMaterial1 = Materials::PBR({ { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 0, 0, 0 } }, { { 0.15, 0, 0 } }, { { 0, 0, 0 } });
-    Component::RenderMesh boneR = Component::RenderMesh();
-    boneR.setModel(cubeBuffer);
-    boneR.setMaterial({ &cubeMaterial1 });
-    std::list<GameObject> bones;
-    std::list<Component::RenderMesh> boneMeshes;
-    // manR1.getModel().getSkeleton().getBones().size()
-   
-
-    for (int i = 0; i < manR1.getModel().getSkeleton().getBones().size(); i++) {
-        bones.push_back({});
-        GameObject& bone = bones.back();
-        boneMeshes.push_back(boneR.copy());
-        bone.addComponet(&boneMeshes.back());
-        glm::vec3 skew;
-        glm::vec4 perspective;
-        auto frame = manAnimatedComp.getCurrentFrame();
-        glm::decompose(manModel.getSkeleton().getBones()[i].getTransformation() * manObject.getTransform()->getModel(), bone.getTransform()->Scale, bone.getTransform()->Rotation, bone.getTransform()->Position, skew, perspective);
-        // bone.getTransform()->Position = { 0, 5 * (i + 1), 0 };
-        bone.getTransform()->Scale *= 0.25f;
-    }*/
-    
-    // Physics::BoxColliderSAT collider1 = Physics::BoxColliderSAT(10);
-    // manObject->addComponet(&collider1);
-    // 
-    // Component::RigidBody rb1 = Component::RigidBody();
-    // rb1.isKinimatic = true;
-    // rb1.hasGravity = false;
-    // manObject->addComponet(&rb1);
-    
-
-    timer.reName("Object 2");
-    timer.start();
-    /*Component::RenderMesh cubeR2 = Component::RenderMesh();
-    auto model = ResourceLoader::getModel("sphere.obj");
-    cubeR2.setModel(model);
-    Materials::PBR cubeMat2 = Materials::PBR({ { 0, 1, 1 } }, { { 1, 0, 0 } }, { { 0.5, 0, 0 } }, { { 0.2, 0, 0 } }, { { 0.5, 0, 0 } });
-    cubeR2.setMaterial({ &cubeMat2 });
-    
-    GameObject cube2 = GameObject();
-    cube2.getTransform()->Position = { 0, 1, -5 };
-    cube2.addComponet(&cubeR2);
-    timer.stop();*/
-    
-    //Physics::BoxColliderSAT collider2 = Physics::BoxColliderSAT(10);
-    //cube2->addComponet(&collider2);
-    //
-    //Component::RigidBody rb2 = Component::RigidBody();
-    //cube2->addComponet(&rb2);
-    //rb2.hasGravity = false;
-
-
-    //Render::RenderMesh bsgMesh = Render::RenderMesh();
-    //bsgMesh.setModel(bsgModel);
-    //Materials::PBR bsgMaterial = Materials::PBR({ { 0.542, 0.497, 0.449 } }, { { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 0.9, 0, 0 } }, { { 0, 0, 0 } });
-    //bsgMesh.setMaterial({ &bsgMaterial });
-
-    //GameObject bsgObject = GameObject();
-    //bsgObject.getTransform()->Position = { 0, 0, -5 };
-    //bsgObject.getTransform()->Scale *= 1.0f;
-    //bsgObject.addComponet(&bsgMesh);
-
-    // std::cout << glm::to_string(s1) << " : " << glm::to_string(s2) << std::endl;
     
     timer.reName("Static Buffer");
     timer.start();
@@ -248,6 +199,7 @@ int main() {
     glm::mat4 lightSpaceMatrix = lightProjection * lightView;
     
     b.fill(4, value_ptr(lightSpaceMatrix));
+    timer.log();
     timer.stop();
 
     timer.reName("Scene");
@@ -266,7 +218,7 @@ int main() {
     /*for (GameObject& bone : bones) {
         scene.addObject(&bone);
     }*/
-    scene.addObject(&manObject);
+    //scene.addObject(&manObject);
 
     scene.setBG({ 1, 1, 0 });
     timer.log();
@@ -318,6 +270,12 @@ int main() {
     // cube2->getRigidbody()->hasGravity = true;
     //cube2->getRigidbody()->velocityAdder({ 1, -1, 0 });
 
+    Gizmos::Sphere gizmoSphere({ 0, 0, 0 }, { 1, 0, 0 });
+    gizmoSphere.setThickness(2);
+    gizmoSphere.setRadius(2);
+
+    Gizmos::GizmoRenderer::addGizmo(&gizmoSphere);
+
     float counter = 0;
     while (!main.shouldClose())
     {
@@ -343,13 +301,12 @@ int main() {
         scene.preProcess(); // shadows and scene quad
         scene.postProcess();// render to screen
         UI::UIRenderer::render(&tb);
+        Gizmos::GizmoRenderer::drawAll();
 
         // PHYSICS-----------------------------------------------------------------------------------------------------------------------------------------------
 
         // cube2->getTransform()->Position.x -= 0.01;
         Physics::Engine::update();
-
-
     
         // EVENTS-----------------------------------------------------------------------------------------------------------------------------------------------
         float speed = 1;
@@ -380,8 +337,6 @@ int main() {
             manAnimatedComp.togglePlay();
         }
 
-
-
         if (Events::Handler::getKey(Events::Key::Escape, Events::Action::Down)) {
             break;
         }
@@ -396,7 +351,7 @@ int main() {
     }
     Render::Shading::Manager::cleanUp(); // deactivats shdaer
     Physics::Engine::cleanUp();
-    
+    gizmoSphere.cleanUp();
     //audio->cleanUp();
     //delete audio;
     //audio = nullptr;
