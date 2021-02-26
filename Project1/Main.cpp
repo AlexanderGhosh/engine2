@@ -273,7 +273,6 @@ int main() {
     Gizmos::Sphere gizmoSphere({ 0, 0, 0 }, { 1, 0, 0 });
     gizmoSphere.setThickness(2);
     gizmoSphere.setRadius(2);
-
     Gizmos::GizmoRenderer::addGizmo(&gizmoSphere);
 
     float counter = 0;
