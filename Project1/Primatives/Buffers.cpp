@@ -123,6 +123,11 @@ Primative::StaticBuffer::StaticBuffer(const std::vector<std::string>& types, cha
 		else if (type == "m4") {
 			len = sizeof(glm::mat4);
 		}
+		else if (Utils::contains(type, "m4")) {
+			std::string num = Utils::replaceAll(type, "m4", "");
+			int a = std::stoi(num);
+			len = sizeof(glm::mat4) * a;
+		}
 		positions.push_back({ prev, len });
 		prev += len;
 	}
@@ -137,8 +142,8 @@ const void Primative::StaticBuffer::init(unsigned dataSize, short bindingPoint)
 	this->bindingPoint %= GL_MAX_UNIFORM_BUFFER_BINDINGS;
 	Primative::StaticBuffer::usedBindingPoint = this->bindingPoint;
 	glGenBuffers(1, &UBO);
-	this->bind();
-	glBufferData(GL_UNIFORM_BUFFER, dataSize, NULL, GL_STATIC_DRAW);
+	this->bind();// GL_STATIC_DRAW
+	glBufferData(GL_UNIFORM_BUFFER, dataSize, NULL, GL_DYNAMIC_DRAW);
 
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
@@ -452,4 +457,73 @@ const unsigned& Primative::MSAABuffer::getTextureId(const std::string& name)
 		unBind();
 	}*/
 	return middleMan->getTextureId(name);
+}
+
+Primative::TextureBuffer::TextureBuffer() : VBO(0), TAO(0), typeContained(GL_R32F), dataSize()
+{
+
+}
+
+Primative::TextureBuffer::TextureBuffer(String typeContained, Unsigned dataSize) : TextureBuffer()
+{
+	this->dataSize = dataSize;
+	if (typeContained == "f") {
+	}
+	else if (typeContained == "i") {
+		this->typeContained = GL_R32I;
+	}
+	else if (typeContained == "f2") {
+		this->typeContained = GL_RG32F;
+	}
+	else if (typeContained == "i2") {
+		this->typeContained = GL_RG32I;
+	}
+	else if (typeContained == "f3") {
+		this->typeContained = GL_RGB32F;
+	}
+	else if (typeContained == "i3") {
+		this->typeContained = GL_RGB32I;
+	}
+	else if (typeContained == "f4") {
+		this->typeContained = GL_RGBA32F;
+	}
+	else if (typeContained == "i4") {
+		this->typeContained = GL_RGBA32I;
+	}
+	// VBO
+	glGenBuffers(1, &VBO);
+	glBindBuffer(GL_TEXTURE_BUFFER, VBO);
+	glBufferData(GL_TEXTURE_BUFFER, dataSize, NULL, GL_DYNAMIC_DRAW);
+	// TAO
+	glGenTextures(1, &TAO);
+	glBindTexture(GL_TEXTURE_BUFFER, TAO);
+	glTexBuffer(GL_TEXTURE_BUFFER, this->typeContained, VBO);
+	// un bind
+	glBindTexture(GL_TEXTURE_BUFFER, 0);
+	glBindBuffer(GL_TEXTURE_BUFFER, 0);
+}
+
+void Primative::TextureBuffer::fill(const void* data, Unsigned dataSize, int offset)
+{
+	bind();
+	glBufferSubData(GL_TEXTURE_BUFFER, offset, dataSize, data);
+	unBind();
+}
+
+void Primative::TextureBuffer::bind() const
+{
+	glBindBuffer(GL_TEXTURE_BUFFER, VBO);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_BUFFER, TAO);
+}
+
+void Primative::TextureBuffer::unBind() const
+{
+	glBindTexture(GL_TEXTURE_BUFFER, 0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+void Primative::TextureBuffer::cleanUp()
+{
+	glDeleteBuffers(1, &VBO);
 }

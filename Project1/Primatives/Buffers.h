@@ -91,5 +91,17 @@ namespace Primative {
 		void cleanUp();
 		inline const unsigned& getSBO() const { return SBO; };
 	};
+	class TextureBuffer {
+	private:
+		unsigned VBO, TAO, dataSize;
+		GLenum typeContained;
+	public:
+		TextureBuffer();
+		TextureBuffer(String typeContained, Unsigned dataSize);
+		void fill(const void* data, Unsigned dataSize, int offset = 0);
+		void bind() const;
+		void unBind() const;
+		void cleanUp();
+	};
 }
 

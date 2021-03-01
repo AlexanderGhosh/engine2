@@ -6,6 +6,7 @@
 #include <GL/glew.h>
 #include "General.h"
 #include "../Rendering/Animation/Animation.h"
+#include "../Rendering/Animation/Bones.h"
 namespace Materials {
 	class Material;
 	struct PBR;
@@ -44,7 +45,7 @@ public:
 	static Materials::Material* getMaterial(const int& index);
 	static void addMaterial(Materials::Material* mat);
 	// animation
-	static const Render::Animation::Animation& createAnimation(String filePath);
+	static const Render::Animation::Animation createAnimation(String filePath, const Render::Animation::Skeleton& skeleton);
 	static Render::Animation::Animation* getAnimation(String name);
 	// general
 	static void cleanUp();

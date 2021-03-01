@@ -339,6 +339,7 @@ const Primative::Model ResourceLoader::processMeshData(std::vector<Primative::Me
 const Primative::Model ResourceLoader::createModel(const std::string& filePath, GLenum draw_type)
 {
     auto data = FileReaders::AssimpWrapper::loadModel(filePath);
+    
     const std::string name = Utils::getFileName(filePath, 1);
     for (auto itt = std::get<1>(data).begin(); itt != std::get<1>(data).end(); itt++) {
         animations.insert({ (*itt).getName(), (*itt) });
@@ -384,9 +385,12 @@ void ResourceLoader::addMaterial(Materials::Material* mat)
     materials.push_back(mat);
 }
 
-const Render::Animation::Animation& ResourceLoader::createAnimation(String filePath)
+const Render::Animation::Animation ResourceLoader::createAnimation(String filePath, const Render::Animation::Skeleton& skeleton)
 {
-    return {};
+    auto res = FileReaders::AssimpWrapper::loadAnimation(filePath, skeleton);
+
+    animations.insert({ res.getName(), res });
+    return res;
 }
 
 Render::Animation::Animation* ResourceLoader::getAnimation(String name)

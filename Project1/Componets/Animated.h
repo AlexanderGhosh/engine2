@@ -3,6 +3,9 @@
 #include "../Rendering/Animation/Bones.h"
 #include "Componets.h"
 
+namespace Primative {
+	class TextureBuffer;
+}
 namespace Render {
 	namespace Animation {
 		class Animation;
@@ -18,6 +21,9 @@ namespace Component {
 		std::string activeAnimation;
 		float runTime;
 		bool running;
+		static Primative::TextureBuffer bonesBuffer;
+		static bool initalized;
+		bool isActive();
 	public:
 		Animated();
 		~Animated() = default;
@@ -34,5 +40,7 @@ namespace Component {
 		}
 		void update(float deltaTime);
 		const Render::Animation::Animation* getActiveAnimation();
+		void bind();
+		void unbind();
 	};
 }

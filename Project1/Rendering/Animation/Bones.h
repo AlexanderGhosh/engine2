@@ -18,8 +18,8 @@ namespace Render {
 
 		class Skeleton {
 		private:
-			std::vector<Bone> bones;
 		public:
+			std::vector<Bone> bones;
 			Skeleton();
 			Bone& operator[] (const int& index);
 			Bone& operator[] (const std::string& index);
@@ -30,6 +30,7 @@ namespace Render {
 			bool hasBones() const;
 
 			void cleanUp();
+			int size() const;
 		};
 
 		class BoneDetails {

@@ -71,7 +71,7 @@ unsigned Render::Shading::Manager::active = 0;
 		 return true;
 	 int loc = glGetUniformLocation(Render::Shading::Manager::active, name.c_str());
 	 if (loc < 0) return false;
-	 glUniformMatrix4fv(loc, frame.translations.size(), GL_FALSE, glm::value_ptr(frame.translations[0]));
+	 glUniformMatrix4fv(loc, frame.translations.size(), GL_FALSE, glm::value_ptr(frame.translations[0])); 
 	 return true;
  }
  bool Render::Shading::Manager::setValue(const std::string& name, const Materials::Forward& fwd)
@@ -79,8 +79,10 @@ unsigned Render::Shading::Manager::active = 0;
 	 bool vals[] = { 0, 0, 0, 0 };
 	 std::string names[] = { ".diffuse", ".specular", ".normals" };
 	 auto& diff_spec_norm = fwd.getDiffSpecNorm();
+	 short unit = 1;
 	 for (short i = 0; i < 3; i++) {
-		 vals[i] = Render::Shading::Manager::setValue(name + names[i], diff_spec_norm[i], i);
+		 vals[i] = Render::Shading::Manager::setValue(name + names[i], diff_spec_norm[i], unit);
+		 unit++;
 	 }
 	 vals[3] = Render::Shading::Manager::setValue(name + ".shininess", fwd.shininess);
 
@@ -88,10 +90,10 @@ unsigned Render::Shading::Manager::active = 0;
  }
  bool Render::Shading::Manager::setValue(const std::string& name, const Materials::PBR& mat)
  {
-	 bool val = 0;
+	 short unit = 1;
 	 std::string names[] = { ".albedo", ".normal", ".metalic", ".roughness", ".ao" };
 	 const auto all = mat.getAll();
-	 short unit = 0;
+	 bool val = true;
 	 for (short i = 0; i < 5; i++) {
 		 val = val AND Render::Shading::Manager::setValue(name + names[i], all[i], unit);
 		 unit++;

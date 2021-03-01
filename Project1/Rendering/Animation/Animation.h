@@ -18,9 +18,9 @@ namespace Render {
 		private:
 			std::string name;
 			float duration, tps;
+			std::vector<KeyFrame> keyFrames;
 			float getScaleFactor(Float ticks, Float nextTS, Float lastTS) const;
 		public:
-			std::vector<KeyFrame> keyFrames;
 			Animation();
 			Animation(String name, Float duration, Float tps);
 			const KeyFrame getFrame(Float timeInSecconds) const;

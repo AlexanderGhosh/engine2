@@ -23,27 +23,40 @@ out VS_OUT{
 } vs_out;
 
 uniform mat4 model;
-uniform mat4 bones[100];
+//uniform mat4 bones[200];
+uniform samplerBuffer bones;
+
+mat4 getMatrix(int index){
+    mat4 res = mat4(0);
+    int x = index * 16;
+    for(int i = 0; i < 4; i++){
+        for(int j = 0; j < 4; j++){
+            res[i][j] = texelFetch(bones, x++).x;
+        }
+    }
+    return res;
+}
 
 void main() {
 
     // ivec4 ids = ivec4(BoneWightsIds1.xz, BoneWightsIds2.xz);
     // vec4 weights = vec4(BoneWightsIds1.yw, BoneWightsIds2.yw);
-    
-    mat4 boneTransform = mat4(0);
 
-    vs_out.ws = weights; 
-    if(ids[0] == -1 || bones[0] == mat4(0)){
+    mat4 boneTransform = mat4(1);
+
+    vs_out.ws = vec4(abs(weights.x), abs(weights.y), abs(weights.z), 0);
+    if(ids.x == -1/* || getMatrix(0) == mat4(0)*/){
         boneTransform = mat4(1);
-        vs_out.ws = vec4(1, 0, 0 , 0); 
+        vs_out.ws = vec4(1, 1, 0, 0); 
     }
-    else{
+    else
+    {
         for(int i = 0; i < 4; i++){
-            int id = int(ids[i]);
+            int id = abs(int(ids[i]));
             float weight = weights[i];
-            boneTransform += bones[id] * weight; // bones[id]
+            boneTransform += getMatrix(id) * weight; // bones[id]
         }
-        vs_out.ws = vec4(1, 1 , 0 , 0); 
+        // vs_out.ws = vec4(1, 0, 1, 0);
     }
     //boneTransform = mat4(1);
 

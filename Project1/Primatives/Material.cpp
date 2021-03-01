@@ -49,17 +49,17 @@ Materials::PBR::PBR(const MatItem& albedo, const MatItem& normal, const MatItem&
 
 void Materials::PBR::activateTextures() const
 {
-	short i = 0;
+	short unit = 1;
 	for (const Materials::MatItem& item : getAll()) {
 		if (!item.hasTex()) continue;
-		glActiveTexture(GL_TEXTURE0 + i++);
+		glActiveTexture(GL_TEXTURE0 + unit++);
 		glBindTexture(GL_TEXTURE_2D, item.getId());
 	}
-	glActiveTexture(GL_TEXTURE0 + i++);
+	glActiveTexture(GL_TEXTURE0 + unit++);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, hdrMap);
-	glActiveTexture(GL_TEXTURE0 + i++);
+	glActiveTexture(GL_TEXTURE0 + unit++);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, getIBLmap());
-	glActiveTexture(GL_TEXTURE0 + i);
+	glActiveTexture(GL_TEXTURE0 + unit);
 	glBindTexture(GL_TEXTURE_2D, getBRDFtex());
 }
 

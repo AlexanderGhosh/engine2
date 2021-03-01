@@ -78,3 +78,8 @@ void Render::Animation::Skeleton::cleanUp()
 {
     bones.clear();
 }
+
+int Render::Animation::Skeleton::size() const
+{
+    return bones.size();
+}

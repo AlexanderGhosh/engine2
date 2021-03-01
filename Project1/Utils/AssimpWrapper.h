@@ -29,7 +29,8 @@ namespace FileReaders {
     class AssimpWrapper
     {
     public:
-        static const std::tuple<std::vector<Primative::Mesh*>, std::vector<Render::Animation::Animation>, Render::Animation::Skeleton> loadModel(std::string path);
+        static const std::tuple<std::vector<Primative::Mesh*>, std::vector<Render::Animation::Animation>, Render::Animation::Skeleton> loadModel(String path);
+        static const Render::Animation::Animation loadAnimation(String path, const Render::Animation::Skeleton& skeleton);
     private:
         // mesh for the most part
         static void processNode(aiNode* node, const aiScene* scene, std::vector<Primative::Mesh*>& meshes, Render::Animation::Skeleton& skeleton);

@@ -3,8 +3,10 @@
 #include "../Rendering/Animation/Animation.h"
 #include "General.h"
 #include <gtc/type_ptr.hpp>
+#include <unordered_map>
 
-const std::tuple<std::vector<Primative::Mesh*>, std::vector<Render::Animation::Animation>, Render::Animation::Skeleton> FileReaders::AssimpWrapper::loadModel(std::string path)
+bool done = 1;
+const std::tuple<std::vector<Primative::Mesh*>, std::vector<Render::Animation::Animation>, Render::Animation::Skeleton> FileReaders::AssimpWrapper::loadModel(String path)
 {
     std::vector<Primative::Mesh*> meshes;
     Assimp::Importer import;
@@ -20,12 +22,44 @@ const std::tuple<std::vector<Primative::Mesh*>, std::vector<Render::Animation::A
     Render::Animation::Skeleton skeleton;
     processNode(scene->mRootNode, scene, meshes, skeleton);
     auto animations = createAnimations(scene->mRootNode, scene, skeleton);
+    Utils::reverse(meshes.begin(), meshes.end());
+    std::unordered_map<int, char> ids;
+    std::unordered_map<float, char> weights;
+    if(NOT done){
+        meshes = { meshes[1] };
+        done = true;
+        for (Primative::Vertex& v : meshes[0]->verts) {
+            for (char i = 0; i < 4; i++) {
+                ids[v.ids[i]] = 0;
+                weights[v.weights[i]] = 0;
+            }
+        }
+    }
+    for (auto& ani : animations) {
+        printf(ani.getName().c_str());
+        printf("\n");
+    }
     return { meshes, animations, skeleton };
+}
+
+const Render::Animation::Animation FileReaders::AssimpWrapper::loadAnimation(String path, const Render::Animation::Skeleton& skeleton)
+{
+    Render::Animation::Animation res;
+    Assimp::Importer import;
+    const aiScene* scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_FixInfacingNormals | aiProcess_OptimizeGraph | aiProcess_OptimizeMeshes);
+
+    if (NOT scene OR NOT scene->mRootNode)
+    {
+        std::cout << "ERROR::ASSIMP::" << import.GetErrorString() << std::endl;
+        return res;
+    }
+    auto animation = createAnimations(scene->mRootNode, scene, skeleton)[0];
+    return animation;
 }
 
 void FileReaders::AssimpWrapper::processNode(aiNode* node, const aiScene* scene, std::vector<Primative::Mesh*>& meshes, Render::Animation::Skeleton& skeleton)
 {
-    // process all the node's meshes (if any)
+    // process all the node's res (if any)
     for (unsigned int i = 0; i < node->mNumMeshes; i++)
     {
         aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
@@ -54,7 +88,8 @@ Primative::Mesh* FileReaders::AssimpWrapper::processMeshVertices(aiMesh* mesh, c
     std::vector<Primative::Vertex> vertices;
     std::vector<unsigned int> indices;
     // std::vector<Texture> textures;
-
+    if (mesh->mName.C_Str() == "hair")
+        int t = 0;
     // walk through each of the mesh's vertices
     for (unsigned int i = 0; i < mesh->mNumVertices; i++)
     {
@@ -153,7 +188,7 @@ void FileReaders::AssimpWrapper::processMeshBones(aiMesh* mesh, Primative::Mesh*
             aiVertexWeight weight = bone->mWeights[j];
             assert(weight.mVertexId < currentMesh->verts.size());
             Primative::Vertex& currVertex = currentMesh->verts[weight.mVertexId];
-            addBone(currVertex, weight, skeleton.getBones().size()-1);
+            addBone(currVertex, weight, skeleton.size() - 1);
         }
     }
     return;
@@ -206,7 +241,7 @@ std::vector<Render::Animation::Animation> FileReaders::AssimpWrapper::createAnim
 
             //currentAnimation.mName().dataString(), frames, currentAnimation.mDuration();
 
-        const int s = skeleton.getBones().size();
+        const int s = skeleton.size();
         for (int j = 0; j < maxFrames; j++) {
             Render::Animation::KeyFrame animatedFrame;
             animatedFrame.translations.reserve(s);
@@ -256,12 +291,17 @@ void FileReaders::AssimpWrapper::processAnimNode(const aiAnimation* anim, const 
         const Render::Animation::Bone& bone = bones[i];
         if (bone.getName() == nodeName) {
             glm::mat4 boneTransform = globalInverseTransform * nodeGlobalTransform * bone.getTransformation();
-            // glm::mat4 boneTransform = bone.getTransformation() * nodeGlobalTransform * globalInverseTransform;
+            if (Utils::nan_inf(glm::mat3(boneTransform))) {
+                char i = 0;
+            }
             keyFrame.translations[i] = boneTransform;
             break;
         }
     }
 
+    if (Utils::nan_inf(glm::mat3(nodeGlobalTransform))) {
+        char i = 0;
+    }
     // for each child of node reccersive
     for (int i = 0; i < node->mNumChildren; i++) {
         processAnimNode(anim, node->mChildren[i], nodeGlobalTransform, globalInverseTransform, keyFrame, frame, bones);
@@ -283,78 +323,19 @@ int FileReaders::AssimpWrapper::calcAnimationFrameCount(const aiAnimation* animt
 
 glm::mat4 FileReaders::AssimpWrapper::buildMatrix(const aiNodeAnim* node, float frame)
 {
-    int f = static_cast<int>(frame);
-    
-    // position
     glm::mat4 translation(1), rotation(1), scale(1);
     const float b = Utils::round(frame, 3);
     for (unsigned i = 0; i < node->mNumPositionKeys; i++) {
         auto key = node->mPositionKeys[i];
         float a = Utils::round(key.mTime, 3);
         if (a <= b) {
-            translation = glm::translate(glm::mat4(1), toVec3(node->mPositionKeys[i].mValue));
-            rotation = glm::mat4_cast(toQuat(node->mRotationKeys[i].mValue));
-            scale = glm::scale(glm::mat4(1), toVec3(node->mScalingKeys[i].mValue));
+            rotation = glm::mat4_cast(toQuat(node->mRotationKeys[i >= node->mNumRotationKeys ? node->mNumRotationKeys - 1 : i].mValue));
+            scale = glm::scale(glm::mat4(1), toVec3(node->mScalingKeys[i >= node->mNumScalingKeys ? node->mNumScalingKeys - 1 : i].mValue));
         }
         else {
             break;
         }
     }
-    /*if (node->mNumPositionKeys == 1 OR true) {
-        translation = glm::translate(translation, toVec3(node->mPositionKeys[f].mValue));
-    }
-    /*int numPositions = node->mNumPositionKeys;
-    if (numPositions > 0) {
-        aiVecKey = positionKeys[numPositions - 1];
-        for (int i = 0; i < numPositions; i++) {
-            if (positionKeys[i].mTime == static_cast<double>(frame)) {
-                aiVecKey = positionKeys[i];
-                break;
-            }
-        }
-        //aiVecKey = positionKeys[static_cast<int>(fminf(numPositions - 1, frame))];
-        vec = aiVecKey.mValue;
-        nodeTransform = glm::translate(nodeTransform, glm::vec3(vec.x, vec.y, vec.z));
-    }
-    // rotation
-    glm::mat4 rotation(1);
-    if (node->mNumRotationKeys == 1 OR true) {
-        rotation = glm::mat4_cast(toQuat(node->mRotationKeys[f].mValue));
-    }
-    /*int numRotations = node->mNumRotationKeys;
-    if (numRotations > 0) {
-        aiQuatKey quatKey = rotationKeys[numRotations - 1];
-        for (int i = 0; i < numRotations; i++) {
-            if (rotationKeys[i].mTime == static_cast<double>(frame)) {
-                quatKey = rotationKeys[i];
-                break;
-            }
-        }
-        // aiQuatKey quatKey = rotationKeys[static_cast<int>(fminf(numRotations - 1, frame))];
-        aiQuaternion aiQuat = quatKey.mValue;
-        glm::quat quat = glm::quat(aiQuat.w, aiQuat.x, aiQuat.y, aiQuat.z);
-        // nodeTransform = Utils::rotate(nodeTransform, quat);
-
-        nodeTransform = nodeTransform * glm::mat4(quat);
-    }
-    // scaling
-    glm::mat4 scale(1);
-    if (node->mNumScalingKeys == 1 OR true) {
-        scale = glm::scale(scale, toVec3(node->mScalingKeys[f].mValue));
-    }*/
-    /*int numScalingKeys = node->mNumScalingKeys;
-    if (numScalingKeys > 0) {
-        aiVecKey = scalingKeys[numScalingKeys - 1];
-        for (int i = 0; i < numScalingKeys; i++) {
-            if (scalingKeys[i].mTime == static_cast<double>(frame)) {
-                aiVecKey = scalingKeys[i];
-                break;
-            }
-        }
-        // aiVecKey = scalingKeys[static_cast<int>(fminf(numScalingKeys - 1, frame))];
-        vec = aiVecKey.mValue;
-        nodeTransform = glm::scale(nodeTransform, glm::vec3(vec.x, vec.y, vec.z));
-    }*/
     return  translation * rotation * scale;
 }
 

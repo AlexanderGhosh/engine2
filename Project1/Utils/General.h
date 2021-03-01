@@ -30,6 +30,7 @@
 
 
 #define MAX_BONE_WEIGHTS 4
+#define MAX_NUM_BONES 200
 #define NOT !
 #define AND &&
 #define OR ||
@@ -205,7 +206,11 @@ namespace Utils {
             b = *it;
         return res;
     }
-
+    /// <summary>
+    /// returns true if any are nan or inf regardles of sign
+    /// </summary>
+    /// <param name="a"></param>
+    /// <returns></returns>
     inline bool nan_inf(const glm::mat3& a) {
         for (char i = 0; i < 3; i++) {
             for (char j = 0; j < 3; j++) {
@@ -296,6 +301,41 @@ namespace Utils {
             }
         }
         return res;
+    }
+    /// <summary>
+    /// returns the matrix but without nan or inf
+    /// </summary>
+    /// <param name="a"></param>
+    /// <returns></returns>
+    inline glm::mat4 validate(glm::mat4 a, float val = 0) {
+        for (char i = 0; i < 4; i++) {
+            for (char j = 0; j < 4; j++) {
+                float& element = a[i][j];
+                if (glm::isnan(element) OR glm::isinf(element)) {
+                    element = val;
+                }
+            }
+        }
+        return a;
+    }
+    /// <summary>
+    /// replaces all occorances in the string
+    /// </summary>
+    inline std::string replaceAll(std::string str, std::string from, std::string to) {
+        size_t start_pos = 0;
+        while ((start_pos = str.find(from, start_pos)) != std::string::npos) {
+            str.replace(start_pos, from.length(), to);
+            start_pos += to.length(); // Handles case where 'to' is a substring of 'from'
+        }
+        return str;
+    }
+    template <class BidirectionalIterator>
+    void reverse(BidirectionalIterator first, BidirectionalIterator last)
+    {
+        while ((first != last) && (first != --last)) {
+            std::iter_swap(first, last);
+            ++first;
+        }
     }
     class Timer {
     public:

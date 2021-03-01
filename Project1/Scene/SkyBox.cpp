@@ -34,9 +34,9 @@ SkyBox::SkyBox(const std::string& name) : SkyBox()
 void SkyBox::draw()
 {
 	Render::Shading::Manager::setActive(shaderId);
-	glActiveTexture(GL_TEXTURE0);
+	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, texId);
-	bool t = Render::Shading::Manager::setValue("skybox", 0);
+	bool t = Render::Shading::Manager::setValue("skybox", 1);
 	mesh->update(0);
 }
 

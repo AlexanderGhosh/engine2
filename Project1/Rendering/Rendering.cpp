@@ -38,7 +38,8 @@ void Component::RenderMesh::update(float deltaTime)
 	}*/
 	if (animatedComponet) {
 		const Render::Animation::KeyFrame frame = animatedComponet->getCurrentFrame();
-		Render::Shading::Manager::setValue("bones", frame);
+		// Render::Shading::Manager::setValue("bones", frame);
+		animatedComponet->bind();
 	}
 
 	const auto& buffers = model.getBuffers();
@@ -46,13 +47,15 @@ void Component::RenderMesh::update(float deltaTime)
 		Primative::VertexBuffer& buffer = ResourceLoader::getBuffer(buffers[i]);
 		const Materials::Material* material = materials[i];
 		if (material) {
-			Render::Shading::Manager::setValue("material", material);
-			material->activateTextures();
+			Render::Shading::Manager::setValue("material", material); // sets values to the samplers
+			material->activateTextures(); // activates the texture units and binds the ids
 		}
 		buffer.bind();
 		buffer.draw();
 		buffer.unBind();
 	}
+	if (animatedComponet)
+		animatedComponet->unbind();
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 }

@@ -92,8 +92,13 @@ int main() {
 
     timer.reName("Models");
     timer.start();
-    const Primative::Model manModel    = ResourceLoader::createModel("Resources/Models/RFA_Model.fbx");
+    const Primative::Model manModel    = ResourceLoader::createModel("Resources/Models/male.fbx"); // RFA_Model
     const Primative::Model cubeBuffer  = ResourceLoader::createModel("Resources/Models/cube.obj"); // needed for the skybox
+    timer.log();
+
+    timer.reName("Animations");
+    timer.start();
+    // const auto manAnimations = ResourceLoader::createAnimation("Resources/Models/Animations/RFA_Attack.fbx", manModel.getSkeleton());
     timer.log();
 
     timer.reName("Textures");
@@ -165,10 +170,10 @@ int main() {
     // manR1.setMaterialTo(&weponMaterial, "Dagger");
 
     Component::Animated manAnimatedComp = Component::Animated();
-    auto anim = ResourceLoader::getAnimation("");
+    const std::string AnimationLoaded = "Rig|man_fall";
+    auto anim = ResourceLoader::getAnimation(AnimationLoaded); // RFA_Attack
     if(anim)
         manAnimatedComp.addAnimation(anim);
-    manAnimatedComp.startAnimation("");
     GameObject manObject = GameObject();
     manObject.getTransform()->Position = { 0, 0, 0 };
     manObject.addComponet(&manR1);
@@ -177,7 +182,7 @@ int main() {
     timer.stop();
 
     
-    timer.reName("Static Buffer");
+    timer.reName("Static Buffers");
     timer.start();
     Primative::StaticBuffer b("m4, m4, v3, f, m4", 0);
     // view    | matrix 4
@@ -202,6 +207,7 @@ int main() {
     glm::mat4 lightSpaceMatrix = lightProjection * lightView;
     
     b.fill(4, value_ptr(lightSpaceMatrix));
+
     timer.log();
     timer.stop();
 
@@ -218,10 +224,7 @@ int main() {
     scene.setPostProcShader(ResourceLoader::getShader(PBRen ? "PBRShader" : "DefaultShder")); // PBRShader
     scene.setContext(&main);
 
-    /*for (GameObject& bone : bones) {
-        scene.addObject(&bone);
-    }*/
-    //scene.addObject(&manObject);
+    scene.addObject(&manObject);
 
     scene.setBG({ 1, 1, 0 });
     timer.log();
@@ -338,8 +341,11 @@ int main() {
         counter += main.getTime().deltaTime;
         if (counter >= 0.2 AND Events::Handler::getKey(Events::Key::Enter, Events::Action::Down)) {
             counter = 0;
-            manAnimatedComp.togglePlay();
+            // manAnimatedComp.togglePlay();
+            manAnimatedComp.startAnimation("");
         }
+        if(Events::Handler::getKey(Events::Key::Backspace, Events::Action::Down))
+            manAnimatedComp.startAnimation(AnimationLoaded);
 
         if (Events::Handler::getKey(Events::Key::Escape, Events::Action::Down)) {
             break;

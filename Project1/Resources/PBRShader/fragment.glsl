@@ -110,9 +110,9 @@ vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
 void main()
 {
     vec3 c = fs_in.ws.xyz;
-    //c = normalize(c);
+    c = normalize(c);
     FragColor = vec4(c, 1);
-    //return;
+    return;
     vec3 albedo = pow(getData(material.albedo_vec, material.albedo_id), vec3(2.2));
     
     float metallic = getData(material.metalic_vec, material.metalic_id).r;
@@ -204,5 +204,5 @@ void main()
     color /= color + vec3(1.0);
     // gamma correct
     color = pow(color, vec3(1.0/2.2)); 
-    FragColor = vec4(color, 1.0);
+    FragColor = vec4(albedo, 1.0);
 }

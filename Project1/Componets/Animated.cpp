@@ -1,8 +1,21 @@
 #include "Animated.h"
 #include "../Rendering/Animation/Animation.h"
+#include "../Rendering/Shading/Manager.h"
+#include "../Primatives/Buffers.h"
+
+Primative::TextureBuffer Component::Animated::bonesBuffer = {};
+bool Component::Animated::initalized = false;
+
+bool Component::Animated::isActive()
+{
+	return running AND getActiveAnimation();
+}
 
 Component::Animated::Animated() : animations(), activeAnimation(""), runTime(0), running(false)
 {
+	if (NOT initalized) {
+		bonesBuffer = Primative::TextureBuffer("f", sizeof(float) * MAX_NUM_BONES * 16);
+	}
 }
 
 void Component::Animated::startAnimation(const std::string& name, bool start)
@@ -37,7 +50,7 @@ const Render::Animation::KeyFrame& Component::Animated::nextFrame()
 
 const Render::Animation::KeyFrame Component::Animated::getCurrentFrame()
 {
-	if (NOT running OR NOT getActiveAnimation())
+	if (NOT isActive())
 		return {};
 	return getActiveAnimation()->getFrame(runTime);
 }
@@ -70,4 +83,21 @@ const Render::Animation::Animation* Component::Animated::getActiveAnimation()
 		return nullptr;
 	}
 	return res;
+}
+
+void Component::Animated::bind()
+{
+	if (NOT isActive())
+		return;
+	// Render::Shading::Manager::setValue("bones", this->getCurrentFrame());
+	auto t = this->getCurrentFrame();
+	// Utils::reverse(t.translations.begin(), t.translations.end());
+	bonesBuffer.fill(&t.translations[0], sizeof(float) * 16 * t.translations.size());
+	bonesBuffer.bind();
+	Render::Shading::Manager::setValue("bones", 0);
+}
+
+void Component::Animated::unbind()
+{
+	bonesBuffer.unBind();
 }
