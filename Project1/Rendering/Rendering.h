@@ -21,6 +21,8 @@ namespace Component {
 		inline Component::Type getType() const {
 			return Component::Type::RenderMesh;
 		}
+		void setTransparent(bool transparent);
+		const bool getTransparent() const;
 
 		void setAnimatedComp(Component::Animated* comp);
 		void cleanUp();
@@ -33,6 +35,7 @@ namespace Component {
 		std::vector<Materials::Material*> materials;
 		Primative::Model model;
 		Animated* animatedComponet;
+		bool isTransparent;
 	};
 }
 

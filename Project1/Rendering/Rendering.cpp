@@ -87,6 +87,14 @@ void Component::RenderMesh::setMaterialTo(Materials::Material* material, String 
 		i++;
 	}
 }
+void Component::RenderMesh::setTransparent(bool transparent)
+{
+	this->isTransparent = transparent;
+}
+const bool Component::RenderMesh::getTransparent() const
+{
+	return isTransparent;
+}
 void Component::RenderMesh::setAnimatedComp(Component::Animated* comp)
 {
 	animatedComponet = comp;

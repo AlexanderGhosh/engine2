@@ -170,7 +170,7 @@ int main() {
     // manR1.setMaterialTo(&weponMaterial, "Dagger");
 
     Component::Animated manAnimatedComp = Component::Animated();
-    const std::string AnimationLoaded = "Rig|man_fall";
+    const std::string AnimationLoaded = "Rig|man_run_in_place";
     auto anim = ResourceLoader::getAnimation(AnimationLoaded); // RFA_Attack
     if(anim)
         manAnimatedComp.addAnimation(anim);
@@ -178,7 +178,7 @@ int main() {
     manObject.getTransform()->Position = { 0, 0, 0 };
     manObject.addComponet(&manR1);
     manObject.addComponet(&manAnimatedComp);
-    manObject.getTransform()->Scale *= 0.05;
+    manObject.getTransform()->Scale *= 0.005;
     timer.stop();
 
     

@@ -195,7 +195,11 @@ const unsigned ResourceLoader::loadTexture(const std::string& filePath, const Te
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     
     int width, height, nrChannels;
+    Utils::Timer ti;
+    ti.reName("STBI load");
+    ti.start();
     unsigned char* data = stbi_load(filePath.c_str(), &width, &height, &nrChannels, 0);
+    ti.log();
     GLenum t = GL_SRGB;
     switch (nrChannels)
     {
