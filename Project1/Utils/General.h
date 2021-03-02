@@ -375,7 +375,7 @@ namespace Utils {
 
         // copy temp to original interval
         for (i = start; i <= end; i += 1) {
-            Arr[i] = temp[i - start]
+            Arr[i] = temp[i - start];
         }
     }
 
