@@ -43,8 +43,7 @@ void GameObject::addComponet(Component::ComponetBase* componet)
 void GameObject::tick(short currentTick, float deltaTime)
 {
 	for (unsigned i = 0; i < componets.size(); i++) {
-		if (!enabled[i] OR componets[i]->getType() == Component::Type::RenderMesh OR componets[i]->getType() == Component::Type::Rigidbody) 
-			continue;
+		if (!enabled[i] OR componets[i]->getType() == Component::Type::RenderMesh OR componets[i]->getType() == Component::Type::Rigidbody) continue;
 		Component::ComponetBase*& comp = componets[i];
 		comp->update(deltaTime);
 		if (currentTick == FIXED_UPDATE_RATE) {

@@ -26,8 +26,7 @@ namespace Primative {
 		inline void bind() const { glBindVertexArray(VAO); };
 		inline void unBind() const { glBindVertexArray(0); };
 		inline void draw() const { 
-			glDrawElements(shape_type, num_indices, GL_UNSIGNED_INT, 0); 
-		};
+			glDrawElements(shape_type, num_indices, GL_UNSIGNED_INT, 0); };
 		inline void setDrawType(GLenum type) { drawType = type; };
 		String getName() const;
 		void setName(String name);
@@ -65,7 +64,6 @@ namespace Primative {
 			glViewport(0, 0, dimentions.x, dimentions.y);
 			glBindFramebuffer(GL_FRAMEBUFFER, FBO);
 		};
-		void clear() const;
 		virtual inline void unBind() const { glBindFramebuffer(GL_FRAMEBUFFER, 0); };
 		virtual void cleanUp();
 		inline const unsigned& getFBO() const { return FBO; };

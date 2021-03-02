@@ -82,18 +82,17 @@ int main() {
 
     Utils::Timer timer("Shaders");
     timer.start();
-    ResourceLoader::createShader("Resources/Shaders/DefaultShader");
-    ResourceLoader::createShader("Resources/Shaders/ShadowShader");
-    ResourceLoader::createShader("Resources/Shaders/PBRShader");
-    ResourceLoader::createShader("Resources/Shaders/UIShader");
-    ResourceLoader::createShader("Resources/Shaders/TextShader");
-    ResourceLoader::createShader("Resources/Shaders/PostprocessingShader");
+    ResourceLoader::createShader("Resources/DefaultShader");
+    ResourceLoader::createShader("Resources/ShadowShader");
+    ResourceLoader::createShader("Resources/PBRShader");
+    ResourceLoader::createShader("Resources/UIShader");
+    ResourceLoader::createShader("Resources/TextShader");
     Gizmos::GizmoRenderer::init();
     timer.log();
 
     timer.reName("Models");
     timer.start();
-    const Primative::Model manModel    = ResourceLoader::createModel("Resources/Models/RFA_Model.fbx"); // RFA_Model
+    const Primative::Model manModel    = ResourceLoader::createModel("Resources/Models/male.fbx"); // RFA_Model
     const Primative::Model cubeBuffer  = ResourceLoader::createModel("Resources/Models/cube.obj"); // needed for the skybox
     timer.log();
 
@@ -178,7 +177,7 @@ int main() {
     GameObject manObject = GameObject();
     manObject.getTransform()->Position = { 0, 0, 0 };
     manObject.addComponet(&manR1);
-    //manObject.addComponet(&manAnimatedComp);
+    manObject.addComponet(&manAnimatedComp);
     manObject.getTransform()->Scale *= 0.005;
     timer.stop();
 
@@ -219,15 +218,15 @@ int main() {
 
     GameScene scene;
     // scene.addFBO("shadows", frameBuffer);
-    //scene.addFBO("final", finalQB);
-    //// scene.addPreProcLayer("shadows", ResourceLoader::getShader("ShadowShader"));
-    //scene.addPreProcLayer("final", ResourceLoader::getShader(PBRen ? "PBRShader" : "DefaultShder"));
-    scene.setPostProcShader(ResourceLoader::getShader("PostprocessingShader"));
+    scene.addFBO("final", finalQB);
+    // scene.addPreProcLayer("shadows", ResourceLoader::getShader("ShadowShader"));
+    scene.addPreProcLayer("final", ResourceLoader::getShader(PBRen ? "PBRShader" : "DefaultShder"));
+    scene.setPostProcShader(ResourceLoader::getShader(PBRen ? "PBRShader" : "DefaultShder")); // PBRShader
     scene.setContext(&main);
 
     scene.addObject(&manObject);
 
-    scene.setBG({ 1, 0, 1 });
+    scene.setBG({ 1, 1, 0 });
     timer.log();
 
     // SKYBOX //
@@ -277,11 +276,10 @@ int main() {
     // cube2->getRigidbody()->hasGravity = true;
     //cube2->getRigidbody()->velocityAdder({ 1, -1, 0 });
 
-    Gizmos::Sphere gizmo1({ 0, 0, 0 }, { 1, 0, 0 });
+    Gizmos::Sphere gizmo1({ 0, 0, 0 }, { 1, 1, 0 });
     gizmo1.setThickness(2);
     Gizmos::GizmoRenderer::addGizmo(&gizmo1);
     Gizmos::Line gizmo2({ 0, 0, 0 }, { 1, 1, 0 }, true);
-    gizmo2.setColour({ 1, 0, 0 });
     gizmo2.setThickness(2);
     Gizmos::GizmoRenderer::addGizmo(&gizmo2);
 
@@ -358,6 +356,7 @@ int main() {
         // glfwSwapInterval(1); // V-SYNC
         //glfwSwapBuffers(window);
         main.update();
+
         Events::Handler::pollEvents();
     }
     Render::Shading::Manager::cleanUp(); // deactivats shdaer
