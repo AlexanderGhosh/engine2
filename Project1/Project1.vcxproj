@@ -254,6 +254,9 @@
     <None Include="Resources\DefaultShader\fragment.glsl" />
     <None Include="Resources\DefaultShader\geometry.glsl" />
     <None Include="Resources\DefaultShader\vertex.glsl" />
+    <None Include="Resources\Models\male.fbx" />
+    <None Include="Resources\Models\Man.dae" />
+    <None Include="Resources\Models\RFA_Model.fbx" />
     <None Include="Resources\PBRShader\fragment.glsl" />
     <None Include="Resources\PBRShader\geometry.glsl" />
     <None Include="Resources\PBRShader\vertex.glsl" />
@@ -269,6 +272,13 @@
   </ItemGroup>
   <ItemGroup>
     <Font Include="Resources\Fonts\arial.ttf" />
+  </ItemGroup>
+  <ItemGroup>
+    <Object Include="Resources\Models\bsg.obj" />
+    <Object Include="Resources\Models\cube.obj" />
+    <Object Include="Resources\Models\pistol.obj" />
+    <Object Include="Resources\Models\sphere.obj" />
+    <Object Include="Resources\Models\sword.obj" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

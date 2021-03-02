@@ -340,6 +340,9 @@
     <None Include="Resources\UIShader\fragment.glsl" />
     <None Include="Resources\UIShader\geometry.glsl" />
     <None Include="Resources\UIShader\vertex.glsl" />
+    <None Include="Resources\Models\male.fbx" />
+    <None Include="Resources\Models\Man.dae" />
+    <None Include="Resources\Models\RFA_Model.fbx" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="Resources\Fonts\arial.ttf" />
@@ -348,5 +351,12 @@
     <Image Include="Resources\Textures\default.png">
       <Filter>Resource Files</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Object Include="Resources\Models\bsg.obj" />
+    <Object Include="Resources\Models\cube.obj" />
+    <Object Include="Resources\Models\pistol.obj" />
+    <Object Include="Resources\Models\sphere.obj" />
+    <Object Include="Resources\Models\sword.obj" />
   </ItemGroup>
 </Project>
