@@ -38,8 +38,8 @@ void Component::RenderMesh::update(float deltaTime)
 	}*/
 	if (animatedComponet) {
 		const Render::Animation::KeyFrame frame = animatedComponet->getCurrentFrame();
-		// Render::Shading::Manager::setValue("bones", frame);
-		animatedComponet->bind();
+		Render::Shading::Manager::setValue("bones", frame);
+		// animatedComponet->bind();
 	}
 
 	const auto& buffers = model.getBuffers();

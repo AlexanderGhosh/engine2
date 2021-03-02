@@ -92,9 +92,9 @@ void Component::Animated::bind()
 	// Render::Shading::Manager::setValue("bones", this->getCurrentFrame());
 	auto t = this->getCurrentFrame();
 	// Utils::reverse(t.translations.begin(), t.translations.end());
-	bonesBuffer.fill(&t.translations[0], sizeof(float) * 16 * t.translations.size());
-	bonesBuffer.bind();
-	Render::Shading::Manager::setValue("bones", 0);
+	//bonesBuffer.fill(&t.translations[0], sizeof(float) * 16 * t.translations.size());
+	//bonesBuffer.bind();
+	Render::Shading::Manager::setValue("bones", t);
 }
 
 void Component::Animated::unbind()

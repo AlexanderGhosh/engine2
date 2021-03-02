@@ -2,40 +2,66 @@
 #include "../Rendering/Shading/Manager.h"
 #include "SkyBox.h"
 #include  "../Context.h"
+#include "../Utils/ResourceLoader.h"
+#include "../Rendering/Rendering.h"
+#include "../Componets/Camera.h"
+#include "../Primatives/Mesh.h"
+#include "../Primatives/Vertex.h"
+
+GameScene::GameScene() : objects(), preProcessingLayers(), currentTick(0), postProcShaderId(0), FBOs(), backgroundColour(0), skybox(nullptr), mainContext(nullptr), mainCamera(nullptr), opaque(), transparent(), quadBuffer(), quadFBO()
+{
+	Primative::Vertex v1 = Primative::Vertex({ 0, 0, 0 });
+	Primative::Vertex v2 = Primative::Vertex({ 1, 0, 0 });
+	Primative::Vertex v3 = Primative::Vertex({ 0, 1, 0 });
+	Primative::Vertex v4 = Primative::Vertex({ 1, 1, 0 });
+	Primative::Mesh m = Primative::Mesh({ v1, v2, v3, v4 }, { 0, 1, 2, 3 }, "ScreenQuad");
+	quadBuffer = Primative::VertexBuffer(m, GL_TRIANGLE_STRIP);
+	addPreProcLayer("MainScene", ResourceLoader::getShader("PBRShader"));
+	quadFBO = DBG_NEW Primative::FrameBuffer({ "col" }, { 800, 600 });
+	addFBO("MainScene", quadFBO);
+}
+
+void GameScene::addObject(GameObject* obj)
+{
+	objects.push_back(obj);
+	Component::RenderMesh* comp = obj->getComponet<Component::RenderMesh>();
+	if (comp) {
+		if (comp->getTransparent()) {
+			transparent[rand()] = comp;
+		}
+		else {
+			opaque.push_back(comp);
+		}
+	}
+};
 
 void GameScene::preProcess()
 {
-	for (const auto& layer : preProcessingLayers) {
+	for (const auto& layer : preProcessingLayers)
+	{
+
 		const std::string& name = layer.first; // of the layer
 		const unsigned& shaderId = layer.second;
 		const auto& fbo = getFBO(name);
 		fbo->bind();
-		clearFBO();
+		fbo->clear();
 		Render::Shading::Manager::setActive(shaderId);
-
-		if (name == "shadows") {
-			glCullFace(GL_FRONT);
+		if (name == "MainScene") {
+			drawOpaque();
+			drawTransparent();
 		}
-
-		renderObjects();
-		renderSkyBox();
-		glCullFace(GL_BACK);
 	}
 }
 
 void GameScene::postProcess()
 {
+	Render::Shading::Manager::setActive(postProcShaderId);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0); // default fbo
 	clearFBO();
-	Render::Shading::Manager::setActive(postProcShaderId);
-	//Render::Shading::Manager::setValue("depthMap", 3); // depth map
-	/*glActiveTexture(GL_TEXTURE3);
-	glBindTexture(GL_TEXTURE, FBOs["shadows"]->getTextureId("depth"));*/
-
-	renderObjects();
-	glDisable(GL_CULL_FACE);
-	renderSkyBox();
-	glEnable(GL_CULL_FACE);
+	glBindTexture(GL_TEXTURE_2D, FBOs["MainScene"]->getTextureId("col0"));
+	quadBuffer.bind();
+	quadBuffer.draw();
+	quadBuffer.unBind();
 }
 
 void GameScene::updateScene()
@@ -56,9 +82,33 @@ void GameScene::renderSkyBox()
 {
 	if (!skybox)
 		return;
+	glDisable(GL_CULL_FACE);
 	glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
 	skybox->draw();
 	glDepthFunc(GL_LESS); // set depth function back to default
+	glEnable(GL_CULL_FACE);
+}
+
+void GameScene::drawOpaque()
+{
+	for (Component::RenderMesh* mesh : opaque) {
+		mesh->update(mainContext->getTime().deltaTime);
+	}
+	renderSkyBox();
+}
+void GameScene::drawTransparent()
+{
+	if (NOT transparent.size()) {
+		return;
+	}
+	std::map<float, Component::RenderMesh*> sortedTransparents;
+	for (auto itt = transparent.rbegin(); itt != transparent.rend(); itt++) {
+		Component::RenderMesh* mesh = (*itt).second;
+		mesh->update(mainContext->getTime().deltaTime);
+		sortedTransparents[glm::length2(mainCamera->getPos() - mesh->getParent()->getTransform()->Position)] = mesh;
+	}
+	transparent.clear();
+	transparent = sortedTransparents;
 }
 
 const Primative::FrameBuffer* GameScene::getFBO(const std::string& name)
@@ -92,7 +142,11 @@ void GameScene::cleanUp()
 	FBOs.clear();
 	if(skybox)
 		skybox->cleanUp();
+	mainContext->cleanUp();
 	skybox = nullptr;
+	mainCamera = nullptr;
+	opaque.clear();
+	transparent.clear();
 }
 
 void GameScene::addPreProcLayer(const std::string& name, const unsigned& shaderId)
@@ -108,4 +162,9 @@ void GameScene::setSkyBox(SkyBox* sb)
 void GameScene::setContext(Context* context)
 {
 	mainContext = context;
+}
+
+void GameScene::setMainCamera(Component::Camera* camera)
+{
+	mainCamera = camera;
 }

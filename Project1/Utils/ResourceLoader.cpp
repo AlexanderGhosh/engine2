@@ -199,7 +199,7 @@ const unsigned ResourceLoader::loadTexture(const std::string& filePath, const Te
     ti.reName("STBI load");
     ti.start();
     unsigned char* data = stbi_load(filePath.c_str(), &width, &height, &nrChannels, 0);
-    ti.log();
+    //ti.log();
     GLenum t = GL_SRGB;
     switch (nrChannels)
     {

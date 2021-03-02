@@ -167,36 +167,6 @@ void Primative::StaticBuffer::cleanUp()
 	glDeleteBuffers(1, &UBO);
 }
 
-const std::tuple<GLenum, int, std::string> Primative::FrameBuffer::getTexType(const std::string& t, char& colTypes)
-{
-	std::tuple<GLenum, int, std::string> res;
-	GLenum& attachmentType = std::get<GLenum>(res) = 0;
-	int& type = std::get<int>(res) = -1;
-	std::string& t_ = std::get<std::string>(res) = t;
-
-	if (t == "col") {
-		attachmentType = GL_COLOR_ATTACHMENT0 + colTypes;
-		type = GL_RGB;
-		t_ += std::to_string(colTypes++);
-	}
-	else if (t == "depth") {
-		attachmentType = GL_DEPTH_ATTACHMENT;
-		type = GL_DEPTH_COMPONENT;
-	}
-	else if (t == "stencil") {
-		attachmentType = GL_STENCIL_ATTACHMENT;
-		type = GL_FLOAT;
-	}
-	else if (t == "dep_sten") {
-		attachmentType = GL_DEPTH_STENCIL_ATTACHMENT;
-		type = GL_DEPTH24_STENCIL8;
-	}
-	else {
-		t_ = "failed";
-	}
-	return res;
-}
-
 Primative::FrameBuffer::FrameBuffer(std::vector<std::string> textureTypes, glm::ivec2 dimentions) : FrameBuffer()
 {
 	this->dimentions = dimentions;
@@ -233,17 +203,17 @@ Primative::FrameBuffer::FrameBuffer(std::vector<std::string> textureTypes, glm::
 		glFramebufferTexture2D(GL_FRAMEBUFFER, attachmentType, GL_TEXTURE_2D, tex, 0);
 	}
 	
-	if (!Utils::contains(textureTypes, { "col" })) {
+	if (NOT Utils::contains(textureTypes, { "col" })) {
 		glDrawBuffer(GL_NONE);
 		glReadBuffer(GL_NONE);
 	}
-	if (!Utils::contains(textureTypes, { "depth" })) {
+	if (NOT Utils::contains(textureTypes, { "depth" })) {
 		unsigned rbo = 0;
 		glGenRenderbuffers(1, &rbo);
 		glBindRenderbuffer(GL_RENDERBUFFER, rbo);
 		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, dimentions.x, dimentions.y);
-		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_COMPONENT, GL_RENDERBUFFER, rbo);
 		glBindRenderbuffer(GL_RENDERBUFFER, 0);
+		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rbo);
 		renderBuffers.push_back(rbo);
 	}
 	/*if (!Utils::contains(textureTypes, { "stencil" })) {
@@ -255,10 +225,44 @@ Primative::FrameBuffer::FrameBuffer(std::vector<std::string> textureTypes, glm::
 		glBindRenderbuffer(GL_RENDERBUFFER, 0);
 		renderBuffers.push_back(rbo);
 	}*/
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-		std::cout << "FBO failed to complete\n";
-	}
+	assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) EQ GL_FRAMEBUFFER_COMPLETE);
 	this->unBind();
+}
+
+const std::tuple<GLenum, int, std::string> Primative::FrameBuffer::getTexType(const std::string& t, char& colTypes)
+{
+	std::tuple<GLenum, int, std::string> res;
+	GLenum& attachmentType = std::get<GLenum>(res) = 0;
+	int& type = std::get<int>(res) = -1;
+	std::string& t_ = std::get<std::string>(res) = t;
+
+	if (t == "col") {
+		attachmentType = GL_COLOR_ATTACHMENT0 + colTypes;
+		type = GL_RGB;
+		t_ += std::to_string(colTypes++);
+	}
+	else if (t == "depth") {
+		attachmentType = GL_DEPTH_ATTACHMENT;
+		type = GL_DEPTH_COMPONENT;
+	}
+	else if (t == "stencil") {
+		attachmentType = GL_STENCIL_ATTACHMENT;
+		type = GL_FLOAT;
+	}
+	else if (t == "dep_sten") {
+		attachmentType = GL_DEPTH_STENCIL_ATTACHMENT;
+		type = GL_DEPTH24_STENCIL8;
+	}
+	else {
+		t_ = "failed";
+	}
+	return res;
+}
+
+void Primative::FrameBuffer::clear() const
+{
+	glClearColor(1, 1, 0, 1);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 }
 
 void Primative::FrameBuffer::cleanUp()

@@ -1,5 +1,4 @@
 #version 460 core
-precision highp float;
 
 out vec4 FragColor;
 
@@ -111,8 +110,8 @@ void main()
 {
     vec3 c = fs_in.ws.xyz;
     c = normalize(c);
-    FragColor = vec4(c, 1);
-    return;
+    FragColor = vec4(1, 0 ,0, 1);
+    //return;
     vec3 albedo = pow(getData(material.albedo_vec, material.albedo_id), vec3(2.2));
     
     float metallic = getData(material.metalic_vec, material.metalic_id).r;

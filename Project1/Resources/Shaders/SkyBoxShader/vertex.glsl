@@ -10,12 +10,10 @@ layout(std140, binding = 0) uniform Matrices
     mat4 lightSpaceMatrix;
 };
 
-out VS_OUT{
-    vec3 texCoords;
-} vs_out;
+out vec3 texCoords;
 
 void main() {
     vec4 p = projection * mat4(mat3(view)) * vec4(pos, 1);
     gl_Position = p.xyww;
-    vs_out.texCoords = pos;
+    texCoords = pos;
 }
