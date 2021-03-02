@@ -76,24 +76,25 @@ int main() {
 
 
     Context main({ 800, 600 }, false);
-    main.init("Engine 2", { GL_DEPTH_TEST, GL_CULL_FACE, GL_MULTISAMPLE, GL_TEXTURE_CUBE_MAP_SEAMLESS });
+    main.init("Engine 2", { GL_BLEND, GL_DEPTH_TEST, GL_CULL_FACE, GL_MULTISAMPLE, GL_TEXTURE_CUBE_MAP_SEAMLESS });
 
     cam.setPos({ 0, 0, 10 }); // 200, 700
 
     Utils::Timer timer("Shaders");
     timer.start();
-    ResourceLoader::createShader("Resources/DefaultShader");
-    ResourceLoader::createShader("Resources/ShadowShader");
-    ResourceLoader::createShader("Resources/PBRShader");
-    ResourceLoader::createShader("Resources/UIShader");
-    ResourceLoader::createShader("Resources/TextShader");
+    ResourceLoader::createShader("Resources/Shaders/DefaultShader");
+    ResourceLoader::createShader("Resources/Shaders/ShadowShader");
+    ResourceLoader::createShader("Resources/Shaders/PBRShader");
+    ResourceLoader::createShader("Resources/Shaders/UIShader");
+    ResourceLoader::createShader("Resources/Shaders/TextShader");
     Gizmos::GizmoRenderer::init();
     timer.log();
 
     timer.reName("Models");
     timer.start();
-    const Primative::Model manModel    = ResourceLoader::createModel("Resources/Models/male.fbx"); // RFA_Model
+    const Primative::Model manModel    = ResourceLoader::createModel("Resources/Models/RFA_Model.fbx"); // RFA_Model
     const Primative::Model cubeBuffer  = ResourceLoader::createModel("Resources/Models/cube.obj"); // needed for the skybox
+    const Primative::Model planeBuffer = ResourceLoader::createModel("Resources/Models/plane.dae");
     timer.log();
 
     timer.reName("Animations");
@@ -103,6 +104,7 @@ int main() {
 
     timer.reName("Textures");
     timer.start();
+    const unsigned wi   = ResourceLoader::loadTexture("Resources/Textures/window.png", TextureType::AlbedoMap, 0);
     const unsigned ba   = ResourceLoader::loadTexture("Resources/Textures/rust base.png",      TextureType::AlbedoMap);
     const unsigned r    = ResourceLoader::loadTexture("Resources/Textures/rust roughness.png", TextureType::RoughnessMap);
     const unsigned m    = ResourceLoader::loadTexture("Resources/Textures/rust metalic.png",   TextureType::MetalicMap);
@@ -178,7 +180,7 @@ int main() {
     manObject.getTransform()->Position = { 0, 0, 0 };
     manObject.addComponet(&manR1);
     manObject.addComponet(&manAnimatedComp);
-    manObject.getTransform()->Scale *= 0.005;
+    manObject.getTransform()->Scale *= 0.05;
     timer.stop();
 
     

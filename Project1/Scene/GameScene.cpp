@@ -2,6 +2,37 @@
 #include "../Rendering/Shading/Manager.h"
 #include "SkyBox.h"
 #include  "../Context.h"
+#include "../Rendering/Rendering.h"
+#include "../Componets/Camera.h"
+
+GameScene::GameScene() : objects(), preProcessingLayers(), currentTick(0), postProcShaderId(0), FBOs(), backgroundColour(0), skybox(nullptr), mainContext(nullptr), opaque(), transparent()
+{
+
+}
+
+void GameScene::drawOpaque()
+{
+	for (Component::RenderMesh* mesh : opaque) {
+		mesh->update(mainContext->getTime().deltaTime);
+	}
+}
+
+void GameScene::drawTransparent()
+{
+	if (NOT transparent.size()) {
+		return;
+	}
+	std::map<float, Component::RenderMesh*> sorted;
+	for (auto itt = transparent.rbegin(); itt != transparent.rend(); itt++) {
+		float dist = (*itt).first;
+		Component::RenderMesh* mesh = (*itt).second;
+		mesh->update(mainContext->getTime().deltaTime);
+		dist = glm::length2(mesh->getParent()->getTransform()->Position - mainCamera->getPos());
+		sorted[dist] = mesh;
+	}
+	transparent.clear();
+	transparent = sorted;
+}
 
 void GameScene::preProcess()
 {
@@ -17,8 +48,8 @@ void GameScene::preProcess()
 			glCullFace(GL_FRONT);
 		}
 
-		renderObjects();
-		renderSkyBox();
+		drawObjects();
+		drawSkyBox();
 		glCullFace(GL_BACK);
 	}
 }
@@ -32,9 +63,9 @@ void GameScene::postProcess()
 	/*glActiveTexture(GL_TEXTURE3);
 	glBindTexture(GL_TEXTURE, FBOs["shadows"]->getTextureId("depth"));*/
 
-	renderObjects();
+	drawObjects();
 	glDisable(GL_CULL_FACE);
-	renderSkyBox();
+	drawSkyBox();
 	glEnable(GL_CULL_FACE);
 }
 
@@ -45,14 +76,14 @@ void GameScene::updateScene()
 	}
 }
 
-void GameScene::renderObjects()
+void GameScene::drawObjects()
 {
 	for (GameObject*& obj : objects) {
 		obj->tryDraw(mainContext->getTime().deltaTime);
 	}
 }
 
-void GameScene::renderSkyBox()
+void GameScene::drawSkyBox()
 {
 	if (!skybox)
 		return;

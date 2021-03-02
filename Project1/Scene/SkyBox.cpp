@@ -10,7 +10,7 @@ unsigned SkyBox::shaderId = 0;
 SkyBox::SkyBox() : texId(0), mesh(nullptr)
 {
 	if (!shaderId) {
-		ResourceLoader::createShader("Resources/SkyBoxShader");
+		ResourceLoader::createShader("Resources/Shaders/SkyBoxShader");
 		shaderId = ResourceLoader::getShader("SkyBoxShader");
 	}
 	if (!mesh) {

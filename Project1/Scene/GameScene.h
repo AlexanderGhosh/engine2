@@ -1,14 +1,22 @@
 #pragma once
 #include <vector>
 #include <unordered_map>
+#include <map>
 #include "../GameObject/GameObject.h"
 #include "../Primatives/Buffers.h"
 class SkyBox;
 class Context;
+namespace Component {
+	class Camera;
+	class RenderMesh;
+}
 class GameScene
 {
 private:
 	SkyBox* skybox;
+	Component::Camera* mainCamera;
+	std::vector<Component::RenderMesh*> opaque;
+	std::map<float, Component::RenderMesh*> transparent;
 	std::vector<GameObject*> objects;
 	std::unordered_map<std::string, unsigned> preProcessingLayers;
 	unsigned currentTick, postProcShaderId;
@@ -19,10 +27,12 @@ private:
 		glClearColor(backgroundColour.x, backgroundColour.y, backgroundColour.z, 1);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
-	void renderObjects(); // just moved
-	void renderSkyBox();
+	void drawObjects(); // just moved
+	void drawSkyBox();
 public:
-	inline GameScene() : objects(), preProcessingLayers(), currentTick(0), postProcShaderId(0), FBOs(), backgroundColour(0), skybox(nullptr), mainContext(nullptr) { };
+	GameScene();
+	void drawOpaque();
+	void drawTransparent();
 	inline void addObject(GameObject* obj) { objects.push_back(obj); };
 	inline void setBG(Vector3 col) { backgroundColour = col; };
 	void preProcess();
