@@ -29,6 +29,8 @@ namespace Component {
 		const glm::mat4 getModel() const;
 		inline Transform(glm::vec3 p = Utils::zero(), glm::vec3 s = Utils::fill(1), glm::vec3 r = Utils::zero()) : Position(p), Scale(s), Rotation(r), ComponetBase() { };
 		inline Type getType() const { return Type::Transform; };
+		void rotate(Vector3 axis, Float angle);
+		void rotate(Vector3 rotation);
 		void cleanUp() { };
 	};
 }

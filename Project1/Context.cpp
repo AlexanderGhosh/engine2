@@ -27,8 +27,8 @@ void Context::init(const std::string& name, std::list<long> enable)
     // glEnable(GL_MULTISAMPLE);
     for (auto itt = enable.begin(); itt != enable.end(); itt++)
         glEnable(*itt);
-
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    if(Utils::contains(enable, static_cast<long>(GL_BLEND)))
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     glViewport(0, 0, dimentions.x, dimentions.y);
     glewInit();

@@ -30,12 +30,14 @@ void Gizmos::GizmoRenderer::init()
 
 void Gizmos::GizmoRenderer::drawAll()
 {
+	glDisable(GL_DEPTH_TEST);
 	for (auto itt = gizmos.begin(); itt != gizmos.end(); itt++) {
 		for (auto gizmo : (*itt).second)
 		{
 			gizmo->draw();
 		}
 	}
+	glEnable(GL_DEPTH_TEST);
 }
 
 void Gizmos::GizmoRenderer::drawType(const Types type)

@@ -82,6 +82,11 @@ namespace Utils {
         return matrix * glm::mat4_cast(vec);
     }
     template<class T>
+    inline bool contains(const std::list<T>& a, const T& b) {
+        auto found = std::find(a.begin(), a.end(), b);
+        return found != a.end();
+    }
+    template<class T>
     inline bool contains(const std::vector<T>& a, const T& b) {
         auto found = std::find(a.begin(), a.end(), b);
         return found != a.end();

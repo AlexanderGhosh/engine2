@@ -33,7 +33,7 @@ public:
 	GameScene();
 	void drawOpaque();
 	void drawTransparent();
-	inline void addObject(GameObject* obj) { objects.push_back(obj); };
+	void addObject(GameObject* obj);
 	inline void setBG(Vector3 col) { backgroundColour = col; };
 	void preProcess();
 	void postProcess();
@@ -51,5 +51,6 @@ public:
 	inline void setPostProcShader(const unsigned& shaderId) { postProcShaderId = shaderId; };
 	void setSkyBox(SkyBox* sb);
 	void setContext(Context* context);
+	void setMainCamera(Component::Camera* camera);
 };
 

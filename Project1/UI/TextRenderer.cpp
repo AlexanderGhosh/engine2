@@ -148,7 +148,6 @@ void UI::TextRenderer::drawText(const std::string& text, float x, float y, float
     }
     glBindVertexArray(0);
     glBindTexture(GL_TEXTURE_2D, 0);
-    glDisable(GL_BLEND);
 }
 
 const glm::vec2& UI::TextRenderer::getStringDimentions(const std::string& text, const unsigned& scale) const

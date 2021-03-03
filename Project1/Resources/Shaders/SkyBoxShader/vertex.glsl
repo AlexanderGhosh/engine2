@@ -16,6 +16,6 @@ out VS_OUT{
 
 void main() {
     vec4 p = projection * mat4(mat3(view)) * vec4(pos, 1);
-    gl_Position = p.xyww;
+    gl_Position = p;
     vs_out.texCoords = pos;
 }

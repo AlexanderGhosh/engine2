@@ -46,6 +46,12 @@ vec3 getData(vec4 col, sampler2D id){
     }
     return col.rgb;
 }
+float getAlpha(vec4 col, sampler2D id){
+    if(col.a == 0){
+        return texture(id, fs_in.texCoords).a;
+    }
+    return col.a;
+}
 
 vec3 norm_;
 vec3 getNormalFromMap()
@@ -109,10 +115,10 @@ vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
 // ----------------------------------------------------------------------------
 void main()
 {
-    vec3 c = fs_in.ws.xyz;
+    /*vec3 c = fs_in.ws.xyz;
     c = normalize(c);
     FragColor = vec4(c, 1);
-    return;
+    return;*/
     vec3 albedo = pow(getData(material.albedo_vec, material.albedo_id), vec3(2.2));
     
     float metallic = getData(material.metalic_vec, material.metalic_id).r;
@@ -204,5 +210,9 @@ void main()
     color /= color + vec3(1.0);
     // gamma correct
     color = pow(color, vec3(1.0/2.2)); 
-    FragColor = vec4(albedo, 1.0);
+    float a = getAlpha(material.albedo_vec, material.albedo_id);
+    if (a < 0.1) {
+        discard;
+    }
+    FragColor = vec4(albedo, a);
 }
