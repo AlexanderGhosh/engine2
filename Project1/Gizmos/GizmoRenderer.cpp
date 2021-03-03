@@ -22,20 +22,22 @@ void Gizmos::GizmoRenderer::updateInstanceDate()
 
 void Gizmos::GizmoRenderer::init()
 {
-	ResourceLoader::createShader("Resources/Gizmos/PointShader", true);
-	ResourceLoader::createShader("Resources/Gizmos/LineShader", true);
-	ResourceLoader::createShader("Resources/Gizmos/CubeShader");
-	ResourceLoader::createShader("Resources/Gizmos/CircleShader", true);
+	ResourceLoader::createShader("Resources/Shaders/Gizmos/PointShader", true);
+	ResourceLoader::createShader("Resources/Shaders/Gizmos/LineShader", true);
+	ResourceLoader::createShader("Resources/Shaders/Gizmos/CubeShader");
+	ResourceLoader::createShader("Resources/Shaders/Gizmos/CircleShader", true);
 }
 
 void Gizmos::GizmoRenderer::drawAll()
 {
+	glDisable(GL_DEPTH_TEST);
 	for (auto itt = gizmos.begin(); itt != gizmos.end(); itt++) {
 		for (auto gizmo : (*itt).second)
 		{
 			gizmo->draw();
 		}
 	}
+	glEnable(GL_DEPTH_TEST);
 }
 
 void Gizmos::GizmoRenderer::drawType(const Types type)

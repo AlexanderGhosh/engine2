@@ -76,24 +76,25 @@ int main() {
 
 
     Context main({ 800, 600 }, false);
-    main.init("Engine 2", { GL_DEPTH_TEST, GL_CULL_FACE, GL_MULTISAMPLE, GL_TEXTURE_CUBE_MAP_SEAMLESS });
+    main.init("Engine 2", { GL_BLEND, GL_DEPTH_TEST, GL_CULL_FACE, GL_MULTISAMPLE, GL_TEXTURE_CUBE_MAP_SEAMLESS });
 
     cam.setPos({ 0, 0, 10 }); // 200, 700
 
     Utils::Timer timer("Shaders");
     timer.start();
-    ResourceLoader::createShader("Resources/DefaultShader");
-    ResourceLoader::createShader("Resources/ShadowShader");
-    ResourceLoader::createShader("Resources/PBRShader");
-    ResourceLoader::createShader("Resources/UIShader");
-    ResourceLoader::createShader("Resources/TextShader");
+    ResourceLoader::createShader("Resources/Shaders/DefaultShader");
+    ResourceLoader::createShader("Resources/Shaders/ShadowShader");
+    ResourceLoader::createShader("Resources/Shaders/PBRShader");
+    ResourceLoader::createShader("Resources/Shaders/UIShader");
+    ResourceLoader::createShader("Resources/Shaders/TextShader");
     Gizmos::GizmoRenderer::init();
     timer.log();
 
     timer.reName("Models");
     timer.start();
-    const Primative::Model manModel    = ResourceLoader::createModel("Resources/Models/male.fbx"); // RFA_Model
+    const Primative::Model manModel    = ResourceLoader::createModel("Resources/Models/RFA_Model.fbx"); // RFA_Model
     const Primative::Model cubeBuffer  = ResourceLoader::createModel("Resources/Models/cube.obj"); // needed for the skybox
+    const Primative::Model planeBuffer = ResourceLoader::createModel("Resources/Models/plane.dae");
     timer.log();
 
     timer.reName("Animations");
@@ -103,6 +104,8 @@ int main() {
 
     timer.reName("Textures");
     timer.start();
+    const unsigned wi   = ResourceLoader::loadTexture("Resources/Textures/window.png", TextureType::AlbedoMap, 0);
+    const unsigned wiy  = ResourceLoader::loadTexture("Resources/Textures/yellowWindow.png", TextureType::AlbedoMap, 0);
     const unsigned ba   = ResourceLoader::loadTexture("Resources/Textures/rust base.png",      TextureType::AlbedoMap);
     const unsigned r    = ResourceLoader::loadTexture("Resources/Textures/rust roughness.png", TextureType::RoughnessMap);
     const unsigned m    = ResourceLoader::loadTexture("Resources/Textures/rust metalic.png",   TextureType::MetalicMap);
@@ -150,7 +153,7 @@ int main() {
     // printf("weapon\n");
     timer.log();
 
-    timer.reName("Object 1");
+    timer.reName("Objects");
     timer.start();
     Component::RenderMesh manR1 = Component::RenderMesh();
     manR1.setModel(manModel);
@@ -178,8 +181,38 @@ int main() {
     manObject.getTransform()->Position = { 0, 0, 0 };
     manObject.addComponet(&manR1);
     manObject.addComponet(&manAnimatedComp);
-    manObject.getTransform()->Scale *= 0.005;
-    timer.stop();
+    manObject.getTransform()->Scale *= 0.0125;
+
+
+    GameObject redWindow;
+    Component::RenderMesh plane;
+    plane.setTransparent(true);
+    plane.setModel(planeBuffer);
+    Materials::PBR planeMat(MI(wi), MI(n), MI(m), MI(r), MI(Utils::xAxis(0.2)));
+    plane.setMaterial(&planeMat);
+    redWindow.addComponet(&plane);
+    redWindow.getTransform()->Position.z = 3;
+
+    GameObject yellowWindow;
+    Component::RenderMesh plane_y;
+    plane_y.setTransparent(true);
+    plane_y.setModel(planeBuffer);
+    Materials::PBR planeMat_y(MI(wiy), MI(n), MI(m), MI(r), MI(Utils::xAxis(0.2)));
+    plane_y.setMaterial(&planeMat_y);
+    yellowWindow.addComponet(&plane_y);
+    yellowWindow.getTransform()->Position.z = 2;
+    yellowWindow.getTransform()->Position.x = 0.5;
+    timer.log();
+
+    GameObject land;
+    Component::RenderMesh landMesh;
+    landMesh.setModel(planeBuffer);
+    landMesh.setMaterial(&planeMat_y);
+    land.addComponet(&landMesh);
+    land.getTransform()->Position.y = -0.5;
+    land.getTransform()->Scale *= 10;
+    land.getTransform()->rotate(Utils::xAxis(), glm::radians(90.0f));
+
 
     
     timer.reName("Static Buffers");
@@ -217,6 +250,7 @@ int main() {
     Primative::MSAABuffer* finalQB = DBG_NEW Primative::MSAABuffer({ "col" }, { 800, 600 });
 
     GameScene scene;
+    scene.setMainCamera(&cam);
     // scene.addFBO("shadows", frameBuffer);
     scene.addFBO("final", finalQB);
     // scene.addPreProcLayer("shadows", ResourceLoader::getShader("ShadowShader"));
@@ -225,6 +259,9 @@ int main() {
     scene.setContext(&main);
 
     scene.addObject(&manObject);
+    scene.addObject(&redWindow);
+    scene.addObject(&yellowWindow);
+    scene.addObject(&land);
 
     scene.setBG({ 1, 1, 0 });
     timer.log();
@@ -301,11 +338,10 @@ int main() {
         counter += main.getTime().deltaTime;
 
         // RENDERING--------------------------------------------------------------------------------------------------------------------------------------------
-        main.disable(GL_CULL_FACE);
         b.fill(0, value_ptr(cam.getView()));
         b.fill(2, value_ptr(cam.getPos())); 
     
-        scene.preProcess(); // shadows and scene quad
+        // scene.preProcess(); // shadows and scene quad
         scene.postProcess();// render to screen
         UI::UIRenderer::render(&tb);
         Gizmos::GizmoRenderer::drawAll();
@@ -354,7 +390,7 @@ int main() {
         // sound->update();
 
         // glfwSwapInterval(1); // V-SYNC
-        //glfwSwapBuffers(window);
+        //glfwSwapBuffers(redWindow);
         main.update();
 
         Events::Handler::pollEvents();

@@ -25,7 +25,7 @@ void UI::UIRenderer::init(const unsigned& shaderId, const glm::vec2& screenDim)
 		0, 1, 2,
 		3, 2, 1
 	};
-	quadBuffer = Primative::VertexBuffer(mesh, GL_TRIANGLES);
+	quadBuffer = Primative::VertexBuffer(mesh);
 
 	uiBuffer = Primative::StaticBuffer("m4", 1);
 	// uiBuffer.init(sizeof(glm::mat4), 1);
