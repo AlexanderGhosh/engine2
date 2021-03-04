@@ -39,6 +39,7 @@
 #include "Primatives/Model.h"
 #include "Gizmos/GizmoRenderer.h"
 #include "Gizmos/GizmoShapes.h"
+#include "GameObject/Terrain.h"
 
 #include "MainWindow.h"
 #include "Context.h"
@@ -87,6 +88,7 @@ int main() {
     ResourceLoader::createShader("Resources/Shaders/PBRShader");
     ResourceLoader::createShader("Resources/Shaders/UIShader");
     ResourceLoader::createShader("Resources/Shaders/TextShader");
+    ResourceLoader::createShader("Resources/Shaders/TerrainShader");
     Gizmos::GizmoRenderer::init();
     timer.log();
 
@@ -113,6 +115,7 @@ int main() {
     const unsigned hdr  = ResourceLoader::loadCubeMap("Resources/Textures/Galaxy hdr", ".png", 0);
     const unsigned ibl  = ResourceLoader::loadCubeMap("Resources/Textures/Galaxy ibl", ".png", 0);
     const unsigned brdf = ResourceLoader::loadTexture("Resources/Textures/ibl brdf.png", TextureType::AlbedoMap, 0);
+    const unsigned hm   = ResourceLoader::loadTexture("Resources/Textures/heightmap.png", TextureType::HeightMap, 0);
     /*ResourceLoader::loadTextureFile("Resources/Textures/RFATextures/Armour", 
         { TextureType::AlbedoMap,TextureType::RoughnessMap,TextureType::MetalicMap,TextureType::NormalMap, TextureType::CubeMap, TextureType::CubeMap, TextureType::AlbedoMap },
         { 1, 1, 1, 1 , 0, 0, 0 });*/
@@ -182,6 +185,7 @@ int main() {
     manObject.addComponet(&manR1);
     manObject.addComponet(&manAnimatedComp);
     manObject.getTransform()->Scale *= 0.0125;
+    manObject.getTransform()->Position.y = -1;
 
 
     GameObject redWindow;
@@ -204,14 +208,11 @@ int main() {
     yellowWindow.getTransform()->Position.x = 0.5;
     timer.log();
 
-    GameObject land;
-    Component::RenderMesh landMesh;
-    landMesh.setModel(planeBuffer);
-    landMesh.setMaterial(&planeMat_y);
-    land.addComponet(&landMesh);
-    land.getTransform()->Position.y = -0.5;
-    land.getTransform()->Scale *= 10;
-    land.getTransform()->rotate(Utils::xAxis(), glm::radians(90.0f));
+    Terrain land(1000);
+    land.getTransform().Position.y = -1;
+    land.getTransform().Scale = { 1000, 500 ,1000 };
+    land.setHeightMap(hm);
+    land.setTextures(0, 0, 0);
 
 
     
@@ -261,7 +262,7 @@ int main() {
     scene.addObject(&manObject);
     scene.addObject(&redWindow);
     scene.addObject(&yellowWindow);
-    scene.addObject(&land);
+    scene.addTerrain(&land);
 
     scene.setBG({ 1, 1, 0 });
     timer.log();

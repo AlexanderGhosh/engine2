@@ -2,17 +2,22 @@
 #include <vector>
 #include <unordered_map>
 #include <map>
-#include "../GameObject/GameObject.h"
-#include "../Primatives/Buffers.h"
+#include "../Utils/General.h"
 class SkyBox;
 class Context;
+class GameObject;
+class Terrain;
 namespace Component {
 	class Camera;
 	class RenderMesh;
 }
+namespace Primative {
+	class FrameBuffer;
+}
 class GameScene
 {
 private:
+	std::vector<Terrain*> terrain;
 	SkyBox* skybox;
 	Component::Camera* mainCamera;
 	std::vector<Component::RenderMesh*> opaque;
@@ -23,32 +28,29 @@ private:
 	std::unordered_map<std::string, Primative::FrameBuffer*> FBOs;
 	glm::vec3 backgroundColour;
 	Context* mainContext;
-	inline void clearFBO() const {
-		glClearColor(backgroundColour.x, backgroundColour.y, backgroundColour.z, 1);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	}
+	void clearFBO() const;
 	void drawObjects(); // just moved
 	void drawSkyBox();
-public:
-	GameScene();
 	void drawOpaque();
 	void drawTransparent();
-	void addObject(GameObject* obj);
-	inline void setBG(Vector3 col) { backgroundColour = col; };
+	void drawTerrain();
+public:
+	GameScene();
 	void preProcess();
 	void postProcess();
 	void updateScene();
 	const Primative::FrameBuffer* getFBO(const std::string& name);
 	void cleanUp();
+
+	// adders
 	void addPreProcLayer(const std::string& name, const unsigned& shaderId);
-	inline void addFBO(const std::string& layerName, Primative::FrameBuffer* fbo) 
-	{ 
-		FBOs.insert({ layerName, fbo }); 
-		fbo = nullptr; 
-	};
+	void addFBO(const std::string& layerName, Primative::FrameBuffer* fbo);
+	void addObject(GameObject* obj);
+	void addTerrain(Terrain* terrain);
 
 	// setters
-	inline void setPostProcShader(const unsigned& shaderId) { postProcShaderId = shaderId; };
+	void setBG(Vector3 col);
+	void setPostProcShader(const unsigned& shaderId);
 	void setSkyBox(SkyBox* sb);
 	void setContext(Context* context);
 	void setMainCamera(Component::Camera* camera);

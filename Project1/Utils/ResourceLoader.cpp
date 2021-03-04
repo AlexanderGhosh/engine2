@@ -110,6 +110,7 @@ const unsigned ResourceLoader::getShader(const std::string& name)
     if (s < shaders.size()) {
         r = ResourceLoader::getShader(ResourceLoader::defaultShaderName);
         shaders.erase(name);
+        return 0;
     }
     return r;
 }
@@ -206,6 +207,9 @@ const unsigned ResourceLoader::loadTexture(const std::string& filePath, const Te
     case 1:
         t = GL_RED;
         break;
+    case 2:
+        t = GL_RG;
+        break;
     case 3:
         t = GL_RGB;
         break;
@@ -216,7 +220,7 @@ const unsigned ResourceLoader::loadTexture(const std::string& filePath, const Te
     // unsigned char data[] = { 255, 127, 127 };
     if (data)
     {
-        glTexImage2D(GL_TEXTURE_2D, 0, t, width, height, 0, t, GL_UNSIGNED_BYTE, data);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, t, GL_UNSIGNED_BYTE, data);
         // glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1, 1, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
     }

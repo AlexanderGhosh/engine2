@@ -166,6 +166,7 @@
     <ClCompile Include="Componets\Rigidbody.cpp" />
     <ClCompile Include="Physics\ConstraintEngine\Constraints\DistanceConstraint.cpp" />
     <ClCompile Include="Scene\SkyBox.cpp" />
+    <ClCompile Include="GameObject\Terrain.cpp" />
     <ClCompile Include="Utils\Shapes.cpp" />
     <ClCompile Include="UI\Elements\ListBox.cpp" />
     <ClCompile Include="UI\Panes\Grid.cpp" />
@@ -220,6 +221,7 @@
     <ClInclude Include="Componets\Rigidbody.h" />
     <ClInclude Include="Physics\ConstraintEngine\Constraints\DistanceConstraint.h" />
     <ClInclude Include="Scene\SkyBox.h" />
+    <ClInclude Include="GameObject\Terrain.h" />
     <ClInclude Include="Utils\Shapes.h" />
     <ClInclude Include="UI\Elements\ListBox.h" />
     <ClInclude Include="UI\Panes\Grid.h" />
