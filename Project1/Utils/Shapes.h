@@ -103,5 +103,27 @@ namespace Utils {
 		};
 		using Plane = Face <glm::vec3, 3>;
 		using LineSegment = Edge<glm::vec3>;
+
+		/// <summary>
+		/// defined by normal and point
+		/// </summary>
+		class PlaneAlternate {
+		public:
+			glm::vec3 normal, point;
+			PlaneAlternate();
+			PlaneAlternate(const glm::vec3& n, const glm::vec3& p);
+			~PlaneAlternate() = default;
+			float distance(glm::vec3 a) const;
+		};
+		class Frustrum {
+		private:
+			std::array<PlaneAlternate, 6> planes;
+		public:
+			Frustrum();
+			~Frustrum() = default;
+			void init(float fov, float near, float far, glm::vec3 pos, glm::vec3 fwd, glm::vec3 up, glm::vec3 right, glm::vec2 dimetions, bool normalised = true);
+			bool shouldDraw(const std::array<glm::vec3, 8>& aabb) const;
+			bool shouldDraw(const std::vector<glm::vec3>& aabb) const;
+		};
 	};
 };
