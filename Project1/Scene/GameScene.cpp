@@ -4,8 +4,11 @@
 #include  "../Context.h"
 #include "../Rendering/Rendering.h"
 #include "../Componets/Camera.h"
+#include "../GameObject/Terrain.h"
+#include "../GameObject/GameObject.h"
+#include "../Primatives/Buffers.h"
 
-GameScene::GameScene() : objects(), preProcessingLayers(), currentTick(0), postProcShaderId(0), FBOs(), backgroundColour(0), skybox(nullptr), mainContext(nullptr), opaque(), transparent(), mainCamera(nullptr)
+GameScene::GameScene() : objects(), preProcessingLayers(), currentTick(0), postProcShaderId(0), FBOs(), backgroundColour(0), skybox(nullptr), mainContext(nullptr), opaque(), transparent(), mainCamera(nullptr), terrain()
 {
 
 }
@@ -32,10 +35,16 @@ void GameScene::drawTransparent()
 		mesh->update(mainContext->getTime().deltaTime);
 		dist = glm::length2(mesh->getParent()->getTransform()->Position - mainCamera->getPos());
 		sorted[dist] = mesh;
-		std::cout << std::to_string(dist) + "\r";
 	}
 	transparent.clear();
 	transparent = sorted;
+}
+
+void GameScene::drawTerrain()
+{
+	for (Terrain* terrain : this->terrain) {
+		terrain->draw();
+	}
 }
 
 void GameScene::addObject(GameObject* obj)
@@ -50,6 +59,16 @@ void GameScene::addObject(GameObject* obj)
 			opaque.push_back(mesh);
 		}
 	}
+}
+
+void GameScene::addTerrain(Terrain* terrain)
+{
+	this->terrain.push_back(terrain);
+}
+
+void GameScene::setBG(Vector3 col) 
+{ 
+	backgroundColour = col; 
 };
 
 void GameScene::preProcess()
@@ -92,12 +111,20 @@ void GameScene::updateScene()
 	}
 }
 
+void GameScene::clearFBO() const 
+{
+	glClearColor(backgroundColour.x, backgroundColour.y, backgroundColour.z, 1);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
 void GameScene::drawObjects()
 {
 	/*for (GameObject*& obj : objects) {
 		obj->tryDraw(mainContext->getTime().deltaTime);
 	}*/
 	drawOpaque();
+	drawTerrain();
+	Render::Shading::Manager::setActive(postProcShaderId);
 	drawTransparent();
 }
 
@@ -155,6 +182,16 @@ void GameScene::addPreProcLayer(const std::string& name, const unsigned& shaderI
 {
 	this->preProcessingLayers[name] = shaderId;	
 }
+
+void GameScene::addFBO(const std::string& layerName, Primative::FrameBuffer* fbo)
+{
+	FBOs.insert({ layerName, fbo });
+};
+
+void GameScene::setPostProcShader(const unsigned& shaderId)
+{
+	postProcShaderId = shaderId;
+};
 
 void GameScene::setSkyBox(SkyBox* sb)
 {

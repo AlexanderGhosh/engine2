@@ -26,7 +26,8 @@ namespace Primative {
 		inline void bind() const { glBindVertexArray(VAO); };
 		inline void unBind() const { glBindVertexArray(0); };
 		inline void draw() const { 
-			glDrawElements(shape_type, num_indices, GL_UNSIGNED_INT, 0); };
+			glDrawElements(shape_type, num_indices, GL_UNSIGNED_INT, 0);
+		};
 		inline void setDrawType(GLenum type) { drawType = type; };
 		String getName() const;
 		void setName(String name);
