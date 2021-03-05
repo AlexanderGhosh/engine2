@@ -8,7 +8,6 @@ layout(std140, binding = 0) uniform Matrices
     mat4 projection;
     vec3 viewPosition;
     float gamma;
-    mat4 lightSpaceMatrix;
 };
 
 out vec2 texCoords;

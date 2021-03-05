@@ -83,9 +83,8 @@ int main() {
 
     Utils::Timer timer("Shaders");
     timer.start();
-    ResourceLoader::createShader("Resources/Shaders/DefaultShader");
-    ResourceLoader::createShader("Resources/Shaders/ShadowShader");
     ResourceLoader::createShader("Resources/Shaders/PBRShader");
+    ResourceLoader::createShader("Resources/Shaders/ShadowShader");
     ResourceLoader::createShader("Resources/Shaders/UIShader");
     ResourceLoader::createShader("Resources/Shaders/TextShader");
     ResourceLoader::createShader("Resources/Shaders/TerrainShader");
@@ -253,9 +252,7 @@ int main() {
     GameScene scene;
     scene.setMainCamera(&cam);
     // scene.addFBO("shadows", frameBuffer);
-    scene.addFBO("final", finalQB);
     // scene.addPreProcLayer("shadows", ResourceLoader::getShader("ShadowShader"));
-    scene.addPreProcLayer("final", ResourceLoader::getShader(PBRen ? "PBRShader" : "DefaultShder"));
     scene.setPostProcShader(ResourceLoader::getShader(PBRen ? "PBRShader" : "DefaultShder")); // PBRShader
     scene.setContext(&main);
 
