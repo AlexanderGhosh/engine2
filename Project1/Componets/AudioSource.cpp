@@ -1,4 +1,5 @@
 #include "AudioSource.h"
+#include "../Primatives/Buffers/SoundBuffer.h"
 #include "../GameObject/GameObject.h"
 
 void Component::AudioSource::update(float deltaTime)
@@ -13,7 +14,7 @@ void Component::AudioSource::update(float deltaTime)
 	alSource3f(source, AL_POSITION, pos.x, pos.y, pos.z);
 }
 
-void Component::AudioSource::addBuffer(Primative::SoundBuffer* buffer) const
+void Component::AudioSource::addBuffer(Primative::Buffers::SoundBuffer* buffer) const
 {
 	alSourcei(source, AL_BUFFER, buffer->getSBO());
 }

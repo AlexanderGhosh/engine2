@@ -5,13 +5,14 @@
 #include <alc.h>
 #include <al.h>
 #include <Audio/AudioReader.h>
+#include "Primatives/Buffers/SoundBuffer.h"
 #define NUM_BUFFERS 1
 
 ALCdevice* SoundManager::device = nullptr;
 ALCcontext* SoundManager::contex = nullptr;
-std::vector<Primative::SoundBuffer> SoundManager::buffers = { };
+std::vector<Primative::Buffers::SoundBuffer> SoundManager::buffers = { };
 
-Primative::SoundBuffer* SoundManager::createBuffer(const std::string& filePath)
+Primative::Buffers::SoundBuffer* SoundManager::createBuffer(const std::string& filePath)
 {
 	unsigned channels, bitDepth;
 	int sampleRate, len;

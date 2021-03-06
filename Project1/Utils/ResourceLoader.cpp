@@ -1,23 +1,26 @@
 #include "ResourceLoader.h"
-#include <array>
-#include <iostream>
 #include <fstream>
 #include <sstream>
 #include <Images/STBImage.h>
+
 #include "AssimpWrapper.h"
 #include "../Primatives/Material.h"
-#include "../Primatives/Buffers.h"
+#include "../Primatives/Buffers/VertexBuffer.h"
 #include "../Primatives/Model.h"
 
+#pragma region Static Variables
 std::string ResourceLoader::defaultShaderName = "";
 std::unordered_map<std::string, unsigned> ResourceLoader::shaders = { };
 std::unordered_map<std::string, unsigned> ResourceLoader::textures = { };
-std::vector<Primative::VertexBuffer> ResourceLoader::buffers = { };
+std::vector<Primative::Buffers::VertexBuffer> ResourceLoader::buffers = { };
 std::unordered_map<std::string, Render::Animation::Animation> ResourceLoader::animations = { };
 std::vector<Materials::Material*> ResourceLoader::materials = { };
 std::unordered_map<std::string, Primative::Model> ResourceLoader::models = { };
+#pragma endregion
 
-std::string ResourceLoader::createShader(const std::string& filePath, bool hasGeom)
+#pragma region Creation
+#pragma region Shaders
+std::string ResourceLoader::createShader(String filePath, bool hasGeom)
 {
     const std::string extensions[] = { "/vertex.glsl", "/geometry.glsl", "/fragment.glsl" };
     std::string codes[] = { "", "", "" };
@@ -30,7 +33,7 @@ std::string ResourceLoader::createShader(const std::string& filePath, bool hasGe
     for (short i = 0; i < 3; i++) {
         if (NOT hasGeom AND i == 1)
             continue;
-        const std::string& extension = extensions[i];
+        String extension = extensions[i];
         std::string& code = codes[i];
         std::ifstream& stream = streams[i];
         const GLenum& type = types[i];
@@ -70,7 +73,7 @@ std::string ResourceLoader::createShader(const std::string& filePath, bool hasGe
     // link shaders
     int shaderProgram = glCreateProgram();
     glAttachShader(shaderProgram, shaders[0]); // vertex
-    if(hasGeom)
+    if (hasGeom)
         glAttachShader(shaderProgram, shaders[1]); // geometry
     glAttachShader(shaderProgram, shaders[2]); // fragment
     glLinkProgram(shaderProgram);
@@ -82,7 +85,7 @@ std::string ResourceLoader::createShader(const std::string& filePath, bool hasGe
     }
 
     glDetachShader(shaderProgram, shaders[0]);
-    if(hasGeom)
+    if (hasGeom)
         glDetachShader(shaderProgram, shaders[1]);
     glDetachShader(shaderProgram, shaders[2]);
     glDeleteShader(shaders[0]);
@@ -92,7 +95,7 @@ std::string ResourceLoader::createShader(const std::string& filePath, bool hasGe
 
     // auto shader_s = Utils::split(filePath, "/");
     const std::string name = Utils::getFileName(filePath);
-    
+
     ResourceLoader::shaders[name] = shaderProgram;
 
     if (ResourceLoader::defaultShaderName == "") {
@@ -101,20 +104,9 @@ std::string ResourceLoader::createShader(const std::string& filePath, bool hasGe
 
     return name;
 }
+#pragma endregion
 
-const unsigned ResourceLoader::getShader(const std::string& name)
-{
-    auto& shaders = ResourceLoader::shaders;
-    unsigned s = shaders.size();
-    unsigned r = shaders[name];
-    if (s < shaders.size()) {
-        r = ResourceLoader::getShader(ResourceLoader::defaultShaderName);
-        shaders.erase(name);
-        return 0;
-    }
-    return r;
-}
-
+#pragma region Matrials
 const Materials::PBR ResourceLoader::createPBR(String dirPath, std::vector<TextureType> types, std::vector<bool> flip)
 {
     const std::vector<unsigned> textures = loadTextureFile(dirPath, types, flip);
@@ -145,7 +137,9 @@ const Materials::PBR ResourceLoader::createPBR(String dirPath, std::vector<Textu
     }
     return *dynamic_cast<Materials::PBR*>(materials.back());
 }
+#pragma endregion
 
+#pragma region Textures
 const std::vector<unsigned> ResourceLoader::loadTextureFile(String dirPath, std::vector<TextureType> types, std::vector<bool> flip)
 {
     const int s = Utils::countFiles(dirPath) - 1;
@@ -175,14 +169,14 @@ const std::vector<unsigned> ResourceLoader::loadTextureFile(String dirPath, std:
         i++;
         if (i == 1)
             continue;
-        if (types[i-2] == TextureType::CubeMap)
+        if (types[i - 2] == TextureType::CubeMap)
             continue;
-        res.push_back(loadTexture(file.path().string(), types[i-2], flip[i-2]));
+        res.push_back(loadTexture(file.path().string(), types[i - 2], flip[i - 2]));
     }
     return res;
 }
 
-const unsigned ResourceLoader::loadTexture(const std::string& filePath, const TextureType type, const bool& flip)
+const unsigned ResourceLoader::loadTexture(String filePath, const TextureType type, const bool& flip)
 {
     stbi_set_flip_vertically_on_load(flip);
     unsigned tex = 0;
@@ -194,7 +188,7 @@ const unsigned ResourceLoader::loadTexture(const std::string& filePath, const Te
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    
+
     int width, height, nrChannels;
     Utils::Timer ti;
     ti.reName("STBI load");
@@ -234,7 +228,7 @@ const unsigned ResourceLoader::loadTexture(const std::string& filePath, const Te
     return tex;
 }
 
-const unsigned ResourceLoader::loadCubeMap(const std::string& dirPath, const std::string& extension, const bool& flip)
+const unsigned ResourceLoader::loadCubeMap(String dirPath, String extension, const bool& flip)
 {
     stbi_set_flip_vertically_on_load(flip);
     unsigned tex = 0;
@@ -283,8 +277,79 @@ const unsigned ResourceLoader::loadCubeMap(const std::string& dirPath, const std
     textures.emplace(Utils::getFileName(dirPath, 0) + ".cm", tex);
     return tex;
 }
+#pragma endregion
 
-const unsigned ResourceLoader::getTexture(const std::string& name)
+#pragma region Models
+#pragma region Utilitys
+const Primative::Model ResourceLoader::processMeshData(std::vector<Primative::Mesh*>& data, String name, GLenum draw_type, const bool deleteAble)
+{
+    std::vector<unsigned> res;
+    if (data.empty()) {
+        return Primative::Model();
+    }
+    auto& model = models[name];
+    for (auto& mesh : data) {
+        buffers.push_back(Primative::Buffers::VertexBuffer(*mesh, draw_type, 35044U, mesh->name));
+        res.push_back(buffers.size() - 1);
+        model.addBuffer(buffers.size() - 1);
+        if (deleteAble)
+            delete mesh;
+        mesh = nullptr;
+    }
+    return model;
+}
+#pragma endregion
+const Primative::Model ResourceLoader::createModel(String filePath, GLenum draw_type)
+{
+    auto data = FileReaders::AssimpWrapper::loadModel(filePath);
+
+    const std::string name = Utils::getFileName(filePath, 1);
+    for (auto itt = std::get<1>(data).begin(); itt != std::get<1>(data).end(); itt++) {
+        animations.insert({ (*itt).getName(), (*itt) });
+    }
+    Primative::Model model = processMeshData(std::get<0>(data), name, draw_type, true);
+    model.setSkeleton(std::get<2>(data));
+    return model;
+}
+
+const Primative::Model ResourceLoader::createModel(Primative::Mesh* meshes, String name, GLenum draw_type, const bool deleteAble)
+{
+    std::vector<Primative::Mesh*> data = { meshes };
+    return createModel(data, name, draw_type, deleteAble);
+}
+
+const Primative::Model ResourceLoader::createModel(std::vector<Primative::Mesh*>& meshes, String name, GLenum draw_type, const bool deleteAble) {
+    return processMeshData(meshes, name, draw_type, deleteAble);
+}
+#pragma endregion
+
+#pragma region Animation
+const Render::Animation::Animation ResourceLoader::createAnimation(String filePath, const Render::Animation::Skeleton& skeleton)
+{
+    auto res = FileReaders::AssimpWrapper::loadAnimation(filePath, skeleton);
+
+    animations.insert({ res.getName(), res });
+    return res;
+}
+#pragma endregion
+
+#pragma endregion
+
+#pragma region Getters
+const unsigned ResourceLoader::getShader(String name)
+{
+    auto& shaders = ResourceLoader::shaders;
+    unsigned s = shaders.size();
+    unsigned r = shaders[name];
+    if (s < shaders.size()) {
+        r = ResourceLoader::getShader(ResourceLoader::defaultShaderName);
+        shaders.erase(name);
+        return 0;
+    }
+    return r;
+}
+
+const unsigned ResourceLoader::getTexture(String name)
 {
     auto& texs = ResourceLoader::textures;
     unsigned s = texs.size();
@@ -295,6 +360,46 @@ const unsigned ResourceLoader::getTexture(const std::string& name)
     }
     return r;
 }
+
+const Primative::Model ResourceLoader::getModel(String name)
+{
+    const unsigned s = models.size();
+    auto& r = models[name];
+    if (s < models.size()) {
+        models.erase(name);
+        return Primative::Model();
+    }
+    return r;
+}
+
+Primative::Buffers::VertexBuffer& ResourceLoader::getBuffer(Unsigned index)
+{
+    return Utils::getElement(buffers, index);
+}
+
+Materials::Material* ResourceLoader::getMaterial(Int index)
+{
+    return Utils::getElement(materials, index);
+}
+
+Render::Animation::Animation* ResourceLoader::getAnimation(String name)
+{
+    const unsigned s = animations.size();
+    Render::Animation::Animation& res = animations[name];
+    if (s != animations.size()) {
+        animations.erase(name);
+        return nullptr;
+    }
+    return &res;
+}
+#pragma endregion
+
+#pragma region Adders
+void ResourceLoader::addMaterial(Materials::Material* mat)
+{
+    materials.push_back(mat);
+}
+#pragma endregion
 
 void ResourceLoader::cleanUp()
 {
@@ -324,90 +429,4 @@ void ResourceLoader::cleanUp()
         itt = animations.erase(itt);
     }
     animations.clear();
-}
-
-const Primative::Model ResourceLoader::processMeshData(std::vector<Primative::Mesh*>& data, const std::string& name, GLenum draw_type, const bool deleteAble)
-{
-    std::vector<unsigned> res;
-    if (data.empty()) {
-        return Primative::Model();
-    }
-    auto& model = models[name];
-    for (auto& mesh : data) {
-        buffers.emplace_back(Primative::VertexBuffer(*mesh, draw_type, 35044U, mesh->name));
-        res.push_back(buffers.size() - 1);
-        model.addBuffer(buffers.size() - 1);
-        if(deleteAble)
-            delete mesh;
-        mesh = nullptr;
-    }
-    return model;
-}
-
-const Primative::Model ResourceLoader::createModel(const std::string& filePath, GLenum draw_type)
-{
-    auto data = FileReaders::AssimpWrapper::loadModel(filePath);
-    
-    const std::string name = Utils::getFileName(filePath, 1);
-    for (auto itt = std::get<1>(data).begin(); itt != std::get<1>(data).end(); itt++) {
-        animations.insert({ (*itt).getName(), (*itt) });
-    }
-    Primative::Model model = processMeshData(std::get<0>(data), name, draw_type, true);
-    model.setSkeleton(std::get<2>(data));
-    return model;
-}
-
-const Primative::Model ResourceLoader::createModel(Primative::Mesh* meshes, const std::string& name, GLenum draw_type, const bool deleteAble)
-{
-    std::vector<Primative::Mesh*> data = { meshes };
-    return createModel(data, name, draw_type, deleteAble);
-}
-
-const Primative::Model ResourceLoader::createModel(std::vector<Primative::Mesh*>& meshes, const std::string& name, GLenum draw_type, const bool deleteAble) {
-    return processMeshData(meshes, name, draw_type, deleteAble);
-}
-
-const Primative::Model ResourceLoader::getModel(const std::string& name)
-{
-    const unsigned s = models.size();
-    auto& r = models[name];
-    if (s < models.size()) {
-        models.erase(name);
-        return Primative::Model();
-    }
-    return r;
-}
-
-Primative::VertexBuffer& ResourceLoader::getBuffer(const unsigned& index)
-{
-    return Utils::getElement(buffers, index);
-}
-
-Materials::Material* ResourceLoader::getMaterial(const int& index)
-{
-    return Utils::getElement(materials, index);
-}
-
-void ResourceLoader::addMaterial(Materials::Material* mat)
-{
-    materials.push_back(mat);
-}
-
-const Render::Animation::Animation ResourceLoader::createAnimation(String filePath, const Render::Animation::Skeleton& skeleton)
-{
-    auto res = FileReaders::AssimpWrapper::loadAnimation(filePath, skeleton);
-
-    animations.insert({ res.getName(), res });
-    return res;
-}
-
-Render::Animation::Animation* ResourceLoader::getAnimation(String name)
-{
-    const unsigned s = animations.size();
-    Render::Animation::Animation& res = animations[name];
-    if (s != animations.size()) {
-        animations.erase(name);
-        return nullptr;
-    }
-    return &res;
 }

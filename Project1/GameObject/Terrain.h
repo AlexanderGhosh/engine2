@@ -1,6 +1,6 @@
 #pragma once
 #include "../Utils/General.h"
-#include "../Primatives/Buffers.h"
+#include "../Primatives/Buffers/VertexBuffer.h"
 #include "../Componets/Componets.h"
 
 class Terrain
@@ -9,7 +9,7 @@ private:
 	void init();
 	int resolution;
 	Component::Transform transform;
-	Primative::VertexBuffer groundBuffer;
+	Primative::Buffers::VertexBuffer groundBuffer;
 	std::vector<unsigned> seperators;
 	unsigned heightMap;
 	std::array<unsigned, 3> textures;

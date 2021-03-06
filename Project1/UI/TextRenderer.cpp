@@ -8,7 +8,7 @@
 unsigned UI::TextRenderer::shaderId = 0;
 std::unordered_map<std::string, UI::TextRenderer*> UI::TextRenderer::loadedFonts = { };
 
-UI::TextRenderer::TextRenderer(const glm::vec2& screenDim, const std::string& fontName) : chars(), VBO(0), VAO(0)
+UI::TextRenderer::TextRenderer(const glm::vec2& screenDim, String fontName) : chars(), VBO(0), VAO(0)
 {
     FT_Library ft;
     // All functions return a value different than 0 whenever an error occurred
@@ -100,7 +100,7 @@ UI::TextRenderer::TextRenderer(const glm::vec2& screenDim, const std::string& fo
     UI::TextRenderer::loadedFonts.insert({ fontName, this });
 }
 
-void UI::TextRenderer::drawText(const std::string& text, float x, float y, float scale, glm::vec3 color) const
+void UI::TextRenderer::drawText(String text, float x, float y, float scale, glm::vec3 color) const
 {
     glEnable(GL_BLEND);
     Render::Shading::Manager::setActive(UI::TextRenderer::shaderId);
@@ -150,7 +150,7 @@ void UI::TextRenderer::drawText(const std::string& text, float x, float y, float
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-const glm::vec2& UI::TextRenderer::getStringDimentions(const std::string& text, const unsigned& scale) const
+const glm::vec2& UI::TextRenderer::getStringDimentions(String text, Unsigned scale) const
 {
     glm::vec2 res(0, -INFINITY);
     std::string::const_iterator c;
@@ -167,7 +167,7 @@ const glm::vec2& UI::TextRenderer::getStringDimentions(const std::string& text, 
     return res;
 }
 
-UI::TextRenderer* UI::TextRenderer::getFont(const std::string& name)
+UI::TextRenderer* UI::TextRenderer::getFont(String name)
 {
     unsigned s = UI::TextRenderer::loadedFonts.size();
     UI::TextRenderer* r = UI::TextRenderer::loadedFonts[name];

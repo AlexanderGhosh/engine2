@@ -7,7 +7,7 @@
 bool Terrain::gottenShader = false;
 unsigned Terrain::shader = 0;
 
-Terrain::Terrain() : resolution(), transform(), groundBuffer(), seperators(), textures()
+Terrain::Terrain() : resolution(), transform(), groundBuffer(), seperators(), textures(), heightMap(0)
 {
 	if (NOT gottenShader) {
 		shader = ResourceLoader::getShader("TerrainShader");
@@ -54,7 +54,7 @@ void Terrain::init()
 		}
 	}
 	getIndices(mesh.indices, resolution);
-	groundBuffer = Primative::VertexBuffer(mesh, GL_TRIANGLES);
+	groundBuffer = Primative::Buffers::VertexBuffer(mesh, GL_TRIANGLES);
 }
 
 
@@ -63,20 +63,18 @@ void Terrain::draw()
 	glDisable(GL_CULL_FACE);
 	Render::Shading::Manager::setActive(shader);
 	Render::Shading::Manager::setValue("model", transform.getModel());
-
+	
 	glActiveTexture(GL_TEXTURE0);
 	Render::Shading::Manager::setValue("hm", 0);
 	glBindTexture(GL_TEXTURE_2D, heightMap);
-
+	
 	for (char i = 0; i < 3; i++) {
 		glActiveTexture(GL_TEXTURE1 + i);
 		Render::Shading::Manager::setValue("textures[" + std::to_string(i) + "]", i + 1);
 		glBindTexture(GL_TEXTURE_2D, textures[i]);
 	}
 
-	groundBuffer.bind();
-	groundBuffer.draw();
-	groundBuffer.unBind();
+	groundBuffer.render();
 	glEnable(GL_CULL_FACE);
 }
 

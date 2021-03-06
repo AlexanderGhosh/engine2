@@ -4,11 +4,12 @@
 #include "Panes/Grid.h"
 #include "../Primatives/Mesh.h"
 #include "../Primatives/Vertex.h"
-#include "../Primatives/buffers.h"
+#include "../Primatives/Buffers/VertexBuffer.h"
+#include "../Primatives/Buffers/UniformBuffer.h"
 
 unsigned UI::UIRenderer::shaderId = 0;
-Primative::VertexBuffer UI::UIRenderer::quadBuffer = { };
-Primative::StaticBuffer UI::UIRenderer::uiBuffer = { };
+Primative::Buffers::VertexBuffer UI::UIRenderer::quadBuffer = { };
+Primative::Buffers::StaticBuffer UI::UIRenderer::uiBuffer = { };
 
 void UI::UIRenderer::init(const unsigned& shaderId, const glm::vec2& screenDim)
 {
@@ -25,9 +26,9 @@ void UI::UIRenderer::init(const unsigned& shaderId, const glm::vec2& screenDim)
 		0, 1, 2,
 		3, 2, 1
 	};
-	quadBuffer = Primative::VertexBuffer(mesh);
+	quadBuffer = Primative::Buffers::VertexBuffer(mesh);
 
-	uiBuffer = Primative::StaticBuffer("m4", 1);
+	uiBuffer = Primative::Buffers::StaticBuffer("m4", 2);
 	// uiBuffer.init(sizeof(glm::mat4), 1);
 	glm::mat4 proj = glm::ortho(0.0f, screenDim.x, 0.0f, screenDim.y);
 	uiBuffer.fill(0, glm::value_ptr(proj));

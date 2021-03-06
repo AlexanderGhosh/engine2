@@ -4,7 +4,9 @@
 #include "Componets.h"
 
 namespace Primative {
-	class TextureBuffer;
+	namespace Buffers {
+		class TextureBuffer;
+	}
 }
 namespace Render {
 	namespace Animation {
@@ -21,13 +23,13 @@ namespace Component {
 		std::string activeAnimation;
 		float runTime;
 		bool running;
-		static Primative::TextureBuffer bonesBuffer;
+		static Primative::Buffers::TextureBuffer bonesBuffer;
 		static bool initalized;
 		bool isActive();
 	public:
 		Animated();
 		~Animated() = default;
-		void startAnimation(const std::string& name, bool start = true);
+		void startAnimation(String name, bool start = true);
 		void stopAnimation();
 		void playAnimation();
 		void togglePlay();

@@ -6,11 +6,13 @@
 #include "../Componets/Camera.h"
 #include "../GameObject/Terrain.h"
 #include "../GameObject/GameObject.h"
-#include "../Primatives/Buffers.h"
+#include "../Utils/ResourceLoader.h"
+#include "../Primatives/Buffers/FrameBuffer.h"
 
-GameScene::GameScene() : objects(), preProcessingLayers(), currentTick(0), postProcShaderId(0), FBOs(), backgroundColour(0), skybox(nullptr), mainContext(nullptr), opaque(), transparent(), mainCamera(nullptr), terrain()
+GameScene::GameScene() : objects(), preProcessingLayers(), currentTick(0), postProcShaderId(0), FBOs(), backgroundColour(0),
+							skybox(nullptr), mainContext(nullptr), opaque(), transparent(), mainCamera(nullptr), terrain(), quadModel()
 {
-
+	quadModel = ResourceLoader::getModel("plane.dae");
 }
 
 void GameScene::drawOpaque()
@@ -78,16 +80,20 @@ void GameScene::preProcess()
 		const unsigned& shaderId = layer.second;
 		const auto& fbo = getFBO(name);
 		fbo->bind();
-		clearFBO();
+		fbo->clearBits();
 		Render::Shading::Manager::setActive(shaderId);
 
-		if (name == "shadows") {
-			glCullFace(GL_FRONT);
-		}
+		// if (name == "shadows") {
+		// 	glEnable(GL_DEPTH_TEST);
+		// 	//glCullFace(GL_FRONT);
+		// 	drawOpaque();
+		// 	glCullFace(GL_BACK);
+		// }
 
-		drawObjects();
 		drawSkyBox();
-		glCullFace(GL_BACK);
+		//drawTerrain();
+		drawObjects(shaderId);
+		fbo->unBind();
 	}
 }
 
@@ -95,13 +101,22 @@ void GameScene::postProcess()
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0); // default fbo
 	clearFBO();
-	//Render::Shading::Manager::setValue("depthMap", 3); // depth map
-	/*glActiveTexture(GL_TEXTURE3);
-	glBindTexture(GL_TEXTURE, FBOs["shadows"]->getTextureId("depth"));*/
 
-	drawSkyBox();
+
 	Render::Shading::Manager::setActive(postProcShaderId);
-	drawObjects();
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, FBOs["shadows"]->getTexture("col0"));
+	Render::Shading::Manager::setValue("tex", 0);
+
+
+
+	const Primative::Buffers::VertexBuffer& buffer = ResourceLoader::getBuffer(quadModel.getBuffers()[0]);
+	buffer.render();
+
+
+	// drawSkyBox();
+	// drawObjects(postProcShaderId);
 }
 
 void GameScene::updateScene()
@@ -117,14 +132,12 @@ void GameScene::clearFBO() const
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void GameScene::drawObjects()
+void GameScene::drawObjects(Unsigned shaderId)
 {
-	/*for (GameObject*& obj : objects) {
-		obj->tryDraw(mainContext->getTime().deltaTime);
-	}*/
+	Render::Shading::Manager::setActive(shaderId);
 	drawOpaque();
 	drawTerrain();
-	Render::Shading::Manager::setActive(postProcShaderId);
+	Render::Shading::Manager::setActive(shaderId);
 	drawTransparent();
 }
 
@@ -141,7 +154,7 @@ void GameScene::drawSkyBox()
 	mainContext->enable(GL_DEPTH_TEST);
 }
 
-const Primative::FrameBuffer* GameScene::getFBO(const std::string& name)
+const Primative::Buffers::FrameBuffer* GameScene::getFBO(const std::string& name)
 {
 	if (name == "any") {
 		return (*FBOs.begin()).second;
@@ -164,9 +177,9 @@ void GameScene::cleanUp()
 	}
 	objects.clear();
 	for (auto& pair : FBOs) {
-		Primative::FrameBuffer*& fbo = pair.second;
+		Primative::Buffers::FrameBuffer*& fbo = pair.second;
 		fbo->cleanUp();
-		delete fbo;
+		//delete fbo;
 		fbo = nullptr;
 	}
 	FBOs.clear();
@@ -183,7 +196,7 @@ void GameScene::addPreProcLayer(const std::string& name, const unsigned& shaderI
 	this->preProcessingLayers[name] = shaderId;	
 }
 
-void GameScene::addFBO(const std::string& layerName, Primative::FrameBuffer* fbo)
+void GameScene::addFBO(const std::string& layerName, Primative::Buffers::FrameBuffer* fbo)
 {
 	FBOs.insert({ layerName, fbo });
 };

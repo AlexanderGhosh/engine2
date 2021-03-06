@@ -1,35 +1,22 @@
 #include "Rendering.h"
 
 #include "Shading/Manager.h"
-#include "../Componets/Componets.h"
-#include "../GameObject/GameObject.h"
+#include "Animation/Animation.h"
 #include "../Componets/Animated.h"
+#include "../Utils/ResourceLoader.h"
+#include "../Primatives/Buffers/VertexBuffer.h"
+#include "../GameObject/GameObject.h"
+#include "../Primatives/Material.h"
 
 Component::RenderMesh::RenderMesh() : model(), materials(), animatedComponet(nullptr), Component::ComponetBase()
 {
-	/*Materials::Forward* fwd = DBG_NEW Materials::Forward();
-	fwd->getDiffuse()(1); // set to the texture id
-	// fwd.getDiffuse()({ 1, 0, 0 });
-	fwd->getSpecular()(2);
-	fwd->getNormals()(3);
-	fwd->shininess = 32;
-	this->material = fwd;
-
-	Materials::PBR* prb = DBG_NEW Materials::PBR();
-	prb->getAlbedo()(1);
-	prb->getAO()({ 1, 1, 1 });
-	prb->getNormal()(3);
-	prb->getMetalic()(2); // { 1.0f/7.0f, 0, 0 }
-	prb->getRoughness()({ 0.025, 0.1, 0.1 });
-	this->material = prb;*/
 }
-
 
 void Component::RenderMesh::update(float deltaTime)
 {
 	glm::mat4 m(1);
 	if(parent)
-		m = Component::ComponetBase::parent->getTransform()->getModel();
+		m = parent->getTransform()->getModel();
 	Render::Shading::Manager::setValue("model", m);
 	/*if (materials.size() == 1) {
 		Materials::Material* material = materials[0];
@@ -44,7 +31,7 @@ void Component::RenderMesh::update(float deltaTime)
 
 	const auto& buffers = model.getBuffers();
 	for (short i = 0; i < buffers.size(); i++) {
-		Primative::VertexBuffer& buffer = ResourceLoader::getBuffer(buffers[i]);
+		Primative::Buffers::VertexBuffer& buffer = ResourceLoader::getBuffer(buffers[i]);
 		const Materials::Material* material = materials[i];
 		if (material) {
 			Render::Shading::Manager::setValue("material", material); // sets values to the samplers
@@ -79,7 +66,7 @@ void Component::RenderMesh::setMaterialTo(Materials::Material* material, String 
 {
 	unsigned i = 0;
 	for (Unsigned buff : model.getBuffers()) {
-		const Primative::VertexBuffer& vertexBuffer = ResourceLoader::getBuffer(buff);
+		const Primative::Buffers::VertexBuffer& vertexBuffer = ResourceLoader::getBuffer(buff);
 		if (vertexBuffer.getName() == meshName) {
 			materials[i] = material;
 			return;

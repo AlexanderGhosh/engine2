@@ -2,15 +2,18 @@
 layout(location = 0) in vec3 pos;
 layout(location = 1) in vec2 tex;
 
-layout(std140, binding = 2) uniform Matrices
+layout(std140, binding = 0) uniform Matrices
 {
+    mat4 view;
     mat4 projection;
+    vec3 viewPosition;
+    float gamma;
 };
 
 out vec2 texCoords;
-uniform mat4 model;
 
 void main() {
-	gl_Position = projection * model * vec4(pos, 1);
+	gl_Position = vec4(pos, 1);
     texCoords = tex;
+    texCoords.y *= -1;
 }

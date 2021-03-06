@@ -1,26 +1,29 @@
 #pragma once
-#include <vector>
-#include "../Primatives/Buffers.h"
-#include "../Utils/ResourceLoader.h"
-#include "../Primatives/Mesh.h"
-#include "../Primatives/Model.h"
-#include "Animation/Animation.h"
+#include <GL/glew.h>
 #include "../Componets/Componets.h"
-#include "../Primatives/Material.h"
+#include "../Utils/General.h"
+#include "../Primatives/Model.h"
+
+namespace Materials {
+	class Material;
+}
 namespace Component {
 	class Animated;
-	class RenderMesh : public Component::ComponetBase // special case of animation with only one frame
+	class RenderMesh : public ComponetBase
 	{
 	public:
 		RenderMesh();
 		~RenderMesh() = default;
-		virtual void update(float deltaTime);
+
+		void update(float deltaTime);
 		void setModel(const Primative::Model model, const GLenum draw_type = GL_TRIANGLES);
 		void setMaterial(Materials::Material* material);
-		void setMaterialTo(Materials::Material * material, String meshName);
+		void setMaterialTo(Materials::Material* material, String meshName);
+
 		inline Component::Type getType() const {
 			return Component::Type::RenderMesh;
 		}
+
 		void setTransparent(bool transparent);
 		const bool getTransparent() const;
 

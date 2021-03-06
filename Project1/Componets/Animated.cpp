@@ -1,9 +1,9 @@
 #include "Animated.h"
 #include "../Rendering/Animation/Animation.h"
 #include "../Rendering/Shading/Manager.h"
-#include "../Primatives/Buffers.h"
+#include "../Primatives/Buffers/ArrayBuffer.h"
 
-Primative::TextureBuffer Component::Animated::bonesBuffer = {};
+Primative::Buffers::TextureBuffer Component::Animated::bonesBuffer = {};
 bool Component::Animated::initalized = false;
 
 bool Component::Animated::isActive()
@@ -14,11 +14,11 @@ bool Component::Animated::isActive()
 Component::Animated::Animated() : animations(), activeAnimation(""), runTime(0), running(false)
 {
 	if (NOT initalized) {
-		bonesBuffer = Primative::TextureBuffer("f", sizeof(float) * MAX_NUM_BONES * 16);
+		bonesBuffer = Primative::Buffers::TextureBuffer("f", sizeof(float) * MAX_NUM_BONES * 16);
 	}
 }
 
-void Component::Animated::startAnimation(const std::string& name, bool start)
+void Component::Animated::startAnimation(String name, bool start)
 {
 	if (NOT animations.size())
 		return;

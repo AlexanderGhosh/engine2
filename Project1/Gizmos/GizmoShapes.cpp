@@ -1,5 +1,5 @@
 #include "GizmoShapes.h"
-#include "../Primatives/Buffers.h" // for the buffer functions
+#include "../Primatives/Buffers/VertexBuffer.h" // for the buffer functions
 #include "../Rendering/Shading/Manager.h"
 #include "../Utils/ResourceLoader.h"
 
@@ -215,7 +215,7 @@ void Gizmos::Cuboide::draw() {
 	glDisable(GL_CULL_FACE);
 	const auto& buffers = cubeModel.getBuffers();
 	for (short i = 0; i < buffers.size(); i++) {
-		Primative::VertexBuffer& buffer = ResourceLoader::getBuffer(buffers[i]);
+		Primative::Buffers::VertexBuffer& buffer = ResourceLoader::getBuffer(buffers[i]);
 		buffer.bind();
 		buffer.draw();
 		buffer.unBind();

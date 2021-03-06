@@ -40,6 +40,8 @@
 #include "Gizmos/GizmoRenderer.h"
 #include "Gizmos/GizmoShapes.h"
 #include "GameObject/Terrain.h"
+#include "Primatives/Buffers/FrameBuffer.h"
+#include "Primatives/Buffers/UniformBuffer.h"
 
 #include "MainWindow.h"
 #include "Context.h"
@@ -88,6 +90,7 @@ int main() {
     ResourceLoader::createShader("Resources/Shaders/UIShader");
     ResourceLoader::createShader("Resources/Shaders/TextShader");
     ResourceLoader::createShader("Resources/Shaders/TerrainShader");
+    ResourceLoader::createShader("Resources/Shaders/PostShader");
     Gizmos::GizmoRenderer::init();
     timer.log();
 
@@ -217,12 +220,25 @@ int main() {
     
     timer.reName("Static Buffers");
     timer.start();
-    Primative::StaticBuffer b("m4, m4, v3, f, m4", 0);
+    Primative::Buffers::StaticBuffer b("m4, m4, v3, f, m4", 0);
     // view    | matrix 4
     // proj    | matrix 4
     // viewPos | vector 3
     // gamma   | scalar f
     // lspaceM | matrix 4
+    Primative::Buffers::StaticBuffer shadowUBO("m4, m4", 1);
+    // view    | matrix 4
+    // proj    | matrix 4
+
+    glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 0.1f, 100.0f);
+
+    glm::mat4 lightView = glm::lookAt(
+        glm::vec3(5),
+        glm::vec3(0),
+        Utils::yAxis());
+    shadowUBO.fill(0, glm::value_ptr(lightProjection));
+    shadowUBO.fill(1, glm::value_ptr(lightView));
+
     
     glm::mat4 projection = glm::perspective(glm::radians(cam.getFOV()), 800.0f / 600.0f, 0.01f, 5000.0f);
     
@@ -230,30 +246,21 @@ int main() {
     
     float gamma = 2.2f;
     b.fill(3, &gamma);
-    
-    glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 0.1f, 100.0f);
-    
-    glm::mat4 lightView = glm::lookAt(
-        glm::vec3(10, 10 ,10),
-        glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec3(0.0f, 1.0f, 0.0f));
-    glm::mat4 lightSpaceMatrix = lightProjection * lightView;
-    
-    b.fill(4, value_ptr(lightSpaceMatrix));
 
     timer.log();
     timer.stop();
 
     timer.reName("Scene");
     timer.start();
-    // Primative::FrameBuffer* frameBuffer = DBG_NEW Primative::FrameBuffer({ "depth" }, { 800, 600 });
-    Primative::MSAABuffer* finalQB = DBG_NEW Primative::MSAABuffer({ "col" }, { 800, 600 });
+    Primative::Buffers::FrameBuffer shadowFBO({ "col0" }, { 800, 600 }, { 1, 0, 1 });
+    //Primative::MSAABuffer* finalQB = DBG_NEW Primative::MSAABuffer({ "col" }, { 800, 600 });
 
     GameScene scene;
     scene.setMainCamera(&cam);
-    // scene.addFBO("shadows", frameBuffer);
-    // scene.addPreProcLayer("shadows", ResourceLoader::getShader("ShadowShader"));
-    scene.setPostProcShader(ResourceLoader::getShader(PBRen ? "PBRShader" : "DefaultShder")); // PBRShader
+    scene.addFBO("shadows", &shadowFBO);
+    scene.addPreProcLayer("shadows", ResourceLoader::getShader("PBRShader"));
+    // scene.setPostProcShader(ResourceLoader::getShader(PBRen ? "PBRShader" : "DefaultShder")); // PostShader
+    scene.setPostProcShader(ResourceLoader::getShader("PostShader")); // PBRShader
     scene.setContext(&main);
 
     scene.addObject(&manObject);
@@ -261,7 +268,7 @@ int main() {
     scene.addObject(&yellowWindow);
     scene.addTerrain(&land);
 
-    scene.setBG({ 1, 1, 0 });
+    scene.setBG({ 1, 0, 0 });
     timer.log();
 
     // SKYBOX //
@@ -312,11 +319,9 @@ int main() {
     //cube2->getRigidbody()->velocityAdder({ 1, -1, 0 });
 
     Gizmos::Sphere gizmo1({ 0, 0, 0 }, { 1, 1, 0 });
+    gizmo1.setColour({ 1, 0, 0 });
     gizmo1.setThickness(2);
     Gizmos::GizmoRenderer::addGizmo(&gizmo1);
-    Gizmos::Line gizmo2({ 0, 0, 0 }, { 1, 1, 0 }, true);
-    gizmo2.setThickness(2);
-    Gizmos::GizmoRenderer::addGizmo(&gizmo2);
 
     float counter = 0;
     while (!main.shouldClose())
@@ -339,7 +344,7 @@ int main() {
         b.fill(0, value_ptr(cam.getView()));
         b.fill(2, value_ptr(cam.getPos())); 
     
-        // scene.preProcess(); // shadows and scene quad
+        scene.preProcess(); // shadows and scene quad
         scene.postProcess();// render to screen
         UI::UIRenderer::render(&tb);
         Gizmos::GizmoRenderer::drawAll();

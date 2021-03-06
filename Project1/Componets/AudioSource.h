@@ -1,8 +1,12 @@
 #pragma once
 #include "Componets.h"
-#include "../Primatives/Buffers.h"
 #include <al.h>
 
+namespace Primative {
+    namespace Buffers {
+        class SoundBuffer;
+    }
+}
 namespace Component {
     class AudioSource : public ComponetBase
     {
@@ -20,7 +24,7 @@ namespace Component {
             alGetSourcei(source, AL_SOURCE_STATE, &res);
             return res == AL_PLAYING;
         }
-        void addBuffer(Primative::SoundBuffer* buffer) const;
+        void addBuffer(Primative::Buffers::SoundBuffer* buffer) const;
         void cleanUp();
         inline Type getType() const { return Type::AudioSource; };
     };

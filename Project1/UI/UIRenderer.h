@@ -1,17 +1,19 @@
 #pragma once
-#include "../Primatives/Buffers.h"
 #include "Panes/Pane.h"
 #include "Page.h"
+
 namespace  Primative {
-	class VertexBuffer;
-	class StaticBuffer;
+	namespace Buffers {
+		class VertexBuffer;
+		class StaticBuffer;
+	}
 }
 namespace UI {
 	class UIRenderer
 	{
 		static unsigned shaderId;
-		static Primative::VertexBuffer quadBuffer;
-		static Primative::StaticBuffer uiBuffer;
+		static Primative::Buffers::VertexBuffer quadBuffer;
+		static Primative::Buffers::StaticBuffer uiBuffer;
 	public:
 		static void init(const unsigned& shaderId, const glm::vec2& screenDim);
 		static void render(const Pane* pane);
