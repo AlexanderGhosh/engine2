@@ -37,9 +37,7 @@ void Component::RenderMesh::update(float deltaTime)
 			Render::Shading::Manager::setValue("material", material); // sets values to the samplers
 			material->activateTextures(); // activates the texture units and binds the ids
 		}
-		buffer.bind();
-		buffer.draw();
-		buffer.unBind();
+		buffer.render();
 	}
 	if (animatedComponet)
 		animatedComponet->unbind();

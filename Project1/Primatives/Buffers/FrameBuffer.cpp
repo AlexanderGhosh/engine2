@@ -30,8 +30,6 @@ Primative::Buffers::FrameBuffer::FrameBuffer(const std::vector<std::string>& tex
 		std::cout << "Failed to create FBO" << std::endl;
 	}
 	unBind();
-
-
 }
 
 void Primative::Buffers::FrameBuffer::initalize()

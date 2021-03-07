@@ -89,6 +89,7 @@ void GameScene::preProcess()
 			glCullFace(GL_BACK);
 		}
 		else {
+			drawSkyBox();
 			drawObjects(shaderId);
 		}
 		fbo->unBind();
@@ -107,9 +108,8 @@ void GameScene::postProcess()
 	glBindTexture(GL_TEXTURE_2D, FBOs["final"]->getTexture("col0"));
 	Render::Shading::Manager::setValue("tex", 0);
 
-
-
 	const Primative::Buffers::VertexBuffer& buffer = ResourceLoader::getBuffer(quadModel.getBuffers()[0]);
+	//drawSkyBox();
 	buffer.render();
 
 
