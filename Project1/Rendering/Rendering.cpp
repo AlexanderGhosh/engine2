@@ -26,7 +26,7 @@ void Component::RenderMesh::update(float deltaTime)
 	if (animatedComponet) {
 		const Render::Animation::KeyFrame frame = animatedComponet->getCurrentFrame();
 		// Render::Shading::Manager::setValue("bones", frame);
-		animatedComponet->bind();
+		animatedComponet->bind(); // bound to unit 0
 	}
 
 	const auto& buffers = model.getBuffers();
@@ -34,8 +34,9 @@ void Component::RenderMesh::update(float deltaTime)
 		Primative::Buffers::VertexBuffer& buffer = ResourceLoader::getBuffer(buffers[i]);
 		const Materials::Material* material = materials[i];
 		if (material) {
-			Render::Shading::Manager::setValue("material", material); // sets values to the samplers
-			material->activateTextures(); // activates the texture units and binds the ids
+			int unit = 1;
+			Render::Shading::Manager::setValue("material", material, unit); // sets values to the samplers
+			material->activateTextures(unit); // activates the texture units and binds the ids
 		}
 		buffer.render();
 	}

@@ -1,16 +1,17 @@
 #pragma once
 #include <glm.hpp>
 #include <string>
+#include "../Primatives/Material.h"
 
-namespace Component {
-	class RenderMesh;
+namespace Primative {
+	class Model;
 }
 class SkyBox
 {
 private:
 	static unsigned shaderId;
 	int texId;
-	Component::RenderMesh* mesh;
+	static Primative::Model model;
 public:
 	SkyBox();
 	SkyBox(const int& texId);

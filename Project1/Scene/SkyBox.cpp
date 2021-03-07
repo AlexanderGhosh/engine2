@@ -1,23 +1,19 @@
 #include "SkyBox.h"
 #include "../Utils/ResourceLoader.h"
 #include "../Rendering/Shading/Manager.h"
-#include "../Rendering/Rendering.h"
-#include "../GameObject/GameObject.h"
-#include "../Primatives/Mesh.h"
-#include "../Primatives/Vertex.h"
+#include "../Primatives/Model.h"
+#include "../Primatives/Buffers/VertexBuffer.h"
 
 unsigned SkyBox::shaderId = 0;
-SkyBox::SkyBox() : texId(0), mesh(nullptr)
+Primative::Model SkyBox::model = { };
+SkyBox::SkyBox() : texId(0)
 {
 	if (!shaderId) {
-		ResourceLoader::createShader("Resources/Shaders/SkyBoxShader");
 		shaderId = ResourceLoader::getShader("SkyBoxShader");
 	}
-	if (!mesh) {
-		mesh = DBG_NEW Component::RenderMesh();
-		// auto model = ResourceLoader::getModel("cube.obj");
-		auto m = ResourceLoader::getModel("cube.obj");
-		mesh->setModel(m);
+	
+	if (!model.hasMesh()) {
+		model = ResourceLoader::getModel("cube.obj");
 	}
 }
 
@@ -37,16 +33,12 @@ void SkyBox::draw()
 	Render::Shading::Manager::setValue("skybox", 0);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, texId);
-	mesh->update(0);
+	ResourceLoader::getBuffer(model.getBuffers()[0]).render();
 }
 
 void SkyBox::cleanUp()
 {
-    if (mesh) {
-        mesh->cleanUp();
-        delete mesh;
-        mesh = nullptr;
-    }
+	model.cleanUp();
 }
 
 void SkyBox::setTexture(const int& texId)

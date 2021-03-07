@@ -9,6 +9,19 @@ layout(std140, binding = 0) uniform Matrices
     vec3 viewPosition;
     float gamma;
 };
+layout(std140, binding = 1) uniform LSMatrices
+{
+    mat4 lsMatrix;
+};
+
+out VS_OUT{
+    vec3 normals;
+    vec2 texCoords;
+    vec3 worldPos;
+    vec3 camPos;
+    vec4 ws;
+    vec4 lsPos;
+} vs_out;
 
 out vec2 texCoords;
 out float height;
@@ -24,4 +37,9 @@ void main() {
     //p.y = height;
     texCoords = tex;
 	gl_Position = projection * view * model * vec4(p, 1);
+    vs_out.worldPos = vec3(model * vec4(p, 1));
+    vs_out.normals = mat3(model) * vec3(0, 1, 0);
+    vs_out.camPos = viewPosition;
+    vs_out.texCoords = tex;
+    vs_out.lsPos = lsMatrix * vec4(vs_out.worldPos, 1);
 }

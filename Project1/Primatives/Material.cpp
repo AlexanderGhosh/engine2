@@ -27,7 +27,7 @@ Materials::Forward::Forward(const MatItem& diffuse, const MatItem& specular, con
 	Material::type = Materials::Type::Forward;
 }
 
-void Materials::Forward::activateTextures() const
+void Materials::Forward::activateTextures(int unit) const
 {
 	for (short i = 0; i < diff_spec_norm.size(); i++) {
 		const auto& d_s = this->diff_spec_norm[i];
@@ -47,9 +47,8 @@ Materials::PBR::PBR(const MatItem& albedo, const MatItem& normal, const MatItem&
 	Material::type = Materials::Type::PBR;
 }
 
-void Materials::PBR::activateTextures() const
+void Materials::PBR::activateTextures(int unit) const
 {
-	short unit = 1;
 	for (const Materials::MatItem& item : getAll()) {
 		if (!item.hasTex()) continue;
 		glActiveTexture(GL_TEXTURE0 + unit++);

@@ -7,7 +7,7 @@
 bool Terrain::gottenShader = false;
 unsigned Terrain::shader = 0;
 
-Terrain::Terrain() : resolution(), transform(), groundBuffer(), seperators(), textures(), heightMap(0)
+Terrain::Terrain() : resolution(), transform(), groundBuffer(), seperators(), textures(), heightMap(0), material()
 {
 	if (NOT gottenShader) {
 		shader = ResourceLoader::getShader("TerrainShader");
@@ -68,11 +68,8 @@ void Terrain::draw()
 	Render::Shading::Manager::setValue("hm", 0);
 	glBindTexture(GL_TEXTURE_2D, heightMap);
 	
-	for (char i = 0; i < 3; i++) {
-		glActiveTexture(GL_TEXTURE1 + i);
-		Render::Shading::Manager::setValue("textures[" + std::to_string(i) + "]", i + 1);
-		glBindTexture(GL_TEXTURE_2D, textures[i]);
-	}
+	material.activateTextures(1);
+	Render::Shading::Manager::setValue("material", &material, 1);
 
 	groundBuffer.render();
 	glEnable(GL_CULL_FACE);
@@ -81,6 +78,7 @@ void Terrain::draw()
 void Terrain::cleanUp()
 {
 	groundBuffer.cleanUp();
+	material.cleanUp();
 }
 
 void Terrain::setHeightMap(unsigned tex)
@@ -93,6 +91,11 @@ void Terrain::setTextures(Unsigned tex1, Unsigned tex2, Unsigned tex3)
 	textures = {
 		tex1, tex2, tex3
 	};
+}
+
+Materials::PBR& Terrain::getMaterial()
+{
+	return material;
 }
 
 Component::Transform& Terrain::getTransform()

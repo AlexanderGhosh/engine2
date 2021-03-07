@@ -1,8 +1,7 @@
 #pragma once
 #include <GL/glew.h>
-#include <string>
-#include <glm.hpp>
-#include <gtc/type_ptr.hpp>
+#include "../../Utils/General.h"
+
 namespace Materials {
 	class MatItem;
 	class Material;
@@ -17,21 +16,21 @@ namespace Render {
 		class Manager
 		{
 		public:
-			static bool setValue(const std::string& name, int val);
-			static bool setValue(const std::string& name, float val);
-			static bool setValue(const std::string& name, glm::vec2 val);
-			static bool setValue(const std::string& name, glm::vec3 val);
-			static bool setValue(const std::string& name, glm::vec4 val);
-			static bool setValue(const std::string& name, glm::mat3 val);
-			static bool setValue(const std::string& name, glm::mat4 val);
-			static bool setValue(const std::string& name, const Materials::MatItem& fwd, short& texUnit);
-			static bool setValue(const std::string& name, const Materials::Material*mat);
-			static bool setValue(const std::string& name, const Render::Animation::KeyFrame& frame);
-			static void setActive(const unsigned& shaderId);
+			static bool setValue(String name, int val);
+			static bool setValue(String name, float val);
+			static bool setValue(String name, glm::vec2 val);
+			static bool setValue(String name, glm::vec3 val);
+			static bool setValue(String name, glm::vec4 val);
+			static bool setValue(String name, glm::mat3 val);
+			static bool setValue(String name, glm::mat4 val);
+			static bool setValue(String name, const Materials::MatItem& fwd, int& texUnit);
+			static bool setValue(String name, const Materials::Material*mat, int unit);
+			static bool setValue(String name, const Render::Animation::KeyFrame& frame);
+			static bool setValue(String name, const Materials::Forward& fwd);
+			static bool setValue(String name, const Materials::PBR& mat, int unit);
+			static void setActive(Unsigned shaderId);
 			static void cleanUp();
 		private:
-			static bool setValue(const std::string& name, const Materials::Forward& fwd);
-			static bool setValue(const std::string& name, const Materials::PBR& mat);
 			static unsigned active;
 		};
 	}

@@ -8,6 +8,7 @@
 #include <gtc/matrix_transform.hpp>
 #include <gtx/string_cast.hpp>
 #include <gtx/matrix_decompose.hpp>
+#include <gtc/type_ptr.hpp>
 
 
 #include "Rendering/Rendering.h"
@@ -45,9 +46,6 @@
 
 #include "MainWindow.h"
 #include "Context.h"
-
-
-#define PBRen 1
 
 Component::Camera cam;
 bool firstMouse = 1;
@@ -91,6 +89,7 @@ int main() {
     ResourceLoader::createShader("Resources/Shaders/TextShader");
     ResourceLoader::createShader("Resources/Shaders/TerrainShader");
     ResourceLoader::createShader("Resources/Shaders/PostShader");
+    ResourceLoader::createShader("Resources/Shaders/SkyBoxShader");
     Gizmos::GizmoRenderer::init();
     timer.log();
 
@@ -214,6 +213,9 @@ int main() {
     land.getTransform().Scale = { 1000, 500 ,1000 };
     land.setHeightMap(hm);
     land.setTextures(0, 0, 0);
+    land.getMaterial().setBRDFtex(brdf);
+    land.getMaterial().setHDRmap(hdr);
+    land.getMaterial().setIBLmap(ibl);
 
 
     
@@ -263,7 +265,7 @@ int main() {
     scene.addObject(&yellowWindow);
     scene.addTerrain(&land);
 
-    scene.setBG({ 1, 0, 0 });
+    scene.setBG({ 1, 0, 0 }); 
     timer.log();
 
     // SKYBOX //

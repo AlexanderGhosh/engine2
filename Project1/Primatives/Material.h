@@ -11,7 +11,7 @@ namespace Materials {
 		Materials::Type type;
 		Material();
 	public:
-		virtual void activateTextures() const { };
+		virtual void activateTextures(int unit = 0) const { };
 		inline const Materials::Type& getType() const { return type; };
 		virtual void cleanUp() = 0;
 		virtual ~Material() = default;
@@ -47,7 +47,7 @@ namespace Materials {
 		inline MatItem& getSpecular() { return diff_spec_norm[1]; };
 		inline MatItem& getNormals() { return diff_spec_norm[2]; };
 		inline const std::array<MatItem, 3>& getDiffSpecNorm() const  { return diff_spec_norm; };
-		void activateTextures() const;
+		void activateTextures(int unit = 0) const;
 		void cleanUp();
 	};
 
@@ -62,7 +62,7 @@ namespace Materials {
 	public:
 		inline PBR() : albedo({ 1, 0, 0 }), normal({ 0, 1, 0 }), metalic({ 0.5, 0, 0 }), roughness({ 0.1, 0, 0 }), ao({ 1, 0, 0 }), hdrMap(0), lbrMap(0), brdfTex(0), Material() { Material::type = Materials::Type::PBR; };
 		PBR(const MatItem& albedo, const MatItem& normal, const MatItem& metalic, const MatItem& roughness, const MatItem& ao);
-		void activateTextures() const;
+		void activateTextures(int unit = 0) const;
 		void cleanUp();
 
 		// getters

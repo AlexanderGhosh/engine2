@@ -57,5 +57,5 @@ Unsigned Primative::Model::getBuffer(String meshName) const
 
 bool Primative::Model::hasMesh() const
 {
-	return !buffers.empty();
+	return NOT buffers.empty();
 }

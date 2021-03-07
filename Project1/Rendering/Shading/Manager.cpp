@@ -1,52 +1,53 @@
 #include "Manager.h"
+#include <gtc/type_ptr.hpp>
 #include "../../Primatives/Material.h"
 #include "../Animation/Animation.h"
 
 unsigned Render::Shading::Manager::active = 0;
 
- bool Render::Shading::Manager::setValue(const std::string& name, int val) {
+ bool Render::Shading::Manager::setValue(String name, int val) {
 	int loc = glGetUniformLocation(Render::Shading::Manager::active, name.c_str());
 	if (loc < 0) return false;
 	glUniform1i(loc, val);
 	return true;
 };
- bool Render::Shading::Manager::setValue(const std::string& name, float val) {
+ bool Render::Shading::Manager::setValue(String name, float val) {
 	int loc = glGetUniformLocation(Render::Shading::Manager::active, name.c_str());
 	if (loc < 0) return false;
 	glUniform1f(loc, val);
 	return true;
 };
- bool Render::Shading::Manager::setValue(const std::string& name, glm::vec2 val) {
+ bool Render::Shading::Manager::setValue(String name, glm::vec2 val) {
 	int loc = glGetUniformLocation(Render::Shading::Manager::active, name.c_str());
 	if (loc < 0) return false;
 	glUniform2f(loc, val[0], val[1]);
 	return true;
 };
- bool Render::Shading::Manager::setValue(const std::string& name, glm::vec3 val) {
+ bool Render::Shading::Manager::setValue(String name, glm::vec3 val) {
 	int loc = glGetUniformLocation(Render::Shading::Manager::active, name.c_str());
 	if (loc < 0) return false;
 	glUniform3f(loc, val[0], val[1], val[2]);
 	return true;
 };
- bool Render::Shading::Manager::setValue(const std::string& name, glm::vec4 val) {
+ bool Render::Shading::Manager::setValue(String name, glm::vec4 val) {
 	int loc = glGetUniformLocation(Render::Shading::Manager::active, name.c_str());
 	if (loc < 0) return false;
 	glUniform4f(loc, val[0], val[1], val[2], val[3]);
 	return true;
 };
- bool Render::Shading::Manager::setValue(const std::string& name, glm::mat3 val) {
+ bool Render::Shading::Manager::setValue(String name, glm::mat3 val) {
 	int loc = glGetUniformLocation(Render::Shading::Manager::active, name.c_str());
 	if (loc < 0) return false;
 	glUniformMatrix3fv(loc, 1, GL_FALSE, glm::value_ptr(val));
 	return true;
 };
- bool Render::Shading::Manager::setValue(const std::string& name, glm::mat4 val) {
+ bool Render::Shading::Manager::setValue(String name, glm::mat4 val) {
 	int loc = glGetUniformLocation(Render::Shading::Manager::active, name.c_str());
 	if (loc < 0) return false;
 	glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(val));
 	return true;
 }
- bool Render::Shading::Manager::setValue(const std::string& name, const Materials::MatItem& fwd, short& texUnit)
+ bool Render::Shading::Manager::setValue(String name, const Materials::MatItem& fwd, int& texUnit)
  {
 	 if (!fwd.hasTex() || texUnit < 0) {
 		 texUnit--;
@@ -55,17 +56,17 @@ unsigned Render::Shading::Manager::active = 0;
 	 Render::Shading::Manager::setValue(name + "_vec", glm::vec4(fwd.getRaw(), 0));
 	 return Render::Shading::Manager::setValue(name + "_id", texUnit); // set to texture unit
  }
- bool Render::Shading::Manager::setValue(const std::string& name, const Materials::Material* mat)
+ bool Render::Shading::Manager::setValue(String name, const Materials::Material* mat, int unit)
  {
 	 switch (mat->getType())
 	 {
 	 case Materials::Type::Forward:
 		 return setValue(name, *reinterpret_cast<const Materials::Forward*>(mat));
 	 case Materials::Type::PBR:
-		 return setValue(name, *reinterpret_cast<const Materials::PBR*>(mat));
+		 return setValue(name, *reinterpret_cast<const Materials::PBR*>(mat), unit);
 	 }
  }
- bool Render::Shading::Manager::setValue(const std::string& name, const Render::Animation::KeyFrame& frame)
+ bool Render::Shading::Manager::setValue(String name, const Render::Animation::KeyFrame& frame)
  {
 	 if (frame.translations.size() == 0)
 		 return true;
@@ -74,12 +75,12 @@ unsigned Render::Shading::Manager::active = 0;
 	 glUniformMatrix4fv(loc, frame.translations.size(), GL_FALSE, glm::value_ptr(frame.translations[0])); 
 	 return true;
  }
- bool Render::Shading::Manager::setValue(const std::string& name, const Materials::Forward& fwd)
+ bool Render::Shading::Manager::setValue(String name, const Materials::Forward& fwd)
  {
 	 bool vals[] = { 0, 0, 0, 0 };
 	 std::string names[] = { ".diffuse", ".specular", ".normals" };
 	 auto& diff_spec_norm = fwd.getDiffSpecNorm();
-	 short unit = 1;
+	 int unit = 1;
 	 for (short i = 0; i < 3; i++) {
 		 vals[i] = Render::Shading::Manager::setValue(name + names[i], diff_spec_norm[i], unit);
 		 unit++;
@@ -88,9 +89,8 @@ unsigned Render::Shading::Manager::active = 0;
 
 	 return vals[0] && vals[1] && vals[2] && vals[3];
  }
- bool Render::Shading::Manager::setValue(const std::string& name, const Materials::PBR& mat)
+ bool Render::Shading::Manager::setValue(String name, const Materials::PBR& mat, int unit)
  {
-	 short unit = 1;
 	 std::string names[] = { ".albedo", ".normal", ".metalic", ".roughness", ".ao" };
 	 const auto all = mat.getAll();
 	 bool val = true;
@@ -104,7 +104,7 @@ unsigned Render::Shading::Manager::active = 0;
 	 return val;
  }
 
- void Render::Shading::Manager::setActive(const unsigned& shaderId)
+ void Render::Shading::Manager::setActive(Unsigned shaderId)
  {
 	 Manager::active = shaderId;
 	 glUseProgram(shaderId);

@@ -232,5 +232,5 @@ void main()
     if (a < 0.1) {
         discard;
     }
-    FragColor = vec4(color, a);
+    FragColor = vec4(color, 1);
 }

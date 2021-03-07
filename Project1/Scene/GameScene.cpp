@@ -101,7 +101,6 @@ void GameScene::postProcess()
 	glBindFramebuffer(GL_FRAMEBUFFER, 0); // default fbo
 	clearFBO();
 
-
 	Render::Shading::Manager::setActive(postProcShaderId);
 
 	glActiveTexture(GL_TEXTURE0);
@@ -109,12 +108,9 @@ void GameScene::postProcess()
 	Render::Shading::Manager::setValue("tex", 0);
 
 	const Primative::Buffers::VertexBuffer& buffer = ResourceLoader::getBuffer(quadModel.getBuffers()[0]);
-	//drawSkyBox();
 	buffer.render();
-
-
 	// drawSkyBox();
-	// drawObjects(postProcShaderId);
+	// drawObjects(ResourceLoader::getShader("PBRShader"));
 }
 
 void GameScene::updateScene()
