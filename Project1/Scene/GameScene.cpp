@@ -76,23 +76,21 @@ void GameScene::setBG(Vector3 col)
 void GameScene::preProcess()
 {
 	for (const auto& layer : preProcessingLayers) {
-		const std::string& name = layer.first; // of the layer
+		const std::string& name = layer.first;
 		const unsigned& shaderId = layer.second;
 		const auto& fbo = getFBO(name);
 		fbo->bind();
 		fbo->clearBits();
 		Render::Shading::Manager::setActive(shaderId);
 
-		// if (name == "shadows") {
-		// 	glEnable(GL_DEPTH_TEST);
-		// 	//glCullFace(GL_FRONT);
-		// 	drawOpaque();
-		// 	glCullFace(GL_BACK);
-		// }
-
-		drawSkyBox();
-		//drawTerrain();
-		drawObjects(shaderId);
+		if (name == "shadows") {
+			glCullFace(GL_FRONT);
+			drawOpaque();
+			glCullFace(GL_BACK);
+		}
+		else {
+			drawObjects(shaderId);
+		}
 		fbo->unBind();
 	}
 }
@@ -106,7 +104,7 @@ void GameScene::postProcess()
 	Render::Shading::Manager::setActive(postProcShaderId);
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, FBOs["shadows"]->getTexture("col0"));
+	glBindTexture(GL_TEXTURE_2D, FBOs["final"]->getTexture("col0"));
 	Render::Shading::Manager::setValue("tex", 0);
 
 

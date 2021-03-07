@@ -12,6 +12,10 @@ layout(std140, binding = 0) uniform Matrices
     vec3 viewPosition;
     float gamma;
 };
+layout(std140, binding = 1) uniform LSMatrices
+{
+    mat4 lsMatrix;
+};
 
 out VS_OUT{
     vec3 normals;
@@ -19,6 +23,7 @@ out VS_OUT{
     vec3 worldPos;
     vec3 camPos;
     vec4 ws;
+    vec4 lsPos;
 } vs_out;
 
 uniform mat4 model;
@@ -64,5 +69,6 @@ void main() {
     vs_out.worldPos = vec3(model * vec4(pos, 1));
     vs_out.normals = mat3(model) * norm;
     vs_out.camPos = viewPosition;
-    vs_out.texCoords = tex;   
+    vs_out.texCoords = tex;
+    vs_out.lsPos = lsMatrix * vec4(vs_out.worldPos, 1);
 }

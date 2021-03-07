@@ -4,8 +4,7 @@ out vec4 FragCol;
 in vec2 texCoords;
 
 uniform sampler2D tex;
-
 void main()
 {
-    FragCol = texture(tex, texCoords);
+    FragCol = vec4(texture(tex, texCoords).rgb, 1);
 }

@@ -25,4 +25,5 @@ void main() {
 
 
     FragColor = vec4(vec3(r), 1);
+    FragColor = vec4(1);
 }

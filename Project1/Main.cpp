@@ -81,7 +81,7 @@ int main() {
     Context main({ 800, 600 }, false);
     main.init("Engine 2", { GL_BLEND, GL_DEPTH_TEST, GL_CULL_FACE, GL_MULTISAMPLE, GL_TEXTURE_CUBE_MAP_SEAMLESS });
 
-    cam.setPos({ 0, 0, 10 }); // 200, 700
+    cam.setPos({ 0, 1, 0.15 }); // 200, 700
 
     Utils::Timer timer("Shaders");
     timer.start();
@@ -183,11 +183,10 @@ int main() {
     if(anim)
         manAnimatedComp.addAnimation(anim);
     GameObject manObject = GameObject();
-    manObject.getTransform()->Position = { 0, 0, 0 };
+    manObject.getTransform()->Position = { 0, -1, 0 };
     manObject.addComponet(&manR1);
     manObject.addComponet(&manAnimatedComp);
     manObject.getTransform()->Scale *= 0.0125;
-    manObject.getTransform()->Position.y = -1;
 
 
     GameObject redWindow;
@@ -220,47 +219,43 @@ int main() {
     
     timer.reName("Static Buffers");
     timer.start();
-    Primative::Buffers::StaticBuffer b("m4, m4, v3, f, m4", 0);
+    Primative::Buffers::StaticBuffer mainBuffer("m4, m4, v3, f", 0);
     // view    | matrix 4
     // proj    | matrix 4
     // viewPos | vector 3
     // gamma   | scalar f
+    Primative::Buffers::StaticBuffer lsUBO("m4", 1);
     // lspaceM | matrix 4
-    Primative::Buffers::StaticBuffer shadowUBO("m4, m4", 1);
-    // view    | matrix 4
-    // proj    | matrix 4
 
-    glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 0.1f, 100.0f);
+    glm::mat4 lightProjection = glm::ortho<float>(-10, 10, -10, 10, 1, 50);
 
-    glm::mat4 lightView = glm::lookAt(
-        glm::vec3(5),
-        glm::vec3(0),
-        Utils::yAxis());
-    shadowUBO.fill(0, glm::value_ptr(lightProjection));
-    shadowUBO.fill(1, glm::value_ptr(lightView));
+    glm::mat4 lightView = glm::lookAt(glm::vec3(2), glm::vec3(0), glm::vec3(0, 1, 0));
+    lightProjection *= lightView;
+    lsUBO.fill(0, glm::value_ptr(lightProjection));
 
     
     glm::mat4 projection = glm::perspective(glm::radians(cam.getFOV()), 800.0f / 600.0f, 0.01f, 5000.0f);
     
-    b.fill(1, glm::value_ptr(projection));
-    
+    mainBuffer.fill(1, glm::value_ptr(projection));
     float gamma = 2.2f;
-    b.fill(3, &gamma);
+    mainBuffer.fill(3, &gamma);
 
     timer.log();
     timer.stop();
 
     timer.reName("Scene");
     timer.start();
-    Primative::Buffers::FrameBuffer shadowFBO({ "col0" }, { 800, 600 }, { 1, 0, 1 });
+    Primative::Buffers::FrameBuffer shadowFBO({ "depth" }, { 800, 600 }, { 1, 0, 1 });
+    Primative::Buffers::FrameBuffer finalFBO({ "col0" }, { 800, 600 }, { 0, 0, 1 });
     //Primative::MSAABuffer* finalQB = DBG_NEW Primative::MSAABuffer({ "col" }, { 800, 600 });
 
     GameScene scene;
     scene.setMainCamera(&cam);
     scene.addFBO("shadows", &shadowFBO);
-    scene.addPreProcLayer("shadows", ResourceLoader::getShader("PBRShader"));
-    // scene.setPostProcShader(ResourceLoader::getShader(PBRen ? "PBRShader" : "DefaultShder")); // PostShader
-    scene.setPostProcShader(ResourceLoader::getShader("PostShader")); // PBRShader
+    scene.addPreProcLayer("shadows", ResourceLoader::getShader("ShadowShader"));
+    scene.addFBO("final", &finalFBO);
+    scene.addPreProcLayer("final", ResourceLoader::getShader("PBRShader"));
+    scene.setPostProcShader(ResourceLoader::getShader("PostShader")); // PBRShader  PostShader
     scene.setContext(&main);
 
     scene.addObject(&manObject);
@@ -341,8 +336,8 @@ int main() {
         counter += main.getTime().deltaTime;
 
         // RENDERING--------------------------------------------------------------------------------------------------------------------------------------------
-        b.fill(0, value_ptr(cam.getView()));
-        b.fill(2, value_ptr(cam.getPos())); 
+        mainBuffer.fill(0, value_ptr(cam.getView()));
+        mainBuffer.fill(2, value_ptr(cam.getPos()));
     
         scene.preProcess(); // shadows and scene quad
         scene.postProcess();// render to screen
@@ -409,7 +404,7 @@ int main() {
     
     scene.cleanUp(); // removes and destrys all componets and fbos (destroysing comonets doesnt destry buffers(except audio source))
     
-    b.cleanUp(); // destroys UBO 0
+    mainBuffer.cleanUp(); // destroys UBO 0
     UI::TextRenderer::cleanUpStatic(); // destroys char buffers and char textures for all fonts
     UI::UIRenderer::cleanUp(); // destroys quadbuffer and UBO 1
     SoundManager::cleanUp(); // destroys sound buffers

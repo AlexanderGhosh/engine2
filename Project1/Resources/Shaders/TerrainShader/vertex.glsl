@@ -21,7 +21,7 @@ float map(float val, float low, float high, float l, float h){
 void main() {
     vec3 p = pos;
     height = map(texture(hm, tex).r, 0, 1, -0.5, 0.5);
-    p.y = height;
+    //p.y = height;
     texCoords = tex;
 	gl_Position = projection * view * model * vec4(p, 1);
 }

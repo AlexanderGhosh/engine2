@@ -9,6 +9,7 @@ in VS_OUT {
     vec3 worldPos;
     vec3 camPos;
     vec4 ws;
+    vec4 lsPos;
 } fs_in;
 
 struct Material {
@@ -32,6 +33,7 @@ uniform Material material;
 uniform samplerCube hdrMap;
 uniform samplerCube lbrMap;
 uniform sampler2D brdfLUT;
+uniform sampler2D shadowMap;
 
 const float PI = 3.14159265359f;
 // ----------------------------------------------------------------------------
@@ -52,7 +54,21 @@ float getAlpha(vec4 col, sampler2D id){
     }
     return col.a;
 }
+float ShadowCalculation(vec4 fragPosLightSpace)
+{
+    // perform perspective divide
+    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+    // transform to [0,1] range
+    projCoords = projCoords * 0.5 + 0.5;
+    // get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
+    float closestDepth = texture(shadowMap, projCoords.xy).r; 
+    // get depth of current fragment from light's perspective
+    float currentDepth = projCoords.z;
+    // check whether current frag pos is in shadow
+    float shadow = currentDepth > closestDepth  ? 1.0 : 0.0;
 
+    return shadow;
+}
 vec3 norm_;
 vec3 getNormalFromMap()
 {
@@ -202,9 +218,11 @@ void main()
     vec2 brdf  = texture(brdfLUT, vec2(max(dot(N, V), 0.0), roughness)).rg;
     vec3 specular = prefilteredColor * (F * brdf.x + brdf.y);
 
-    vec3 ambient    = (kD * diffuse + specular) * ao;
+    float shadow = ShadowCalculation(fs_in.lsPos);
 
-    vec3 color = ambient + Lo;
+    vec3 ambient    = ((kD * diffuse + specular) * ao);
+
+    vec3 color = ambient + (1 - 0) * Lo;
 
     // HDR tonemapping
     color /= color + vec3(1.0);
@@ -214,5 +232,5 @@ void main()
     if (a < 0.1) {
         discard;
     }
-    FragColor = vec4(albedo, a);
+    FragColor = vec4(color, a);
 }

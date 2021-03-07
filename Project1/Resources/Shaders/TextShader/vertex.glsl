@@ -1,7 +1,7 @@
 #version 460 core
 layout(location = 0) in vec4 pos_tex;
 
-layout(std140, binding = 2) uniform Matrices
+layout(std140, binding = 1) uniform Matrices
 {
     mat4 projection;
 };

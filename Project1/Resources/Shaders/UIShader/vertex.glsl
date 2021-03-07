@@ -2,7 +2,7 @@
 layout(location = 0) in vec3 pos;
 layout(location = 1) in vec2 tex;
 
-layout(std140, binding = 2) uniform Matrices
+layout(std140, binding = 1) uniform Matrices
 {
     mat4 projection;
 };
