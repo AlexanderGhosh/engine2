@@ -111,8 +111,9 @@ void GameScene::postProcess()
 
 	const Primative::Buffers::VertexBuffer& buffer = ResourceLoader::getBuffer(quadModel.getBuffers()[0]);
 	buffer.render();*/
-	drawSkyBox();
-	drawObjects(ResourceLoader::getShader("PBRShader"));
+	//drawSkyBox();
+	//drawObjects(ResourceLoader::getShader("PBRShader"));
+	drawOpaque();
 }
 
 void GameScene::updateScene()

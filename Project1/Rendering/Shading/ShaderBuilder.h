@@ -15,14 +15,23 @@ namespace Render {
 		enum class FragmentParts {
 			Bling_Phong, PBR, Empty
 		};
-
 		using VertexDescrition = std::vector<VertexParts>;
+
+		class PipelineShader {
+		private:
+		public:
+			unsigned piplineProgram, vertexID, fragmentID;
+			PipelineShader();
+			PipelineShader(Unsigned pipeline, Unsigned vert, Unsigned frag);
+			~PipelineShader() = default;
+		};
+
 		class ShaderBuilder
 		{
 		private:
 			static std::map<VertexParts, std::string> vertexText;
 			static std::map<FragmentParts, unsigned> fragmentPrograms;
-			static std::map<std::string, unsigned> programPipelines;
+			static std::map<std::string, PipelineShader> programPipelines;
 
 			static void setFragmentUniforms(FragmentParts fragPart, unsigned& program);
 			static void setVertexUniforms(VertexDescrition vertexDesc, unsigned& program);
@@ -30,7 +39,7 @@ namespace Render {
 			static void loadVertexData(String filePath = "Resources/Shaders/VertexParts.dat");
 		public:
 			static void init();
-			static unsigned requestShader(VertexDescrition vert, FragmentParts frag);
+			static PipelineShader requestShader(VertexDescrition vert, FragmentParts frag);
 			static std::string getUID(VertexDescrition vert, FragmentParts frag);
 			static void cleanUp();
 		};

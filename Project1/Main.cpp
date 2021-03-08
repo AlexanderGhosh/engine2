@@ -184,6 +184,20 @@ int main() {
     auto anim = ResourceLoader::getAnimation(AnimationLoaded); // RFA_Attack
     if(anim)
         manAnimatedComp.addAnimation(anim);
+#define builder Render::Shader
+    builder::VertexDescrition desc = {
+        builder::VertexParts::Position,
+        builder::VertexParts::Normal,
+        builder::VertexParts::CameraInfo,
+        builder::VertexParts::UniformModel,
+        builder::VertexParts::Out_Norm,
+        builder::VertexParts::StartMain,
+        builder::VertexParts::ProjectViewModel,
+        builder::VertexParts::Pass_Norm,
+        builder::VertexParts::EndMain
+    };
+    auto tfd = builder::ShaderBuilder::requestShader(desc, builder::FragmentParts::Bling_Phong);
+    manR1.pipeline = tfd;
     GameObject manObject = GameObject();
     manObject.getTransform()->Position = { 0, -1, 0 };
     manObject.addComponet(&manR1);
@@ -264,8 +278,8 @@ int main() {
     scene.setContext(&main);
 
     scene.addObject(&manObject);
-    scene.addObject(&redWindow);
-    scene.addObject(&yellowWindow);
+   // scene.addObject(&redWindow);
+   // scene.addObject(&yellowWindow);
     scene.addTerrain(&land);
 
     scene.setBG({ 1, 0, 0 }); 
@@ -319,23 +333,10 @@ int main() {
     //cube2->getRigidbody()->velocityAdder({ 1, -1, 0 });
 
     Gizmos::Sphere gizmo1({ 0, 0, 0 }, { 1, 1, 0 });
-    gizmo1.setColour({ 1, 0, 0 });
+    gizmo1.setColour({ 0, 1, 1 });
     gizmo1.setThickness(2);
     Gizmos::GizmoRenderer::addGizmo(&gizmo1);
 
-#define builder Render::Shader
-    builder::VertexDescrition desc = {
-        builder::VertexParts::Position,
-        builder::VertexParts::Normal,
-        builder::VertexParts::CameraInfo,
-        builder::VertexParts::UniformModel,
-        builder::VertexParts::Out_Norm,
-        builder::VertexParts::StartMain,
-        builder::VertexParts::ProjectViewModel,
-        builder::VertexParts::Pass_Norm,
-        builder::VertexParts::EndMain
-    };
-    unsigned tfd = builder::ShaderBuilder::requestShader(desc, builder::FragmentParts::Bling_Phong);
 
     float counter = 0;
     while (!main.shouldClose())

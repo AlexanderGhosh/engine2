@@ -3,6 +3,7 @@
 #include "../Componets/Componets.h"
 #include "../Utils/General.h"
 #include "../Primatives/Model.h"
+#include "../Rendering/Shading/ShaderBuilder.h"
 
 namespace Materials {
 	class Material;
@@ -12,6 +13,7 @@ namespace Component {
 	class RenderMesh : public ComponetBase
 	{
 	public:
+		Render::Shader::PipelineShader pipeline;
 		RenderMesh();
 		~RenderMesh() = default;
 
