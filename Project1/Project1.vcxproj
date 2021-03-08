@@ -171,6 +171,7 @@
     <ClCompile Include="GameObject\Terrain.cpp" />
     <ClCompile Include="Primatives\Buffers\SoundBuffer.cpp" />
     <ClCompile Include="Primatives\Buffers\UniformBuffer.cpp" />
+    <ClCompile Include="Rendering\Shading\ShaderBuilder.cpp" />
     <ClCompile Include="Utils\Shapes.cpp" />
     <ClCompile Include="UI\Elements\ListBox.cpp" />
     <ClCompile Include="UI\Panes\Grid.cpp" />
@@ -230,6 +231,7 @@
     <ClInclude Include="GameObject\Terrain.h" />
     <ClInclude Include="Primatives\Buffers\UniformBuffer.h" />
     <ClInclude Include="Primatives\Buffers\SoundBuffer.h" />
+    <ClInclude Include="Rendering\Shading\ShaderBuilder.h" />
     <ClInclude Include="Utils\Shapes.h" />
     <ClInclude Include="UI\Elements\ListBox.h" />
     <ClInclude Include="UI\Panes\Grid.h" />

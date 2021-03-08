@@ -8,7 +8,7 @@
 #include "../GameObject/GameObject.h"
 #include "../Primatives/Material.h"
 
-Component::RenderMesh::RenderMesh() : model(), materials(), animatedComponet(nullptr), Component::ComponetBase()
+Component::RenderMesh::RenderMesh() : model(), materials(), animatedComponet(nullptr), Component::ComponetBase(), isTransparent(false)
 {
 }
 

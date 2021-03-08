@@ -43,6 +43,7 @@
 #include "GameObject/Terrain.h"
 #include "Primatives/Buffers/FrameBuffer.h"
 #include "Primatives/Buffers/UniformBuffer.h"
+#include "Rendering/Shading/ShaderBuilder.h"
 
 #include "MainWindow.h"
 #include "Context.h"
@@ -80,6 +81,8 @@ int main() {
     main.init("Engine 2", { GL_BLEND, GL_DEPTH_TEST, GL_CULL_FACE, GL_MULTISAMPLE, GL_TEXTURE_CUBE_MAP_SEAMLESS });
 
     cam.setPos({ 0, 1, 0.15 }); // 200, 700
+
+    Render::Shader::ShaderBuilder::init();
 
     Utils::Timer timer("Shaders");
     timer.start();
@@ -320,6 +323,20 @@ int main() {
     gizmo1.setThickness(2);
     Gizmos::GizmoRenderer::addGizmo(&gizmo1);
 
+#define builder Render::Shader
+    builder::VertexDescrition desc = {
+        builder::VertexParts::Position,
+        builder::VertexParts::Normal,
+        builder::VertexParts::CameraInfo,
+        builder::VertexParts::UniformModel,
+        builder::VertexParts::Out_Norm,
+        builder::VertexParts::StartMain,
+        builder::VertexParts::ProjectViewModel,
+        builder::VertexParts::Pass_Norm,
+        builder::VertexParts::EndMain
+    };
+    unsigned tfd = builder::ShaderBuilder::requestShader(desc, builder::FragmentParts::Bling_Phong);
+
     float counter = 0;
     while (!main.shouldClose())
     {
@@ -412,7 +429,7 @@ int main() {
     SoundManager::cleanUp(); // destroys sound buffers
     ResourceLoader::cleanUp(); // destroys textures shaders and models(buffers)
     Gizmos::GizmoRenderer::cleanUp();
-    
+    Render::Shader::ShaderBuilder::cleanUp();
     
     main.cleanUp();
     return 0;

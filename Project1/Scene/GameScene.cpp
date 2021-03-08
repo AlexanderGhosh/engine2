@@ -8,6 +8,7 @@
 #include "../GameObject/GameObject.h"
 #include "../Utils/ResourceLoader.h"
 #include "../Primatives/Buffers/FrameBuffer.h"
+#include "../Rendering/Shading/ShaderBuilder.h"
 
 GameScene::GameScene() : objects(), preProcessingLayers(), currentTick(0), postProcShaderId(0), FBOs(), backgroundColour(0),
 							skybox(nullptr), mainContext(nullptr), opaque(), transparent(), mainCamera(nullptr), terrain(), quadModel()
@@ -75,6 +76,7 @@ void GameScene::setBG(Vector3 col)
 
 void GameScene::preProcess()
 {
+	return;
 	for (const auto& layer : preProcessingLayers) {
 		const std::string& name = layer.first;
 		const unsigned& shaderId = layer.second;
@@ -103,14 +105,14 @@ void GameScene::postProcess()
 
 	Render::Shading::Manager::setActive(postProcShaderId);
 
-	glActiveTexture(GL_TEXTURE0);
+	/*glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, FBOs["final"]->getTexture("col0"));
 	Render::Shading::Manager::setValue("tex", 0);
 
 	const Primative::Buffers::VertexBuffer& buffer = ResourceLoader::getBuffer(quadModel.getBuffers()[0]);
-	buffer.render();
-	// drawSkyBox();
-	// drawObjects(ResourceLoader::getShader("PBRShader"));
+	buffer.render();*/
+	drawSkyBox();
+	drawObjects(ResourceLoader::getShader("PBRShader"));
 }
 
 void GameScene::updateScene()

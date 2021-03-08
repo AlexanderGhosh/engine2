@@ -1,0 +1,46 @@
+0,9
+layout(std140, binding = 0) uniform CamMatrices
+{
+    mat4 view;
+    mat4 projection;
+    vec3 viewPosition;
+    float gamma;
+};
+1,14
+layout(std140, binding = 1) uniform LSMatrices
+{
+    mat4 lsMatrix;
+};
+2,19
+layout(std140, binding = 2) uniform UIMatrices
+{
+    mat4 uiMatrix;
+};
+3,21
+layout(location = 0) in vec3 vertexPosition;
+4,23
+layout(location = 1) in vec2 textureCoords;
+5,25
+layout(location = 2) in vec3 vertexNormal;
+6,27
+layout(location = 3) in vec4 boneIndices;
+7,29
+layout(location = 4) in vec4 boneWeights;
+8,31
+out vec4 worldPosition;
+9,33
+out vec2 texCoords;
+10,35
+out vec3 normal;
+11,37
+gl_Position = projection * view * vec4(vertexPosition, 1);
+12,39
+gl_Position = projection * view * model * vec4(vertexPosition, 1);
+13,41
+uniform mat4 model;
+14,43
+worldPosition = model * vec4(vertexPosition, 1);
+15,45
+texCoords = textureCoords;
+16,57
+normal = vertexNormal;
