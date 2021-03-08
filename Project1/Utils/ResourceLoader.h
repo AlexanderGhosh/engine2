@@ -8,12 +8,8 @@
 #include "General.h"
 #include "../Rendering/Animation/Animation.h"
 #include "../Rendering/Animation/Bones.h"
+#include "../Primatives/Material.h"
 
-namespace Materials {
-	class Material;
-	struct PBR;
-	struct Forward;
-}
 namespace Primative {
 	namespace Buffers {
 		class VertexBuffer;

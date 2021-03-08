@@ -2,6 +2,7 @@
 
 out vec4 FragColor;
 
+in vec3 norm;
 in vec2 texCoords;
 in float height;
 
@@ -25,5 +26,4 @@ void main() {
 
 
     FragColor = vec4(vec3(r), 1);
-    FragColor = vec4(1);
 }

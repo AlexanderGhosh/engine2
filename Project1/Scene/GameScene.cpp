@@ -24,6 +24,7 @@ void GameScene::drawOpaque()
 
 void GameScene::drawTransparent()
 {
+	Render::Shading::Manager::setActive(ResourceLoader::getShader("TransparentShader"));
 	assert(mainCamera);
 	if (NOT transparent.size()) {
 		return;
