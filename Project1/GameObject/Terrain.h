@@ -2,19 +2,24 @@
 #include "../Utils/General.h"
 #include "../Primatives/Buffers/VertexBuffer.h"
 #include "../Componets/Componets.h"
-
+namespace Utils {
+	using NoiseMap = std::vector<float>;
+}
 class Terrain
 {
 private:
 	void init();
+	void getIndices(std::vector<unsigned>& indices, int resolution);
+	float getHeight(glm::vec2 pos) const;
+	glm::vec3 getNormal(glm::vec2 pos) const;
 	int resolution;
+	bool useTexture;
 	Component::Transform transform;
 	Primative::Buffers::VertexBuffer groundBuffer;
-	std::vector<unsigned> seperators;
+	Utils::NoiseMap noise;
 	unsigned heightMap;
-	std::array<unsigned, 3> textures;
 	static bool gottenShader;
-	static unsigned shader;
+	static unsigned shaderHM, shaderMesh;
 public:
 	~Terrain() = default;
 	Terrain();
@@ -22,7 +27,8 @@ public:
 	void draw();
 	void cleanUp();
 	void setHeightMap(unsigned tex);
-	void setTextures(Unsigned tex1, Unsigned tex2, Unsigned tex3);
+	void setNoiseBuffer(const Utils::NoiseMap& noise);
+	void useTextureMap(bool use);
 
 	Component::Transform& getTransform();
 };

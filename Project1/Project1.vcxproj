@@ -144,6 +144,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Utils\NoiseGeneration.cpp" />
     <ClCompile Include="Primatives\Buffers\ArrayBuffer.cpp" />
     <ClCompile Include="Componets\Animated.cpp" />
     <ClCompile Include="Primatives\Buffers\FrameBuffer.cpp" />
@@ -201,6 +202,7 @@
     <ClCompile Include="Primatives\Buffers\VertexBuffer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Utils\NoiseGeneration.h" />
     <ClInclude Include="Primatives\Buffers\ArrayBuffer.h" />
     <ClInclude Include="Componets\Animated.h" />
     <ClInclude Include="Primatives\Buffers\FrameBuffer.h" />

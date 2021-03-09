@@ -42,6 +42,7 @@
 #include "GameObject/Terrain.h"
 #include "Primatives/Buffers/FrameBuffer.h"
 #include "Primatives/Buffers/UniformBuffer.h"
+#include "Utils/NoiseGeneration.h"
 
 #include "MainWindow.h"
 #include "Context.h"
@@ -79,7 +80,7 @@ int main() {
 
 
     Context main({ 800, 600 }, false);
-    main.init("Engine 2", { GL_BLEND, GL_DEPTH_TEST, GL_CULL_FACE, GL_MULTISAMPLE, GL_TEXTURE_CUBE_MAP_SEAMLESS });
+    main.init("Engine 2", { GL_BLEND, GL_DEPTH_TEST, GL_CULL_FACE, GL_MULTISAMPLE });
 
     cam.setPos({ 0, 1, 0.15 }); // 200, 700
 
@@ -90,7 +91,8 @@ int main() {
     ResourceLoader::createShader("Resources/Shaders/ShadowShader");
     ResourceLoader::createShader("Resources/Shaders/UIShader");
     ResourceLoader::createShader("Resources/Shaders/TextShader");
-    ResourceLoader::createShader("Resources/Shaders/TerrainShader");
+    ResourceLoader::createShader("Resources/Shaders/TerrainShaderHeightMap");
+    ResourceLoader::createShader("Resources/Shaders/TerrainShaderMesh");
     ResourceLoader::createShader("Resources/Shaders/PostShader");
     Gizmos::GizmoRenderer::init();
     timer.log();
@@ -119,44 +121,42 @@ int main() {
     const unsigned ibl  = ResourceLoader::loadCubeMap("Resources/Textures/Galaxy ibl", ".png", 0);
     const unsigned brdf = ResourceLoader::loadTexture("Resources/Textures/ibl brdf.png", TextureType::AlbedoMap, 0);
     const unsigned hm   = ResourceLoader::loadTexture("Resources/Textures/heightmap.png", TextureType::HeightMap, 0);
-    ResourceLoader::loadTextureFile("Resources/Textures/RFATextures/Armour", 
-        { TextureType::AlbedoMap,TextureType::RoughnessMap,TextureType::MetalicMap,TextureType::NormalMap, TextureType::CubeMap, TextureType::CubeMap, TextureType::AlbedoMap },
-        { 1, 1, 1, 1 , 0, 0, 0 });
+
     Materials::PBR armourMaterial = ResourceLoader::createPBR("Resources/Textures/RFATextures/Armour",
         { TextureType::AlbedoMap, TextureType::AOMap, TextureType::MetalicMap, TextureType::NormalMap, TextureType::RoughnessMap },
         { 0, 0, 0, 0, 0 });
     armourMaterial.setHDRmap(hdr);
     armourMaterial.setIBLmap(ibl);
     armourMaterial.setBRDFtex(brdf);
-    printf("armour\n");
-    Materials::PBR clothesMaterial = ResourceLoader::createPBR("Resources/Textures/RFATextures/Clothes",
-            { TextureType::AlbedoMap, TextureType::AOMap, TextureType::MetalicMap, TextureType::NormalMap, TextureType::RoughnessMap },
-            { 0, 0, 0, 0, 0 });
-    clothesMaterial.setHDRmap(hdr);
-    clothesMaterial.setIBLmap(ibl);
-    clothesMaterial.setBRDFtex(brdf);
-    printf("cloths\n");
-    Materials::PBR headMaterial = ResourceLoader::createPBR("Resources/Textures/RFATextures/Head",
-        { TextureType::AlbedoMap, TextureType::AOMap, TextureType::MetalicMap, TextureType::NormalMap, TextureType::RoughnessMap },
-        { 0, 0, 0, 0, 0 });
-    headMaterial.setHDRmap(hdr);
-    headMaterial.setIBLmap(ibl);
-    headMaterial.setBRDFtex(brdf);
-    printf("head\n");
-    Materials::PBR hairMaterial = ResourceLoader::createPBR("Resources/Textures/RFATextures/Hair",
-        { TextureType::AlbedoMap, TextureType::AOMap, TextureType::RoughnessMap, TextureType::NormalMap },
-        { 0, 0, 0, 0, 0 });
-    hairMaterial.setHDRmap(hdr);
-    hairMaterial.setIBLmap(ibl);
-    hairMaterial.setBRDFtex(brdf);
-    printf("hair\n");
-    Materials::PBR weponMaterial = ResourceLoader::createPBR("Resources/Textures/RFATextures/Weapon",
-        { TextureType::AlbedoMap, TextureType::AOMap, TextureType::MetalicMap, TextureType::NormalMap, TextureType::RoughnessMap },
-        { 0, 0, 0, 0, 0 });
-    weponMaterial.setHDRmap(hdr);
-    weponMaterial.setIBLmap(ibl);
-    weponMaterial.setBRDFtex(brdf);
-    printf("weapon\n");
+    // printf("armour\n");
+    // Materials::PBR clothesMaterial = ResourceLoader::createPBR("Resources/Textures/RFATextures/Clothes",
+    //         { TextureType::AlbedoMap, TextureType::AOMap, TextureType::MetalicMap, TextureType::NormalMap, TextureType::RoughnessMap },
+    //         { 0, 0, 0, 0, 0 });
+    // clothesMaterial.setHDRmap(hdr);
+    // clothesMaterial.setIBLmap(ibl);
+    // clothesMaterial.setBRDFtex(brdf);
+    // printf("cloths\n");
+    // Materials::PBR headMaterial = ResourceLoader::createPBR("Resources/Textures/RFATextures/Head",
+    //     { TextureType::AlbedoMap, TextureType::AOMap, TextureType::MetalicMap, TextureType::NormalMap, TextureType::RoughnessMap },
+    //     { 0, 0, 0, 0, 0 });
+    // headMaterial.setHDRmap(hdr);
+    // headMaterial.setIBLmap(ibl);
+    // headMaterial.setBRDFtex(brdf);
+    // printf("head\n");
+    // Materials::PBR hairMaterial = ResourceLoader::createPBR("Resources/Textures/RFATextures/Hair",
+    //     { TextureType::AlbedoMap, TextureType::AOMap, TextureType::RoughnessMap, TextureType::NormalMap },
+    //     { 0, 0, 0, 0, 0 });
+    // hairMaterial.setHDRmap(hdr);
+    // hairMaterial.setIBLmap(ibl);
+    // hairMaterial.setBRDFtex(brdf);
+    // printf("hair\n");
+    // Materials::PBR weponMaterial = ResourceLoader::createPBR("Resources/Textures/RFATextures/Weapon",
+    //     { TextureType::AlbedoMap, TextureType::AOMap, TextureType::MetalicMap, TextureType::NormalMap, TextureType::RoughnessMap },
+    //     { 0, 0, 0, 0, 0 });
+    // weponMaterial.setHDRmap(hdr);
+    // weponMaterial.setIBLmap(ibl);
+    // weponMaterial.setBRDFtex(brdf);
+    // printf("weapon\n");
     timer.log();
 
     timer.reName("Objects");
@@ -169,14 +169,14 @@ int main() {
     //manMaterial1.setHDRmap(hdr);
     //manMaterial1.setIBLmap(ibl);
     //manMaterial1.setBRDFtex(brdf);
-    //manR1.setMaterial(&manMaterial1);
-    manR1.setMaterialTo(&hairMaterial, "Hair");
-    manR1.setMaterialTo(&clothesMaterial, "Cloth");
-    manR1.setMaterialTo(&clothesMaterial, "Scarf");
-    manR1.setMaterialTo(&armourMaterial, "Armour");
-    manR1.setMaterialTo(&headMaterial, "Head");
-    manR1.setMaterialTo(&weponMaterial, "Sword");
-    manR1.setMaterialTo(&weponMaterial, "Dagger");
+    manR1.setMaterial(&armourMaterial);
+    // manR1.setMaterialTo(&hairMaterial, "Hair");
+    // manR1.setMaterialTo(&clothesMaterial, "Cloth");
+    // manR1.setMaterialTo(&clothesMaterial, "Scarf");
+    // manR1.setMaterialTo(&armourMaterial, "Armour");
+    // manR1.setMaterialTo(&headMaterial, "Head");
+    // manR1.setMaterialTo(&weponMaterial, "Sword");
+    // manR1.setMaterialTo(&weponMaterial, "Dagger");
 
     Component::Animated manAnimatedComp = Component::Animated();
     const std::string AnimationLoaded = "Rig|man_run_in_place";
@@ -210,12 +210,15 @@ int main() {
     yellowWindow.getTransform()->Position.x = 0.5;
     timer.log();
 
-    Terrain land(1000);
+    timer.reName("Terrain");
+    timer.start();
+    Terrain land(100);
     land.getTransform().Position.y = -1;
-    land.getTransform().Scale = { 1000, 500 ,1000 };
+    land.getTransform().Scale = { 100, 10 ,100 };
     land.setHeightMap(hm);
-    land.setTextures(0, 0, 0);
-
+    land.setNoiseBuffer(Utils::NoiseGeneration::getMap(100, { 1, 0.5, 0.1 }, { 1, 2, 3 }));
+    land.useTextureMap(true);
+    timer.log();
 
     
     timer.reName("Static Buffers");
