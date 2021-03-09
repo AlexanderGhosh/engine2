@@ -6,9 +6,10 @@
 #include "Vertex.h"
 
 namespace Primative {
-	struct Vertex;
-	struct Mesh
+	class Vertex;
+	class Mesh
 	{
+	public:
 		std::vector<Vertex> verts;
 		std::vector<unsigned> indices;
 		std::string name;

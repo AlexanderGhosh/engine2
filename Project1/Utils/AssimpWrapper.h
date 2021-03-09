@@ -12,8 +12,8 @@
 #include "General.h"
 
 namespace Primative {
-    struct Mesh;
-    struct Vertex;
+    class Mesh;
+    class Vertex;
 }; 
 namespace Render {
     namespace Animation {

@@ -22,7 +22,7 @@ namespace Primative {
 	namespace Buffers {
 		class VertexBuffer;
 	}
-	struct Mesh;
+	class Mesh;
 	class Model;
 }
 namespace Render {
