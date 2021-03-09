@@ -4,9 +4,15 @@
 #include "../Componets/Animated.h"
 #include "../Componets/RigidBody.h"
 
-GameObject::GameObject() : componets(), enabled(), transform(DBG_NEW Component::Transform()) {
+GameObject::GameObject() : componets(), enabled(), transform(DBG_NEW Component::Transform()), alive(true) {
 	// this->addComponet(DBG_NEW Component::Transform());
 	enabled.push_back(1);
+}
+
+GameObject::GameObject(Vector3 postion, Vector3 scale) : GameObject()
+{
+	getTransform()->Position = postion;
+	getTransform()->Scale = scale;
 }
 
 void GameObject::addComponet(Component::ComponetBase* componet)
@@ -100,4 +106,19 @@ void GameObject::cleanUp()
 	transform->cleanUp();
 	delete transform;
 	transform = nullptr;
+}
+
+bool GameObject::isAlive() const
+{
+	return alive;
+}
+
+void GameObject::kill()
+{
+	alive = false;
+}
+
+void GameObject::resurect()
+{
+	alive = true;
 }

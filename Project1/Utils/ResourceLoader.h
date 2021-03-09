@@ -9,6 +9,10 @@
 // #include "../Rendering/Animation/Animation.h"
 // #include "../Rendering/Animation/Bones.h"
 
+namespace Utils {
+	class Path;
+}
+
 namespace Materials {
 	class Material;
 	struct PBR;
@@ -38,8 +42,10 @@ class ResourceLoader
 {
 public:
 	// shaders
+	static std::vector<std::string> createShaders(const std::vector<std::string>& shaders, std::vector<bool>& geoms);
+	static std::vector<std::string> createShaders(const std::vector<std::string>& shaders);
 	static std::string createShader(String filePath, bool hasGeom = false);
-	static const unsigned getShader(String name);
+	static const unsigned getShader(String name, bool create = false);
 	// materials
 	static Materials::PBR createPBR(String dirPath, std::vector<TextureType> types, std::vector<bool> flip);
 
@@ -61,6 +67,8 @@ public:
 	static Render::Animation::Animation* getAnimation(String name);
 	// general
 	static void cleanUp();
+	// statics
+	static std::string ShaderDirectory, TextureDirectory, ModelDirectory;
 private:
 	static std::unordered_map<std::string, unsigned> shaders;
 	static std::unordered_map<std::string, unsigned> textures;

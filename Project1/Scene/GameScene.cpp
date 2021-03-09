@@ -19,7 +19,8 @@ GameScene::GameScene() : objects(), preProcessingLayers(), currentTick(0), postP
 void GameScene::drawOpaque()
 {
 	for (Component::RenderMesh* mesh : opaque) {
-		mesh->update(mainContext->getTime().deltaTime);
+		if(mesh->getParent()->isAlive())
+			mesh->update(mainContext->getTime().deltaTime);
 	}
 }
 
@@ -36,7 +37,8 @@ void GameScene::drawTransparent()
 	for (auto itt = transparent.rbegin(); itt != transparent.rend(); itt++) {
 		float dist = (*itt).first;
 		Component::RenderMesh* mesh = (*itt).second;
-		mesh->update(mainContext->getTime().deltaTime);
+		if (mesh->getParent()->isAlive())
+			mesh->update(mainContext->getTime().deltaTime);
 		dist = glm::length2(mesh->getParent()->getTransform()->Position - mainCamera->getPos());
 		sorted[dist] = mesh;
 	}
@@ -122,7 +124,8 @@ void GameScene::postProcess()
 void GameScene::updateScene()
 {
 	for (GameObject*& obj : objects) {
-		obj->tick(currentTick++ % FIXED_UPDATE_RATE, mainContext->getTime().deltaTime);
+		if(obj->isAlive())
+			obj->tick(currentTick++ % FIXED_UPDATE_RATE, mainContext->getTime().deltaTime);
 	}
 }
 

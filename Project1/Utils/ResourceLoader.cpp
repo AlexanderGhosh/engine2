@@ -19,10 +19,36 @@ std::vector<Primative::Buffers::VertexBuffer> ResourceLoader::buffers = { };
 std::unordered_map<std::string, Render::Animation::Animation> ResourceLoader::animations = { };
 std::vector<Materials::Material*> ResourceLoader::materials = { };
 std::unordered_map<std::string, Primative::Model> ResourceLoader::models = { };
+std::string ResourceLoader::ShaderDirectory = "Resources/Shaders/";
+std::string ResourceLoader::TextureDirectory = "Resources/Textures";
+std::string ResourceLoader::ModelDirectory = "Resources/Models";
 #pragma endregion
 
 #pragma region Creation
 #pragma region Shaders
+std::vector<std::string> ResourceLoader::createShaders(const std::vector<std::string>& shaders, std::vector<bool>& geoms)
+{
+    std::vector<std::string> res;
+    res.reserve(shaders.size());
+    geoms.reserve(shaders.size());
+    while (geoms.size() < shaders.size())
+    {
+        geoms.push_back(false);
+    }
+    for (int i = 0; i < shaders.size(); i++) {
+        res.push_back(createShader(ShaderDirectory + shaders[i], geoms[i]));
+    }
+    return res;
+}
+std::vector<std::string> ResourceLoader::createShaders(const std::vector<std::string>& shaders)
+{
+    std::vector<std::string> res;
+    res.reserve(shaders.size());
+    for (int i = 0; i < shaders.size(); i++) {
+        res.push_back(createShader(ShaderDirectory + shaders[i], false));
+    }
+    return res;
+}
 std::string ResourceLoader::createShader(String filePath, bool hasGeom)
 {
     const std::string extensions[] = { "/vertex.glsl", "/geometry.glsl", "/fragment.glsl" };
@@ -339,15 +365,18 @@ const Render::Animation::Animation ResourceLoader::createAnimation(String filePa
 #pragma endregion
 
 #pragma region Getters
-const unsigned ResourceLoader::getShader(String name)
+const unsigned ResourceLoader::getShader(String name, bool create)
 {
     auto& shaders = ResourceLoader::shaders;
     unsigned s = shaders.size();
-    unsigned r = shaders[name];
+    unsigned& r = shaders[name];
     if (s < shaders.size()) {
-        r = ResourceLoader::getShader(ResourceLoader::defaultShaderName);
-        shaders.erase(name);
-        return 0;
+        if(create)
+            r = getShader(ResourceLoader::createShader(ShaderDirectory + name, 0), false);
+        else {
+            shaders.erase(name);
+            return 0;
+        }
     }
     return r;
 }

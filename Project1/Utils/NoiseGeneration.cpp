@@ -4,8 +4,9 @@
 Utils::NoiseMap Utils::NoiseGeneration::getMap(Int resolution, const std::vector<float>& ratios, const std::vector<float>& frequencys)
 {
 	NoiseMap res;
-	res.reserve(resolution * resolution);
-	res.resize(resolution * resolution);
+	long res2 = static_cast<long>(resolution) * static_cast<long>(resolution);
+	res.reserve(res2);
+	res.resize(res2);
 	for (int x = 0; x < resolution; x++) {
 		for (int y = 0; y < resolution; y++) {
 			float noise = 0;

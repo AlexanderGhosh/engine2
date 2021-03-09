@@ -14,8 +14,11 @@ protected:
 	std::vector<Component::ComponetBase*> componets;
 	Component::Transform* transform;
 	std::vector<bool> enabled;
+	bool alive;
 public:
 	GameObject();
+	GameObject(Vector3 postion, Vector3 scale);
+	~GameObject() = default;
 	void addComponet(Component::ComponetBase* componet);
 	void tick(short currentTick, float deltaTime);
 	virtual void tryDraw(Float deltaTime);
@@ -24,5 +27,8 @@ public:
 	template<class T>
 	T* getComponet();
 	void cleanUp();
+	bool isAlive() const;
+	void kill();
+	void resurect();
 };
 

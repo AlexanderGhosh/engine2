@@ -75,6 +75,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 }
 
 int main() {
+    srand(time(0));
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
     // _crtBreakAlloc = 6157;
 
@@ -86,14 +87,11 @@ int main() {
 
     Utils::Timer timer("Shaders");
     timer.start();
-    ResourceLoader::createShader("Resources/Shaders/PBRShader");
-    ResourceLoader::createShader("Resources/Shaders/TransparentShader");
-    ResourceLoader::createShader("Resources/Shaders/ShadowShader");
-    ResourceLoader::createShader("Resources/Shaders/UIShader");
-    ResourceLoader::createShader("Resources/Shaders/TextShader");
-    ResourceLoader::createShader("Resources/Shaders/TerrainShaderHeightMap");
-    ResourceLoader::createShader("Resources/Shaders/TerrainShaderMesh");
-    ResourceLoader::createShader("Resources/Shaders/PostShader");
+    std::vector<std::string> shaders = {
+        "PBRShader", "TransparentShader", "ShadowShader", "UIShader", "TextShader", "TerrainShaderHeightMap", "TerrainShaderMesh", "PostShader"
+    };
+    ResourceLoader::createShaders(shaders);
+
     Gizmos::GizmoRenderer::init();
     timer.log();
 
@@ -214,10 +212,10 @@ int main() {
     timer.start();
     Terrain land(100);
     land.getTransform().Position.y = -1;
-    land.getTransform().Scale = { 100, 10 ,100 };
+    land.getTransform().Scale = { 1, 1 ,1 };
     land.setHeightMap(hm);
     land.setNoiseBuffer(Utils::NoiseGeneration::getMap(100, { 1, 0.5, 0.1 }, { 1, 2, 3 }));
-    land.useTextureMap(true);
+    land.useTextureMap(false);
     timer.log();
 
     
