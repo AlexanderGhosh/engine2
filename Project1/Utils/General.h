@@ -54,288 +54,139 @@ constexpr float INV_PI = 1.0f / PI;
 
 namespace Utils {
 
-    inline std::vector<std::string> split(const std::string& str, const std::string& delim)
-    {
-        std::vector<std::string> tokens;
-        size_t prev = 0, pos = 0;
-        do
-        {
-            pos = str.find(delim, prev);
-            if (pos == std::string::npos) pos = str.length();
-            std::string token = str.substr(prev, pos - prev);
-            if (!token.empty()) tokens.push_back(token);
-            prev = pos + delim.length();
-        } while (pos < str.length() && prev < str.length());
-        return tokens;
-    };
+    std::vector<std::string> split(const std::string& str, const std::string& delim);
 
-    inline glm::mat4 translate(glm::mat4 matrix, Vector3 vec) {
-        for (char i = 0; i < 3; i++)
-            matrix[3][i] = vec[i];
-        return matrix;
-    }
+    glm::mat4 translate(glm::mat4 matrix, Vector3 vec);
 
-    inline glm::mat4 rotate(Matrix4 matrix, Vector3 vec) {
-        if (glm::all(glm::equal(vec, { 0, 0, 0 }))) return matrix;
-        return glm::rotate(matrix, glm::radians(glm::length(vec)), glm::normalize(vec));
-    };
-    inline glm::mat4 rotate(Matrix4 matrix, Quaternion vec) {
-        return matrix * glm::mat4_cast(vec);
-    }
-    template<class T>
-    inline bool contains(const std::list<T>& a, const T& b) {
+    glm::mat4 rotate(Matrix4 matrix, Vector3 vec);
+
+    glm::mat4 rotate(Matrix4 matrix, Quaternion vec);
+
+    template<typename T>
+    bool contains(const std::list<T>& a, const T& b) {
         auto found = std::find(a.begin(), a.end(), b);
         return found != a.end();
     }
-    template<class T>
-    inline bool contains(const std::vector<T>& a, const T& b) {
+
+    template<typename T>
+    bool contains(const std::vector<T>& a, const T& b) {
         auto found = std::find(a.begin(), a.end(), b);
         return found != a.end();
     }
-    inline bool contains(const std::string& a, const std::string& b) {
-        const short s = b.size();
-        for (short i = 0; i < a.size() - b.size(); i++) {
-            const std::string& sub = a.substr(i, s);
-            if (sub == b) {
-                return true;
-            }
-        }
-        return false;
-    }
 
-    inline bool contained(std::array<glm::vec2, 2> bound, glm::vec2 pos) {
-        return glm::all(glm::greaterThanEqual(pos, bound[0]) && glm::lessThanEqual(pos, bound[1]));
-    }
-    inline bool contained(std::array<glm::vec3, 2> bound, glm::vec3 pos) {
-        return glm::all(glm::greaterThanEqual(pos, bound[0]) && glm::lessThanEqual(pos, bound[1]));
-    }
+    bool contains(const std::string& a, const std::string& b);
 
-    inline std::string toUTF8(unsigned int codepoint)
-    {
-        std::string out;
+    bool contained(std::array<glm::vec2, 2> bound, glm::vec2 pos);
 
-        if (codepoint <= 0x7f)
-            out.append(1, static_cast<char>(codepoint));
-        else if (codepoint <= 0x7ff)
-        {
-            out.append(1, static_cast<char>(0xc0 | ((codepoint >> 6) & 0x1f)));
-            out.append(1, static_cast<char>(0x80 | (codepoint & 0x3f)));
-        }
-        else if (codepoint <= 0xffff)
-        {
-            out.append(1, static_cast<char>(0xe0 | ((codepoint >> 12) & 0x0f)));
-            out.append(1, static_cast<char>(0x80 | ((codepoint >> 6) & 0x3f)));
-            out.append(1, static_cast<char>(0x80 | (codepoint & 0x3f)));
-        }
-        else
-        {
-            out.append(1, static_cast<char>(0xf0 | ((codepoint >> 18) & 0x07)));
-            out.append(1, static_cast<char>(0x80 | ((codepoint >> 12) & 0x3f)));
-            out.append(1, static_cast<char>(0x80 | ((codepoint >> 6) & 0x3f)));
-            out.append(1, static_cast<char>(0x80 | (codepoint & 0x3f)));
-        }
-        return out;
-    }
-    inline glm::vec3 xAxis(float mag = 1) {
-        return glm::vec3(mag, 0, 0);
-    }
-    inline glm::vec3 yAxis(float mag = 1) {
-        return glm::vec3(0, mag, 0);
-    }
-    inline glm::vec3 zAxis(float mag = 1) {
-        return glm::vec3(0, 0, mag);
-    }
-    inline glm::vec3 zero() {
-        return glm::vec3(0);
-    }
-    inline glm::vec3 fill(const float& num) {
-        return glm::vec3(num);
-    }
-    inline const std::string getFileName(const std::string& filePath, const bool& includeExtension = false) {
-        std::string dilimeter = "/";
-        std::array<std::string, 2> possible = {
-            "/", "\\"
-        };
-        for (const std::string& pos : possible) {
-            if (contains(filePath, pos)) {
-                dilimeter = pos;
-                break;
-            }
-        }
-        auto s = split(filePath, dilimeter);
-        std::string res = s.back();
-        if (!includeExtension) {
-            s = split(res, ".");
-            res = s[0];
-        }
-        return res;
-    }
-    template<class T>
-    inline const unsigned& findIndex(std::vector<T>& a, T& b) {
+    bool contained(std::array<glm::vec3, 2> bound, glm::vec3 pos);
+
+    std::string toUTF8(unsigned int codepoint);
+
+    glm::vec3 xAxis(float mag = 1);
+
+    glm::vec3 yAxis(float mag = 1);
+
+    glm::vec3 zAxis(float mag = 1);
+
+    glm::vec3 zero();
+
+    glm::vec3 fill(const float& num);
+
+    const std::string getFileName(const std::string& filePath, const bool& includeExtension = false);
+
+    template< typename T>
+    const unsigned& findIndex(std::vector<T>& a, T& b) {
         auto c = std::find(a.begin(), a.end(), b);
         return std::distance(a.begin(), c);
     }
-    template<class T>
-    inline T& elementAt(std::list<T>& list, const int& index) {
+
+    template< typename T>
+    T& elementAt(std::list<T>& list, const int& index) {
         auto s = list.begin();
         std::advance(s, index);
         return *s;
     }
-    template<class T>
-    inline T& getElement(std::vector<T>& list, int index) {
+
+    template< typename T>
+    T& getElement(std::vector<T>& list, int index) {
         if (index < 0) {
             index = list.size() + index;
         }
         index = index % list.size();
         return list[index];
     }
-    template<class T, size_t size>
-    inline T& getElement(std::array<T, size> list, int index) {
+
+    template< typename T, size_t size>
+    T& getElement(std::array<T, size> list, int index) {
         if (index < 0) {
             index = size + index;
         }
         index = index % size;
         return list[index];
     }
-    inline glm::vec3 map(const glm::vec3& x, const glm::vec2& from, const glm::vec2& to) {
-        float a = from.x;
-        float b = from.y;
-        float c = to.x;
-        float d = to.y;
-        return ((c + d) + (d - c) * ((2.0f * x - (a + b)) / (b - a))) / 2.0f;
-    }
-    template<class T>
+
+    glm::vec3 map(const glm::vec3& x, const glm::vec2& from, const glm::vec2& to);
+
+    template<typename T>
     bool find(const std::list<T>& a, T& b) {
         auto it = std::find(a.begin(), a.end(), b);
         bool res = it != a.end();
-        if (res) 
+        if (res)
             b = *it;
         return res;
     }
+
     /// <summary>
     /// returns true if any are nan or inf regardles of sign
     /// </summary>
     /// <param name="a"></param>
     /// <returns></returns>
-    inline bool nan_inf(const glm::mat3& a) {
-        for (char i = 0; i < 3; i++) {
-            for (char j = 0; j < 3; j++) {
-                if (glm::isnan(a[i][j]) || glm::isinf(a[i][j]) || glm::isinf(-a[i][j]))
-                    return true;
-            }
-        }
-        return false;
-    }
-    inline glm::vec3 tripProduct(const glm::vec3& a, const glm::vec3& b, const glm::vec3& c) {
-        const float ca = glm::dot(c, a);
-        const float cb = glm::dot(c, b);
-        const glm::vec3 bca = b * ca;
-        const glm::vec3 acb = a * cb;
-        return b * glm::dot(a, c) - a * glm::dot(b, c);
-    }
+    bool nan_inf(const glm::mat3& a);
+
+    glm::vec3 tripProduct(const glm::vec3& a, const glm::vec3& b, const glm::vec3& c);
+
     // a x b x a
-    inline glm::vec3 tripProduct(const glm::vec3& a, const glm::vec3& b) {
-        return tripProduct(a, b, a);
-    }
-    inline bool isParallel(const glm::vec3& a, const glm::vec3& b) {
-        float d = fabsf(glm::dot(a, b));
-        float t = glm::length(a) * glm::length(b);
-        return d == t;
-    }
-    inline bool isPerpendicular(const glm::vec3& a, glm::vec3& b) {
-        return !glm::dot(a, b);
-    }
-    inline glm::vec3 linePlaneIntersection(const glm::vec3& rayVector, const glm::vec3& rayPoint, const glm::vec3& planeNormal, const glm::vec3& planePoint) {
-        const glm::vec3 diff = rayPoint - planePoint;
-        const float prod1 = glm::dot(diff, planeNormal);
-        const float prod2 = glm::dot(rayVector, planeNormal);
-        const float prod3 = prod1 / prod2;
-        return rayPoint - rayVector * prod3;
-    }
-    inline float isInFront(const glm::vec3& p1, const glm::vec3& p2, const glm::vec3& planeNormal) {
-        return glm::dot(glm::normalize(planeNormal), p1 - p2);
-    }
-    inline glm::vec3 projectPointPlane(const glm::vec3& n, const glm::vec3& o, const glm::vec3& p) {
-        return p - (glm::dot(n, p - o)) * n;
-    }
-    template<class T>
-    inline void removeAt(T& a, const unsigned& i) {
+    glm::vec3 tripProduct(const glm::vec3& a, const glm::vec3& b);
+
+    bool isParallel(const glm::vec3& a, const glm::vec3& b);
+
+    bool isPerpendicular(const glm::vec3& a, glm::vec3& b);
+
+    glm::vec3 linePlaneIntersection(const glm::vec3& rayVector, const glm::vec3& rayPoint, const glm::vec3& planeNormal, const glm::vec3& planePoint);
+
+    float isInFront(const glm::vec3& p1, const glm::vec3& p2, const glm::vec3& planeNormal);
+
+    glm::vec3 projectPointPlane(const glm::vec3& n, const glm::vec3& o, const glm::vec3& p);
+
+    template<typename T>
+    void removeAt(T& a, const unsigned& i) {
         auto t = a.begin();
         std::advance(t, i);
         a.erase(t);
     }
-    inline glm::mat3 inverse(const glm::mat3& a, const bool symetrical = false) {
-        if (symetrical) {
-            glm::mat3 res(1.0f);
-            for (char i = 0; i < 3; i++)
-                res[i][i] /= a[i][i];
-            return res;
-        }
-        else
-            return glm::inverse(a);
-    }
-    inline float round(float var, int dp)
-    {
-        float t = powf(10, dp);
-        // 37.66666 * 100 =3766.66 
-        // 3766.66 + .5 =3767.16    for rounding off value 
-        // then type cast to int so value is 3767 
-        // then divided by 100 so the value converted into 37.67 
-        float value = static_cast<int>(var * t + .5);
-        return static_cast<float>(value / t);
-    }
-    // doenst go deep
-    inline int countFiles(String dirPath) {
-        auto dirIter = std::filesystem::directory_iterator(dirPath);
-        int fileCount = 0;
 
-        for (auto& entry : dirIter)
-        {
-            if (entry.is_regular_file())
-            {
-                ++fileCount;
-            }
-        }
-        return fileCount;
-    }
-    inline glm::vec3 normalize(Vector3 a) {
-        glm::vec3 res = glm::normalize(a);
-        for (char i = 0; i < 3; i++) {
-            float& x = res[i];
-            if (glm::isnan(x) OR glm::isinf(x)) {
-                x = 0;
-            }
-        }
-        return res;
-    }
+    glm::mat3 inverse(const glm::mat3& a, const bool symetrical = false);
+
+    float round(float var, int dp);
+
+    // doenst go deep
+    int countFiles(String dirPath);
+
+    glm::vec3 normalize(Vector3 a);
+
     /// <summary>
     /// returns the matrix but without nan or inf
     /// </summary>
     /// <param name="a"></param>
     /// <returns></returns>
-    inline glm::mat4 validate(glm::mat4 a, float val = 0) {
-        for (char i = 0; i < 4; i++) {
-            for (char j = 0; j < 4; j++) {
-                float& element = a[i][j];
-                if (glm::isnan(element) OR glm::isinf(element)) {
-                    element = val;
-                }
-            }
-        }
-        return a;
-    }
+    glm::mat4 validate(glm::mat4 a, float val = 0);
+
     /// <summary>
     /// replaces all occorances in the string
     /// </summary>
-    inline std::string replaceAll(std::string str, std::string from, std::string to) {
-        size_t start_pos = 0;
-        while ((start_pos = str.find(from, start_pos)) != std::string::npos) {
-            str.replace(start_pos, from.length(), to);
-            start_pos += to.length(); // Handles case where 'to' is a substring of 'from'
-        }
-        return str;
-    }
-    template <class BidirectionalIterator>
+    std::string replaceAll(std::string str, std::string from, std::string to);
+
+    template <typename BidirectionalIterator>
     void reverse(BidirectionalIterator first, BidirectionalIterator last)
     {
         while ((first != last) && (first != --last)) {
@@ -344,118 +195,21 @@ namespace Utils {
         }
     }
 
-    /// <summary>
-    /// Merge Sort Helper
-    /// </summary>
-    template<class T>
-    void merge(std::vector<T> Arr, int start, int mid, int end) {
-        // create a temp array
-        std::array<int, end - start + 1> temp;
-
-        // crawlers for both intervals and for temp
-        int i = start, j = mid + 1, k = 0;
-
-        // traverse both arrays and in each iteration add smaller of both elements in temp 
-        while (i <= mid && j <= end) {
-            if (Arr[i] <= Arr[j]) {
-                temp[k] = Arr[i];
-                k += 1; i += 1;
-            }
-            else {
-                temp[k] = Arr[j];
-                k += 1; j += 1;
-            }
-        }
-
-        // add elements left in the first interval 
-        while (i <= mid) {
-            temp[k] = Arr[i];
-            k += 1; i += 1;
-        }
-
-        // add elements left in the second interval 
-        while (j <= end) {
-            temp[k] = Arr[j];
-            k += 1; j += 1;
-        }
-
-        // copy temp to original interval
-        for (i = start; i <= end; i += 1) {
-            Arr[i] = temp[i - start];
-        }
-    }
-
-    // Arr is an array of integer type
-    // start and end are the starting and ending index of current interval of Arr
-
-    /// <summary>
-    /// Merge Sort
-    /// </summary>
-    template<class T>
-    void mergeSort(std::vector<T> Arr, int start, int end) {
-
-        if (start < end) {
-            int mid = (start + end) / 2;
-            mergeSort(Arr, start, mid);
-            mergeSort(Arr, mid + 1, end);
-            merge(Arr, start, mid, end);
-        }
-    }
-
     class Timer {
     public:
-        inline Timer(const std::string name) : s(), e(), pausing(), name(name) {  };
-        inline Timer() : s(), e(), pausing() 
-        {
-            name = "Timer misc";
-        };
-        inline void start() { s = getNow(); };
-        inline void stop() 
-        { 
-            e = getNow(); 
-            if (pausing.size() % 2 != 0)
-                pausing.push_back(e);
-        };
-        inline bool pause() 
-        { 
-            if (pausing.size() % 2 == 0) {
-                pausing.push_back(getNow());
-                return true;
-            }
-            return false;
-        };
-        inline bool resume()
-        {
-            if (pausing.size() % 2 != 0) {
-                pausing.push_back(getNow());
-                return true;
-            }
-            return false;
-        };
-        inline void log(bool frames = 0) { 
-            stop();
-            std::string units = frames ? " Frames" : " Milliseconds";
-            std::cout << name << ": " << std::to_string(getDuration(frames)) << units << std::endl;
-        };
-        inline const float& getDuration(bool frames = 0) 
-        {
-            float d = calcDurration(s, e)/1000.0f;
-            assert(!(pausing.size() % 2) && "Timer pausing not working");
-            for (short i = 0; i < pausing.size(); i += 2)
-                d -= calcDurration(elementAt(pausing, i), elementAt(pausing, i + 1))/1000.0f;
-            if (frames)
-                d = (d / 1000.0f) * 60.0f;
-            return d;
-        };
-        inline void reName(String name) {
-            this->name = name;
-        }
+        Timer(const std::string name);
+        Timer();
+        void start();
+        void stop();
+        bool pause();
+        bool resume();
+        void log(bool frames = 0);
+        const float& getDuration(bool frames = 0);
+        void reName(String name);
     private:
         std::string name;
-        static inline const std::chrono::time_point<std::chrono::high_resolution_clock> getNow() { return std::chrono::high_resolution_clock::now(); };
-        static inline float calcDurration(const std::chrono::time_point<std::chrono::high_resolution_clock>& s, const std::chrono::time_point<std::chrono::high_resolution_clock>& e) {
-            return std::chrono::duration_cast<std::chrono::microseconds>(e - s).count();
-        }
+        static const std::chrono::time_point<std::chrono::high_resolution_clock> getNow();
+        static float calcDurration(const std::chrono::time_point<std::chrono::high_resolution_clock>& s, const std::chrono::time_point<std::chrono::high_resolution_clock>& e);
         std::chrono::time_point<std::chrono::high_resolution_clock> s, e;
         std::list<std::chrono::time_point<std::chrono::high_resolution_clock>> pausing;
     };
@@ -465,131 +219,29 @@ namespace Utils {
         using MassMatrix6 = std::array<std::array<float, 6>, 6>;
         using Matrix12 = std::array<std::array<float, 12>, 12>;
 
-        inline const Vector12 combine(const Vector6& a, const Vector6& b)
-        {
-            Vector12 res{};
-            for (char i = 0; i < 6; i++) {
-                res[i] = a[i];
-                res[i + 6] = b[i];
-            }
-            // res[0] = a[0];
-            // res[1] = a[1];
-            // res[2] = a[2];
-            // res[3] = a[3];
-            // res[4] = a[4];
-            // res[5] = a[5];
-            // 
-            // res[6] =  b[0];
-            // res[7] =  b[1];
-            // res[8] =  b[2];
-            // res[9] =  b[3];
-            // res[10] = b[4];
-            // res[11] = b[5];
-            return res;
-        }
+        const Vector12 combine(const Vector6& a, const Vector6& b);
 
-        inline const Matrix12 combine(const MassMatrix6& a, const MassMatrix6& b)
-        {
-            Matrix12 res{};
-            for (char i = 0; i < 6; i++) {
-                for (char j = 0; j < 6; j++) {
-                    res[i][j] = a[i][j];
-                    res[i + 6][j + 6] = b[i][j];
-                }
-            }
-            return res;
-        }
+        const Matrix12 combine(const MassMatrix6& a, const MassMatrix6& b);
         // 1/n element wise
-        inline const Matrix12 inverse(const Matrix12& m)
-        {
-            Matrix12 res{};
-            for (char i = 0; i < 12; i++) {
-                for (char j = 0; j < 12; j++) {
-                    if (m[i][j] == 0) {
-                        res[i][j] = 0;
-                    }
-                    else {
-                        res[i][j] = 1.0f / m[i][j];
-                    }
-                }
-            }
-            return res;
-        }
+        const Matrix12 inverse(const Matrix12& m);
 
-        inline std::array<Vector6, 2> split(const Vector12& a) {
-            Vector6 r1{}, r2{};
-            for (char i = 0; i < 6; i++) {
-                r1[i] = a[i];
-                r2[i] = a[i + 6];
-            }
-            return { r1, r2 };
-        }
-        inline std::array<glm::vec3, 2> split(const Vector6& a) {
-            glm::vec3 r1{}, r2{};
-            for (char i = 0; i < 3; i++) {
-                r1[i] = a[i];
-                r2[i] = a[i + 3];
-            }
-            return { r1, r2 };
-        }
+        std::array<Vector6, 2> split(const Vector12& a);
+        std::array<glm::vec3, 2> split(const Vector6& a);
     };
 }
 
 // dot product [1 x 1]
-inline float operator * (const Utils::BigMaths::Vector12& a, const Utils::BigMaths::Vector12& b)
-{
-    float res = 0;
-    for (char i = 0; i < 12; i++)
-        res += a[i] * b[i];
-    return res;
-}
+float operator * (const Utils::BigMaths::Vector12& a, const Utils::BigMaths::Vector12& b);
 // element wise multiplication
-inline Utils::BigMaths::Vector12 operator * (const Utils::BigMaths::Vector12& a, const float& b)
-{
-    Utils::BigMaths::Vector12 res = a;
-    for (char i = 0; i < 12; i++)
-        res[i] *= b;
-    return res;
-}
+Utils::BigMaths::Vector12 operator * (const Utils::BigMaths::Vector12& a, const float& b);
 // dot product [12 x 1]
-inline Utils::BigMaths::Vector12 operator * (const Utils::BigMaths::Matrix12& a, const Utils::BigMaths::Vector12& b)
-{
-    Utils::BigMaths::Vector12 res{};
-    for (char i = 0; i < 12; i++)
-        for (char j = 0; j < 12; j++)
-            res[i] += a[i][j] * b[i];
-    return res;
-}
+Utils::BigMaths::Vector12 operator * (const Utils::BigMaths::Matrix12& a, const Utils::BigMaths::Vector12& b);
 // dot product [1 x 12]
-inline Utils::BigMaths::Vector12 operator * (const Utils::BigMaths::Vector12& a, const Utils::BigMaths::Matrix12& b)
-{
-    Utils::BigMaths::Vector12 res{};
-    for (char i = 0; i < 12; i++)
-        for (char j = 0; j < 12; j++) 
-            res[i] += a[j] * b[j][i];
-    return res;
-}
+Utils::BigMaths::Vector12 operator * (const Utils::BigMaths::Vector12& a, const Utils::BigMaths::Matrix12& b);
 // dot product [3 x 1]
-inline glm::vec3 operator * (const glm::mat3& a, const glm::vec3& b)
-{
-    glm::vec3 res(0);
-    for (char i = 0; i < 3; i++) {
-        for (char j = 0; j < 3; j++) {
-            res[i] += a[i][j] * b[i];
-        }
-    }
-    return res;
-}
+glm::vec3 operator * (const glm::mat3& a, const glm::vec3& b);
 // element wise addition
-inline const Utils::BigMaths::Vector12 operator +(const Utils::BigMaths::Vector12& a, const Utils::BigMaths::Vector12& b)
-{
-    Utils::BigMaths::Vector12 res{};
-    for (char i = 0; i < 12; i++)
-        res[i] = a[i] + b[i];
-    return res;
-}
+const Utils::BigMaths::Vector12 operator +(const Utils::BigMaths::Vector12& a, const Utils::BigMaths::Vector12& b);
 // element wise division
-inline const Utils::BigMaths::Vector12 operator /(const Utils::BigMaths::Vector12& a, const float& b) {
-    return a * (1.0f / b);
-}
+const Utils::BigMaths::Vector12 operator /(const Utils::BigMaths::Vector12& a, const float& b);
 

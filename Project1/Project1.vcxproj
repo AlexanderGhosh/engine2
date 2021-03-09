@@ -171,6 +171,7 @@
     <ClCompile Include="GameObject\Terrain.cpp" />
     <ClCompile Include="Primatives\Buffers\SoundBuffer.cpp" />
     <ClCompile Include="Primatives\Buffers\UniformBuffer.cpp" />
+    <ClCompile Include="Utils\General.cpp" />
     <ClCompile Include="Utils\Shapes.cpp" />
     <ClCompile Include="UI\Elements\ListBox.cpp" />
     <ClCompile Include="UI\Panes\Grid.cpp" />
