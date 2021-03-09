@@ -1,6 +1,5 @@
 #pragma once
 #include <unordered_map>
-#include "../Rendering/Animation/Bones.h"
 #include "Componets.h"
 
 namespace Primative {

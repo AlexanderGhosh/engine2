@@ -2,6 +2,7 @@
 #include "../Rendering/Animation/Animation.h"
 #include "../Rendering/Shading/Manager.h"
 #include "../Primatives/Buffers/ArrayBuffer.h"
+#include "../Rendering/Animation/Bones.h"
 
 Primative::Buffers::TextureBuffer Component::Animated::bonesBuffer = {};
 bool Component::Animated::initalized = false;

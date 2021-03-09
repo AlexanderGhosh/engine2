@@ -2,8 +2,8 @@
 #include <vector>
 #include <unordered_map>
 #include <map>
-#include "../Utils/General.h"
 #include "../Primatives/Model.h"
+#include "../Utils/General.h"
 
 class SkyBox;
 class Context;
@@ -14,6 +14,7 @@ namespace Component {
 	class RenderMesh;
 }
 namespace Primative {
+	class Model;
 	namespace Buffers {
 		class FrameBuffer;
 	}

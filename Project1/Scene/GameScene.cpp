@@ -8,6 +8,7 @@
 #include "../GameObject/GameObject.h"
 #include "../Utils/ResourceLoader.h"
 #include "../Primatives/Buffers/FrameBuffer.h"
+#include "../Primatives/Buffers/VertexBuffer.h"
 
 GameScene::GameScene() : objects(), preProcessingLayers(), currentTick(0), postProcShaderId(0), FBOs(), backgroundColour(0),
 							skybox(nullptr), mainContext(nullptr), opaque(), transparent(), mainCamera(nullptr), terrain(), quadModel()

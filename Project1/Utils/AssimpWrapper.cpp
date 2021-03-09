@@ -1,6 +1,8 @@
 #include "AssimpWrapper.h"
 #include "../Rendering/Animation/Bones.h"
 #include "../Rendering/Animation/Animation.h"
+#include "../Primatives/Vertex.h"
+#include "../Primatives/Mesh.h"
 #include "General.h"
 #include <gtc/type_ptr.hpp>
 #include <unordered_map>

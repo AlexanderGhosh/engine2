@@ -1,7 +1,6 @@
 #pragma once
 #include <array>
 #include <glm.hpp>
-#include "../Rendering/Animation/Bones.h"
 #include "../Utils/General.h"
 
 namespace Primative {

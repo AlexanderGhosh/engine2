@@ -6,16 +6,26 @@
 #include <GL/glew.h>
 
 #include "General.h"
-#include "../Rendering/Animation/Animation.h"
-#include "../Rendering/Animation/Bones.h"
-#include "../Primatives/Material.h"
+// #include "../Rendering/Animation/Animation.h"
+// #include "../Rendering/Animation/Bones.h"
 
+namespace Materials {
+	class Material;
+	struct PBR;
+	struct Forward;
+}
 namespace Primative {
 	namespace Buffers {
 		class VertexBuffer;
 	}
 	struct Mesh;
 	class Model;
+}
+namespace Render {
+	namespace Animation {
+		class Animation;
+		class Skeleton;
+	}
 }
 
 enum class TextureType {
@@ -31,7 +41,7 @@ public:
 	static std::string createShader(String filePath, bool hasGeom = false);
 	static const unsigned getShader(String name);
 	// materials
-	static const Materials::PBR createPBR(String dirPath, std::vector<TextureType> types, std::vector<bool> flip);
+	static Materials::PBR createPBR(String dirPath, std::vector<TextureType> types, std::vector<bool> flip);
 
 	// textures
 	static const std::vector<unsigned> loadTextureFile(String dirPath, std::vector<TextureType> types, std::vector<bool> flip);

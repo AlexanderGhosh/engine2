@@ -1,14 +1,15 @@
 #include "AudioSource.h"
 #include "../Primatives/Buffers/SoundBuffer.h"
 #include "../GameObject/GameObject.h"
+#include "../Componets/RigidBody.h"
 
 void Component::AudioSource::update(float deltaTime)
 {
 	// update buffers position
-	const glm::vec3& pos = parent->getTransform()->Position;
-	const Component::ComponetBase* rb = parent->getRigidbody();
+	Vector3 pos = parent->getTransform()->Position;
+	const Component::RigidBody* rb = parent->getRigidbody();
 	if (rb) {
-		const glm::vec3& vel = { 0, 0, 0 };
+		Vector3 vel = rb->getVelocity();
 		alSource3f(source, AL_VELOCITY, vel.x, vel.y, vel.z);
 	}
 	alSource3f(source, AL_POSITION, pos.x, pos.y, pos.z);

@@ -5,8 +5,11 @@
 
 #include "AssimpWrapper.h"
 #include "../Primatives/Material.h"
+#include "../Rendering/Animation/Animation.h"
+#include "../Rendering/Animation/Bones.h"
 #include "../Primatives/Buffers/VertexBuffer.h"
 #include "../Primatives/Model.h"
+#include "../Primatives/Mesh.h"
 
 #pragma region Static Variables
 std::string ResourceLoader::defaultShaderName = "";
@@ -107,7 +110,7 @@ std::string ResourceLoader::createShader(String filePath, bool hasGeom)
 #pragma endregion
 
 #pragma region Matrials
-const Materials::PBR ResourceLoader::createPBR(String dirPath, std::vector<TextureType> types, std::vector<bool> flip)
+Materials::PBR ResourceLoader::createPBR(String dirPath, std::vector<TextureType> types, std::vector<bool> flip)
 {
     const std::vector<unsigned> textures = loadTextureFile(dirPath, types, flip);
     materials.push_back(new Materials::PBR());

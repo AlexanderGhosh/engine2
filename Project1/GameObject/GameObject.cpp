@@ -1,6 +1,8 @@
 #include "GameObject.h"
+#include "../Componets/Componets.h"
 #include "../Rendering/Rendering.h"
 #include "../Componets/Animated.h"
+#include "../Componets/RigidBody.h"
 
 GameObject::GameObject() : componets(), enabled(), transform(DBG_NEW Component::Transform()) {
 	// this->addComponet(DBG_NEW Component::Transform());

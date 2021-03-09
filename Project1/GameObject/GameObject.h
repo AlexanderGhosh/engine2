@@ -1,8 +1,13 @@
 #pragma once
 #define FIXED_UPDATE_RATE 20
 #include <vector>
-#include "../Componets/Componets.h"
-#include "../Componets/RigidBody.h"
+#include "../Utils/General.h"
+
+namespace Component {
+	class ComponetBase;
+	struct Transform;
+	class RigidBody;
+}
 class GameObject
 {
 protected:

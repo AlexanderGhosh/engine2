@@ -3,6 +3,7 @@
 #include <array>
 #include <glm.hpp>
 #include <string>
+#include "Vertex.h"
 
 namespace Primative {
 	struct Vertex;
