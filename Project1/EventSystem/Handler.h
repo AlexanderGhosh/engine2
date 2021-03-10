@@ -59,6 +59,7 @@ namespace Events {
 		static bool getCursor(const Cursor& button, const Action& state);
 		static const glm::vec2& getCursorPos();
 		static std::string lastChar;
+		static bool keyDown, mouseMove, buttonDown;
 	private:
 		static GLFWwindow* window;
 		static void keyCallBack(GLFWwindow* window, int key, int scancode, int action, int mode); 

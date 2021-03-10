@@ -7,12 +7,21 @@ class GameObject;
 namespace Component {
 	enum class Type
 	{
-		Transform, Camera, AudioSource, Rigidbody, Collider, RenderMesh, Light, Animated
+		Transform, Camera, AudioSource, Rigidbody, Collider, RenderMesh, Light, Animated, Script
 	};
 	class ComponetBase {
 	public:
+		// event callbacks
+		virtual void awake() { };
+		virtual void start() { };
 		virtual void update(float deltaTime) { }; // every tick
-		virtual void fixedUpdate() { }; // every x ticks
+		virtual void fixedUpdate(float deltaTime) { }; // every x ticks
+		virtual void mouseMove(float deltaTime) { };
+		virtual void mouseButton(float deltaTime) { };
+		virtual void keyButton(float deltaTime) { };
+
+
+
 		virtual void cleanUp() = 0;
 		virtual void setParent(GameObject* parent) { this->parent = parent; };
 		inline GameObject* getParent() { return parent; };

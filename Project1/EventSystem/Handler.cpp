@@ -5,6 +5,9 @@
 
 GLFWwindow* Events::Handler::window = nullptr;
 std::string Events::Handler::lastChar = "";
+bool Events::Handler::keyDown = false;
+bool Events::Handler::mouseMove = false;
+bool Events::Handler::buttonDown = false;
 
 void Events::Handler::init(GLFWwindow* window)
 {
@@ -38,24 +41,24 @@ bool Events::Handler::getCursor(const Cursor& button, const Action& state)
 
 const glm::vec2& Events::Handler::getCursorPos()
 {
-	glm::dvec2 res;
+	glm::dvec2 res(0);
 	glfwGetCursorPos(Events::Handler::window, &res.x, &res.y);
 	return static_cast<glm::vec2>(res);
 }
 
 void Events::Handler::keyCallBack(GLFWwindow* window, int key, int scancode, int action, int mode)
 {
-
+	keyDown = action;
 }
 
 void Events::Handler::mouseCallback(GLFWwindow* window, double xpos, double ypos)
 {
-
+	mouseMove = xpos != 0 OR ypos != 0;
 }
 
 void Events::Handler::mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 {
-
+	buttonDown = action;
 }
 
 void Events::Handler::characterCallBack(GLFWwindow* window, unsigned int codePoint)

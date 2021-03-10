@@ -43,6 +43,7 @@
 #include "Primatives/Buffers/FrameBuffer.h"
 #include "Primatives/Buffers/UniformBuffer.h"
 #include "Utils/NoiseGeneration.h"
+#include "Scripts/PlayerControler.h"
 
 #include "MainWindow.h"
 #include "Context.h"
@@ -245,16 +246,25 @@ int main() {
     timer.log();
     timer.stop();
 
+
+    GameObject player = GameObject({ 0, 0, 5 }, { 1, 1, 1 });
+    Component::Camera playerCamera = Component::Camera();
+    player.addComponet(&playerCamera);
+    PlayerControler playerScript;
+    player.addComponet(&playerScript);
+
+
     timer.reName("Scene");
     timer.start();
     //Primative::MSAABuffer* finalQB = DBG_NEW Primative::MSAABuffer({ "col" }, { 800, 600 });
 
     GameScene scene;
-    scene.setMainCamera(&cam);
+    scene.setMainCamera(&playerCamera);
     scene.setContext(&main);
     scene.setBG({ 1, 0, 0 });
     scene.initalize();
 
+    scene.addObject(&player);
     scene.addObject(&manObject);
     scene.addObject(&redWindow);
     scene.addObject(&yellowWindow);
@@ -296,12 +306,12 @@ int main() {
     Events::Handler::init(main.getWindow());
     glfwSetCursorPosCallback(main.getWindow(), mouse_callback);
     
-    timer.reName("Physics");
-    timer.start();
-    Physics::CollisionDetection::setBroadphase<Physics::NSquared>();
-    Physics::CollisionDetection::setNarrowphase< Physics::SAT3D>();
-    Physics::Engine::setResponse<Physics::ImpulseBased>();
-    timer.log();
+    // timer.reName("Physics");
+    // timer.start();
+    // Physics::CollisionDetection::setBroadphase<Physics::NSquared>();
+    // Physics::CollisionDetection::setNarrowphase< Physics::SAT3D>();
+    // Physics::Engine::setResponse<Physics::ImpulseBased>();
+    // timer.log();
     // Physics::Constraints::ConstraintsSolver::addConstraint<Physics::Constraints::DistanceConstraint>(rb1, rb2, Utils::fill(0.5f), Utils::fill(-0.5f), 1.0f);
     // Physics::Constraints::ConstraintsSolver::addConstraint(DBG_NEW Physics::Constraints::DistanceConstraint(rb1, rb2, Utils::fill(0), Utils::fill(0), 1.5f));
 
@@ -314,8 +324,10 @@ int main() {
     gizmo1.setThickness(2);
     Gizmos::GizmoRenderer::addGizmo(&gizmo1);
 
+    scene.gameLoop();
+
     float counter = 0;
-    while (!main.shouldClose())
+    /*while (!main.shouldClose())
     {
         // FPS--------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -327,7 +339,7 @@ int main() {
         tb.setPos({ p.x + diff, p.y });
 
         // UPDATES----------------------------------------------------------------------------------------------------------------------------------------------
-        scene.updateScene();
+        scene.updateObjects();
 
         counter += main.getTime().deltaTime;
 
@@ -388,7 +400,7 @@ int main() {
         main.update();
 
         Events::Handler::pollEvents();
-    }
+    }*/
     Render::Shading::Manager::cleanUp(); // deactivats shdaer
     Physics::Engine::cleanUp();
     gizmo1.cleanUp();
@@ -400,7 +412,7 @@ int main() {
     
     scene.cleanUp(); // removes and destrys all componets and fbos (destroysing comonets doesnt destry buffers(except audio source))
     
-    mainBuffer.cleanUp(); // destroys UBO 0
+    //mainBuffer.cleanUp(); // destroys UBO 0
     UI::TextRenderer::cleanUpStatic(); // destroys char buffers and char textures for all fonts
     UI::UIRenderer::cleanUp(); // destroys quadbuffer and UBO 1
     SoundManager::cleanUp(); // destroys sound buffers
@@ -408,6 +420,7 @@ int main() {
     Gizmos::GizmoRenderer::cleanUp();
     
     
-    main.cleanUp();
+    //main.cleanUp();
+    cam.cleanUp();
     return 0;
 }

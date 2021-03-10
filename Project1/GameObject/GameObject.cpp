@@ -3,6 +3,7 @@
 #include "../Rendering/Rendering.h"
 #include "../Componets/Animated.h"
 #include "../Componets/RigidBody.h"
+#include "../Scene/GameScene.h"
 
 GameObject::GameObject() : componets(), enabled(), transform(DBG_NEW Component::Transform()), alive(true) {
 	// this->addComponet(DBG_NEW Component::Transform());
@@ -48,6 +49,38 @@ void GameObject::addComponet(Component::ComponetBase* componet)
 	}
 }
 
+void GameObject::raiseEvents(const std::vector<GameEventsTypes>& events, Float deltaTime)
+{
+	for (auto& comp : componets) {
+		for (const GameEventsTypes& type : events) {
+			switch (type)
+			{
+			case GameEventsTypes::Update:
+				comp->update(deltaTime);
+				break;
+			case GameEventsTypes::FixedUpdate:
+				comp->fixedUpdate(deltaTime);
+				break;
+			case GameEventsTypes::MouseToggle:
+				comp->mouseButton(deltaTime);
+				break;
+			case GameEventsTypes::MouseMove:
+				comp->mouseMove(deltaTime);
+				break;
+			case GameEventsTypes::KeyToggle:
+				comp->keyButton(deltaTime);
+				break;
+			case GameEventsTypes::Awake:
+				comp->awake();
+				break;
+			case GameEventsTypes::Start:
+				comp->start();
+				break;
+			}
+		}
+	}
+}
+
 void GameObject::tick(short currentTick, float deltaTime)
 {
 	for (unsigned i = 0; i < componets.size(); i++) {
@@ -55,7 +88,7 @@ void GameObject::tick(short currentTick, float deltaTime)
 		Component::ComponetBase*& comp = componets[i];
 		comp->update(deltaTime);
 		if (currentTick == FIXED_UPDATE_RATE) {
-			comp->fixedUpdate();
+			comp->fixedUpdate(deltaTime);
 		}
 	}
 }
@@ -75,17 +108,6 @@ Component::RigidBody* GameObject::getRigidbody()
 	for (Component::ComponetBase* comp : componets) {
 		if (comp->getType() == Component::Type::Rigidbody)
 			return reinterpret_cast<Component::RigidBody*>(comp);
-	}
-	return nullptr;
-}
-
-template<class T>
-T* GameObject::getComponet()
-{
-	for (Component::ComponetBase* componet : componets) {
-		T* cast = dynamic_cast<T*>(componet);
-		if (cast)
-			return cast;
 	}
 	return nullptr;
 }
@@ -121,4 +143,14 @@ void GameObject::kill()
 void GameObject::resurect()
 {
 	alive = true;
+}
+
+void GameObject::setScene(GameScene* scene)
+{
+	this->scene = scene;
+}
+
+GameScene* GameObject::getScene()
+{
+	return scene;
 }

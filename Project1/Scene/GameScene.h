@@ -20,6 +20,11 @@ namespace Primative {
 		class StaticBuffer;
 	}
 }
+enum class GameEventsTypes {
+	Update, FixedUpdate, MouseToggle, MouseMove, KeyToggle,
+	Awake, // will occour when object is added to the scene
+	Start  // will occout before first game loop
+};
 class GameScene
 {
 private:
@@ -36,6 +41,7 @@ private:
 	glm::vec3 backgroundColour;
 	Context* mainContext;
 	std::vector<Primative::Buffers::StaticBuffer> uniformBuffers;
+	bool isFirstLoop, closing;
 
 	void clearFBO() const;
 	void drawObjects(Unsigned shaderId); // just moved
@@ -43,15 +49,19 @@ private:
 	void drawOpaque();
 	void drawTransparent();
 	void drawTerrain();
+
+	// polling evetns
+	std::vector<GameEventsTypes> getCurrentEvents() const;
 public:
 	GameScene();
 	void preProcess();
 	void postProcess();
-	void updateScene();
+	void updateObjects();
 	const Primative::Buffers::FrameBuffer& getFBO(const std::string& name);
 	void initalize();
 	void gameLoop();
 	void cleanUp();
+	void close();
 
 	// adders
 	void addPreProcLayer(const std::string& name, const unsigned& shaderId);

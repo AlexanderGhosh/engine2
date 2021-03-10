@@ -10,9 +10,28 @@
 #include "../Primatives/Buffers/FrameBuffer.h"
 #include "../Primatives/Buffers/VertexBuffer.h"
 #include "../Primatives/Buffers/UniformBuffer.h"
+#include "../EventSystem/Handler.h"
+#include "../Gizmos/GizmoRenderer.h"
+
+std::vector<GameEventsTypes> GameScene::getCurrentEvents() const
+{
+	std::vector<GameEventsTypes> res = {
+		GameEventsTypes::Update
+	};
+	if (isFirstLoop)
+		res.push_back(GameEventsTypes::Start);
+	if (Events::Handler::buttonDown)
+		res.push_back(GameEventsTypes::MouseToggle);
+	if (Events::Handler::mouseMove)
+		res.push_back(GameEventsTypes::MouseMove);
+	if (Events::Handler::keyDown)
+		res.push_back(GameEventsTypes::KeyToggle);
+	return res;
+}
 
 GameScene::GameScene() : objects(), preProcessingLayers(), currentTick(0), postProcShaderId(0), FBOs(), backgroundColour(0),
-							skybox(nullptr), mainContext(nullptr), opaque(), transparent(), mainCamera(nullptr), terrain(), quadModel()
+							skybox(nullptr), mainContext(nullptr), opaque(), transparent(), mainCamera(nullptr), terrain(), 
+							quadModel(), isFirstLoop(false), closing(false)
 {
 	quadModel = ResourceLoader::getModel("plane.dae");
 }
@@ -57,6 +76,7 @@ void GameScene::drawTerrain()
 void GameScene::addObject(GameObject* obj)
 {
 	objects.push_back(obj);
+	obj->setScene(this);
 	Component::RenderMesh* mesh = obj->getComponet<Component::RenderMesh>();
 	if (mesh) {
 		if (mesh->getTransparent()) {
@@ -66,6 +86,7 @@ void GameScene::addObject(GameObject* obj)
 			opaque.push_back(mesh);
 		}
 	}
+	obj->raiseEvents({ GameEventsTypes::Awake }, 0);
 }
 
 void GameScene::addTerrain(Terrain* terrain)
@@ -122,11 +143,14 @@ void GameScene::postProcess()
 	// drawObjects(postProcShaderId);
 }
 
-void GameScene::updateScene()
+void GameScene::updateObjects()
 {
+	const auto events = getCurrentEvents();
 	for (GameObject*& obj : objects) {
-		if(obj->isAlive())
-			obj->tick(currentTick++ % FIXED_UPDATE_RATE, mainContext->getTime().deltaTime);
+		if (obj->isAlive()) {
+			//obj->tick(currentTick++ % FIXED_UPDATE_RATE, mainContext->getTime().deltaTime);
+			obj->raiseEvents(events,  mainContext->getTime().deltaTime);
+		}
 	}
 }
 
@@ -210,7 +234,7 @@ void GameScene::initalize()
 void GameScene::gameLoop()
 {
 	// float counter = 0;
-	while (NOT mainContext->shouldClose())
+	while (NOT (closing OR mainContext->shouldClose()))
 	{
 		// FPS--------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -222,7 +246,7 @@ void GameScene::gameLoop()
 		// tb.setPos({ p.x + diff, p.y });
 
 		// UPDATES----------------------------------------------------------------------------------------------------------------------------------------------
-		updateScene();
+		updateObjects();
 
 		// counter += main.getTime().deltaTime;
 
@@ -234,7 +258,7 @@ void GameScene::gameLoop()
 		preProcess(); // shadows and scene quad
 		postProcess();// render to screen
 		// UI::UIRenderer::render(&tb);
-		// Gizmos::GizmoRenderer::drawAll();
+		Gizmos::GizmoRenderer::drawAll();
 
 		// PHYSICS-----------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -279,11 +303,8 @@ void GameScene::gameLoop()
 		// COLOR BUFFERS----------------------------------------------------------------------------------------------------------------------------------------
 		// sound->update();
 
-		// glfwSwapInterval(1); // V-SYNC
-		//glfwSwapBuffers(redWindow);
 		mainContext->update();
-
-		//Events::Handler::pollEvents();
+		Events::Handler::pollEvents();
 	}
 }
 
@@ -299,6 +320,15 @@ void GameScene::cleanUp()
 		Primative::Buffers::FrameBuffer& fbo = pair.second;
 		fbo.cleanUp();
 	}
+	for (auto itt = uniformBuffers.begin(); itt != uniformBuffers.end();) {
+		(*itt).cleanUp();
+		itt = uniformBuffers.erase(itt);
+	}
+	for (auto itt = terrain.begin(); itt != terrain.end();) {
+		(*itt)->cleanUp();
+		itt = terrain.erase(itt);
+	}
+
 	FBOs.clear();
 	if(skybox)
 		skybox->cleanUp();
@@ -306,6 +336,13 @@ void GameScene::cleanUp()
 	mainCamera = nullptr;
 	opaque.clear();
 	transparent.clear();
+	quadModel.cleanUp();
+	mainContext->cleanUp();
+}
+
+void GameScene::close()
+{
+	closing = true;
 }
 
 void GameScene::addPreProcLayer(const std::string& name, const unsigned& shaderId)

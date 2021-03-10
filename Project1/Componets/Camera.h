@@ -15,7 +15,7 @@ namespace Component {
 
 		// getters
 		inline const float& getFOV() const { return fov; };
-		inline Vector3 getPos() const { return pos; };
+		Vector3 getPos() const;
 		inline Vector3 getForward() const { return fwd; };
 		inline Vector3 getRight() const { return right; };
 		inline Type getType() const { return Type::Camera; };
