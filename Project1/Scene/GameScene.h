@@ -17,6 +17,7 @@ namespace Primative {
 	class Model;
 	namespace Buffers {
 		class FrameBuffer;
+		class StaticBuffer;
 	}
 }
 class GameScene
@@ -31,9 +32,11 @@ private:
 	std::vector<GameObject*> objects;
 	std::unordered_map<std::string, unsigned> preProcessingLayers;
 	unsigned currentTick, postProcShaderId;
-	std::unordered_map<std::string, Primative::Buffers::FrameBuffer*> FBOs;
+	std::unordered_map<std::string, Primative::Buffers::FrameBuffer> FBOs;
 	glm::vec3 backgroundColour;
 	Context* mainContext;
+	std::vector<Primative::Buffers::StaticBuffer> uniformBuffers;
+
 	void clearFBO() const;
 	void drawObjects(Unsigned shaderId); // just moved
 	void drawSkyBox();
@@ -45,12 +48,14 @@ public:
 	void preProcess();
 	void postProcess();
 	void updateScene();
-	const Primative::Buffers::FrameBuffer* getFBO(const std::string& name);
+	const Primative::Buffers::FrameBuffer& getFBO(const std::string& name);
+	void initalize();
+	void gameLoop();
 	void cleanUp();
 
 	// adders
 	void addPreProcLayer(const std::string& name, const unsigned& shaderId);
-	void addFBO(const std::string& layerName, Primative::Buffers::FrameBuffer* fbo);
+	void addFBO(const std::string& layerName, Primative::Buffers::FrameBuffer fbo);
 	void addObject(GameObject* obj);
 	void addTerrain(Terrain* terrain);
 

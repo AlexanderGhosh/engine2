@@ -9,6 +9,7 @@
 #include "../Utils/ResourceLoader.h"
 #include "../Primatives/Buffers/FrameBuffer.h"
 #include "../Primatives/Buffers/VertexBuffer.h"
+#include "../Primatives/Buffers/UniformBuffer.h"
 
 GameScene::GameScene() : objects(), preProcessingLayers(), currentTick(0), postProcShaderId(0), FBOs(), backgroundColour(0),
 							skybox(nullptr), mainContext(nullptr), opaque(), transparent(), mainCamera(nullptr), terrain(), quadModel()
@@ -83,8 +84,8 @@ void GameScene::preProcess()
 		const std::string& name = layer.first;
 		const unsigned& shaderId = layer.second;
 		const auto& fbo = getFBO(name);
-		fbo->bind();
-		fbo->clearBits();
+		fbo.bind();
+		fbo.clearBits();
 		Render::Shading::Manager::setActive(shaderId);
 
 		if (name == "shadows") {
@@ -96,7 +97,7 @@ void GameScene::preProcess()
 			drawSkyBox();
 			drawObjects(shaderId);
 		}
-		fbo->unBind();
+		fbo.unBind();
 	}
 }
 
@@ -109,7 +110,7 @@ void GameScene::postProcess()
 	Render::Shading::Manager::setActive(postProcShaderId);
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, FBOs["final"]->getTexture("col0"));
+	glBindTexture(GL_TEXTURE_2D, FBOs["final"].getTexture("col0"));
 	Render::Shading::Manager::setValue("tex", 0);
 
 	const Primative::Buffers::VertexBuffer& buffer = ResourceLoader::getBuffer(quadModel.getBuffers()[0]);
@@ -157,7 +158,7 @@ void GameScene::drawSkyBox()
 	mainContext->enable(GL_DEPTH_TEST);
 }
 
-const Primative::Buffers::FrameBuffer* GameScene::getFBO(const std::string& name)
+const Primative::Buffers::FrameBuffer& GameScene::getFBO(const std::string& name)
 {
 	if (name == "any") {
 		return (*FBOs.begin()).second;
@@ -166,9 +167,124 @@ const Primative::Buffers::FrameBuffer* GameScene::getFBO(const std::string& name
 	const auto& r = FBOs[name];
 	if (s < FBOs.size()) {
 		FBOs.erase(name);
-		return nullptr;
+		return {};
 	}
 	return r;
+}
+
+void GameScene::initalize()
+{
+	Primative::Buffers::FrameBuffer shadowFBO({ "depth" }, { 800, 600 }, { 1, 0, 1 });
+	Primative::Buffers::FrameBuffer finalFBO({ "col0" }, { 800, 600 }, { 0, 0, 1 });
+	addFBO("shadows", shadowFBO);
+	addPreProcLayer("shadows", ResourceLoader::getShader("ShadowShader"));
+	addFBO("final", finalFBO);
+	addPreProcLayer("final", ResourceLoader::getShader("PBRShader"));
+	setPostProcShader(ResourceLoader::getShader("PostShader")); // PBRShader  PostShader
+
+
+	Primative::Buffers::StaticBuffer mainBuffer("m4, m4, v3, f", 0);
+	// view    | matrix 4
+	// proj    | matrix 4
+	// viewPos | vector 3
+	// gamma   | scalar f
+
+	glm::mat4 projection = glm::perspective(glm::radians(mainCamera->getFOV()), 800.0f / 600.0f, 0.01f, 5000.0f);
+
+	mainBuffer.fill(1, glm::value_ptr(projection));
+	float gamma = 2.2f;
+	mainBuffer.fill(3, &gamma);
+
+	Primative::Buffers::StaticBuffer lsUBO("m4", 1);
+	// lspaceM | matrix 4
+
+	glm::mat4 lightProjection = glm::ortho<float>(-10, 10, -10, 10, 1, 50);
+	glm::mat4 lightView = glm::lookAt(glm::vec3(2), glm::vec3(0), glm::vec3(0, 1, 0));
+	lightProjection *= lightView;
+	lsUBO.fill(0, glm::value_ptr(lightProjection));
+
+	uniformBuffers.push_back(mainBuffer);
+	uniformBuffers.push_back(lsUBO);
+}
+
+void GameScene::gameLoop()
+{
+	// float counter = 0;
+	while (NOT mainContext->shouldClose())
+	{
+		// FPS--------------------------------------------------------------------------------------------------------------------------------------------------
+
+		// tb.setText("FPS: " + std::to_string(main.getTime().avgFPS));
+		// const float w = tb.getWidth() / 2.0f;
+		// const glm::vec2& p = tb.getPos();
+		// float diff = p.x - w; // left edge
+		// diff = 5 - diff;
+		// tb.setPos({ p.x + diff, p.y });
+
+		// UPDATES----------------------------------------------------------------------------------------------------------------------------------------------
+		updateScene();
+
+		// counter += main.getTime().deltaTime;
+
+		// RENDERING--------------------------------------------------------------------------------------------------------------------------------------------
+		auto& mainBuffer = uniformBuffers[0];
+		mainBuffer.fill(0, glm::value_ptr(mainCamera->getView()));
+		mainBuffer.fill(2, glm::value_ptr(mainCamera->getPos()));
+
+		preProcess(); // shadows and scene quad
+		postProcess();// render to screen
+		// UI::UIRenderer::render(&tb);
+		// Gizmos::GizmoRenderer::drawAll();
+
+		// PHYSICS-----------------------------------------------------------------------------------------------------------------------------------------------
+
+		// cube2->getTransform()->Position.x -= 0.01;
+		// Physics::Engine::update();
+		// 
+		// // EVENTS-----------------------------------------------------------------------------------------------------------------------------------------------
+		// float speed = 1;
+		// if (Events::Handler::getCursor(Events::Cursor::Middle, Events::Action::Down)) {
+		// 	speed = 10;
+		// }
+		// if (Events::Handler::getKey(Events::Key::W, Events::Action::Down)) {
+		// 	cam.setPos(cam.getPos() + cam.getForward() * glm::vec3(1, 0, 1) * main.getTime().deltaTime * speed);
+		// }
+		// if (Events::Handler::getKey(Events::Key::S, Events::Action::Down)) {
+		// 	cam.setPos(cam.getPos() - cam.getForward() * glm::vec3(1, 0, 1) * main.getTime().deltaTime * speed);
+		// }
+		// if (Events::Handler::getKey(Events::Key::A, Events::Action::Down)) {
+		// 	cam.setPos(cam.getPos() - cam.getRight() * main.getTime().deltaTime * speed);
+		// }
+		// if (Events::Handler::getKey(Events::Key::D, Events::Action::Down)) {
+		// 	cam.setPos(cam.getPos() + cam.getRight() * main.getTime().deltaTime * speed);
+		// }
+		// if (Events::Handler::getKey(Events::Key::Space, Events::Action::Down)) {
+		// 	cam.setPos(cam.getPos() + Utils::yAxis() * main.getTime().deltaTime * speed);
+		// }
+		// if (Events::Handler::getKey(Events::Key::L_Shift, Events::Action::Down)) {
+		// 	cam.setPos(cam.getPos() - Utils::yAxis() * main.getTime().deltaTime * speed);
+		// }
+		// counter += main.getTime().deltaTime;
+		// if (counter >= 0.2 AND Events::Handler::getKey(Events::Key::Enter, Events::Action::Down)) {
+		// 	counter = 0;
+		// 	// manAnimatedComp.togglePlay();
+		// 	manAnimatedComp.startAnimation("");
+		// }
+		// if (Events::Handler::getKey(Events::Key::Backspace, Events::Action::Down))
+		// 	manAnimatedComp.startAnimation(AnimationLoaded);
+		// 
+		// if (Events::Handler::getKey(Events::Key::Escape, Events::Action::Down)) {
+		// 	break;
+		// }
+		// COLOR BUFFERS----------------------------------------------------------------------------------------------------------------------------------------
+		// sound->update();
+
+		// glfwSwapInterval(1); // V-SYNC
+		//glfwSwapBuffers(redWindow);
+		mainContext->update();
+
+		//Events::Handler::pollEvents();
+	}
 }
 
 void GameScene::cleanUp()
@@ -180,10 +296,8 @@ void GameScene::cleanUp()
 	}
 	objects.clear();
 	for (auto& pair : FBOs) {
-		Primative::Buffers::FrameBuffer*& fbo = pair.second;
-		fbo->cleanUp();
-		//delete fbo;
-		fbo = nullptr;
+		Primative::Buffers::FrameBuffer& fbo = pair.second;
+		fbo.cleanUp();
 	}
 	FBOs.clear();
 	if(skybox)
@@ -199,7 +313,7 @@ void GameScene::addPreProcLayer(const std::string& name, const unsigned& shaderI
 	this->preProcessingLayers[name] = shaderId;	
 }
 
-void GameScene::addFBO(const std::string& layerName, Primative::Buffers::FrameBuffer* fbo)
+void GameScene::addFBO(const std::string& layerName, Primative::Buffers::FrameBuffer fbo)
 {
 	FBOs.insert({ layerName, fbo });
 };

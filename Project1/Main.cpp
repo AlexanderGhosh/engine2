@@ -221,51 +221,45 @@ int main() {
     
     timer.reName("Static Buffers");
     timer.start();
-    Primative::Buffers::StaticBuffer mainBuffer("m4, m4, v3, f", 0);
-    // view    | matrix 4
-    // proj    | matrix 4
-    // viewPos | vector 3
-    // gamma   | scalar f
-    Primative::Buffers::StaticBuffer lsUBO("m4", 1);
-    // lspaceM | matrix 4
-
-    glm::mat4 lightProjection = glm::ortho<float>(-10, 10, -10, 10, 1, 50);
-
-    glm::mat4 lightView = glm::lookAt(glm::vec3(2), glm::vec3(0), glm::vec3(0, 1, 0));
-    lightProjection *= lightView;
-    lsUBO.fill(0, glm::value_ptr(lightProjection));
-
-    
-    glm::mat4 projection = glm::perspective(glm::radians(cam.getFOV()), 800.0f / 600.0f, 0.01f, 5000.0f);
-    
-    mainBuffer.fill(1, glm::value_ptr(projection));
-    float gamma = 2.2f;
-    mainBuffer.fill(3, &gamma);
+    // Primative::Buffers::StaticBuffer mainBuffer("m4, m4, v3, f", 0);
+    // // view    | matrix 4
+    // // proj    | matrix 4
+    // // viewPos | vector 3
+    // // gamma   | scalar f
+    // Primative::Buffers::StaticBuffer lsUBO("m4", 1);
+    // // lspaceM | matrix 4
+    // 
+    // glm::mat4 lightProjection = glm::ortho<float>(-10, 10, -10, 10, 1, 50);
+    // 
+    // glm::mat4 lightView = glm::lookAt(glm::vec3(2), glm::vec3(0), glm::vec3(0, 1, 0));
+    // lightProjection *= lightView;
+    // lsUBO.fill(0, glm::value_ptr(lightProjection));
+    // 
+    // 
+    // glm::mat4 projection = glm::perspective(glm::radians(cam.getFOV()), 800.0f / 600.0f, 0.01f, 5000.0f);
+    // 
+    // mainBuffer.fill(1, glm::value_ptr(projection));
+    // float gamma = 2.2f;
+    // mainBuffer.fill(3, &gamma);
 
     timer.log();
     timer.stop();
 
     timer.reName("Scene");
     timer.start();
-    Primative::Buffers::FrameBuffer shadowFBO({ "depth" }, { 800, 600 }, { 1, 0, 1 });
-    Primative::Buffers::FrameBuffer finalFBO({ "col0" }, { 800, 600 }, { 0, 0, 1 });
     //Primative::MSAABuffer* finalQB = DBG_NEW Primative::MSAABuffer({ "col" }, { 800, 600 });
 
     GameScene scene;
     scene.setMainCamera(&cam);
-    scene.addFBO("shadows", &shadowFBO);
-    scene.addPreProcLayer("shadows", ResourceLoader::getShader("ShadowShader"));
-    scene.addFBO("final", &finalFBO);
-    scene.addPreProcLayer("final", ResourceLoader::getShader("PBRShader"));
-    scene.setPostProcShader(ResourceLoader::getShader("PostShader")); // PBRShader  PostShader
     scene.setContext(&main);
+    scene.setBG({ 1, 0, 0 });
+    scene.initalize();
 
     scene.addObject(&manObject);
     scene.addObject(&redWindow);
     scene.addObject(&yellowWindow);
     scene.addTerrain(&land);
 
-    scene.setBG({ 1, 0, 0 });
     timer.log();
 
     // SKYBOX //
