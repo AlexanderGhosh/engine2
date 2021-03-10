@@ -9,7 +9,7 @@ using Key = Events::Key;
 using Cursor = Events::Cursor;
 using Action = Events::Action;
 
-PlayerControler::PlayerControler() : Component::Scripting()
+PlayerControler::PlayerControler() : Component::Scripting(), firstMouse(true), lastX(0), lastY(0)
 {
 }
 
@@ -24,7 +24,7 @@ void PlayerControler::update(float deltaTime) {
 	}
 	float speed = 10;
 	if (EH::getCursor(Events::Cursor::Middle, Events::Action::Down)) {
-		speed = 10;
+		speed *= 2;
 	}
 	if (EH::getKey(Key::W, Action::Down)) {
 		pos += camera->getForward() * glm::vec3(1, 0, 1) * deltaTime * speed;
@@ -44,4 +44,23 @@ void PlayerControler::update(float deltaTime) {
 	if (EH::getKey(Key::L_Shift, Action::Down)) {
 		pos -= Utils::yAxis() * deltaTime * speed;
 	}
+}
+
+void PlayerControler::mouseMove(float deltaTime)
+{
+	const glm::vec2& pos = EH::getCursorPos();
+	if (firstMouse)
+	{
+		lastX = pos.x;
+		lastY = pos.y;
+		firstMouse = 0;
+	}
+
+	float xoffset = pos.x - lastX;
+	float yoffset = lastY - pos.y;
+	lastX = pos.x;
+	lastY = pos.y;
+
+	Component::Camera* camera = parent->getComponet<Component::Camera>();
+	camera->ProcessMouseMovement(xoffset, yoffset);
 }

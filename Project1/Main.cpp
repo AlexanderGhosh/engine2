@@ -48,33 +48,6 @@
 #include "MainWindow.h"
 #include "Context.h"
 
-
-#define PBRen 1
-
-Component::Camera cam;
-bool firstMouse = 1;
-float lastX = 0, lastY = 0;
-void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
-    if (firstMouse)
-    {
-        lastX = xpos;
-        lastY = ypos;
-        firstMouse = 0;
-    }
-
-    float xoffset = xpos - lastX;
-    float yoffset = lastY - ypos;
-    lastX = xpos;
-    lastY = ypos;
-
-    cam.ProcessMouseMovement(xoffset, yoffset);
-}
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode) {
-    if (key == GLFW_KEY_W){
-        cam.setPos(cam.getForward() * 0.1f + cam.getForward());
-    }
-}
-
 int main() {
     srand(time(0));
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
@@ -83,8 +56,6 @@ int main() {
 
     Context main({ 800, 600 }, false);
     main.init("Engine 2", { GL_BLEND, GL_DEPTH_TEST, GL_CULL_FACE, GL_MULTISAMPLE });
-
-    cam.setPos({ 0, 1, 0.15 }); // 200, 700
 
     Utils::Timer timer("Shaders");
     timer.start();
@@ -304,7 +275,7 @@ int main() {
     // SOUNDS //
     
     Events::Handler::init(main.getWindow());
-    glfwSetCursorPosCallback(main.getWindow(), mouse_callback);
+    //glfwSetCursorPosCallback(main.getWindow(), mouse_callback);
     
     // timer.reName("Physics");
     // timer.start();
@@ -326,7 +297,6 @@ int main() {
 
     scene.gameLoop();
 
-    float counter = 0;
     /*while (!main.shouldClose())
     {
         // FPS--------------------------------------------------------------------------------------------------------------------------------------------------
@@ -341,57 +311,15 @@ int main() {
         // UPDATES----------------------------------------------------------------------------------------------------------------------------------------------
         scene.updateObjects();
 
-        counter += main.getTime().deltaTime;
-
         // RENDERING--------------------------------------------------------------------------------------------------------------------------------------------
-        mainBuffer.fill(0, value_ptr(cam.getView()));
-        mainBuffer.fill(2, value_ptr(cam.getPos()));
-    
-        scene.preProcess(); // shadows and scene quad
-        scene.postProcess();// render to screen
         UI::UIRenderer::render(&tb);
-        Gizmos::GizmoRenderer::drawAll();
 
         // PHYSICS-----------------------------------------------------------------------------------------------------------------------------------------------
 
         // cube2->getTransform()->Position.x -= 0.01;
         Physics::Engine::update();
     
-        // EVENTS-----------------------------------------------------------------------------------------------------------------------------------------------
-        float speed = 1;
-        if(Events::Handler::getCursor(Events::Cursor::Middle, Events::Action::Down)) {
-            speed = 10;
-        }
-        if (Events::Handler::getKey(Events::Key::W, Events::Action::Down)) {
-            cam.setPos(cam.getPos() + cam.getForward() * glm::vec3(1, 0, 1) * main.getTime().deltaTime * speed);
-        }
-        if (Events::Handler::getKey(Events::Key::S, Events::Action::Down)) {
-            cam.setPos(cam.getPos() - cam.getForward() * glm::vec3(1, 0, 1) * main.getTime().deltaTime * speed);
-        }
-        if (Events::Handler::getKey(Events::Key::A, Events::Action::Down)) {
-            cam.setPos(cam.getPos() - cam.getRight() * main.getTime().deltaTime * speed);
-        }
-        if (Events::Handler::getKey(Events::Key::D, Events::Action::Down)) {
-            cam.setPos(cam.getPos() + cam.getRight() * main.getTime().deltaTime * speed);
-        }
-        if (Events::Handler::getKey(Events::Key::Space, Events::Action::Down)) {
-            cam.setPos(cam.getPos() + Utils::yAxis() * main.getTime().deltaTime * speed);
-        }
-        if (Events::Handler::getKey(Events::Key::L_Shift, Events::Action::Down)) {
-            cam.setPos(cam.getPos() - Utils::yAxis() * main.getTime().deltaTime * speed);
-        }
-        counter += main.getTime().deltaTime;
-        if (counter >= 0.2 AND Events::Handler::getKey(Events::Key::Enter, Events::Action::Down)) {
-            counter = 0;
-            // manAnimatedComp.togglePlay();
-            manAnimatedComp.startAnimation("");
-        }
-        if(Events::Handler::getKey(Events::Key::Backspace, Events::Action::Down))
-            manAnimatedComp.startAnimation(AnimationLoaded);
-
-        if (Events::Handler::getKey(Events::Key::Escape, Events::Action::Down)) {
-            break;
-        }
+        
         // COLOR BUFFERS----------------------------------------------------------------------------------------------------------------------------------------
         // sound->update();
 
@@ -421,6 +349,5 @@ int main() {
     
     
     //main.cleanUp();
-    cam.cleanUp();
     return 0;
 }
