@@ -30,7 +30,7 @@ bool SoundManager::init()
 	}
 	ALCcontext* contex = alcCreateContext(device, NULL);
 	if (!contex) {
-		std::cout << "failed to create contex" << std::endl;
+		std::cout << "Failed to create contex" << std::endl;
 		return false;
 	}
 	alcMakeContextCurrent(contex);

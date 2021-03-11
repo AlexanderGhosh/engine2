@@ -21,6 +21,7 @@
 #include "Componets/Animated.h"
 #include "Componets/Camera.h"
 #include "Rendering/Rendering.h"
+#include "Componets/AudioReciever.h"
 
 #include "Physics/Engine.h"
 #include "Physics/Collision/Broadphase/NSquared.h"
@@ -43,6 +44,7 @@
 #include "Scripts/DebugScreen.h"
 #include "Scripts/SpinScript.h"
 #include "Scripts/HoverScript.h"
+#include "Scripts/SoundControllerScript.h"
 
 #include "Context.h"
 
@@ -56,6 +58,9 @@ int main() {
     Context main({ 800, 600 }, false);
     main.init("Engine 2", { GL_BLEND, GL_DEPTH_TEST, GL_CULL_FACE, GL_MULTISAMPLE });
     Events::Handler::init(main.getWindow());
+
+    SoundManager::init();
+    const auto soundDatabuffer = SoundManager::createBuffer("Resources/Sounds/iamtheprotectorofthissystem.wav");
 
     timer.reName("Shaders");
     timer.start();
@@ -171,21 +176,26 @@ int main() {
     GameObject minikit({ 0, 1, 0 }, { 0.5, 0.5, 0.5 });
     Component::RenderMesh minikitMesh;
     minikitMesh.setModel(minikitBuffer);
-    Materials::PBR minikitMatWhite(MI({ 1, 1, 1 }), MI({ 1, 1, 1 }), MI({ 0.5, 0.5, 0.5 }), MI({ 0.5, 0, 0 }), MI({ 0, 0, 0 }));
-    Materials::PBR minikitMatGray(MI({ 0.5, 0.5, 0.5 }), MI({ 1, 1, 1 }), MI({ 0.5, 0.5, 0.5 }), MI({ 0.5, 0, 0 }), MI({ 0, 0, 0 }));
-    Materials::PBR minikitMatBlack(MI({ 0, 0, 0 }), MI({ 1, 1, 1 }), MI({ 0.5, 0.5, 0.5 }), MI({ 0.5, 0, 0 }), MI({ 0, 0, 0 }));
-    Materials::PBR minikitMatGreen(MI({ 0, 0.75, 0 }), MI({ 1, 1, 1 }), MI({ 0.5, 0.5, 0.5 }), MI({ 0.5, 0, 0 }), MI({ 0, 0, 0 }));
-    Materials::PBR minikitMatRed(MI({ 0.75, 0, 0 }), MI({ 1, 1, 1 }), MI({ 0.5, 0.5, 0.5 }), MI({ 0.5, 0, 0 }), MI({ 0, 0, 0 }));
+    Materials::PBR minikitMatWhite(MI({ 1, 1, 1 }),       MI({ 1, 1, 1 }), MI({ 0.5, 0.5, 0.5 }), MI({ 0.5, 0, 0 }), MI({ 0, 0, 0 }));
+    Materials::PBR minikitMatGray( MI({ 0.5, 0.5, 0.5 }), MI({ 1, 1, 1 }), MI({ 0.5, 0.5, 0.5 }), MI({ 0.5, 0, 0 }), MI({ 0, 0, 0 }));
+    Materials::PBR minikitMatBlack(MI({ 0, 0, 0 }),       MI({ 1, 1, 1 }), MI({ 0.5, 0.5, 0.5 }), MI({ 0.5, 0, 0 }), MI({ 0, 0, 0 }));
+    Materials::PBR minikitMatGreen(MI({ 0, 0.75, 0 }),    MI({ 1, 1, 1 }), MI({ 0.5, 0.5, 0.5 }), MI({ 0.5, 0, 0 }), MI({ 0, 0, 0 }));
+    Materials::PBR minikitMatRed(  MI({ 0.75, 0, 0 }),    MI({ 1, 1, 1 }), MI({ 0.5, 0.5, 0.5 }), MI({ 0.5, 0, 0 }), MI({ 0, 0, 0 }));
     minikitMesh.setMaterialTo(&minikitMatWhite, "white");
-    minikitMesh.setMaterialTo(&minikitMatGray, "gray");
+    minikitMesh.setMaterialTo(&minikitMatGray,  "gray");
     minikitMesh.setMaterialTo(&minikitMatBlack, "black");
     minikitMesh.setMaterialTo(&minikitMatGreen, "green");
-    minikitMesh.setMaterialTo(&minikitMatRed, "red");
+    minikitMesh.setMaterialTo(&minikitMatRed,    "red");
     minikit.addComponet(&minikitMesh);
     SpinScript spinScript({ -1, 1, 0 }, 0.125);
     minikit.addComponet(&spinScript);
     HoverScript hoverScript(1, 0.25);
-    minikit.addComponet(&hoverScript);
+    // minikit.addComponet(&hoverScript);
+    Component::AudioSource audio(SoundManager::createSoundSource());
+    audio.addBuffer(soundDatabuffer);
+    minikit.addComponet(&audio);
+    SoundControllerScript scs;
+    minikit.addComponet(&scs);
 
     timer.log();
 
@@ -219,6 +229,8 @@ int main() {
     player.addComponet(&playerScript);
     DebugScreen debugScript;
     player.addComponet(&debugScript);
+    Component::AudioReciever recieverComp;
+    minikit.addComponet(&recieverComp);
     timer.log();
 
 
@@ -249,15 +261,6 @@ int main() {
     scene.setSkyBox(&sb);
     timer.log();
     // SKYBOX //
-    
-
-    // SOUNDS //
-   //SoundManager::init();
-   //const auto buffer = SoundManager::createBuffer("C:/Users/AGWDW/Desktop/iamtheprotectorofthissystem.wav");
-   //Component::AudioSource* audio = DBG_NEW Component::AudioSource(
-   //    SoundManager::createSoundSource());
-   //audio->addBuffer(buffer);
-    // SOUNDS // 
     
     
     // timer.reName("Physics");

@@ -3,7 +3,7 @@
 #include "../EventSystem/Handler.h"
 #include "../Scene/GameScene.h"
 
-HoverScript::HoverScript() : Component::Scripting(), distance(0), speed(0), moved(0), t(0), t1(0)
+HoverScript::HoverScript() : Component::Scripting(), distance(0), speed(0), moved(0)
 {
 }
 
