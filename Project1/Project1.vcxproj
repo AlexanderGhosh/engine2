@@ -145,6 +145,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Componets\Scripting.cpp" />
+    <ClCompile Include="Scripts\DebugScreen.cpp" />
     <ClCompile Include="Scripts\PlayerControler.cpp" />
     <ClCompile Include="Utils\NoiseGeneration.cpp" />
     <ClCompile Include="Primatives\Buffers\ArrayBuffer.cpp" />
@@ -187,7 +188,7 @@
     <ClCompile Include="UI\TextRenderer.cpp" />
     <ClCompile Include="UI\Elements\TextBlock.cpp" />
     <ClCompile Include="UI\UIRenderer.cpp" />
-    <ClCompile Include="UI\Panes\Pane.cpp" />
+    <ClCompile Include="UI\Panes\Canvas.cpp" />
     <ClCompile Include="UI\Elements\Element.cpp" />
     <ClCompile Include="Scene\GameScene.cpp" />
     <ClCompile Include="Primatives\Material.cpp" />
@@ -205,7 +206,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Componets\Scripting.h" />
+    <ClInclude Include="Scripts\DebugScreen.h" />
     <ClInclude Include="Scripts\PlayerControler.h" />
+    <ClInclude Include="UI\Page.h" />
     <ClInclude Include="Utils\NoiseGeneration.h" />
     <ClInclude Include="Primatives\Buffers\ArrayBuffer.h" />
     <ClInclude Include="Componets\Animated.h" />
@@ -241,7 +244,6 @@
     <ClInclude Include="UI\Elements\ListBox.h" />
     <ClInclude Include="UI\Panes\Grid.h" />
     <ClInclude Include="MainWindow.h" />
-    <ClInclude Include="UI\Page.h" />
     <ClInclude Include="SoundManager.h" />
     <ClInclude Include="UI\Elements\TextField.h" />
     <ClInclude Include="UI\Elements\ImageBox.h" />
@@ -250,7 +252,7 @@
     <ClInclude Include="UI\TextRenderer.h" />
     <ClInclude Include="UI\Elements\TextBlock.h" />
     <ClInclude Include="UI\UIRenderer.h" />
-    <ClInclude Include="UI\Panes\Pane.h" />
+    <ClInclude Include="UI\Panes\Canvas.h" />
     <ClInclude Include="UI\Elements\Element.h" />
     <ClInclude Include="Scene\GameScene.h" />
     <ClInclude Include="Primatives\Material.h" />

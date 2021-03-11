@@ -5,6 +5,7 @@ class PlayerControler : public Component::Scripting
 {
 public:
 	PlayerControler();
+	~PlayerControler() = default;
 	void update(float deltaTime);
 	void mouseMove(float deltaTime);
 private:

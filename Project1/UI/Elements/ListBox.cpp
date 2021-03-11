@@ -42,3 +42,11 @@ void UI::ListView::drawContent() const
 		item->drawContent();
 	}
 }
+
+void UI::ListView::cleanUp()
+{
+	for (auto itt = elements.begin(); itt != elements.end();) {
+		(*itt)->cleanUp();
+		itt = elements.erase(itt);
+	}
+}

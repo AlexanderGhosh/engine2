@@ -12,5 +12,5 @@ void main() {
     if (col_vec.a == 0){
         col = texture(col_id, texCoords).rgb;
     }
-    FragColor = vec4(col, 1);
+    FragColor = vec4(1);
 }

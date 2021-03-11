@@ -14,8 +14,8 @@ namespace UI {
 		std::string name;
 		bool cursorOver, mDown;
 		Materials::MatItem backgroundColor;
-	public:
 		Element();
+	public:
 
 		inline const glm::vec4& getMargin() const { return margin; };
 		inline void setMargin(const glm::vec4& margin) { this->margin = margin; };
@@ -48,6 +48,8 @@ namespace UI {
 		glm::mat4 getModel() const;
 
 		virtual void drawContent() const = 0;
+
+		virtual void cleanUp();
 	};
 };
 

@@ -22,7 +22,7 @@ void PlayerControler::update(float deltaTime) {
 	if (EH::getKey(Key::Escape, Action::Down)) {
 		parent->getScene()->close();
 	}
-	float speed = 10;
+	float speed = 5;
 	if (EH::getCursor(Events::Cursor::Middle, Events::Action::Down)) {
 		speed *= 2;
 	}

@@ -19,12 +19,9 @@ UI::TextRenderer::TextRenderer(const glm::vec2& screenDim, String fontName) : ch
     }
 
     // find path to font
-    std::string font_name = "Resources/Fonts/" + fontName + ".ttf";
-    if (font_name.empty())
-    {
-        std::cout << "ERROR::FREETYPE: Failed to load font_name" << std::endl;
-        return;
-    }
+    // C:\Windows\Fonts
+    // Resources/Fonts/
+    std::string font_name = "C:/Windows/Fonts/" + fontName + ".ttf";
 
     // load font as face
     FT_Face face;
@@ -102,7 +99,6 @@ UI::TextRenderer::TextRenderer(const glm::vec2& screenDim, String fontName) : ch
 
 void UI::TextRenderer::drawText(String text, float x, float y, float scale, glm::vec3 color) const
 {
-    glEnable(GL_BLEND);
     Render::Shading::Manager::setActive(UI::TextRenderer::shaderId);
     Render::Shading::Manager::setValue("color", color);
     Render::Shading::Manager::setValue("text", 0);
@@ -118,9 +114,6 @@ void UI::TextRenderer::drawText(String text, float x, float y, float scale, glm:
 
         float xpos = x + ch.bearing.x * scale;
         float ypos = y - (ch.size.y - ch.bearing.y) * scale;
-
-        // xpos--;
-        // ypos--;
 
         float w = ch.size.x * scale;
         float h = ch.size.y * scale;
@@ -153,8 +146,7 @@ void UI::TextRenderer::drawText(String text, float x, float y, float scale, glm:
 const glm::vec2& UI::TextRenderer::getStringDimentions(String text, Unsigned scale) const
 {
     glm::vec2 res(0, -INFINITY);
-    std::string::const_iterator c;
-    for (c = text.begin(); c != text.end(); c++) {
+    for (auto c = text.begin(); c != text.end(); c++) {
         const char& c_ = *c;
         const UI::Character& character = this->chars.at(c_);
         res.x += (character.advance >> 6) * scale;
@@ -169,10 +161,10 @@ const glm::vec2& UI::TextRenderer::getStringDimentions(String text, Unsigned sca
 
 UI::TextRenderer* UI::TextRenderer::getFont(String name)
 {
-    unsigned s = UI::TextRenderer::loadedFonts.size();
-    UI::TextRenderer* r = UI::TextRenderer::loadedFonts[name];
-    if (UI::TextRenderer::loadedFonts.size() > s) {
-        UI::TextRenderer::loadedFonts.erase(name);
+    unsigned s = loadedFonts.size();
+    UI::TextRenderer* r = loadedFonts[name];
+    if (loadedFonts.size() > s) {
+        loadedFonts.erase(name);
         return nullptr;
     }
     return r;
@@ -180,20 +172,18 @@ UI::TextRenderer* UI::TextRenderer::getFont(String name)
 
 void UI::TextRenderer::cleanUpStatic()
 {
-    for (auto& pair : UI::TextRenderer::loadedFonts) {
-        pair.second->cleanUp();
-        // delete pair.second;
-        pair.second = nullptr;
+    for (auto itt = loadedFonts.begin(); itt != loadedFonts.end();) {
+        (*itt).second->cleanUp();
+        itt = loadedFonts.erase(itt);
     }
-    UI::TextRenderer::loadedFonts.clear();
 }
 
 void UI::TextRenderer::cleanUp()
 {
-    for (auto& pair : chars) {
-        glDeleteTextures(1, &pair.second.texId);
+    for (auto itt = chars.begin(); itt != chars.end();) {
+        glDeleteTextures(1, &(*itt).second.texId);
+        itt = chars.erase(itt);
     }
-    chars.clear();
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
 }

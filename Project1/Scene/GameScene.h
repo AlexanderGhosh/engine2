@@ -9,7 +9,11 @@ class SkyBox;
 class Context;
 class GameObject;
 class Terrain;
+namespace UI {
+	class Canvas;
+}
 namespace Component {
+	class ComponetBase;
 	class Camera;
 	class RenderMesh;
 }
@@ -34,6 +38,7 @@ private:
 	Component::Camera* mainCamera;
 	std::vector<Component::RenderMesh*> opaque;
 	std::map<float, Component::RenderMesh*> transparent;
+	std::vector<UI::Canvas*> uiStuff;
 	std::vector<GameObject*> objects;
 	std::unordered_map<std::string, unsigned> preProcessingLayers;
 	unsigned currentTick, postProcShaderId;
@@ -49,6 +54,7 @@ private:
 	void drawOpaque();
 	void drawTransparent();
 	void drawTerrain();
+	void drawUI();
 
 	// polling evetns
 	std::vector<GameEventsTypes> getCurrentEvents() const;
@@ -68,6 +74,7 @@ public:
 	void addFBO(const std::string& layerName, Primative::Buffers::FrameBuffer fbo);
 	void addObject(GameObject* obj);
 	void addTerrain(Terrain* terrain);
+	void processComponet(Component::ComponetBase* comp);
 
 	// setters
 	void setBG(Vector3 col);

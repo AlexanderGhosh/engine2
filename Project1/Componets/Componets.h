@@ -7,7 +7,7 @@ class GameObject;
 namespace Component {
 	enum class Type
 	{
-		Transform, Camera, AudioSource, Rigidbody, Collider, RenderMesh, Light, Animated, Script
+		Transform, Camera, AudioSource, Rigidbody, Collider, RenderMesh, Light, Animated, Script, Canvas
 	};
 	class ComponetBase {
 	public:

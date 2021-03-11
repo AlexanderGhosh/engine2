@@ -81,3 +81,8 @@ glm::mat4 UI::Element::getModel() const
 	model = glm::scale(model, glm::vec3(width, height, 0)/2.0f);
 	return model;
 }
+
+void UI::Element::cleanUp()
+{
+	backgroundColor.cleanUp();
+}

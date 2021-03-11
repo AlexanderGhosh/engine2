@@ -45,7 +45,7 @@
     <ClCompile Include="EventSystem\Handler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="UI\Panes\Pane.cpp">
+    <ClCompile Include="UI\Panes\Canvas.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="UI\Elements\Element.cpp">
@@ -189,6 +189,9 @@
     <ClCompile Include="Scripts\PlayerControler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Scripts\DebugScreen.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Rendering\Rendering.h">
@@ -227,7 +230,7 @@
     <ClInclude Include="EventSystem\Handler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="UI\Panes\Pane.h">
+    <ClInclude Include="UI\Panes\Canvas.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="UI\Elements\Element.h">
@@ -261,9 +264,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MainWindow.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="UI\Page.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="UI\Panes\Grid.h">
@@ -375,6 +375,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Scripts\PlayerControler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\Page.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripts\DebugScreen.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -2,7 +2,6 @@
 #include <GL/glew.h>
 
 #pragma region Static Variables
-int Primative::Buffers::StaticBuffer::usedBindingPoint = -1;
 int Primative::Buffers::StaticBuffer::maxBingingPoints = -1;
 #pragma endregion
 
@@ -69,9 +68,7 @@ Primative::Buffers::StaticBuffer::StaticBuffer(const std::vector<std::string>& t
 
 const void Primative::Buffers::StaticBuffer::init(unsigned dataSize, short bindingPoint)
 {
-	this->bindingPoint = (bindingPoint < 0) ? usedBindingPoint + 1 : bindingPoint;
-	this->bindingPoint %= maxBingingPoints;
-	usedBindingPoint = this->bindingPoint;
+	this->bindingPoint = bindingPoint;
 	glGenBuffers(1, &UBO);
 	this->bind();
 

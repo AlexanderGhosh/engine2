@@ -44,6 +44,7 @@
 #include "Primatives/Buffers/UniformBuffer.h"
 #include "Utils/NoiseGeneration.h"
 #include "Scripts/PlayerControler.h"
+#include "Scripts/DebugScreen.h"
 
 #include "MainWindow.h"
 #include "Context.h"
@@ -66,7 +67,19 @@ int main() {
 
     Gizmos::GizmoRenderer::init();
     timer.log();
+    // UI //
+    timer.reName("UI");
+    timer.start();
+    UI::TextRenderer font = UI::TextRenderer({ 800, 600 }, "arial"); // creates arial Font
+    UI::TextRenderer::setShader(ResourceLoader::getShader("TextShader"));
+    UI::UIRenderer::init(ResourceLoader::getShader("UIShader"), { 800, 600 });
 
+    //UI::TextBlock tb = UI::TextBlock();
+    //tb.setText("FPS: 1000");
+    //tb.setForgroundColor({ 1, 1, 1 });
+    //tb.setPos({ 115, 575 });
+    timer.log();
+    // UI //
     timer.reName("Models");
     timer.start();
     const Primative::Model manModel    = ResourceLoader::createModel("Resources/Models/RFA_Model.fbx"); // RFA_Model
@@ -223,6 +236,16 @@ int main() {
     player.addComponet(&playerCamera);
     PlayerControler playerScript;
     player.addComponet(&playerScript);
+    // UI::Canvas canvas(800, 600);
+    // UI::TextBlock tb = UI::TextBlock();
+    // tb.setText("FPS: 1000");
+    // tb.setForgroundColor({ 1, 1, 1 });
+    // tb.setPos({ 115, 575 });
+    // canvas.addElement(tb);
+    // player.addComponet(&canvas);
+    DebugScreen debugScript;
+    player.addComponet(&debugScript);
+    
 
 
     timer.reName("Scene");
@@ -253,18 +276,7 @@ int main() {
     // SKYBOX //
     
 
-    // UI //
-    timer.reName("UI");
-    timer.start();
-    UI::TextRenderer font = UI::TextRenderer({ 800, 600 }); // creates arial Font
-    UI::TextRenderer::setShader(ResourceLoader::getShader("TextShader"));
-    UI::UIRenderer::init(ResourceLoader::getShader("UIShader"), { 800, 600 });
-
-    UI::TextBlock tb = UI::TextBlock();
-    tb.setText("FPS: 1000");
-    tb.setForgroundColor({ 1, 1, 1 });
-    tb.setPos({ 115, 575 });
-    timer.log();
+    
 
     // SOUNDS //
    //SoundManager::init();

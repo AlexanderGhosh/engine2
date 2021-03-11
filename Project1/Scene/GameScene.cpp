@@ -12,6 +12,8 @@
 #include "../Primatives/Buffers/UniformBuffer.h"
 #include "../EventSystem/Handler.h"
 #include "../Gizmos/GizmoRenderer.h"
+#include "../UI/UIRenderer.h"
+#include "../UI/Panes/Canvas.h"
 
 std::vector<GameEventsTypes> GameScene::getCurrentEvents() const
 {
@@ -31,7 +33,7 @@ std::vector<GameEventsTypes> GameScene::getCurrentEvents() const
 
 GameScene::GameScene() : objects(), preProcessingLayers(), currentTick(0), postProcShaderId(0), FBOs(), backgroundColour(0),
 							skybox(nullptr), mainContext(nullptr), opaque(), transparent(), mainCamera(nullptr), terrain(), 
-							quadModel(), isFirstLoop(false), closing(false)
+							quadModel(), isFirstLoop(false), closing(false), uiStuff()
 {
 	quadModel = ResourceLoader::getModel("plane.dae");
 }
@@ -73,11 +75,30 @@ void GameScene::drawTerrain()
 	}
 }
 
+void GameScene::drawUI()
+{
+	for (UI::Canvas* canvas : uiStuff) {
+		canvas->update(mainContext->getTime().deltaTime);
+	}
+}
+
 void GameScene::addObject(GameObject* obj)
 {
 	objects.push_back(obj);
+	obj->raiseEvents({ GameEventsTypes::Awake }, 0);
 	obj->setScene(this);
-	Component::RenderMesh* mesh = obj->getComponet<Component::RenderMesh>();
+
+	obj->processComponets();
+}
+
+void GameScene::addTerrain(Terrain* terrain)
+{
+	this->terrain.push_back(terrain);
+}
+
+void GameScene::processComponet(Component::ComponetBase* comp)
+{
+	Component::RenderMesh* mesh = reinterpret_cast<Component::RenderMesh*>(comp);
 	if (mesh) {
 		if (mesh->getTransparent()) {
 			transparent[rand()] = mesh;
@@ -86,12 +107,10 @@ void GameScene::addObject(GameObject* obj)
 			opaque.push_back(mesh);
 		}
 	}
-	obj->raiseEvents({ GameEventsTypes::Awake }, 0);
-}
-
-void GameScene::addTerrain(Terrain* terrain)
-{
-	this->terrain.push_back(terrain);
+	UI::Canvas* canv = reinterpret_cast<UI::Canvas*>(comp);
+	if (canv) {
+		uiStuff.push_back(canv);
+	}
 }
 
 void GameScene::setBG(Vector3 col) 
@@ -117,6 +136,7 @@ void GameScene::preProcess()
 		else {
 			drawSkyBox();
 			drawObjects(shaderId);
+			drawUI();
 		}
 		fbo.unBind();
 	}
@@ -129,14 +149,15 @@ void GameScene::postProcess()
 
 
 	Render::Shading::Manager::setActive(postProcShaderId);
-
+	
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, FBOs["final"].getTexture("col0"));
 	Render::Shading::Manager::setValue("tex", 0);
-
+	
 	const Primative::Buffers::VertexBuffer& buffer = ResourceLoader::getBuffer(quadModel.getBuffers()[0]);
 	//drawSkyBox();
 	buffer.render();
+	//drawUI();
 
 
 	// drawSkyBox();
@@ -260,6 +281,7 @@ void GameScene::gameLoop()
 		// UI::UIRenderer::render(&tb);
 		Gizmos::GizmoRenderer::drawAll();
 
+
 		// PHYSICS-----------------------------------------------------------------------------------------------------------------------------------------------
 
 		// cube2->getTransform()->Position.x -= 0.01;
@@ -327,6 +349,10 @@ void GameScene::cleanUp()
 	for (auto itt = terrain.begin(); itt != terrain.end();) {
 		(*itt)->cleanUp();
 		itt = terrain.erase(itt);
+	}
+	for (auto itt = uiStuff.begin(); itt != uiStuff.end();) {
+		(*itt)->cleanUp();
+		itt = uiStuff.erase(itt);
 	}
 
 	FBOs.clear();

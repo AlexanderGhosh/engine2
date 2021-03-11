@@ -1,8 +1,29 @@
 #include "Grid.h"
 #include "../../Utils/General.h"
 
-UI::Grid::Grid(unsigned width, unsigned height) : Pane(width, height), columns(1), rows(1), elementPositions()
+UI::Grid::Grid(unsigned width, unsigned height) : Canvas(width, height), columns(1), rows(1), elementPositions()
 {
+}
+
+void UI::Grid::addElement(Element* element)
+{
+	elements.push_back(element);
+	elementPositions.push_back({ 0, 0 });
+}
+void UI::Grid::addElement(Element& element)
+{
+	elements.push_back(&element);
+	elementPositions.push_back({ 0, 0 });
+}
+
+void UI::Grid::setColumnCount(const unsigned& columns) 
+{
+	this->columns = columns;
+}
+
+void UI::Grid::setRowCount(const unsigned& rows) 
+{
+	this->rows = rows; 
 }
 
 void UI::Grid::setColumn(Element* element, const unsigned& column)
@@ -17,7 +38,7 @@ void UI::Grid::setRow(Element* element, const unsigned& row)
 	elementPositions[i].second = row;
 }
 
-void UI::Grid::update()
+void UI::Grid::update(float deltaTime)
 {
 	unsigned columnSize = width / columns;
 	unsigned rowSize = height / rows;
@@ -28,5 +49,5 @@ void UI::Grid::update()
 			continue;
 		elements[i]->setPos({ c * columnSize, r * rowSize });
 	}
-	Pane::update();
+	Canvas::update(deltaTime);
 }

@@ -19,6 +19,7 @@ namespace UI {
 		inline const unsigned& getSeperation() const { return seperation; };
 		void checkEvents();
 		void drawContent() const; 
+		void cleanUp();
 	};
 };
 

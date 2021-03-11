@@ -8,14 +8,13 @@ namespace Primative {
 			int bindingPoint;
 			std::vector<std::pair<unsigned, unsigned>> positions;
 			// statics
-			static int usedBindingPoint;
 			static int maxBingingPoints;
 			// private functions
 			const void init(unsigned dataSize, short bindingPoint = -1);
 		public:
 			StaticBuffer();
 			StaticBuffer(String types, char bindingPoint = -1);
-			StaticBuffer(const std::vector<std::string>& types, char bindingPoint = -1);
+			StaticBuffer(const std::vector<std::string>& types, char bindingPoint);
 			~StaticBuffer() = default;
 
 			const short getBindingPoint() const;

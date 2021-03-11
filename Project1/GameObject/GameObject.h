@@ -1,12 +1,16 @@
 #pragma once
 #define FIXED_UPDATE_RATE 20
-#include <vector>
+#include <unordered_map>
 #include "../Utils/General.h"
 
 namespace Component {
 	class ComponetBase;
 	struct Transform;
 	class RigidBody;
+	class RenderMesh;
+}
+namespace UI {
+	class Canvas;
 }
 enum class GameEventsTypes;
 class GameScene;
@@ -47,5 +51,6 @@ public:
 	void resurect();
 	void setScene(GameScene* scene);
 	GameScene* getScene();
+	void processComponets();
 };
 

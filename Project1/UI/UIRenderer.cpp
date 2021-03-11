@@ -28,24 +28,23 @@ void UI::UIRenderer::init(const unsigned& shaderId, const glm::vec2& screenDim)
 	};
 	quadBuffer = Primative::Buffers::VertexBuffer(mesh);
 
-	uiBuffer = Primative::Buffers::StaticBuffer("m4");
-	// uiBuffer.init(sizeof(glm::mat4), 1);
+	uiBuffer = Primative::Buffers::StaticBuffer("m4", 2);
 	glm::mat4 proj = glm::ortho(0.0f, screenDim.x, 0.0f, screenDim.y);
 	uiBuffer.fill(0, glm::value_ptr(proj));
 }
 
-void UI::UIRenderer::render(const UI::Pane* pane) // draws the quads
+void UI::UIRenderer::render(const UI::Canvas* pane) // draws the quads
 {
 	glDisable(GL_DEPTH_TEST);
 	quadBuffer.bind();
+	Render::Shading::Manager::setActive(shaderId);
 	for (const UI::Element* element : pane->getElements()) {
-		Render::Shading::Manager::setActive(shaderId);
 		glm::mat4 model = element->getModel();
 		model[3][1] = pane->getDimentions().y - model[3][1];
 		Render::Shading::Manager::setValue("model", model); 
 
 		const Materials::MatItem& bg = element->getBackgroundColor();
-		if (!bg.hasTex()) {
+		if (NOT bg.hasTex()) {
 			Render::Shading::Manager::setValue("col_vec", glm::vec4(bg.getRaw(), 1));
 		}
 		else {
@@ -60,11 +59,6 @@ void UI::UIRenderer::render(const UI::Pane* pane) // draws the quads
 	}
 	quadBuffer.unBind(); 
 	glEnable(GL_DEPTH_TEST);
-}
-
-void UI::UIRenderer::render(const Page* pane)
-{
-	render(pane->getRoot());
 }
 
 void UI::UIRenderer::render(const Element* element)

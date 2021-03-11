@@ -1,6 +1,5 @@
 #pragma once
-#include "Panes/Pane.h"
-#include "Page.h"
+#include "Panes/Canvas.h"
 
 namespace  Primative {
 	namespace Buffers {
@@ -16,8 +15,7 @@ namespace UI {
 		static Primative::Buffers::StaticBuffer uiBuffer;
 	public:
 		static void init(const unsigned& shaderId, const glm::vec2& screenDim);
-		static void render(const Pane* pane);
-		static void render(const Page* pane);
+		static void render(const Canvas* pane);
 		static void render(const Element* element);
 		static void cleanUp();
 	};

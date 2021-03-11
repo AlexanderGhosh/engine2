@@ -47,6 +47,8 @@ void GameObject::addComponet(Component::ComponetBase* componet)
 			comp->setAnimatedComp(reinterpret_cast<Component::Animated*>(componet));
 		}
 	}
+	if (scene)
+		scene->processComponet(componet);
 }
 
 void GameObject::raiseEvents(const std::vector<GameEventsTypes>& events, Float deltaTime)
@@ -153,4 +155,10 @@ void GameObject::setScene(GameScene* scene)
 GameScene* GameObject::getScene()
 {
 	return scene;
+}
+
+void GameObject::processComponets()
+{
+	for(Component::ComponetBase* comp : componets)
+		scene->processComponet(comp);
 }
