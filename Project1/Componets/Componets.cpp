@@ -18,4 +18,5 @@ void Component::Transform::rotate(Vector3 axis, Float angle)
 void Component::Transform::rotate(Vector3 rotation)
 {
     Rotation *= glm::normalize(glm::quat(glm::vec3(rotation.x, rotation.y, rotation.z)));
+    Rotation = glm::normalize(Rotation);
 }

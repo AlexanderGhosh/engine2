@@ -14,6 +14,6 @@ public:
 private:
 	float counter;
 	UI::Canvas mainCanvas;
-	UI::TextBlock fpsText;
+	UI::TextBlock fpsText, position;
 };
 

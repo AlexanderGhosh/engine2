@@ -25,5 +25,5 @@ void main() {
     vec3 col = mix(t2, t1, r);
 
 
-    FragColor = vec4(vec3(1), 1);
+    FragColor = vec4(0, col.g, 0, 1);
 }

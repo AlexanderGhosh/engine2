@@ -96,7 +96,7 @@ Time& Context::getTime()
 void Time::update()
 {
     float currentTime = glfwGetTime();
-    deltaTime = currentTime - timeElapsed;
+    deltaTime = currentTime - (NOT timeElapsed ? currentTime : timeElapsed);
     fps = 1.0f / deltaTime;
     fpsCount += fps;
     timeElapsed = currentTime;

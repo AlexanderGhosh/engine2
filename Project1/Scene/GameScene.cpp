@@ -98,7 +98,8 @@ void GameScene::addTerrain(Terrain* terrain)
 
 void GameScene::processComponet(Component::ComponetBase* comp)
 {
-	Component::RenderMesh* mesh = reinterpret_cast<Component::RenderMesh*>(comp);
+
+	Component::RenderMesh* mesh = dynamic_cast<Component::RenderMesh*>(comp);
 	if (mesh) {
 		if (mesh->getTransparent()) {
 			transparent[rand()] = mesh;
@@ -107,7 +108,7 @@ void GameScene::processComponet(Component::ComponetBase* comp)
 			opaque.push_back(mesh);
 		}
 	}
-	UI::Canvas* canv = reinterpret_cast<UI::Canvas*>(comp);
+	UI::Canvas* canv = dynamic_cast<UI::Canvas*>(comp);
 	if (canv) {
 		uiStuff.push_back(canv);
 	}

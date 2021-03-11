@@ -60,9 +60,9 @@ unsigned Render::Shading::Manager::active = 0;
 	 switch (mat->getType())
 	 {
 	 case Materials::Type::Forward:
-		 return setValue(name, *reinterpret_cast<const Materials::Forward*>(mat));
+		 return setValue(name, *dynamic_cast<const Materials::Forward*>(mat));
 	 case Materials::Type::PBR:
-		 return setValue(name, *reinterpret_cast<const Materials::PBR*>(mat));
+		 return setValue(name, *dynamic_cast<const Materials::PBR*>(mat));
 	 }
  }
  bool Render::Shading::Manager::setValue(const std::string& name, const Render::Animation::KeyFrame& frame)

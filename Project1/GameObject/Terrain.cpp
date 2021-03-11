@@ -93,7 +93,7 @@ void Terrain::init()
 
 void Terrain::draw()
 {
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	glDisable(GL_CULL_FACE);
 	Render::Shading::Manager::setActive(useTexture ? shaderHM : shaderMesh);
 	Render::Shading::Manager::setValue("model", transform.getModel());
@@ -106,7 +106,7 @@ void Terrain::draw()
 	
 	groundBuffer.render();
 	glEnable(GL_CULL_FACE);
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	// glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
 void Terrain::cleanUp()

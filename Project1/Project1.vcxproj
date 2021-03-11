@@ -146,7 +146,9 @@
   <ItemGroup>
     <ClCompile Include="Componets\Scripting.cpp" />
     <ClCompile Include="Scripts\DebugScreen.cpp" />
+    <ClCompile Include="Scripts\HoverScript.cpp" />
     <ClCompile Include="Scripts\PlayerControler.cpp" />
+    <ClCompile Include="Scripts\SpinScript.cpp" />
     <ClCompile Include="Utils\NoiseGeneration.cpp" />
     <ClCompile Include="Primatives\Buffers\ArrayBuffer.cpp" />
     <ClCompile Include="Componets\Animated.cpp" />
@@ -207,7 +209,9 @@
   <ItemGroup>
     <ClInclude Include="Componets\Scripting.h" />
     <ClInclude Include="Scripts\DebugScreen.h" />
+    <ClInclude Include="Scripts\HoverScript.h" />
     <ClInclude Include="Scripts\PlayerControler.h" />
+    <ClInclude Include="Scripts\SpinScript.h" />
     <ClInclude Include="UI\Page.h" />
     <ClInclude Include="Utils\NoiseGeneration.h" />
     <ClInclude Include="Primatives\Buffers\ArrayBuffer.h" />

@@ -10,6 +10,8 @@
 #include <iterator>
 #include <chrono>
 #include <iostream>
+#include <iomanip>
+#include <sstream>
 
 #include "Shapes.h"
 
@@ -194,6 +196,24 @@ namespace Utils {
             ++first;
         }
     }
+
+    /// <summary>
+    /// returns vec as a string casted to T eg (int)
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="vec"></param>
+    /// <returns></returns>
+    template<class T>
+    std::string to_string(Vector3 vec) {
+        std::string res = "";
+        for (char i = 0; i < 3; i++) {
+            res += std::to_string(static_cast<T>(vec[i])) + ", ";
+        }
+        res.pop_back();
+        res.pop_back();
+        return res;
+    }
+    std::string to_string_precision(Vector3 vec, Int dp);
 
     class Timer {
     public:

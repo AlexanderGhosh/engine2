@@ -9,7 +9,7 @@ namespace Physics {
 		float mass;
 		glm::mat3 localInertiaTensor;
 		glm::vec3 localCentroid; // center of mass
-		inline Collider* getCollider() { return reinterpret_cast<Collider*>(this); };
+		inline Collider* getCollider() { return dynamic_cast<Collider*>(this); };
 		virtual const AABB* constructAABB() { return nullptr; };
 		inline Component::Type getType() const { return Component::Type::Collider; };
 		virtual glm::vec3 support(const glm::vec3& direction) const = 0;

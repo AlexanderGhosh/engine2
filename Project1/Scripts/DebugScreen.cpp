@@ -1,7 +1,7 @@
 #include "DebugScreen.h"
 #include "../GameObject/GameObject.h"
 
-DebugScreen::DebugScreen() : mainCanvas(), fpsText(), counter(0)
+DebugScreen::DebugScreen() : mainCanvas(), fpsText(), counter(0), position()
 {
 }
 
@@ -14,8 +14,12 @@ void DebugScreen::awake()
 	}
 	fpsText.setText("FPS: 1000");
 	fpsText.setForgroundColor({ 1, 1, 1 });
-	fpsText.setPos({ 115, 575 });
+	fpsText.setPos({ 115, 585 });
 	canvas->addElement(fpsText);
+	position.setText("Position: " + Utils::to_string_precision(parent->getTransform()->Position, 2));
+	position.setForgroundColor({ 1, 1, 1 });
+	position.setPos({ 115, 550 });
+	canvas->addElement(position);
 }
 
 void DebugScreen::update(float deltaTime)
@@ -30,10 +34,18 @@ void DebugScreen::update(float deltaTime)
 		counter = 0;
 	}
 	counter += deltaTime;
+
+	position.setText("Position: " + Utils::to_string_precision(parent->getTransform()->Position, 2));
+	const float w = position.getWidth() / 2.0f;
+	const glm::vec2& p = position.getPos();
+	float diff = p.x - w; // left edge
+	diff = 5 - diff;
+	position.setPos({ p.x + diff, p.y });
 }
 
 void DebugScreen::cleanUp()
 {
 	mainCanvas.cleanUp();
 	fpsText.cleanUp();
+	position.cleanUp();
 }

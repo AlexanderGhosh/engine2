@@ -255,6 +255,19 @@ std::string Utils::replaceAll(std::string str, std::string from, std::string to)
     return str;
 }
 
+std::string Utils::to_string_precision(Vector3 vec, Int dp) {
+    std::string res = "";
+    for (char i = 0; i < 3; i++) {
+        std::stringstream stream;
+        stream << std::fixed << std::setprecision(dp) << vec[i];
+        res += stream.str() + ", ";
+        stream.clear();
+    }
+    res.pop_back();
+    res.pop_back();
+    return res;
+}
+
 
 
 Utils::Timer::Timer() : s(), e(), pausing()

@@ -5,7 +5,7 @@
 #include "../Componets/RigidBody.h"
 #include "../Scene/GameScene.h"
 
-GameObject::GameObject() : componets(), enabled(), transform(DBG_NEW Component::Transform()), alive(true) {
+GameObject::GameObject() : componets(), enabled(), transform(DBG_NEW Component::Transform()), alive(true), scene(nullptr) {
 	// this->addComponet(DBG_NEW Component::Transform());
 	enabled.push_back(1);
 }
