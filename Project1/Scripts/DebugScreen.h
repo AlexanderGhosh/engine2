@@ -12,6 +12,7 @@ public:
 	void update(float deltaTime);
 	void cleanUp();
 private:
+	glm::ivec2 screenDim;
 	float counter;
 	UI::Canvas mainCanvas;
 	UI::TextBlock fpsText, position;

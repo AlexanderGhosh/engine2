@@ -33,7 +33,7 @@ std::vector<GameEventsTypes> GameScene::getCurrentEvents() const
 
 GameScene::GameScene() : objects(), preProcessingLayers(), currentTick(0), postProcShaderId(0), FBOs(), backgroundColour(0),
 							skybox(nullptr), mainContext(nullptr), opaque(), transparent(), mainCamera(nullptr), terrain(), 
-							quadModel(), isFirstLoop(false), closing(false), uiStuff()
+							quadModel(), isFirstLoop(false), closing(false), uiStuff(), screenDimentions(0)
 {
 	quadModel = ResourceLoader::getModel("plane.dae");
 }
@@ -180,6 +180,7 @@ void GameScene::clearFBO() const
 {
 	glClearColor(backgroundColour.x, backgroundColour.y, backgroundColour.z, 1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glViewport(0, 0, screenDimentions.x, screenDimentions.y);
 }
 
 void GameScene::drawObjects(Unsigned shaderId)
@@ -220,8 +221,8 @@ const Primative::Buffers::FrameBuffer& GameScene::getFBO(const std::string& name
 
 void GameScene::initalize()
 {
-	Primative::Buffers::FrameBuffer shadowFBO({ "depth" }, { 800, 600 }, { 1, 0, 1 });
-	Primative::Buffers::FrameBuffer finalFBO({ "col0" }, { 800, 600 }, { 0, 0, 1 });
+	Primative::Buffers::FrameBuffer shadowFBO({ "depth" }, screenDimentions, { 1, 0, 1 });
+	Primative::Buffers::FrameBuffer finalFBO({ "col0" }, screenDimentions, { 0, 0, 1 });
 	addFBO("shadows", shadowFBO);
 	addPreProcLayer("shadows", ResourceLoader::getShader("ShadowShader"));
 	addFBO("final", finalFBO);
@@ -235,7 +236,7 @@ void GameScene::initalize()
 	// viewPos | vector 3
 	// gamma   | scalar f
 
-	glm::mat4 projection = glm::perspective(glm::radians(mainCamera->getFOV()), 800.0f / 600.0f, 0.01f, 5000.0f);
+	glm::mat4 projection = glm::perspective(glm::radians(mainCamera->getFOV()), static_cast<float>(screenDimentions.x) / static_cast<float>(screenDimentions.y), 0.01f, 5000.0f);
 
 	mainBuffer.fill(1, glm::value_ptr(projection));
 	float gamma = 2.2f;
@@ -395,9 +396,15 @@ void GameScene::setSkyBox(SkyBox* sb)
 void GameScene::setContext(Context* context)
 {
 	mainContext = context;
+	screenDimentions = context->getDimentions();
 }
 
 void GameScene::setMainCamera(Component::Camera* camera)
 {
 	mainCamera = camera;
+}
+
+const glm::ivec2& GameScene::getScreenDimentions() const
+{
+	return screenDimentions;
 }

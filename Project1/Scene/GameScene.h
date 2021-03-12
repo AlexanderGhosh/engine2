@@ -47,6 +47,7 @@ private:
 	Context* mainContext;
 	std::vector<Primative::Buffers::StaticBuffer> uniformBuffers;
 	bool isFirstLoop, closing;
+	glm::ivec2 screenDimentions;
 
 	void clearFBO() const;
 	void drawObjects(Unsigned shaderId); // just moved
@@ -82,5 +83,8 @@ public:
 	void setSkyBox(SkyBox* sb);
 	void setContext(Context* context);
 	void setMainCamera(Component::Camera* camera);
+
+	// getters
+	const glm::ivec2& getScreenDimentions() const;
 };
 

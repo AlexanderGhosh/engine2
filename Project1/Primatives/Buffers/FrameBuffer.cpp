@@ -1,7 +1,7 @@
 #include "FrameBuffer.h"
 
 
-Primative::Buffers::FrameBuffer::FrameBuffer() : fbo(), textures(), backgroundColour(), dimentions(), clearMask(GL_DEPTH_BUFFER_BIT)
+Primative::Buffers::FrameBuffer::FrameBuffer() : fbo(), textures(), backgroundColour(), dimentions(), clearMask(GL_DEPTH_BUFFER_BIT), depthStencilRBO(0)
 {
 }
 

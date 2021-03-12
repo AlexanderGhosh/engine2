@@ -1,7 +1,8 @@
 #include "DebugScreen.h"
+#include "../Scene/GameScene.h"
 #include "../GameObject/GameObject.h"
 
-DebugScreen::DebugScreen() : mainCanvas(), fpsText(), counter(0), position()
+DebugScreen::DebugScreen() : mainCanvas(), fpsText(), counter(0), position(), screenDim(-1)
 {
 }
 
@@ -14,16 +15,21 @@ void DebugScreen::awake()
 	}
 	fpsText.setText("FPS: 1000");
 	fpsText.setForgroundColor({ 1, 1, 1 });
-	fpsText.setPos({ 115, 585 });
+	fpsText.setPos({ 115, 0 });
 	canvas->addElement(fpsText);
 	position.setText("Position: " + Utils::to_string_precision(parent->getTransform()->Position, 2));
 	position.setForgroundColor({ 1, 1, 1 });
-	position.setPos({ 115, 550 });
+	position.setPos({ 115, 0 });
 	canvas->addElement(position);
 }
 
 void DebugScreen::update(float deltaTime)
 {
+	if (screenDim.x < 0) {
+		screenDim = parent->getScene()->getScreenDimentions();
+		position.setPos({ 115, screenDim.y - 50 });
+		fpsText.setPos({ 115, screenDim.y - 15 });
+	}
 	if (counter >= 1.5) {
 		fpsText.setText("FPS: " + std::to_string(static_cast<int>(1.0f / deltaTime)));
 		const float w = fpsText.getWidth() / 2.0f;

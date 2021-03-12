@@ -50,6 +50,8 @@
 
 #include "Context.h"
 
+constexpr glm::ivec2 SCREEN_DIMENTIONS = glm::ivec2(1280, 720);
+
 int main() {
     srand(time(0));
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
@@ -57,7 +59,7 @@ int main() {
 
     Utils::Timer timer;
 
-    Context main({ 800, 600 }, false);
+    Context main(SCREEN_DIMENTIONS, false);
     main.init("Engine 2", { GL_BLEND, GL_DEPTH_TEST, GL_CULL_FACE, GL_MULTISAMPLE });
     Events::Handler::init(main.getWindow());
 
@@ -219,9 +221,9 @@ int main() {
     // UI //
     timer.reName("UI");
     timer.start();
-    UI::TextRenderer font = UI::TextRenderer({ 800, 600 }, "arial", 25); // creates arial Font
+    UI::TextRenderer font = UI::TextRenderer(SCREEN_DIMENTIONS, "arial", 25); // creates arial Font
     UI::TextRenderer::setShader(ResourceLoader::getShader("TextShader"));
-    UI::UIRenderer::init(ResourceLoader::getShader("UIShader"), { 800, 600 });
+    UI::UIRenderer::init(ResourceLoader::getShader("UIShader"), SCREEN_DIMENTIONS);
     timer.log();
     // UI //
 

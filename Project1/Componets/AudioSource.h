@@ -27,7 +27,7 @@ namespace Component {
         bool isPlaying() const;
         void addBuffer(Primative::Buffers::SoundBuffer* buffer);
         void cleanUp();
-        bool canAttenuate() const;
+        bool getAttenuate() const;
         inline Type getType() const { return Type::AudioSource; };
     };
 };

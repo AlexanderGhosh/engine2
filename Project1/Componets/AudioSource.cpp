@@ -90,7 +90,7 @@ void Component::AudioSource::cleanUp()
 	alDeleteSources(1, &source);
 }
 
-bool Component::AudioSource::canAttenuate() const
+bool Component::AudioSource::getAttenuate() const
 {
 	return canAttenuate;
 }
