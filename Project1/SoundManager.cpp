@@ -5,12 +5,13 @@
 #include <alc.h>
 #include <al.h>
 #include <Audio/AudioReader.h>
-#include "Primatives/Buffers/SoundBuffer.h"
+#include "Primatives/Buffers/SoundStreamBuffer.h"
 #define NUM_BUFFERS 1
 
 ALCdevice* SoundManager::device = nullptr;
 ALCcontext* SoundManager::contex = nullptr;
 std::vector<Primative::Buffers::SoundBuffer> SoundManager::buffers = { };
+std::vector<Primative::Buffers::SoundStreamBuffer> SoundManager::streams = { };
 
 Primative::Buffers::SoundBuffer* SoundManager::createBuffer(const std::string& filePath)
 {
@@ -19,6 +20,15 @@ Primative::Buffers::SoundBuffer* SoundManager::createBuffer(const std::string& f
 	const char* data = FileReaders::load_wav(filePath, channels, sampleRate, bitDepth, len);
 	buffers.push_back({ data, len, channels, sampleRate, bitDepth });
 	return &buffers.back();
+}
+
+Primative::Buffers::SoundStreamBuffer* SoundManager::createBuffer(const std::string& filePath, bool isStream)
+{
+	unsigned channels, bitDepth;
+	int sampleRate, len;
+	const char* data = FileReaders::load_wav(filePath, channels, sampleRate, bitDepth, len);
+	streams.push_back({ data, len, channels, sampleRate, bitDepth });
+	return &streams.back();
 }
 
 bool SoundManager::init()
@@ -77,6 +87,10 @@ void SoundManager::cleanUp()
 	while (!buffers.empty()) {
 		buffers.back().cleanUp();
 		buffers.pop_back();
+	}
+	for (auto itt = streams.begin(); itt != streams.end();) {
+		(*itt).cleanUp();
+		itt = streams.erase(itt);
 	}
 
 	alcMakeContextCurrent(nullptr);

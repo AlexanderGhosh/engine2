@@ -2,8 +2,9 @@
 #include "../Primatives/Buffers/SoundBuffer.h"
 #include "../GameObject/GameObject.h"
 #include "../Componets/RigidBody.h"
+#include "../Primatives/Buffers/SoundStreamBuffer.h"
 
-Component::AudioSource::AudioSource() : ComponetBase(), source(0), isLooping(false)
+Component::AudioSource::AudioSource() : ComponetBase(), source(0), isLooping(false), buffer(nullptr)
 { 
 
 }
@@ -15,6 +16,8 @@ Component::AudioSource::AudioSource(unsigned source) : AudioSource()
 
 void Component::AudioSource::update(float deltaTime)
 {
+	if(isPlaying())
+		buffer->update(source);
 	// update buffers position
 	Vector3 pos = parent->getTransform()->Position;
 	const Component::RigidBody* rb = parent->getRigidbody();
@@ -61,9 +64,14 @@ bool Component::AudioSource::isPlaying() const
 	return res == AL_PLAYING;
 }
 
-void Component::AudioSource::addBuffer(Primative::Buffers::SoundBuffer* buffer) const
+void Component::AudioSource::addBuffer(Primative::Buffers::SoundBuffer* buffer)
 {
-	alSourcei(source, AL_BUFFER, buffer->getSBO());
+	if (NOT buffer)
+		return;
+	if(NOT dynamic_cast<Primative::Buffers::SoundStreamBuffer*>(buffer))
+		alSourcei(source, AL_BUFFER, buffer->getSBO());
+	this->buffer = buffer;
+	buffer->setSource(source);
 }
 
 void Component::AudioSource::cleanUp()

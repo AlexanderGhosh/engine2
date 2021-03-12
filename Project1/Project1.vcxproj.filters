@@ -204,6 +204,9 @@
     <ClCompile Include="Scripts\SoundControllerScript.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Primatives\Buffers\SoundStreamBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Rendering\Rendering.h">
@@ -405,6 +408,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Scripts\SoundControllerScript.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Primatives\Buffers\SoundStreamBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

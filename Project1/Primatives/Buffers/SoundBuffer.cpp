@@ -2,7 +2,7 @@
 #include <al.h>
 
 #pragma region Constructors CleanUp
-Primative::Buffers::SoundBuffer::SoundBuffer() : SBO(0), name(), bitDepth(0), sampleRate(0), dataSize()
+Primative::Buffers::SoundBuffer::SoundBuffer() : SBO(0), bitDepth(0), sampleRate(0), dataSize()
 {
 }
 
@@ -41,9 +41,16 @@ Primative::Buffers::SoundBuffer::SoundBuffer(const char* soundData, Int len, Uns
 	delete soundData;
 }
 
+void Primative::Buffers::SoundBuffer::update(unsigned source)
+{
+}
+
 void Primative::Buffers::SoundBuffer::cleanUp()
 {
 	alDeleteBuffers(1, &SBO);
+}
+void Primative::Buffers::SoundBuffer::setSource(Unsigned s)
+{
 }
 #pragma endregion
 

@@ -39,6 +39,8 @@
 #include "GameObject/Terrain.h"
 #include "Primatives/Buffers/FrameBuffer.h"
 #include "Primatives/Buffers/UniformBuffer.h"
+#include "Primatives/Buffers/SoundBuffer.h"
+#include "Primatives/Buffers/SoundStreamBuffer.h"
 #include "Utils/NoiseGeneration.h"
 #include "Scripts/PlayerControler.h"
 #include "Scripts/DebugScreen.h"
@@ -60,7 +62,8 @@ int main() {
     Events::Handler::init(main.getWindow());
 
     SoundManager::init();
-    const auto soundDatabuffer = SoundManager::createBuffer("Resources/Sounds/iamtheprotectorofthissystem.wav");
+    Primative::Buffers::SoundBuffer* soundDatabuffer = SoundManager::createBuffer("Resources/Sounds/iamtheprotectorofthissystem.wav"); // 407640__drotzruhn__countdown-30-seconds
+    Primative::Buffers::SoundStreamBuffer* soundDatabufferS = SoundManager::createBuffer("Resources/Sounds/iamtheprotectorofthissystem.wav", true); // 407640__drotzruhn__countdown-30-seconds
 
     timer.reName("Shaders");
     timer.start();
@@ -192,8 +195,9 @@ int main() {
     HoverScript hoverScript(1, 0.25);
     // minikit.addComponet(&hoverScript);
     Component::AudioSource audio(SoundManager::createSoundSource());
-    audio.addBuffer(soundDatabuffer);
+    audio.addBuffer(dynamic_cast<Primative::Buffers::SoundBuffer*>(soundDatabufferS));
     minikit.addComponet(&audio);
+    //audio.play();
     SoundControllerScript scs;
     minikit.addComponet(&scs);
 

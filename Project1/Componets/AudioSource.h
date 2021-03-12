@@ -13,6 +13,7 @@ namespace Component {
     private:
         unsigned source;
         bool isLooping;
+        Primative::Buffers::SoundBuffer* buffer;
     public:
         AudioSource();
         AudioSource(unsigned source);
@@ -22,7 +23,7 @@ namespace Component {
         void togglePlay();
         void toggleLoop();
         bool isPlaying() const;
-        void addBuffer(Primative::Buffers::SoundBuffer* buffer) const;
+        void addBuffer(Primative::Buffers::SoundBuffer* buffer);
         void cleanUp();
         inline Type getType() const { return Type::AudioSource; };
     };
