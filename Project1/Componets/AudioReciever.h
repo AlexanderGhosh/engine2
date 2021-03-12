@@ -4,7 +4,7 @@ namespace Component {
 	class AudioReciever : public ComponetBase
 	{
 	private:
-
+		char placeHolder;
 	public:
 		AudioReciever();
 		~AudioReciever() = default;

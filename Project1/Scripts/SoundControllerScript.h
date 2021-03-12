@@ -3,7 +3,6 @@
 class SoundControllerScript : public Component::Scripting
 {
 private:
-
 public:
 	SoundControllerScript();
 	~SoundControllerScript() = default;

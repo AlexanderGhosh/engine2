@@ -4,7 +4,7 @@
 #include "../Componets/RigidBody.h"
 #include "../Primatives/Buffers/SoundStreamBuffer.h"
 
-Component::AudioSource::AudioSource() : ComponetBase(), source(0), isLooping(false), buffer(nullptr)
+Component::AudioSource::AudioSource() : ComponetBase(), source(0), isLooping(false), buffer(nullptr), canAttenuate(false)
 { 
 
 }
@@ -57,6 +57,16 @@ void Component::AudioSource::toggleLoop()
 	isLooping = NOT isLooping;
 }
 
+void Component::AudioSource::loop()
+{
+	isLooping = true;
+}
+
+void Component::AudioSource::stopLoop()
+{
+	isLooping = false;
+}
+
 bool Component::AudioSource::isPlaying() const
 {
 	int res = 0;
@@ -72,9 +82,15 @@ void Component::AudioSource::addBuffer(Primative::Buffers::SoundBuffer* buffer)
 		alSourcei(source, AL_BUFFER, buffer->getSBO());
 	this->buffer = buffer;
 	buffer->setSource(source);
+	canAttenuate = buffer->getAttenuate();
 }
 
 void Component::AudioSource::cleanUp()
 {
 	alDeleteSources(1, &source);
+}
+
+bool Component::AudioSource::canAttenuate() const
+{
+	return canAttenuate;
 }

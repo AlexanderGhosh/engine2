@@ -6,6 +6,7 @@ namespace Primative {
 		private:
 			unsigned SBO; // sound buffer object
 			float bitDepth, sampleRate, dataSize;
+			bool canAttenuate;
 		public:
 			SoundBuffer();
 			SoundBuffer(const char* soundData, Int len, Unsigned channel, Int sampleRate, Unsigned bitDepth);
@@ -14,6 +15,7 @@ namespace Primative {
 			void cleanUp();
 			virtual void setSource(Unsigned s);
 			Unsigned getSBO() const;
+			bool getAttenuate() const;
 		};
 	}
 }

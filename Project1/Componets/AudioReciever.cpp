@@ -4,7 +4,7 @@
 #include "RigidBody.h"
 #include "Camera.h"
 
-Component::AudioReciever::AudioReciever() : ComponetBase()
+Component::AudioReciever::AudioReciever() : ComponetBase(), placeHolder(0)
 {
 
 }

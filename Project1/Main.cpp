@@ -62,7 +62,7 @@ int main() {
     Events::Handler::init(main.getWindow());
 
     SoundManager::init();
-    Primative::Buffers::SoundBuffer* soundDatabuffer = SoundManager::createBuffer("Resources/Sounds/iamtheprotectorofthissystem.wav"); // 407640__drotzruhn__countdown-30-seconds
+    Primative::Buffers::SoundBuffer* soundDatabuffer = SoundManager::createBuffer("Resources/Sounds/bounce.wav");
     Primative::Buffers::SoundStreamBuffer* soundDatabufferS = SoundManager::createBuffer("Resources/Sounds/iamtheprotectorofthissystem.wav", true); // 407640__drotzruhn__countdown-30-seconds
 
     timer.reName("Shaders");
@@ -235,7 +235,7 @@ int main() {
     DebugScreen debugScript;
     player.addComponet(&debugScript);
     Component::AudioReciever recieverComp;
-    minikit.addComponet(&recieverComp);
+    player.addComponet(&recieverComp);
     timer.log();
 
 

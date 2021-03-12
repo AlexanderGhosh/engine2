@@ -28,6 +28,9 @@ void SoundControllerScript::keyButton(float deltaTime)
 		std::cout << std::to_string(source->isPlaying()) << std::endl;
 	}
 	if (EH::getKey(Key::L, Action::Down)) {
-		source->toggleLoop();
+		source->loop();
+	}
+	if (EH::getKey(Key::M, Action::Down)) {
+		source->stopLoop();
 	}
 }

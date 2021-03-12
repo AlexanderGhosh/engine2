@@ -2,14 +2,15 @@
 #include <al.h>
 
 #pragma region Constructors CleanUp
-Primative::Buffers::SoundBuffer::SoundBuffer() : SBO(0), bitDepth(0), sampleRate(0), dataSize()
+Primative::Buffers::SoundBuffer::SoundBuffer() : SBO(0), bitDepth(0), sampleRate(0), dataSize(), canAttenuate(false)
 {
 }
 
 Primative::Buffers::SoundBuffer::SoundBuffer(const char* soundData, Int len, Unsigned channel, Int sampleRate, Unsigned bitDepth) : SoundBuffer()
 {
 	alGenBuffers(1, &SBO);
-	ALenum format = AL_FORMAT_MONO8; // 0x1100
+	ALenum format = AL_FORMAT_MONO8; // 0x1100 // 4355
+	canAttenuate = channel == 1;
 	char channels[] = {
 		1, 2
 	};
@@ -18,7 +19,7 @@ Primative::Buffers::SoundBuffer::SoundBuffer(const char* soundData, Int len, Uns
 	};
 
 	bool found = 0;
-	for (char i = 0; i < 2; i++) {
+	for (char i = 0; i < 2 && NOT found; i++) {
 		for (char j = 0; j < 2; j++) {
 			if (channels[i] == channel && bitDepths[j] == bitDepth) {
 				found = 1;
@@ -58,6 +59,10 @@ void Primative::Buffers::SoundBuffer::setSource(Unsigned s)
 Unsigned Primative::Buffers::SoundBuffer::getSBO() const
 {
 	return SBO;
+}
+bool Primative::Buffers::SoundBuffer::getAttenuate() const
+{
+	return canAttenuate;
 }
 #pragma endregion
 

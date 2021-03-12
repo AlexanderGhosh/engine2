@@ -53,7 +53,8 @@ void GameObject::addComponet(Component::ComponetBase* componet)
 
 void GameObject::raiseEvents(const std::vector<GameEventsTypes>& events, Float deltaTime)
 {
-	for (auto& comp : componets) {
+	for (int i = 0; i < componets.size(); i++) {
+		Component::ComponetBase* comp = componets[i];
 		for (const GameEventsTypes& type : events) {
 			switch (type)
 			{
