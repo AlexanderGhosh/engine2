@@ -45,6 +45,7 @@ bool SoundManager::init()
 	}
 	alcMakeContextCurrent(contex);
 	setRecieverInfo();
+	alDistanceModel(AL_INVERSE_DISTANCE_CLAMPED);
 	return true;
 }
 

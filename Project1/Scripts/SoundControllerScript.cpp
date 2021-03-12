@@ -19,7 +19,10 @@ void SoundControllerScript::keyButton(float deltaTime)
 		return;
 	}
 	if (EH::getKey(Key::P, Action::Down)) {
-		source->togglePlay();
+		source->play();
+	}
+	if (EH::getKey(Key::Q, Action::Down)) {
+		source->pause();
 	}
 	if (EH::getKey(Key::Enter, Action::Down)) {
 		std::cout << std::to_string(source->isPlaying()) << std::endl;

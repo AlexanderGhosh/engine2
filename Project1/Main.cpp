@@ -195,7 +195,8 @@ int main() {
     HoverScript hoverScript(1, 0.25);
     // minikit.addComponet(&hoverScript);
     Component::AudioSource audio(SoundManager::createSoundSource());
-    audio.addBuffer(dynamic_cast<Primative::Buffers::SoundBuffer*>(soundDatabufferS));
+    // audio.addBuffer(dynamic_cast<Primative::Buffers::SoundBuffer*>(soundDatabufferS));
+    audio.addBuffer(soundDatabuffer);
     minikit.addComponet(&audio);
     //audio.play();
     SoundControllerScript scs;

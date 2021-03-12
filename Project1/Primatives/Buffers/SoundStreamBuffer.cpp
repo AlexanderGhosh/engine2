@@ -36,10 +36,16 @@ Primative::Buffers::SoundStreamBuffer::SoundStreamBuffer(const char* soundData, 
 	}
 
 	alGenBuffers(MAX_SOUND_BUFFERS, &SBOs[0]);
-	for (char i = 0; i < MAX_SOUND_BUFFERS; ++i)
+	int remainingSize = len;
+	for (int i = 0; i < MAX_SOUND_BUFFERS AND remainingSize > 0; i++) {
+		alBufferData(SBOs[i], format, &soundData[i * SOUND_BUFFER_SIZE], std::min(SOUND_BUFFER_SIZE, remainingSize), sampleRate);
+		remainingSize -= SOUND_BUFFER_SIZE;
+	}
+	cursor = std::max(len - remainingSize, 0);
+	/*for (char i = 0; i < MAX_SOUND_BUFFERS; ++i)
 	{
 		alBufferData(SBOs[i], format, &soundData[i * SOUND_BUFFER_SIZE], SOUND_BUFFER_SIZE, sampleRate); // Asumes the data is divisable by MAX_SOUND_BUFFERS
-	}
+	}*/
 	this->soundData = new char[len];
 	std::memcpy(this->soundData, soundData, len); // populates this->soundData with the soundData
 	delete soundData;
@@ -64,8 +70,8 @@ void Primative::Buffers::SoundStreamBuffer::update(unsigned source)
 		std::memset(data, 0, dataSize);
 
 		std::size_t dataSizeToCopy = SOUND_BUFFER_SIZE;
-		if (cursor + SOUND_BUFFER_SIZE > dataSize)
-			dataSizeToCopy = dataSize - cursor;
+		if (cursor + SOUND_BUFFER_SIZE > this->dataSize)
+			dataSizeToCopy = this->dataSize - cursor;
 
 		std::memcpy(&data[0], &soundData[cursor], dataSizeToCopy);
 		cursor += dataSizeToCopy;
