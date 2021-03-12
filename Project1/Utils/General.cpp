@@ -277,7 +277,13 @@ Utils::Timer::Timer() : s(), e(), pausing()
 Utils::Timer::Timer(const std::string name) : s(), e(), pausing(), name(name) {
 
 }
-void Utils::Timer::start() { s = getNow(); };
+void Utils::Timer::start() { s = getNow(); }
+void Utils::Timer::start(String name)
+{
+    rename(name);
+    start();
+}
+;
 void Utils::Timer::stop()
 {
     e = getNow();

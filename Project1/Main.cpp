@@ -55,7 +55,7 @@ constexpr glm::ivec2 SCREEN_DIMENTIONS = glm::ivec2(1280, 720);
 int main() {
     srand(time(0));
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-    _crtBreakAlloc = 69450;
+    // _crtBreakAlloc = 69450;
 
     Utils::Timer timer;
 
@@ -67,8 +67,7 @@ int main() {
     Primative::Buffers::SoundBuffer* soundDatabuffer = SoundManager::createBuffer("Resources/Sounds/bounce.wav");
     Primative::Buffers::SoundStreamBuffer* soundDatabufferS = SoundManager::createBuffer("Resources/Sounds/iamtheprotectorofthissystem.wav", true); // 407640__drotzruhn__countdown-30-seconds
 
-    timer.reName("Shaders");
-    timer.start();
+    timer.start("Shaders");
     Gizmos::GizmoRenderer::init();
     std::vector<std::string> shaders = {
         "PBRShader", "TransparentShader", "ShadowShader", "UIShader", "TextShader", "TerrainShaderHeightMap", "TerrainShaderMesh", "PostShader"
@@ -79,29 +78,25 @@ int main() {
 
 
     // UI //
-    timer.reName("UI");
-    timer.start();
+    timer.start("UI");
     UI::TextRenderer font = UI::TextRenderer(SCREEN_DIMENTIONS, "arial", 25); // creates arial Font
     UI::TextRenderer::setShader(ResourceLoader::getShader("TextShader"));
     UI::UIRenderer::init(ResourceLoader::getShader("UIShader"), SCREEN_DIMENTIONS);
     timer.log();
     // UI //
 
-    timer.reName("Models");
-    timer.start();
+    timer.start("Models");
     const Primative::Model manModel    = ResourceLoader::createModel("Resources/Models/RFA_Model.fbx"); // RFA_Model
     const Primative::Model cubeBuffer  = ResourceLoader::createModel("Resources/Models/cube.obj"); // needed for the skybox
     const Primative::Model planeBuffer = ResourceLoader::createModel("Resources/Models/plane.dae");
     const Primative::Model minikitBuffer = ResourceLoader::createModel("Resources/Models/minikit.fbx");
     timer.log();
 
-    timer.reName("Animations");
-    timer.start();
+    timer.start("Animations");
     // const auto manAnimations = ResourceLoader::createAnimation("Resources/Models/Animations/RFA_Attack.fbx", manModel.getSkeleton());
     timer.log();
 
-    timer.reName("Textures");
-    timer.start();
+    timer.start("Textures");
     const unsigned wi   = ResourceLoader::loadTexture("Resources/Textures/window.png", TextureType::AlbedoMap, 0);
     const unsigned wiy  = ResourceLoader::loadTexture("Resources/Textures/yellowWindow.png", TextureType::AlbedoMap, 0);
     const unsigned hdr  = ResourceLoader::loadCubeMap("Resources/Textures/Galaxy hdr", ".png", 0);
@@ -146,8 +141,7 @@ int main() {
     // printf("weapon\n");
     timer.log();
 
-    timer.reName("Objects");
-    timer.start();
+    timer.start("Objects");
     Component::RenderMesh manR1 = Component::RenderMesh();
     manR1.setModel(manModel);
     Materials::PBR manMaterial1/* = Materials::PBR({ { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 0, 0, 0 } }, { { 0.15, 0, 0 } }, { { 0, 0, 0 } })*/;
@@ -217,8 +211,7 @@ int main() {
 
     timer.log();
 
-    timer.reName("Terrain");
-    timer.start();
+    timer.start("Terrain");
     Terrain land(100);
     land.getTransform().Position.y = -1;
     land.getTransform().Scale = { 100, 10 ,100 };
@@ -229,8 +222,7 @@ int main() {
 
 
 
-    timer.reName("Player");
-    timer.start();
+    timer.start("Player");
     GameObject player = GameObject({ 0, 0, 5 }, { 1, 1, 1 });
     Component::Camera playerCamera = Component::Camera();
     player.addComponet(&playerCamera);
@@ -243,8 +235,7 @@ int main() {
     timer.log();
 
 
-    timer.reName("Scene");
-    timer.start();
+    timer.start("Scene");
     //Primative::MSAABuffer* finalQB = DBG_NEW Primative::MSAABuffer({ "col" }, { 800, 600 });
 
     GameScene scene;
@@ -263,8 +254,7 @@ int main() {
     timer.log();
 
     // SKYBOX //
-    timer.reName("Skybox");
-    timer.start();
+    timer.start("Skybox");
     ResourceLoader::loadCubeMap("Resources/Textures/Galaxy", ".png", 0);
     SkyBox sb = SkyBox("Galaxy.cm");
     scene.setSkyBox(&sb);
@@ -299,30 +289,17 @@ int main() {
 
         // cube2->getTransform()->Position.x -= 0.01;
         Physics::Engine::update();
-    
-        
-        // COLOR BUFFERS----------------------------------------------------------------------------------------------------------------------------------------
-        // sound->update();
-
     }*/
     Physics::Engine::cleanUp();
     gizmo1.cleanUp();
-    //audio->cleanUp();
-    //delete audio;
-    //audio = nullptr;
-
-    // delete constraint;
     
     scene.cleanUp(); // removes and destrys all componets and fbos (destroysing comonets doesnt destry buffers(except audio source))
     
-    //mainBuffer.cleanUp(); // destroys UBO 0
     UI::TextRenderer::cleanUpStatic(); // destroys char buffers and char textures for all fonts
     UI::UIRenderer::cleanUp(); // destroys quadbuffer and UBO 1
     SoundManager::cleanUp(); // destroys sound buffers
     ResourceLoader::cleanUp(); // destroys textures shaders and models(buffers)
     Gizmos::GizmoRenderer::cleanUp();
     
-    
-    //main.cleanUp();
     return 0;
 }

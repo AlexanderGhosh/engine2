@@ -220,6 +220,7 @@ namespace Utils {
         Timer(const std::string name);
         Timer();
         void start();
+        void start(String name);
         void stop();
         bool pause();
         bool resume();
