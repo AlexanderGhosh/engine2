@@ -11,10 +11,10 @@ Primative::Buffers::SoundBuffer::SoundBuffer(const char* soundData, Int len, Uns
 	alGenBuffers(1, &SBO);
 	ALenum format = AL_FORMAT_MONO8; // 0x1100 // 4355
 	canAttenuate = channel == 1;
-	char channels[] = {
+	const char* channels = new char[2] {
 		1, 2
 	};
-	char bitDepths[] = {
+	const char* bitDepths = new char[2]{
 		8, 16
 	};
 
@@ -39,7 +39,9 @@ Primative::Buffers::SoundBuffer::SoundBuffer(const char* soundData, Int len, Uns
 	}
 
 	alBufferData(SBO, format, soundData, len, sampleRate);
-	delete soundData;
+	delete[] soundData;
+	delete[] channels;
+	delete[] bitDepths;
 }
 
 void Primative::Buffers::SoundBuffer::update(unsigned source)

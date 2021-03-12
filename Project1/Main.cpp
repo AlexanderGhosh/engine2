@@ -193,7 +193,7 @@ int main() {
     SpinScript spinScript({ -1, 1, 0 }, 0.125);
     minikit.addComponet(&spinScript);
     HoverScript hoverScript(1, 0.25);
-    // minikit.addComponet(&hoverScript);
+    minikit.addComponet(&hoverScript);
     Component::AudioSource audio(SoundManager::createSoundSource());
     // audio.addBuffer(dynamic_cast<Primative::Buffers::SoundBuffer*>(soundDatabufferS));
     audio.addBuffer(soundDatabuffer);
