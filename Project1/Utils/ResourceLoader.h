@@ -77,6 +77,7 @@ private:
 	static std::unordered_map<std::string, Render::Animation::Animation> animations;
 	static std::string defaultShaderName;
 	static std::vector<Materials::Material*> materials;
+	static std::vector<void*> roguePointers;
 
 	static const Primative::Model processMeshData(std::vector<Primative::Mesh*>& data, String name, GLenum draw_type, const bool deleteAble);
 };

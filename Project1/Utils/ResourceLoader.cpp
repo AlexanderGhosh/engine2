@@ -22,6 +22,7 @@ std::unordered_map<std::string, Primative::Model> ResourceLoader::models = { };
 std::string ResourceLoader::ShaderDirectory = "Resources/Shaders/";
 std::string ResourceLoader::TextureDirectory = "Resources/Textures";
 std::string ResourceLoader::ModelDirectory = "Resources/Models";
+std::vector<void*> ResourceLoader::roguePointers = { };
 #pragma endregion
 
 #pragma region Creation
@@ -164,6 +165,7 @@ Materials::PBR ResourceLoader::createPBR(String dirPath, std::vector<TextureType
         }
         i++;
     }
+    roguePointers.push_back(materials.back());
     return *dynamic_cast<Materials::PBR*>(materials.back());
 }
 #pragma endregion
@@ -459,6 +461,10 @@ void ResourceLoader::cleanUp()
     for (auto itt = animations.begin(); itt != animations.end();) {
         (*itt).second.cleanUp();
         itt = animations.erase(itt);
+    }
+    for (auto itt = roguePointers.begin(); itt != roguePointers.end();) {
+        delete (*itt);
+        itt = roguePointers.erase(itt);
     }
     animations.clear();
 }

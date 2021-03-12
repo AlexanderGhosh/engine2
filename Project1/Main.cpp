@@ -55,7 +55,7 @@ constexpr glm::ivec2 SCREEN_DIMENTIONS = glm::ivec2(1280, 720);
 int main() {
     srand(time(0));
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-    // _crtBreakAlloc = 6157;
+    _crtBreakAlloc = 69450;
 
     Utils::Timer timer;
 
@@ -74,8 +74,19 @@ int main() {
         "PBRShader", "TransparentShader", "ShadowShader", "UIShader", "TextShader", "TerrainShaderHeightMap", "TerrainShaderMesh", "PostShader"
     };
     ResourceLoader::createShaders(shaders);
-
     timer.log();
+
+
+
+    // UI //
+    timer.reName("UI");
+    timer.start();
+    UI::TextRenderer font = UI::TextRenderer(SCREEN_DIMENTIONS, "arial", 25); // creates arial Font
+    UI::TextRenderer::setShader(ResourceLoader::getShader("TextShader"));
+    UI::UIRenderer::init(ResourceLoader::getShader("UIShader"), SCREEN_DIMENTIONS);
+    timer.log();
+    // UI //
+
     timer.reName("Models");
     timer.start();
     const Primative::Model manModel    = ResourceLoader::createModel("Resources/Models/RFA_Model.fbx"); // RFA_Model
@@ -217,15 +228,6 @@ int main() {
     timer.log();
 
 
-
-    // UI //
-    timer.reName("UI");
-    timer.start();
-    UI::TextRenderer font = UI::TextRenderer(SCREEN_DIMENTIONS, "arial", 25); // creates arial Font
-    UI::TextRenderer::setShader(ResourceLoader::getShader("TextShader"));
-    UI::UIRenderer::init(ResourceLoader::getShader("UIShader"), SCREEN_DIMENTIONS);
-    timer.log();
-    // UI //
 
     timer.reName("Player");
     timer.start();
