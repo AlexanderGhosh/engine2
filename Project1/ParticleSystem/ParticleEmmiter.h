@@ -10,8 +10,10 @@ namespace Component {
 	private:
 		std::vector<Component::Transform> particleTransforms;
 		std::vector<float> life;
+		unsigned texture;
 		int maxParticelCount, maxLife;
 		glm::vec3 velocity, orgiCenter, oridRadii;
+		glm::vec4 colour;
 		bool doLoop;
 		static int shader;
 		static Primative::Buffers::VertexBuffer quadBuffer;
@@ -28,6 +30,9 @@ namespace Component {
 		void restart();
 		void loop();
 		bool isDead() const;
+		void setCenter(Vector3 center);
+		void setTexture(Unsigned tex);
+		void setColour(Vector4 col);
 	};
 }
 

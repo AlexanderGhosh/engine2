@@ -46,6 +46,7 @@ constexpr float INV_PI = 1.0f / PI;
 #define DEGREES(x) (x * INV_PI * 180)
 
 #define Vector3 const glm::vec3&
+#define Vector4 const glm::vec4&
 #define Quaternion const glm::quat&
 #define Matrix3 const glm::mat3&
 #define Matrix4 const glm::mat4&

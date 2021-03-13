@@ -2,6 +2,7 @@
 #include "../Utils/ResourceLoader.h"
 #include "../Rendering/Shading/Manager.h"
 #include "../Primatives/Model.h"
+#include "../GameObject/GameObject.h"
 
 int Component::ParticleEmmiter::shader = 0;
 Primative::Buffers::VertexBuffer Component::ParticleEmmiter::quadBuffer = {};
@@ -23,7 +24,7 @@ void Component::ParticleEmmiter::spawn()
 	}
 }
 
-Component::ParticleEmmiter::ParticleEmmiter() : ComponetBase(), particleTransforms(), life(), maxParticelCount(0), velocity(0, -1, 0), doLoop(false), oridRadii(), orgiCenter(), maxLife()
+Component::ParticleEmmiter::ParticleEmmiter() : ComponetBase(), particleTransforms(), life(), maxParticelCount(0), velocity(0, -1, 0), doLoop(false), oridRadii(), orgiCenter(), maxLife(), colour(1), texture(0)
 {
 	if (NOT shader) {
 		shader = ResourceLoader::getShader("ParticleShader");
@@ -48,14 +49,14 @@ void Component::ParticleEmmiter::update(float deltaTime)
 	for (unsigned i = 0; i < particleTransforms.size(); i++) {
 		float& l = life[i];
 		Component::Transform& transform = particleTransforms[i];
-		l -= deltaTime;
+		//l -= deltaTime;
 		if (l <= 0) {
 			Utils::removeAt(life, i);
 			Utils::removeAt(particleTransforms, i);
 			i--;
 		}
 		else {
-			transform.Position += velocity * deltaTime;
+			//transform.Position += velocity * deltaTime;
 		}
 	}
 	drawParticles();
@@ -71,6 +72,11 @@ void Component::ParticleEmmiter::drawParticles()
 		Render::Shading::Manager::setValue("scale[" + std::to_string(i) + "]", particleTransforms[i].Scale);
 		particleTransforms[i].Rotation = rot;
 	}
+	Render::Shading::Manager::setValue("col", colour);
+	Render::Shading::Manager::setValue("mix_val", (texture ? 0.0f : 1.0f));
+	Render::Shading::Manager::setValue("tex", 0);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, texture);
 	quadBuffer.bind();
 	glDrawElementsInstanced(quadBuffer.getDrawType(), quadBuffer.getIndicesCount(), GL_UNSIGNED_INT, 0, particleTransforms.size());
 	quadBuffer.unBind();
@@ -95,4 +101,24 @@ void Component::ParticleEmmiter::loop()
 bool Component::ParticleEmmiter::isDead() const
 {
 	return NOT life.size();
+}
+
+void Component::ParticleEmmiter::setCenter(Vector3 center)
+{
+	return;
+	for (Component::Transform& trans : particleTransforms) {
+		trans.Position -= orgiCenter;
+		trans.Position += center;
+	}
+	orgiCenter = center;
+}
+
+void Component::ParticleEmmiter::setTexture(Unsigned tex)
+{
+	this->texture = tex;
+}
+
+void Component::ParticleEmmiter::setColour(Vector4 col)
+{
+	colour = col;
 }

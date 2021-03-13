@@ -91,5 +91,11 @@ public:
 
 	// getters
 	const glm::ivec2& getScreenDimentions() const;
+	/// <summary>
+	/// returns the first gameobject with the given name
+	/// </summary>
+	/// <param name="name"></param>
+	/// <returns></returns>
+	GameObject* getObject(String name);
 };
 

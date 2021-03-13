@@ -5,8 +5,7 @@
 #include "../Componets/RigidBody.h"
 #include "../Scene/GameScene.h"
 
-GameObject::GameObject() : componets(), enabled(), transform(DBG_NEW Component::Transform()), alive(true), scene(nullptr) {
-	// this->addComponet(DBG_NEW Component::Transform());
+GameObject::GameObject(String name) : componets(), enabled(), transform(DBG_NEW Component::Transform()), alive(true), scene(nullptr), name(name) {
 	enabled.push_back(1);
 }
 
@@ -162,4 +161,14 @@ void GameObject::processComponets()
 {
 	for(Component::ComponetBase* comp : componets)
 		scene->processComponet(comp);
+}
+
+String GameObject::getName() const
+{
+	return name;
+}
+
+void GameObject::setName(String name)
+{
+	this->name = name;
 }

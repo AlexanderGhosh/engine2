@@ -48,6 +48,7 @@
 #include "Scripts/SpinScript.h"
 #include "Scripts/HoverScript.h"
 #include "Scripts/SoundControllerScript.h"
+#include "Scripts/RainMakerScript.h"
 
 #include "Context.h"
 
@@ -104,6 +105,7 @@ int main() {
     const unsigned ibl  = ResourceLoader::loadCubeMap("Resources/Textures/Galaxy ibl", ".png", 0);
     const unsigned brdf = ResourceLoader::loadTexture("Resources/Textures/ibl brdf.png", TextureType::AlbedoMap, 0);
     const unsigned hm   = ResourceLoader::loadTexture("Resources/Textures/heightmap.png", TextureType::HeightMap, 0);
+    const unsigned rainDrop = ResourceLoader::loadTexture("Resources/Textures/raindrop.png", TextureType::AlbedoMap, 0);
 
    //Materials::PBR armourMaterial = ResourceLoader::createPBR("Resources/Textures/RFATextures/Armour",
    //    { TextureType::AlbedoMap, TextureType::AOMap, TextureType::MetalicMap, TextureType::NormalMap, TextureType::RoughnessMap },
@@ -184,7 +186,7 @@ int main() {
     // plane_y.setMaterial(&planeMat_y);
     // yellowWindow.addComponet(&plane_y);
 
-    GameObject minikit({ 0, 1, 0 }, { 0.5, 0.5, 0.5 });
+    GameObject minikit({ 0, 0, 0 }, { 0.5, 0.5, 0.5 });
     Component::RenderMesh minikitMesh;
     minikitMesh.setModel(minikitBuffer);
     Materials::PBR minikitMatWhite(MI({ 1, 1, 1 }),       MI({ 1, 1, 1 }), MI({ 0.5, 0.5, 0.5 }), MI({ 0.5, 0, 0 }), MI({ 0, 0, 0 }));
@@ -209,9 +211,12 @@ int main() {
     //audio.play();
     SoundControllerScript scs;
     minikit.addComponet(&scs);
-    Component::ParticleEmmiter emitter(200, 2, { 0, 0, 0 }, { 1.5, 1.5, 1.5 });
-    emitter.loop();
+    Component::ParticleEmmiter emitter(200, 2, { 0, 0, 0 }, { 1.5, 2, 1.5 });
+    //emitter.loop();
     minikit.addComponet(&emitter);
+    emitter.setTexture(rainDrop);
+    RainMakerScript rain;
+    minikit.addComponet(&rain);
 
     timer.log();
 
@@ -236,6 +241,7 @@ int main() {
     player.addComponet(&debugScript);
     Component::AudioReciever recieverComp;
     player.addComponet(&recieverComp);
+
     timer.log();
 
 
@@ -279,8 +285,8 @@ int main() {
     // cube2->getRigidbody()->hasGravity = true;
     //cube2->getRigidbody()->velocityAdder({ 1, -1, 0 });
 
-    Gizmos::Sphere gizmo1({ 0, 0, 0 }, { 1, 1, 0 });
-    gizmo1.setColour({ 1, 0, 0 });
+    Gizmos::Sphere gizmo1 = Gizmos::Sphere({ 0, 0, 0 }, { 1, 0, 0 });
+    gizmo1.setRadius(0.25);
     gizmo1.setThickness(2);
     Gizmos::GizmoRenderer::addGizmo(&gizmo1);
 

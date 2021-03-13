@@ -3,8 +3,13 @@
 out vec4 FragCol;
 
 in vec2 textCoords;
+uniform vec4 col;
+uniform float mix_val;
+uniform sampler2D tex;
+
 
 void main()
 {
-    FragCol = vec4(0, 0.25, 1, 1);
+    vec4 colour = mix(texture(tex, textCoords), col, mix_val);
+    FragCol = vec4(colour);
 }

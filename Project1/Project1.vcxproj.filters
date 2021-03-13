@@ -210,6 +210,9 @@
     <ClCompile Include="ParticleSystem\ParticleEmmiter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Scripts\RainMakerScript.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Rendering\Rendering.h">
@@ -417,6 +420,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ParticleSystem\ParticleEmmiter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripts\RainMakerScript.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

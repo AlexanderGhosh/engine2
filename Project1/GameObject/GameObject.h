@@ -22,8 +22,9 @@ protected:
 	std::vector<bool> enabled;
 	bool alive;
 	GameScene* scene;
+	std::string name;
 public:
-	GameObject();
+	GameObject(String name = "");
 	GameObject(Vector3 postion, Vector3 scale);
 	~GameObject() = default;
 	void addComponet(Component::ComponetBase* componet);
@@ -52,5 +53,7 @@ public:
 	void setScene(GameScene* scene);
 	GameScene* getScene();
 	void processComponets();
+	String getName() const;
+	void setName(String name);
 };
 

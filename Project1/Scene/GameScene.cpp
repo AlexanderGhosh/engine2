@@ -21,8 +21,8 @@ std::vector<GameEventsTypes> GameScene::getCurrentEvents() const
 	std::vector<GameEventsTypes> res = {
 		GameEventsTypes::Update
 	};
-	if (isFirstLoop)
-		res.push_back(GameEventsTypes::Start);
+	if (isFirstLoop) 
+		res.insert(res.begin(), GameEventsTypes::Start);
 	if (Events::Handler::buttonDown)
 		res.push_back(GameEventsTypes::MouseToggle);
 	if (Events::Handler::mouseMove)
@@ -270,6 +270,7 @@ void GameScene::initalize()
 void GameScene::gameLoop()
 {
 	// float counter = 0;
+	isFirstLoop = true;
 	while (NOT (closing OR mainContext->shouldClose()))
 	{
 		// FPS--------------------------------------------------------------------------------------------------------------------------------------------------
@@ -342,6 +343,7 @@ void GameScene::gameLoop()
 
 		mainContext->update();
 		Events::Handler::pollEvents();
+		isFirstLoop = false;
 	}
 }
 
@@ -424,4 +426,14 @@ void GameScene::setMainCamera(Component::Camera* camera)
 const glm::ivec2& GameScene::getScreenDimentions() const
 {
 	return screenDimentions;
+}
+
+GameObject* GameScene::getObject(String name)
+{
+	for (GameObject* obj : objects) {
+		if (obj->getName() == name) {
+			return obj;
+		}
+	}
+	return nullptr;
 }
