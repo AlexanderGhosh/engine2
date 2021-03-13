@@ -14,6 +14,7 @@
 #include "../Gizmos/GizmoRenderer.h"
 #include "../UI/UIRenderer.h"
 #include "../UI/Panes/Canvas.h"
+#include "../ParticleSystem/ParticleEmmiter.h"
 
 std::vector<GameEventsTypes> GameScene::getCurrentEvents() const
 {
@@ -33,7 +34,7 @@ std::vector<GameEventsTypes> GameScene::getCurrentEvents() const
 
 GameScene::GameScene() : objects(), preProcessingLayers(), currentTick(0), postProcShaderId(0), FBOs(), backgroundColour(0),
 							skybox(nullptr), mainContext(nullptr), opaque(), transparent(), mainCamera(nullptr), terrain(), 
-							quadModel(), isFirstLoop(false), closing(false), uiStuff(), screenDimentions(0)
+							quadModel(), isFirstLoop(false), closing(false), uiStuff(), screenDimentions(0), emmiters()
 {
 	quadModel = ResourceLoader::getModel("plane.dae");
 }
@@ -82,6 +83,13 @@ void GameScene::drawUI()
 	}
 }
 
+void GameScene::drawParticles()
+{
+	for (Component::ParticleEmmiter* part : emmiters) {
+		part->update(mainContext->getTime().deltaTime);
+	}
+}
+
 void GameScene::addObject(GameObject* obj)
 {
 	objects.push_back(obj);
@@ -112,6 +120,10 @@ void GameScene::processComponet(Component::ComponetBase* comp)
 	if (canv) {
 		uiStuff.push_back(canv);
 	}
+	Component::ParticleEmmiter* part = dynamic_cast<Component::ParticleEmmiter*>(comp);
+	if (part) {
+		emmiters.push_back(part);
+	}
 }
 
 void GameScene::setBG(Vector3 col) 
@@ -138,6 +150,7 @@ void GameScene::preProcess()
 			drawSkyBox();
 			drawObjects(shaderId);
 			drawUI();
+			drawParticles();
 		}
 		fbo.unBind();
 	}
@@ -355,6 +368,10 @@ void GameScene::cleanUp()
 	for (auto itt = uiStuff.begin(); itt != uiStuff.end();) {
 		(*itt)->cleanUp();
 		itt = uiStuff.erase(itt);
+	}
+	for (auto itt = emmiters.begin(); itt != emmiters.end();) {
+		(*itt)->cleanUp();
+		itt = emmiters.erase(itt);
 	}
 
 	FBOs.clear();

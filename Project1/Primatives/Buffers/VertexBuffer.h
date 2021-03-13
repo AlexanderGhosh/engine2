@@ -27,6 +27,9 @@ namespace Primative {
 			Unsigned getVBO() const;
 			Unsigned getVAO() const;
 			Unsigned getEBO() const;
+			Unsigned getIndicesCount() const;
+			const GLenum& getDrawType() const;
+
 
 			// setters
 			void setDrawType(GLenum type);

@@ -1,6 +1,7 @@
 #pragma once
 #include <GL/glew.h>
 #include <string>
+#include <vector>
 #include <glm.hpp>
 #include <gtc/type_ptr.hpp>
 namespace Materials {
@@ -27,6 +28,7 @@ namespace Render {
 			static bool setValue(const std::string& name, const Materials::MatItem& fwd, short& texUnit);
 			static bool setValue(const std::string& name, const Materials::Material*mat);
 			static bool setValue(const std::string& name, const Render::Animation::KeyFrame& frame);
+			static bool setValue(const std::string& name, const std::vector<glm::mat4>& matrices);
 			static void setActive(const unsigned& shaderId);
 			static void cleanUp();
 		private:

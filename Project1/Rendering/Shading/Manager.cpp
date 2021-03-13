@@ -74,6 +74,13 @@ unsigned Render::Shading::Manager::active = 0;
 	 glUniformMatrix4fv(loc, frame.translations.size(), GL_FALSE, glm::value_ptr(frame.translations[0])); 
 	 return true;
  }
+ bool Render::Shading::Manager::setValue(const std::string& name, const std::vector<glm::mat4>& matrices)
+ {
+	 int loc = glGetUniformLocation(Render::Shading::Manager::active, name.c_str());
+	 if (loc < 0) return false;
+	 glUniformMatrix4fv(loc, matrices.size(), GL_FALSE, glm::value_ptr(matrices[0]));
+	 return true;
+ }
  bool Render::Shading::Manager::setValue(const std::string& name, const Materials::Forward& fwd)
  {
 	 bool vals[] = { 0, 0, 0, 0 };

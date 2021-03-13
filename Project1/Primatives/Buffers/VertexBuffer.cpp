@@ -105,6 +105,14 @@ Unsigned Primative::Buffers::VertexBuffer::getEBO() const
 {
 	return EBO;
 }
+Unsigned Primative::Buffers::VertexBuffer::getIndicesCount() const
+{
+	return num_indices;
+}
+const GLenum& Primative::Buffers::VertexBuffer::getDrawType() const
+{
+	return shape_type;
+}
 #pragma endregion
 
 #pragma region Setters

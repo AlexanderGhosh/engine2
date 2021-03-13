@@ -16,6 +16,7 @@ namespace Component {
 	class ComponetBase;
 	class Camera;
 	class RenderMesh;
+	class ParticleEmmiter;
 }
 namespace Primative {
 	class Model;
@@ -36,9 +37,12 @@ private:
 	std::vector<Terrain*> terrain;
 	SkyBox* skybox;
 	Component::Camera* mainCamera;
+
 	std::vector<Component::RenderMesh*> opaque;
 	std::map<float, Component::RenderMesh*> transparent;
 	std::vector<UI::Canvas*> uiStuff;
+	std::vector<Component::ParticleEmmiter*> emmiters;
+
 	std::vector<GameObject*> objects;
 	std::unordered_map<std::string, unsigned> preProcessingLayers;
 	unsigned currentTick, postProcShaderId;
@@ -56,6 +60,7 @@ private:
 	void drawTransparent();
 	void drawTerrain();
 	void drawUI();
+	void drawParticles();
 
 	// polling evetns
 	std::vector<GameEventsTypes> getCurrentEvents() const;

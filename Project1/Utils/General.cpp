@@ -268,6 +268,12 @@ std::string Utils::to_string_precision(Vector3 vec, Int dp) {
     return res;
 }
 
+float Utils::random(float min, float max)
+{
+    assert(min >= 0);
+    return (static_cast<float>(rand()) / static_cast<float>(RAND_MAX)) * (max - min) + min;
+}
+
 
 
 Utils::Timer::Timer() : s(), e(), pausing()
@@ -280,7 +286,7 @@ Utils::Timer::Timer(const std::string name) : s(), e(), pausing(), name(name) {
 void Utils::Timer::start() { s = getNow(); }
 void Utils::Timer::start(String name)
 {
-    rename(name);
+    reName(name);
     start();
 }
 ;

@@ -22,6 +22,7 @@
 #include "Componets/Camera.h"
 #include "Rendering/Rendering.h"
 #include "Componets/AudioReciever.h"
+#include "ParticleSystem/ParticleEmmiter.h"
 
 #include "Physics/Engine.h"
 #include "Physics/Collision/Broadphase/NSquared.h"
@@ -70,7 +71,7 @@ int main() {
     timer.start("Shaders");
     Gizmos::GizmoRenderer::init();
     std::vector<std::string> shaders = {
-        "PBRShader", "TransparentShader", "ShadowShader", "UIShader", "TextShader", "TerrainShaderHeightMap", "TerrainShaderMesh", "PostShader"
+        "PBRShader", "TransparentShader", "ShadowShader", "UIShader", "TextShader", "TerrainShaderHeightMap", "TerrainShaderMesh", "PostShader", "ParticleShader"
     };
     ResourceLoader::createShaders(shaders);
     timer.log();
@@ -86,7 +87,7 @@ int main() {
     // UI //
 
     timer.start("Models");
-    const Primative::Model manModel    = ResourceLoader::createModel("Resources/Models/RFA_Model.fbx"); // RFA_Model
+    // const Primative::Model manModel    = ResourceLoader::createModel("Resources/Models/RFA_Model.fbx"); // RFA_Model
     const Primative::Model cubeBuffer  = ResourceLoader::createModel("Resources/Models/cube.obj"); // needed for the skybox
     const Primative::Model planeBuffer = ResourceLoader::createModel("Resources/Models/plane.dae");
     const Primative::Model minikitBuffer = ResourceLoader::createModel("Resources/Models/minikit.fbx");
@@ -97,19 +98,19 @@ int main() {
     timer.log();
 
     timer.start("Textures");
-    const unsigned wi   = ResourceLoader::loadTexture("Resources/Textures/window.png", TextureType::AlbedoMap, 0);
-    const unsigned wiy  = ResourceLoader::loadTexture("Resources/Textures/yellowWindow.png", TextureType::AlbedoMap, 0);
+    // const unsigned wi   = ResourceLoader::loadTexture("Resources/Textures/window.png", TextureType::AlbedoMap, 0);
+    // const unsigned wiy  = ResourceLoader::loadTexture("Resources/Textures/yellowWindow.png", TextureType::AlbedoMap, 0);
     const unsigned hdr  = ResourceLoader::loadCubeMap("Resources/Textures/Galaxy hdr", ".png", 0);
     const unsigned ibl  = ResourceLoader::loadCubeMap("Resources/Textures/Galaxy ibl", ".png", 0);
     const unsigned brdf = ResourceLoader::loadTexture("Resources/Textures/ibl brdf.png", TextureType::AlbedoMap, 0);
     const unsigned hm   = ResourceLoader::loadTexture("Resources/Textures/heightmap.png", TextureType::HeightMap, 0);
 
-    Materials::PBR armourMaterial = ResourceLoader::createPBR("Resources/Textures/RFATextures/Armour",
-        { TextureType::AlbedoMap, TextureType::AOMap, TextureType::MetalicMap, TextureType::NormalMap, TextureType::RoughnessMap },
-        { 0, 0, 0, 0, 0 });
-    armourMaterial.setHDRmap(hdr);
-    armourMaterial.setIBLmap(ibl);
-    armourMaterial.setBRDFtex(brdf);
+   //Materials::PBR armourMaterial = ResourceLoader::createPBR("Resources/Textures/RFATextures/Armour",
+   //    { TextureType::AlbedoMap, TextureType::AOMap, TextureType::MetalicMap, TextureType::NormalMap, TextureType::RoughnessMap },
+   //    { 0, 0, 0, 0, 0 });
+   //armourMaterial.setHDRmap(hdr);
+   //armourMaterial.setIBLmap(ibl);
+   //armourMaterial.setBRDFtex(brdf);
     // printf("armour\n");
     // Materials::PBR clothesMaterial = ResourceLoader::createPBR("Resources/Textures/RFATextures/Clothes",
     //         { TextureType::AlbedoMap, TextureType::AOMap, TextureType::MetalicMap, TextureType::NormalMap, TextureType::RoughnessMap },
@@ -142,11 +143,11 @@ int main() {
     timer.log();
 
     timer.start("Objects");
-    Component::RenderMesh manR1 = Component::RenderMesh();
-    manR1.setModel(manModel);
-    Materials::PBR manMaterial1/* = Materials::PBR({ { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 0, 0, 0 } }, { { 0.15, 0, 0 } }, { { 0, 0, 0 } })*/;
+    //Component::RenderMesh manR1 = Component::RenderMesh();
+    //manR1.setModel(manModel);
+    //Materials::PBR manMaterial1/* = Materials::PBR({ { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 0, 0, 0 } }, { { 0.15, 0, 0 } }, { { 0, 0, 0 } })*/;
 #define MI Materials::MatItem
-    manR1.setMaterial(&armourMaterial);
+   // manR1.setMaterial(&armourMaterial);
     //manR1.setMaterialTo(&hairMaterial, "Hair");
     //manR1.setMaterialTo(&clothesMaterial, "Cloth");
     //manR1.setMaterialTo(&clothesMaterial, "Scarf");
@@ -155,33 +156,33 @@ int main() {
     //manR1.setMaterialTo(&weponMaterial, "Sword");
     //manR1.setMaterialTo(&weponMaterial, "Dagger");
 
-    Component::Animated manAnimatedComp = Component::Animated();
-    const std::string AnimationLoaded = "Rig|man_run_in_place";
-    auto anim = ResourceLoader::getAnimation(AnimationLoaded); // RFA_Attack
-    if(anim)
-        manAnimatedComp.addAnimation(anim);
-    GameObject manObject = GameObject();
-    manObject.getTransform()->Position = { 0, -1, 0 };
-    manObject.addComponet(&manR1);
-    manObject.addComponet(&manAnimatedComp);
-    manObject.getTransform()->Scale *= 0.0125;
-
-
-    GameObject redWindow({ 0, 0, 3 }, { 1, 1, 1 });
-    Component::RenderMesh plane;
-    plane.setTransparent(true);
-    plane.setModel(planeBuffer);
-    Materials::PBR planeMat(MI(wi), MI({ 0.5, 0, 0 }), MI({ 0.5, 0, 0 }), MI({ 0.5, 0, 0 }), MI(Utils::xAxis(0.2)));
-    plane.setMaterial(&planeMat);
-    redWindow.addComponet(&plane);
-
-    GameObject yellowWindow({ 0.5, 0, 2 }, { 1, 1, 1 });
-    Component::RenderMesh plane_y;
-    plane_y.setTransparent(true);
-    plane_y.setModel(planeBuffer);
-    Materials::PBR planeMat_y(MI(wiy), MI({ 0.5, 0, 0 }), MI({ 0.5, 0, 0 }), MI({ 0.5, 0, 0 }), MI(Utils::xAxis(0.2)));
-    plane_y.setMaterial(&planeMat_y);
-    yellowWindow.addComponet(&plane_y);
+    // Component::Animated manAnimatedComp = Component::Animated();
+    // const std::string AnimationLoaded = "Rig|man_run_in_place";
+    // auto anim = ResourceLoader::getAnimation(AnimationLoaded); // RFA_Attack
+    // if(anim)
+    //     manAnimatedComp.addAnimation(anim);
+    // GameObject manObject = GameObject();
+    // manObject.getTransform()->Position = { 0, -1, 0 };
+    // manObject.addComponet(&manR1);
+    // manObject.addComponet(&manAnimatedComp);
+    // manObject.getTransform()->Scale *= 0.0125;
+    // 
+    // 
+    // GameObject redWindow({ 0, 0, 3 }, { 1, 1, 1 });
+    // Component::RenderMesh plane;
+    // plane.setTransparent(true);
+    // plane.setModel(planeBuffer);
+    // Materials::PBR planeMat(MI(wi), MI({ 0.5, 0, 0 }), MI({ 0.5, 0, 0 }), MI({ 0.5, 0, 0 }), MI(Utils::xAxis(0.2)));
+    // plane.setMaterial(&planeMat);
+    // redWindow.addComponet(&plane);
+    // 
+    // GameObject yellowWindow({ 0.5, 0, 2 }, { 1, 1, 1 });
+    // Component::RenderMesh plane_y;
+    // plane_y.setTransparent(true);
+    // plane_y.setModel(planeBuffer);
+    // Materials::PBR planeMat_y(MI(wiy), MI({ 0.5, 0, 0 }), MI({ 0.5, 0, 0 }), MI({ 0.5, 0, 0 }), MI(Utils::xAxis(0.2)));
+    // plane_y.setMaterial(&planeMat_y);
+    // yellowWindow.addComponet(&plane_y);
 
     GameObject minikit({ 0, 1, 0 }, { 0.5, 0.5, 0.5 });
     Component::RenderMesh minikitMesh;
@@ -208,6 +209,9 @@ int main() {
     //audio.play();
     SoundControllerScript scs;
     minikit.addComponet(&scs);
+    Component::ParticleEmmiter emitter(200, 2, { 0, 0, 0 }, { 1.5, 1.5, 1.5 });
+    emitter.loop();
+    minikit.addComponet(&emitter);
 
     timer.log();
 
@@ -245,9 +249,9 @@ int main() {
     scene.initalize();
 
     scene.addObject(&player);
-    scene.addObject(&manObject);
-    scene.addObject(&redWindow);
-    scene.addObject(&yellowWindow);
+    // scene.addObject(&manObject);
+    // scene.addObject(&redWindow);
+    // scene.addObject(&yellowWindow);
     scene.addObject(&minikit);
     scene.addTerrain(&land);
 

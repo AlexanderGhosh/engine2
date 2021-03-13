@@ -215,6 +215,8 @@ namespace Utils {
     }
     std::string to_string_precision(Vector3 vec, Int dp);
 
+    float random(float min = 0, float max = 1);
+
     class Timer {
     public:
         Timer(const std::string name);

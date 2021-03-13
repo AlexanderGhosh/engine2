@@ -207,6 +207,9 @@
     <ClCompile Include="Primatives\Buffers\SoundStreamBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ParticleSystem\ParticleEmmiter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Rendering\Rendering.h">
@@ -411,6 +414,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Primatives\Buffers\SoundStreamBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ParticleSystem\ParticleEmmiter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
