@@ -213,6 +213,9 @@
     <ClCompile Include="Scripts\RainMakerScript.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Primatives\TextureChain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Rendering\Rendering.h">
@@ -423,6 +426,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Scripts\RainMakerScript.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Primatives\TextureChain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

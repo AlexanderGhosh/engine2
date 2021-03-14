@@ -24,7 +24,7 @@ void Component::ParticleEmmiter::spawn()
 	}
 }
 
-Component::ParticleEmmiter::ParticleEmmiter() : ComponetBase(), particleTransforms(), life(), maxParticelCount(0), velocity(0, -1, 0), doLoop(false), oridRadii(), orgiCenter(), maxLife(), colour(1), texture(0)
+Component::ParticleEmmiter::ParticleEmmiter() : ComponetBase(), particleTransforms(), life(), maxParticelCount(0), velocity(0, -1, 0), doLoop(false), oridRadii(), orgiCenter(), maxLife(), colour(1), textures()
 {
 	if (NOT shader) {
 		shader = ResourceLoader::getShader("ParticleShader");
@@ -59,6 +59,7 @@ void Component::ParticleEmmiter::update(float deltaTime)
 			//transform.Position += velocity * deltaTime;
 		}
 	}
+	textures.update(deltaTime);
 	drawParticles();
 }
 
@@ -73,10 +74,10 @@ void Component::ParticleEmmiter::drawParticles()
 		particleTransforms[i].Rotation = rot;
 	}
 	Render::Shading::Manager::setValue("col", colour);
-	Render::Shading::Manager::setValue("mix_val", (texture ? 0.0f : 1.0f));
+	Render::Shading::Manager::setValue("mix_val", (textures.hasTextures() ? 0.0f : 1.0f));
 	Render::Shading::Manager::setValue("tex", 0);
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, texture);
+	glBindTexture(GL_TEXTURE_2D, textures.getTexture());
 	quadBuffer.bind();
 	glDrawElementsInstanced(quadBuffer.getDrawType(), quadBuffer.getIndicesCount(), GL_UNSIGNED_INT, 0, particleTransforms.size());
 	quadBuffer.unBind();
@@ -113,9 +114,9 @@ void Component::ParticleEmmiter::setCenter(Vector3 center)
 	orgiCenter = center;
 }
 
-void Component::ParticleEmmiter::setTexture(Unsigned tex)
+void Component::ParticleEmmiter::setTexture(const Primative::TextureChain& tex)
 {
-	this->texture = tex;
+	this->textures = tex;
 }
 
 void Component::ParticleEmmiter::setColour(Vector4 col)

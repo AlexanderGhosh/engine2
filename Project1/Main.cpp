@@ -198,7 +198,7 @@ int main() {
     minikitMesh.setMaterialTo(&minikitMatGray,  "gray");
     minikitMesh.setMaterialTo(&minikitMatBlack, "black");
     minikitMesh.setMaterialTo(&minikitMatGreen, "green");
-    minikitMesh.setMaterialTo(&minikitMatRed,    "red");
+    minikitMesh.setMaterialTo(&minikitMatRed,   "red");
     minikit.addComponet(&minikitMesh);
     SpinScript spinScript({ -1, 1, 0 }, 0.125);
     minikit.addComponet(&spinScript);
@@ -214,7 +214,7 @@ int main() {
     Component::ParticleEmmiter emitter(200, 2, { 0, 0, 0 }, { 1.5, 2, 1.5 });
     //emitter.loop();
     minikit.addComponet(&emitter);
-    emitter.setTexture(rainDrop);
+    emitter.setTexture(Primative::TextureChain({ rainDrop, hm }, { 1, 1 }));
     RainMakerScript rain;
     minikit.addComponet(&rain);
 
