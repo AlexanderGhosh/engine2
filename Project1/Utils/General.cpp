@@ -189,8 +189,19 @@ glm::mat3 Utils::inverse(const glm::mat3& a, const bool symetrical) {
         return glm::inverse(a);
 }
 
+glm::vec3 Utils::round(glm::vec3 var, int dp)
+{
+    glm::vec3 res(0);
+    for (char i = 0; i < 3; i++)
+        res[i] = Utils::round(var[i], dp);
+    return res;
+}
+
 float Utils::round(float var, int dp)
 {
+    if (dp < 0) {
+        return var;
+    }
     float t = powf(10, dp);
     // 37.66666 * 100 =3766.66 
     // 3766.66 + .5 =3767.16    for rounding off value 
@@ -255,6 +266,20 @@ std::string Utils::replaceAll(std::string str, std::string from, std::string to)
     return str;
 }
 
+void Utils::Log(String msg, String eol)
+{
+    std::cout << msg << eol;
+}
+
+void Utils::Log(std::vector<std::string> msg, String eol)
+{
+    std::string txt = "";
+    for (String t : msg) {
+        txt += t;
+    }
+    std::cout << txt << eol;
+}
+
 std::string Utils::to_string_precision(Vector3 vec, Int dp) {
     std::string res = "";
     for (char i = 0; i < 3; i++) {
@@ -266,6 +291,11 @@ std::string Utils::to_string_precision(Vector3 vec, Int dp) {
     res.pop_back();
     res.pop_back();
     return res;
+}
+
+std::string Utils::to_string_precision(Float vec, Int dp)
+{
+    return std::to_string(Utils::round(vec, dp));
 }
 
 float Utils::random(float min, float max)

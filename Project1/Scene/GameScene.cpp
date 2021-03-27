@@ -15,6 +15,7 @@
 #include "../UI/UIRenderer.h"
 #include "../UI/Panes/Canvas.h"
 #include "../ParticleSystem/ParticleEmmiter.h"
+#include "../Physics/Engine.h"
 
 std::vector<GameEventsTypes> GameScene::getCurrentEvents() const
 {
@@ -234,8 +235,8 @@ const Primative::Buffers::FrameBuffer& GameScene::getFBO(const std::string& name
 
 void GameScene::initalize()
 {
-	Primative::Buffers::FrameBuffer shadowFBO({ "depth" }, screenDimentions, { 1, 0, 1 });
-	Primative::Buffers::FrameBuffer finalFBO({ "col0" }, screenDimentions, { 0, 0, 1 });
+	Primative::Buffers::FrameBuffer shadowFBO({ "depth" }, screenDimentions, { 0.5, 0.5, 0.5 });
+	Primative::Buffers::FrameBuffer finalFBO({ "col0" }, screenDimentions, { 0.5, 0.5, 0.5 });
 	addFBO("shadows", shadowFBO);
 	addPreProcLayer("shadows", ResourceLoader::getShader("ShadowShader"));
 	addFBO("final", finalFBO);
@@ -269,23 +270,15 @@ void GameScene::initalize()
 
 void GameScene::gameLoop()
 {
+	Utils::Log("--------------------------------------------------------------------------------");
 	// float counter = 0;
 	isFirstLoop = true;
 	while (NOT (closing OR mainContext->shouldClose()))
 	{
-		// FPS--------------------------------------------------------------------------------------------------------------------------------------------------
-
-		// tb.setText("FPS: " + std::to_string(main.getTime().avgFPS));
-		// const float w = tb.getWidth() / 2.0f;
-		// const glm::vec2& p = tb.getPos();
-		// float diff = p.x - w; // left edge
-		// diff = 5 - diff;
-		// tb.setPos({ p.x + diff, p.y });
-
 		// UPDATES----------------------------------------------------------------------------------------------------------------------------------------------
+		Physics::Engine::update();
 		updateObjects();
-
-		// counter += main.getTime().deltaTime;
+		//Physics::Engine::setDeltaTime(mainContext->getTime().deltaTime);
 
 		// RENDERING--------------------------------------------------------------------------------------------------------------------------------------------
 		auto& mainBuffer = uniformBuffers[0];
@@ -294,52 +287,7 @@ void GameScene::gameLoop()
 
 		preProcess(); // shadows and scene quad
 		postProcess();// render to screen
-		// UI::UIRenderer::render(&tb);
 		Gizmos::GizmoRenderer::drawAll();
-
-
-		// PHYSICS-----------------------------------------------------------------------------------------------------------------------------------------------
-
-		// cube2->getTransform()->Position.x -= 0.01;
-		// Physics::Engine::update();
-		// 
-		// // EVENTS-----------------------------------------------------------------------------------------------------------------------------------------------
-		// float speed = 1;
-		// if (Events::Handler::getCursor(Events::Cursor::Middle, Events::Action::Down)) {
-		// 	speed = 10;
-		// }
-		// if (Events::Handler::getKey(Events::Key::W, Events::Action::Down)) {
-		// 	cam.setPos(cam.getPos() + cam.getForward() * glm::vec3(1, 0, 1) * main.getTime().deltaTime * speed);
-		// }
-		// if (Events::Handler::getKey(Events::Key::S, Events::Action::Down)) {
-		// 	cam.setPos(cam.getPos() - cam.getForward() * glm::vec3(1, 0, 1) * main.getTime().deltaTime * speed);
-		// }
-		// if (Events::Handler::getKey(Events::Key::A, Events::Action::Down)) {
-		// 	cam.setPos(cam.getPos() - cam.getRight() * main.getTime().deltaTime * speed);
-		// }
-		// if (Events::Handler::getKey(Events::Key::D, Events::Action::Down)) {
-		// 	cam.setPos(cam.getPos() + cam.getRight() * main.getTime().deltaTime * speed);
-		// }
-		// if (Events::Handler::getKey(Events::Key::Space, Events::Action::Down)) {
-		// 	cam.setPos(cam.getPos() + Utils::yAxis() * main.getTime().deltaTime * speed);
-		// }
-		// if (Events::Handler::getKey(Events::Key::L_Shift, Events::Action::Down)) {
-		// 	cam.setPos(cam.getPos() - Utils::yAxis() * main.getTime().deltaTime * speed);
-		// }
-		// counter += main.getTime().deltaTime;
-		// if (counter >= 0.2 AND Events::Handler::getKey(Events::Key::Enter, Events::Action::Down)) {
-		// 	counter = 0;
-		// 	// manAnimatedComp.togglePlay();
-		// 	manAnimatedComp.startAnimation("");
-		// }
-		// if (Events::Handler::getKey(Events::Key::Backspace, Events::Action::Down))
-		// 	manAnimatedComp.startAnimation(AnimationLoaded);
-		// 
-		// if (Events::Handler::getKey(Events::Key::Escape, Events::Action::Down)) {
-		// 	break;
-		// }
-		// COLOR BUFFERS----------------------------------------------------------------------------------------------------------------------------------------
-		// sound->update();
 
 		mainContext->update();
 		Events::Handler::pollEvents();

@@ -23,6 +23,11 @@ namespace Component {
 	public:
 		bool isKinimatic, hasGravity;
 	public:
+		int counter = 0;
+		void update(float deltaTime) {
+			if(NOT isKinimatic)
+				Utils::Log(":::::::::" + std::to_string(counter++) + ":::::" + Utils::to_string_precision(velocity.y, -1));
+		}
 		RigidBody();
 		void addCollider(Physics::Collider* collider);
 		void updateInertia();
@@ -31,7 +36,7 @@ namespace Component {
 		void cleanUp();
 
 		// intergration
-		// for velocity
+		// for velocity adds gravity and dampening
 		void intergrateForces();
 		// for position
 		void intergrateVelocity();
@@ -40,7 +45,7 @@ namespace Component {
 		void addForce(Vector3 force, Vector3 at);
 
 		// getters
-		Vector3 getCOS() const;
+		Vector3 getCOM() const;
 		Quaternion getRotation() const;
 		glm::mat3 getRotationMatrix() const;
 		Vector3 getVelocity() const;
@@ -48,6 +53,7 @@ namespace Component {
 
 		Matrix3 getInvInertia_G() const;
 		const float& getInvMass() const;
+		const float& getMass() const;
 
 		// setters
 

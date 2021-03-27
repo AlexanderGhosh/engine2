@@ -73,8 +73,8 @@ Utils::Shapes::Face<glm::vec3, 4> Physics::SAT3D::bestFace(ColliderSAT* coll, co
 
 Physics::SAT3D::ClippedPoints Physics::SAT3D::getContactData(CollisionManfold& info) const {
 	using namespace SHAPE;
-	ColliderSAT* a = reinterpret_cast<ColliderSAT*>(info.bodies[0]);
-	ColliderSAT* b = reinterpret_cast<ColliderSAT*>(info.bodies[1]);
+	ColliderSAT* a = reinterpret_cast<ColliderSAT*>(info.bodies[1]);
+	ColliderSAT* b = reinterpret_cast<ColliderSAT*>(info.bodies[0]);
 
 	const glm::vec3& n = info.normal;
 

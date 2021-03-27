@@ -120,8 +120,8 @@ Gizmos::Line::Line(Vector3 from, Vector3 to, bool over) : Line()
 {
 	const glm::vec3 half_d = (to - from) / 2.0f;
 	position = from + half_d;
-	leftOffset = -half_d;
-	rightOffset = half_d;
+	leftOffset = from;
+	rightOffset = to;
 }
 
 void Gizmos::Line::draw() {

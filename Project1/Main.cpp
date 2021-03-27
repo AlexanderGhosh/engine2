@@ -61,7 +61,7 @@ int main() {
 
     Utils::Timer timer;
 
-    Context main(SCREEN_DIMENTIONS, false);
+    Context main = Context(SCREEN_DIMENTIONS, true, 60);
     main.init("Engine 2", { GL_BLEND, GL_DEPTH_TEST, GL_CULL_FACE, GL_MULTISAMPLE });
     Events::Handler::init(main.getWindow());
 
@@ -89,9 +89,9 @@ int main() {
 
     timer.start("Models");
     // const Primative::Model manModel    = ResourceLoader::createModel("Resources/Models/RFA_Model.fbx"); // RFA_Model
-    const Primative::Model cubeBuffer  = ResourceLoader::createModel("Resources/Models/cube.obj"); // needed for the skybox
+    const Primative::Model cubeBuffer  = ResourceLoader::createModel("Resources/Models/cube.dae"); // needed for the skybox
     const Primative::Model planeBuffer = ResourceLoader::createModel("Resources/Models/plane.dae");
-    const Primative::Model minikitBuffer = ResourceLoader::createModel("Resources/Models/minikit.fbx");
+    // const Primative::Model minikitBuffer = ResourceLoader::createModel("Resources/Models/minikit.fbx");
     timer.log();
 
     timer.start("Animations");
@@ -101,11 +101,11 @@ int main() {
     timer.start("Textures");
     // const unsigned wi   = ResourceLoader::loadTexture("Resources/Textures/window.png", TextureType::AlbedoMap, 0);
     // const unsigned wiy  = ResourceLoader::loadTexture("Resources/Textures/yellowWindow.png", TextureType::AlbedoMap, 0);
-    const unsigned hdr  = ResourceLoader::loadCubeMap("Resources/Textures/Galaxy hdr", ".png", 0);
-    const unsigned ibl  = ResourceLoader::loadCubeMap("Resources/Textures/Galaxy ibl", ".png", 0);
-    const unsigned brdf = ResourceLoader::loadTexture("Resources/Textures/ibl brdf.png", TextureType::AlbedoMap, 0);
-    const unsigned hm   = ResourceLoader::loadTexture("Resources/Textures/heightmap.png", TextureType::HeightMap, 0);
-    const unsigned rainDrop = ResourceLoader::loadTexture("Resources/Textures/raindrop.png", TextureType::AlbedoMap, 0);
+    // const unsigned hdr  = ResourceLoader::loadCubeMap("Resources/Textures/Galaxy hdr", ".png", 0);
+    // const unsigned ibl  = ResourceLoader::loadCubeMap("Resources/Textures/Galaxy ibl", ".png", 0);
+    // const unsigned brdf = ResourceLoader::loadTexture("Resources/Textures/ibl brdf.png", TextureType::AlbedoMap, 0);
+    // const unsigned hm   = ResourceLoader::loadTexture("Resources/Textures/heightmap.png", TextureType::HeightMap, 0);
+    // const unsigned rainDrop = ResourceLoader::loadTexture("Resources/Textures/raindrop.png", TextureType::AlbedoMap, 0);
 
    //Materials::PBR armourMaterial = ResourceLoader::createPBR("Resources/Textures/RFATextures/Armour",
    //    { TextureType::AlbedoMap, TextureType::AOMap, TextureType::MetalicMap, TextureType::NormalMap, TextureType::RoughnessMap },
@@ -186,50 +186,76 @@ int main() {
     // plane_y.setMaterial(&planeMat_y);
     // yellowWindow.addComponet(&plane_y);
 
-    GameObject minikit({ 0, 0, 0 }, { 0.5, 0.5, 0.5 });
-    Component::RenderMesh minikitMesh;
-    minikitMesh.setModel(minikitBuffer);
-    Materials::PBR minikitMatWhite(MI({ 1, 1, 1 }),       MI({ 1, 1, 1 }), MI({ 0.5, 0.5, 0.5 }), MI({ 0.5, 0, 0 }), MI({ 0, 0, 0 }));
-    Materials::PBR minikitMatGray( MI({ 0.5, 0.5, 0.5 }), MI({ 1, 1, 1 }), MI({ 0.5, 0.5, 0.5 }), MI({ 0.5, 0, 0 }), MI({ 0, 0, 0 }));
-    Materials::PBR minikitMatBlack(MI({ 0, 0, 0 }),       MI({ 1, 1, 1 }), MI({ 0.5, 0.5, 0.5 }), MI({ 0.5, 0, 0 }), MI({ 0, 0, 0 }));
-    Materials::PBR minikitMatGreen(MI({ 0, 0.75, 0 }),    MI({ 1, 1, 1 }), MI({ 0.5, 0.5, 0.5 }), MI({ 0.5, 0, 0 }), MI({ 0, 0, 0 }));
-    Materials::PBR minikitMatRed(  MI({ 0.75, 0, 0 }),    MI({ 1, 1, 1 }), MI({ 0.5, 0.5, 0.5 }), MI({ 0.5, 0, 0 }), MI({ 0, 0, 0 }));
-    minikitMesh.setMaterialTo(&minikitMatWhite, "white");
-    minikitMesh.setMaterialTo(&minikitMatGray,  "gray");
-    minikitMesh.setMaterialTo(&minikitMatBlack, "black");
-    minikitMesh.setMaterialTo(&minikitMatGreen, "green");
-    minikitMesh.setMaterialTo(&minikitMatRed,   "red");
-    minikit.addComponet(&minikitMesh);
-    SpinScript spinScript({ -1, 1, 0 }, 0.125);
-    minikit.addComponet(&spinScript);
-    HoverScript hoverScript(1, 0.25);
-    minikit.addComponet(&hoverScript);
-    Component::AudioSource audio(SoundManager::createSoundSource());
-    // audio.addBuffer(dynamic_cast<Primative::Buffers::SoundBuffer*>(soundDatabufferS));
-    audio.addBuffer(soundDatabuffer);
-    minikit.addComponet(&audio);
-    //audio.play();
-    SoundControllerScript scs;
-    minikit.addComponet(&scs);
-    Component::ParticleEmmiter emitter(200, 2, { 0, 0, 0 }, { 1.5, 2, 1.5 });
-    //emitter.loop();
-    minikit.addComponet(&emitter);
-    emitter.setTexture(Primative::TextureChain({ rainDrop, hm }, { 1, 1 }));
-    RainMakerScript rain;
-    minikit.addComponet(&rain);
+    // GameObject minikit({ 0, 0, 0 }, { 0.5, 0.5, 0.5 });
+    // Component::RenderMesh minikitMesh;
+    // minikitMesh.setModel(minikitBuffer);
+    // Materials::PBR minikitMatWhite(MI({ 1, 1, 1 }),       MI({ 1, 1, 1 }), MI({ 0.5, 0.5, 0.5 }), MI({ 0.5, 0, 0 }), MI({ 0, 0, 0 }));
+    // Materials::PBR minikitMatGray( MI({ 0.5, 0.5, 0.5 }), MI({ 1, 1, 1 }), MI({ 0.5, 0.5, 0.5 }), MI({ 0.5, 0, 0 }), MI({ 0, 0, 0 }));
+    // Materials::PBR minikitMatBlack(MI({ 0, 0, 0 }),       MI({ 1, 1, 1 }), MI({ 0.5, 0.5, 0.5 }), MI({ 0.5, 0, 0 }), MI({ 0, 0, 0 }));
+    // Materials::PBR minikitMatGreen(MI({ 0, 0.75, 0 }),    MI({ 1, 1, 1 }), MI({ 0.5, 0.5, 0.5 }), MI({ 0.5, 0, 0 }), MI({ 0, 0, 0 }));
+    // Materials::PBR minikitMatRed(  MI({ 0.75, 0, 0 }),    MI({ 1, 1, 1 }), MI({ 0.5, 0.5, 0.5 }), MI({ 0.5, 0, 0 }), MI({ 0, 0, 0 }));
+    // minikitMesh.setMaterialTo(&minikitMatWhite, "white");
+    // minikitMesh.setMaterialTo(&minikitMatGray,  "gray");
+    // minikitMesh.setMaterialTo(&minikitMatBlack, "black");
+    // minikitMesh.setMaterialTo(&minikitMatGreen, "green");
+    // minikitMesh.setMaterialTo(&minikitMatRed,   "red");
+    // minikit.addComponet(&minikitMesh);
+    // SpinScript spinScript({ -1, 1, 0 }, 0.125);
+    // minikit.addComponet(&spinScript);
+    // HoverScript hoverScript(1, 0.25);
+    // minikit.addComponet(&hoverScript);
+    // Component::AudioSource audio(SoundManager::createSoundSource());
+    // // audio.addBuffer(dynamic_cast<Primative::Buffers::SoundBuffer*>(soundDatabufferS));
+    // audio.addBuffer(soundDatabuffer);
+    // minikit.addComponet(&audio);
+    // //audio.play();
+    // SoundControllerScript scs;
+    // minikit.addComponet(&scs);
+    // Component::ParticleEmmiter emitter(200, 2, { 0, 0, 0 }, { 1.5, 2, 1.5 });
+    // //emitter.loop();
+    // minikit.addComponet(&emitter);
+    // emitter.setTexture(Primative::TextureChain({ rainDrop, hm }, { 1, 1 }));
+    // RainMakerScript rain;
+    // minikit.addComponet(&rain);
 
     timer.log();
 
-    timer.start("Terrain");
-    Terrain land(100);
-    land.getTransform().Position.y = -1;
-    land.getTransform().Scale = { 100, 10 ,100 };
-    land.setHeightMap(hm);
-    land.setNoiseBuffer(Utils::NoiseGeneration::getMap(100, { 1, 0.5, 0.1 }, { 1, 2, 3 }));
-    land.useTextureMap(false);
-    timer.log();
+    // timer.start("Terrain");
+    // Terrain land(100);
+    // land.getTransform().Position.y = -1;
+    // land.getTransform().Scale = { 100, 10 ,100 };
+    // land.setHeightMap(hm);
+    // land.setNoiseBuffer(Utils::NoiseGeneration::getMap(100, { 1, 0.5, 0.1 }, { 1, 2, 3 }));
+    // land.useTextureMap(false);
+    // timer.log();
 
+    constexpr glm::vec3 BOX_OFFSET(0);
+    // constexpr glm::vec3 BOX_OFFSET(-4, 1, -2);
+    
+    GameObject topBox = GameObject(glm::vec3(0, 3, 0) + BOX_OFFSET, { 1, 1, 1 });
+    //topBox.getTransform()->rotate({ 0, 0, RADIANS(45) });
+    Component::RenderMesh topCubeMesh;
+    topCubeMesh.setModel(cubeBuffer);
+    Materials::PBR topMat = Materials::PBR(MI({ 1, 0, 0 }), MI({ 1, 1, 1 }), MI({ 0.5, 0.5, 0.5 }), MI({ 0.5, 0, 0 }), MI({ 0, 0, 0 }));
+    topCubeMesh.setMaterial(&topMat);
+    topBox.addComponet(&topCubeMesh);
+    Component::RigidBody rbTop;
+    Physics::BoxColliderSAT topCollider = Physics::BoxColliderSAT(10);
+    topBox.addComponet(&rbTop);
+    topBox.addComponet(&topCollider);
+    
 
+    GameObject bottomBox = GameObject(glm::vec3(0) + BOX_OFFSET, { 1, 1, 1 });
+    Component::RenderMesh bottomCubeMesh;
+    bottomCubeMesh.setModel(cubeBuffer);
+    Materials::PBR bottomMat = Materials::PBR(MI({ 0, 0, 1 }), MI({ 1, 1, 1 }), MI({ 0.5, 0.5, 0.5 }), MI({ 0.5, 0, 0 }), MI({ 0, 0, 0 }));
+    bottomCubeMesh.setMaterial(&bottomMat);
+    bottomBox.addComponet(&bottomCubeMesh);
+    Component::RigidBody rbBottom;
+    Physics::BoxColliderSAT bottomCollider = Physics::BoxColliderSAT(10);
+    bottomBox.addComponet(&rbBottom);
+    bottomBox.addComponet(&bottomCollider);
+    rbBottom.isKinimatic = true;
 
     timer.start("Player");
     GameObject player = GameObject({ 0, 0, 5 }, { 1, 1, 1 });
@@ -238,6 +264,7 @@ int main() {
     PlayerControler playerScript;
     player.addComponet(&playerScript);
     DebugScreen debugScript;
+    debugScript.RedBlock = &topBox;
     player.addComponet(&debugScript);
     Component::AudioReciever recieverComp;
     player.addComponet(&recieverComp);
@@ -251,39 +278,36 @@ int main() {
     GameScene scene;
     scene.setMainCamera(&playerCamera);
     scene.setContext(&main);
-    scene.setBG({ 1, 0, 0 });
+    scene.setBG({ 0.5, 0.5, 0.5 });
     scene.initalize();
 
     scene.addObject(&player);
-    // scene.addObject(&manObject);
-    // scene.addObject(&redWindow);
-    // scene.addObject(&yellowWindow);
-    scene.addObject(&minikit);
-    scene.addTerrain(&land);
+    scene.addObject(&topBox);
+    scene.addObject(&bottomBox);
 
     timer.log();
 
     // SKYBOX //
     timer.start("Skybox");
-    ResourceLoader::loadCubeMap("Resources/Textures/Galaxy", ".png", 0);
-    SkyBox sb = SkyBox("Galaxy.cm");
-    scene.setSkyBox(&sb);
+    // ResourceLoader::loadCubeMap("Resources/Textures/Galaxy", ".png", 0);
+    // SkyBox sb = SkyBox("Galaxy.cm");
+    // scene.setSkyBox(&sb);
     timer.log();
     // SKYBOX //
     
     
-    // timer.reName("Physics");
-    // timer.start();
-    // Physics::CollisionDetection::setBroadphase<Physics::NSquared>();
-    // Physics::CollisionDetection::setNarrowphase< Physics::SAT3D>();
-    // Physics::Engine::setResponse<Physics::ImpulseBased>();
-    // timer.log();
+    timer.reName("Physics");
+    timer.start();
+    Physics::CollisionDetection::setBroadphase<Physics::NSquared>();
+    Physics::CollisionDetection::setNarrowphase< Physics::SAT3D>();
+    Physics::Engine::setResponse<Physics::ImpulseBased>();
+    timer.log();
     // Physics::Constraints::ConstraintsSolver::addConstraint<Physics::Constraints::DistanceConstraint>(rb1, rb2, Utils::fill(0.5f), Utils::fill(-0.5f), 1.0f);
     // Physics::Constraints::ConstraintsSolver::addConstraint(DBG_NEW Physics::Constraints::DistanceConstraint(rb1, rb2, Utils::fill(0), Utils::fill(0), 1.5f));
-
+    
     // cube2->getTransform()->Position = { 0.5, 5, -5 };
     // cube2->getRigidbody()->hasGravity = true;
-    //cube2->getRigidbody()->velocityAdder({ 1, -1, 0 });
+    // cube2->getRigidbody()->velocityAdder({ 1, -1, 0 });
 
     Gizmos::Sphere gizmo1 = Gizmos::Sphere({ 0, 0, 0 }, { 1, 0, 0 });
     gizmo1.setRadius(0.25);
@@ -292,14 +316,6 @@ int main() {
 
     scene.gameLoop();
 
-    /*while (!main.shouldClose())
-    {
-
-        // PHYSICS-----------------------------------------------------------------------------------------------------------------------------------------------
-
-        // cube2->getTransform()->Position.x -= 0.01;
-        Physics::Engine::update();
-    }*/
     Physics::Engine::cleanUp();
     gizmo1.cleanUp();
     

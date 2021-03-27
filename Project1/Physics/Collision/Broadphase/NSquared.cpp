@@ -113,7 +113,6 @@ void Physics::NSquared::cleanUp()
     for (auto itt = pairs.begin(); itt != pairs.end();) {
         for (char i = 0; i < 2; i++) {
             (*itt)[i]->cleanUp();
-            delete (*itt)[i];
         }
         delete[2] (*itt).data();
         itt = pairs.erase(itt);

@@ -169,7 +169,7 @@ namespace Utils {
     }
 
     glm::mat3 inverse(const glm::mat3& a, const bool symetrical = false);
-
+    glm::vec3 round(glm::vec3 var, int dp);
     float round(float var, int dp);
 
     // doenst go deep
@@ -198,6 +198,9 @@ namespace Utils {
         }
     }
 
+    void Log(String msg, String eol = "\n");
+    void Log(std::vector<std::string> msg, String eol = "\n");
+
     /// <summary>
     /// returns vec as a string casted to T eg (int)
     /// </summary>
@@ -215,6 +218,7 @@ namespace Utils {
         return res;
     }
     std::string to_string_precision(Vector3 vec, Int dp);
+    std::string to_string_precision(Float vec, Int dp);
 
     float random(float min = 0, float max = 1);
 

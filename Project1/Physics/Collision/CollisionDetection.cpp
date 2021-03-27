@@ -56,13 +56,13 @@ void Physics::CollisionDetection::cleanUp()
 {
     if (broadphase) {
         broadphase->cleanUp();
-        delete broadphase;
+        // delete broadphase;
         broadphase = nullptr;
     }
 
     if (narrowphase) {
         narrowphase->cleanUp();
-        delete narrowphase;
+        // delete narrowphase;
         narrowphase = nullptr;
     }
 }

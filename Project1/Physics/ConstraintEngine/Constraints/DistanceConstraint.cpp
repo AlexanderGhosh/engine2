@@ -17,8 +17,8 @@ void Physics::Constraints::DistanceConstraint::solve(const float& dt)
 	glm::vec3 r1 = body1->getRotation() * relPosA;
 	glm::vec3 r2 = body2->getRotation() * relPosB;
 
-	glm::vec3 globalOnA = r1 + body1->getCOS();
-	glm::vec3 globalOnB = r2 + body2->getCOS();
+	glm::vec3 globalOnA = r1 + body1->getCOM();
+	glm::vec3 globalOnB = r2 + body2->getCOM();
 
 	glm::vec3 ab = globalOnB - globalOnA;
 	glm::vec3 abn = glm::normalize(ab);

@@ -59,7 +59,7 @@ void Component::RigidBody::addForce(Vector3 force, Vector3 at)
 	this->torque += glm::cross(at - cos, force);
 }
 
-Vector3 Component::RigidBody::getCOS() const
+Vector3 Component::RigidBody::getCOM() const
 {
 	return transform->Position;
 }
@@ -93,10 +93,18 @@ const float& Component::RigidBody::getInvMass() const
 {
 	return invMass;
 }
+const float& Component::RigidBody::getMass() const
+{
+	return 1.0f / invMass;
+}
 
 void Component::RigidBody::velocityAdder(Vector3 add)
 {
-	velocity += add;
+	// Utils::Log(Utils::to_string_precision(velocity.y, Physics::Engine::roundResolution), " + ");
+	// Utils::Log(Utils::to_string_precision(add.y, Physics::Engine::roundResolution), " = ");
+	// //velocity += Utils::round(add, Physics::Engine::roundResolution);
+	velocity *= -1;
+	// Utils::Log(Utils::to_string_precision(velocity.y, Physics::Engine::roundResolution), "\n");
 }
 
 void Component::RigidBody::angularVelAdder(Vector3 add)
@@ -123,6 +131,7 @@ void Component::RigidBody::intergrateForces()
 	velocity += force * invMass * dt;
 
 	velocity *= Physics::Engine::getDamppingFactor();
+	velocity = Utils::round(velocity, Physics::Engine::roundResolution);
 
 	angularVelocity += g_invInertia * torque * dt;
 
@@ -135,9 +144,11 @@ void Component::RigidBody::intergrateVelocity()
 	if (isKinimatic)
 		return;
 	const float& dt = Physics::Engine::getDeltaTime();
+	velocity = Utils::round(velocity, Physics::Engine::roundResolution);
+
 	transform->Position += velocity * dt;
 	cos += velocity * dt;
-
+	return;
 	const glm::quat deltaQ(0.0f, angularVelocity * dt * 0.5f);
 	*rotation += deltaQ * *rotation;
 	*rotation = glm::normalize(*rotation);

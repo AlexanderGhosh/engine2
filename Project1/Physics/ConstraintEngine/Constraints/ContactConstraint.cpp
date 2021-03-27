@@ -14,8 +14,8 @@ void Physics::Constraints::ContactConstraint::solve(const float& dt)
     const auto inv_m = MATHS::inverse({ } /*M*/);
     glm::vec3 acc(0);
     for (const glm::vec3& point : collisionData->points) {
-        glm::vec3 temp1 = -glm::cross(point - body1->getCOS(), n);
-        glm::vec3 temp2 = glm::cross(point - body2->getCOS(), n);
+        glm::vec3 temp1 = -glm::cross(point - body1->getCOM(), n);
+        glm::vec3 temp2 = glm::cross(point - body2->getCOM(), n);
         Jacobian = {
             -n.x, -n.y, -n.z,
             temp1.x, temp1.y, temp1.z,

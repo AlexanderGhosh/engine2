@@ -233,4 +233,5 @@ void main()
         discard;
     }
     FragColor = vec4(color, a);
+    FragColor = vec4(albedo, a);
 }

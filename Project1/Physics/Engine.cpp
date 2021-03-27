@@ -4,40 +4,84 @@
 #include "../GameObject/GameObject.h"
 #include "Resolution/ResolutionBase.h"
 #include "ConstraintEngine/ConstraitnsSolver.h"
+#include "../Gizmos/GizmoRenderer.h"
 
 std::vector<Component::RigidBody*> Physics::Engine::rigidbodies = { };
 std::vector<Physics::Collider*> Physics::Engine::colliders = { }; 
 Physics::Resolution* Physics::Engine::resolution = nullptr; 
-glm::vec3 Physics::Engine::gravity = { 0, -10, 0 };
+glm::vec3 Physics::Engine::gravity = { 0, -20, 0 };
 float Physics::Engine::dampping = 1;
+float Physics::Engine::deltaTime = 1.0f / 60.0f;
+std::list<Gizmos::Point> Physics::Engine::tempGizmos = { };
+Gizmos::Line* Physics::Engine::tempNormal = nullptr;
+int Physics::Engine::roundResolution = -1;
+
+void Physics::Engine::drawManafold(const Physics::CollisionManfold& manafold)
+{
+	bool adding = false;
+	if (tempGizmos.size() != 4) {
+		tempGizmos.resize(4);
+		adding = true;
+	}
+	char i = 0;
+	glm::vec3 mean(0);
+	for (Vector3 pos : manafold.points) {
+		Utils::elementAt(tempGizmos, i) = Gizmos::Point(pos, { 0, 1, 1 });
+		Utils::elementAt(tempGizmos, i++).setThickness(10);
+		if(adding)
+			Gizmos::GizmoRenderer::addGizmo(&Utils::elementAt(tempGizmos, i - 1));
+		mean += pos;
+	}
+	mean /= static_cast<float>(manafold.points.size());
+	adding = NOT tempNormal;
+	/*if (tempNormal)
+		delete tempNormal;*/
+	tempNormal = DBG_NEW Gizmos::Line(mean, mean + manafold.normal, true);
+	tempNormal->setColour({ 0, 1, 1 });
+	if(adding)
+		Gizmos::GizmoRenderer::addGizmo(tempNormal);
+}
 
 void Physics::Engine::update()
 {
+	for (Component::RigidBody* rb : rigidbodies) {
+		rb->intergrateForces();
+	}
+
+
 	auto collisions = CollisionDetection::getCollisions();
 
 	for (Physics::CollisionManfold& manafold : collisions) {
-		Component::RigidBody* b1 = manafold.bodies[0]->getParent()->getRigidbody();
-		Component::RigidBody* b2 = manafold.bodies[1]->getParent()->getRigidbody();
 
-		if(!b1->isKinimatic)
-			*manafold.bodies[0]->position -= manafold.normal * manafold.penetration;
-		if (!b2->isKinimatic)
-			*manafold.bodies[1]->position += manafold.normal * manafold.penetration;
+		for (glm::vec3& p : manafold.points) {
+			//p.y = manafold.bodies[0]->position->y - 0.5f;
+		}
+		drawManafold(manafold);
+		//manafold.bodies[0]->getParent()->getRigidbody()->isKinimatic = true;
+		//manafold.bodies[1]->getParent()->getRigidbody()->isKinimatic = true;
+		//continue;
+		Component::RigidBody* r1 = manafold.bodies[0]->getParent()->getRigidbody();
+		Component::RigidBody* r2 = manafold.bodies[1]->getParent()->getRigidbody();
+		r1->counter = 0;
+		/*if (NOT r1->isKinimatic)
+			*manafold.bodies[0]->position += manafold.normal * manafold.penetration;
+		if (NOT r2->isKinimatic)
+			*manafold.bodies[1]->position -= manafold.normal * manafold.penetration;*/
 
-        resolution->resolve(b1, b2, manafold);
+        resolution->resolve(r1, r2, manafold);
+		// r1->isKinimatic = true;
+		// r2->isKinimatic = true;
 	}
 
-	Constraints::ConstraintsSolver::preSolveAll();
-
-	for (Component::RigidBody* rb : rigidbodies)
-		rb->intergrateForces();
-
-	Constraints::ConstraintsSolver::solveAll(getDeltaTime());
+	// Constraints::ConstraintsSolver::preSolveAll();
 
 	for (Component::RigidBody* rb : rigidbodies) {
 		rb->intergrateVelocity();
 		rb->updateInertia();
 	}
+
+	// Constraints::ConstraintsSolver::solveAll(getDeltaTime());
+
 }
 
 void Physics::Engine::cleanUp()
