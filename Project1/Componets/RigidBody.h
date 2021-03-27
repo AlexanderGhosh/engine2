@@ -25,8 +25,8 @@ namespace Component {
 	public:
 		int counter = 0;
 		void update(float deltaTime) {
-			if(NOT isKinimatic)
-				Utils::Log(":::::::::" + std::to_string(counter++) + ":::::" + Utils::to_string_precision(velocity.y, -1));
+			/*if(NOT isKinimatic)
+				Utils::Log(":::::::::" + std::to_string(counter++) + ":::::" + Utils::to_string_precision(transform->Position.y, -1));*/
 		}
 		RigidBody();
 		void addCollider(Physics::Collider* collider);

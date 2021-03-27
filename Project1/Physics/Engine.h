@@ -3,6 +3,7 @@
 #include "Collision/CollisionDetection.h"
 #include "../Gizmos/GizmoShapes.h"
 
+#define E 0.75f
 namespace Physics {
 	class Resolution;
 	class Engine

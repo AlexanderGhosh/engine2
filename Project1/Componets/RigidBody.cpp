@@ -100,11 +100,7 @@ const float& Component::RigidBody::getMass() const
 
 void Component::RigidBody::velocityAdder(Vector3 add)
 {
-	// Utils::Log(Utils::to_string_precision(velocity.y, Physics::Engine::roundResolution), " + ");
-	// Utils::Log(Utils::to_string_precision(add.y, Physics::Engine::roundResolution), " = ");
-	// //velocity += Utils::round(add, Physics::Engine::roundResolution);
-	velocity *= -1;
-	// Utils::Log(Utils::to_string_precision(velocity.y, Physics::Engine::roundResolution), "\n");
+	velocity += Utils::round(add, Physics::Engine::roundResolution);
 }
 
 void Component::RigidBody::angularVelAdder(Vector3 add)

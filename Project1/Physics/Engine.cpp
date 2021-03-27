@@ -63,12 +63,15 @@ void Physics::Engine::update()
 		Component::RigidBody* r1 = manafold.bodies[0]->getParent()->getRigidbody();
 		Component::RigidBody* r2 = manafold.bodies[1]->getParent()->getRigidbody();
 		r1->counter = 0;
-		/*if (NOT r1->isKinimatic)
-			*manafold.bodies[0]->position += manafold.normal * manafold.penetration;
-		if (NOT r2->isKinimatic)
-			*manafold.bodies[1]->position -= manafold.normal * manafold.penetration;*/
 
         resolution->resolve(r1, r2, manafold);
+
+		Float dt = Physics::Engine::getDeltaTime();
+		for (Component::RigidBody* rb : rigidbodies) {
+			if (rb->getInvMass() AND rb->hasGravity) {
+				rb->velocityAdder(Physics::Engine::getGravity() * dt * E);
+			}
+		}
 		// r1->isKinimatic = true;
 		// r2->isKinimatic = true;
 	}
