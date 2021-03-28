@@ -23,17 +23,17 @@ void Physics::ImpulseBased::resolve(Component::RigidBody* a, Component::RigidBod
         glm::vec3 vp1 = a->getVelocity() + glm::cross(a->getAngularVelocity(), r1);
         glm::vec3 vp2 = b->getVelocity() + glm::cross(b->getAngularVelocity(), r2);
 
-        const glm::vec3 vr = vp1 - (b->isKinimatic ? glm::vec3(0) : vp2);
+        const glm::vec3 vr = vp1 - vp2;
 
         numerator = -(1.0f + E) * glm::dot(vr,  n);
 
         denominator += a->getInvMass();
-        if (!b->isKinimatic) {
+        if (NOT b->isKinimatic) {
             denominator += b->getInvMass();
         }
-        glm::vec3 temp = a->getInvInertia_G() * glm::cross(glm::cross(r1, n), r1);
-        if (!b->isKinimatic) {
-            temp += b->getInvInertia_G() * glm::cross(glm::cross(r2, n), r2);
+        glm::vec3 temp = glm::cross(a->getInvInertia_G() * glm::cross(r1, n), r1);
+        if (NOT b->isKinimatic) {
+            temp += glm::cross(b->getInvInertia_G() * glm::cross(r2, n), r2);
         }
         denominator += glm::dot(temp, n);
 
@@ -45,10 +45,10 @@ void Physics::ImpulseBased::resolve(Component::RigidBody* a, Component::RigidBod
         ang2 += glm::cross(r2, j * n);
 
         // linear
-        glm::vec3 vab = a->getVelocity() - b->getVelocity();
+       glm::vec3 vab = a->getVelocity() - b->getVelocity();
 
         numerator = -(1 + E) * glm::dot(vab, n);
-        Utils::Log("Input Velocity: " + Utils::to_string_precision(a->getVelocity().y, 3));
+        // Utils::Log("Input Velocity: " + Utils::to_string_precision(a->getVelocity().y, 3));
         denominator = a->getInvMass();
         if(NOT b->isKinimatic)
             denominator += b->getInvMass();
@@ -58,8 +58,9 @@ void Physics::ImpulseBased::resolve(Component::RigidBody* a, Component::RigidBod
     }
     im /= static_cast<float>(manafold.points.size() ? manafold.points.size() : 1);
     //std::cout << std::to_string(im / 10.0f) << std::endl;
+    // a->positionAdder(n * im * a->getInvMass() * Physics::Engine::getDeltaTime());
     a->velocityAdder(n * im * a->getInvMass());
-    //b->velocityAdder(n * im * -b->getInvMass());
+    //b->positionAdder(n * im * -b->getInvMass() * static_cast<float>(Physics::Engine::roundResolution));
 
     a->angularVelAdder(a->getInvInertia_G() * ang1);
     b->angularVelAdder(b->getInvInertia_G() * -ang2);

@@ -9,7 +9,7 @@
 std::vector<Component::RigidBody*> Physics::Engine::rigidbodies = { };
 std::vector<Physics::Collider*> Physics::Engine::colliders = { }; 
 Physics::Resolution* Physics::Engine::resolution = nullptr; 
-glm::vec3 Physics::Engine::gravity = { 0, -20, 0 };
+glm::vec3 Physics::Engine::gravity = { 0, -10, 0 };
 float Physics::Engine::dampping = 1;
 float Physics::Engine::deltaTime = 1.0f / 60.0f;
 std::list<Gizmos::Point> Physics::Engine::tempGizmos = { };
@@ -28,7 +28,7 @@ void Physics::Engine::drawManafold(const Physics::CollisionManfold& manafold)
 	for (Vector3 pos : manafold.points) {
 		Utils::elementAt(tempGizmos, i) = Gizmos::Point(pos, { 0, 1, 1 });
 		Utils::elementAt(tempGizmos, i++).setThickness(10);
-		if(adding)
+		if(adding AND i < 4)
 			Gizmos::GizmoRenderer::addGizmo(&Utils::elementAt(tempGizmos, i - 1));
 		mean += pos;
 	}
@@ -44,10 +44,10 @@ void Physics::Engine::drawManafold(const Physics::CollisionManfold& manafold)
 
 void Physics::Engine::update()
 {
+
 	for (Component::RigidBody* rb : rigidbodies) {
 		rb->intergrateForces();
 	}
-
 
 	auto collisions = CollisionDetection::getCollisions();
 
@@ -65,13 +65,14 @@ void Physics::Engine::update()
 		r1->counter = 0;
 
         resolution->resolve(r1, r2, manafold);
-
-		Float dt = Physics::Engine::getDeltaTime();
-		for (Component::RigidBody* rb : rigidbodies) {
-			if (rb->getInvMass() AND rb->hasGravity) {
-				rb->velocityAdder(Physics::Engine::getGravity() * dt * E);
-			}
+		const float totalMass = 1.0f / (r1->getMass() + r2->getMass());
+		if (NOT r1->isKinimatic) {
+			r1->positionAdder(manafold.normal * manafold.penetration * (r2->getMass() * totalMass));
 		}
+		if (NOT r2->isKinimatic) {
+			r2->positionAdder(manafold.normal * manafold.penetration * (r1->getMass() * totalMass));
+		}
+
 		// r1->isKinimatic = true;
 		// r2->isKinimatic = true;
 	}
@@ -79,10 +80,10 @@ void Physics::Engine::update()
 	// Constraints::ConstraintsSolver::preSolveAll();
 
 	for (Component::RigidBody* rb : rigidbodies) {
+
 		rb->intergrateVelocity();
 		rb->updateInertia();
 	}
-
 	// Constraints::ConstraintsSolver::solveAll(getDeltaTime());
 
 }

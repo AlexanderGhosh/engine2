@@ -98,9 +98,16 @@ const float& Component::RigidBody::getMass() const
 	return 1.0f / invMass;
 }
 
+void Component::RigidBody::positionAdder(Vector3 add)
+{
+	transform->Position += add;
+	cos += add;
+}
+
 void Component::RigidBody::velocityAdder(Vector3 add)
 {
-	velocity += Utils::round(add, Physics::Engine::roundResolution);
+	velocity *= -1;
+	// velocity += Utils::round(add, Physics::Engine::roundResolution);
 }
 
 void Component::RigidBody::angularVelAdder(Vector3 add)
@@ -144,7 +151,7 @@ void Component::RigidBody::intergrateVelocity()
 
 	transform->Position += velocity * dt;
 	cos += velocity * dt;
-	return;
+
 	const glm::quat deltaQ(0.0f, angularVelocity * dt * 0.5f);
 	*rotation += deltaQ * *rotation;
 	*rotation = glm::normalize(*rotation);

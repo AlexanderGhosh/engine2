@@ -105,6 +105,8 @@ namespace Utils {
 
     template< typename T>
     T& elementAt(std::list<T>& list, const int& index) {
+        if (index > list.size())
+            return *list.begin();
         auto s = list.begin();
         std::advance(s, index);
         return *s;

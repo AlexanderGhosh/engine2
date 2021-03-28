@@ -58,6 +58,7 @@ namespace Component {
 		// setters
 
 		// adders
+		void positionAdder(Vector3 add);
 		void velocityAdder(Vector3 add);
 		void angularVelAdder(Vector3 add);
 		void cosAdder(Vector3 add);
