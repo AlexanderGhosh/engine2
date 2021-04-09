@@ -39,7 +39,7 @@
     <ClCompile Include="Utils\AssimpWrapper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Primatives\Material.cpp">
+    <ClCompile Include="Primatives\Materials\MaterialBase.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="EventSystem\Handler.cpp">
@@ -216,6 +216,12 @@
     <ClCompile Include="Primatives\TextureChain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Primatives\Materials\PBR.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Primatives\Materials\Forward.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Rendering\Rendering.h">
@@ -248,7 +254,7 @@
     <ClInclude Include="Utils\AssimpWrapper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Primatives\Material.h">
+    <ClInclude Include="Primatives\Materials\MaterialBase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EventSystem\Handler.h">
@@ -429,6 +435,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Primatives\TextureChain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Primatives\Materials\MatItem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Primatives\Materials\PBR.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Primatives\Materials\Forward.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

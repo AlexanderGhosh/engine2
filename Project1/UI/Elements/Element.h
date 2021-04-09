@@ -3,7 +3,7 @@
 #include <string>
 #include <array>
 #include <functional>
-#include "../../Primatives/Material.h"
+#include "../../Primatives/Materials/MaterialBase.h"
 namespace UI {
 	class Element
 	{
@@ -13,7 +13,7 @@ namespace UI {
 		glm::vec4 margin;
 		std::string name;
 		bool cursorOver, mDown;
-		Materials::MatItem backgroundColor;
+		Materials::MatItem<glm::vec3> backgroundColor;
 		Element();
 	public:
 
@@ -29,10 +29,10 @@ namespace UI {
 		virtual inline const float getHeight() const { return height; };
 		virtual inline void setHeight(const float& height) { this->height = height; };
 
-		inline const Materials::MatItem& getBackgroundColor() const { return backgroundColor; };
+		inline const Materials::MatItem<glm::vec3>& getBackgroundColor() const { return backgroundColor; };
 		inline void setBackgroundColor(const glm::vec3& backgroundColor) 
 		{ 
-			this->backgroundColor(backgroundColor);
+			this->backgroundColor.setValue(backgroundColor);
 		};
 
 		std::array<glm::vec2, 2> getCorners() const;

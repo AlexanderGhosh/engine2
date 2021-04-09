@@ -5,7 +5,7 @@
 #include "../Primatives/Model.h"
 
 namespace Materials {
-	class Material;
+	class MaterialBase;
 }
 namespace Component {
 	class Animated;
@@ -17,8 +17,8 @@ namespace Component {
 
 		void update(float deltaTime);
 		void setModel(const Primative::Model model, const GLenum draw_type = GL_TRIANGLES);
-		void setMaterial(Materials::Material* material);
-		void setMaterialTo(Materials::Material* material, String meshName);
+		void setMaterial(Materials::MaterialBase* material);
+		void setMaterialTo(Materials::MaterialBase* material, String meshName);
 
 		inline Component::Type getType() const {
 			return Component::Type::RenderMesh;
@@ -35,7 +35,7 @@ namespace Component {
 		RenderMesh copy() const;
 	private:
 		// index of buffer in the resorce loader
-		std::vector<Materials::Material*> materials;
+		std::vector<Materials::MaterialBase*> materials;
 		Primative::Model model;
 		Animated* animatedComponet;
 		bool isTransparent;

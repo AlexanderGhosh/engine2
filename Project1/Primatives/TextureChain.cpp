@@ -25,7 +25,6 @@ Unsigned Primative::TextureChain::getTexture()
 		res = textures[index++];
 		counter = 0;
 		index %= textures.size();
-		std::cout << "switched : " << std::to_string(res) << std::endl;
 	}
 	return res;
 }

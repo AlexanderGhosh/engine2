@@ -4,7 +4,8 @@
 #include <Images/STBImage.h>
 
 #include "AssimpWrapper.h"
-#include "../Primatives/Material.h"
+#include "../Primatives/Materials/PBR.h"
+#include "../Primatives/Materials/MaterialBase.h"
 #include "../Rendering/Animation/Animation.h"
 #include "../Rendering/Animation/Bones.h"
 #include "../Primatives/Buffers/VertexBuffer.h"
@@ -17,7 +18,7 @@ std::unordered_map<std::string, unsigned> ResourceLoader::shaders = { };
 std::unordered_map<std::string, unsigned> ResourceLoader::textures = { };
 std::vector<Primative::Buffers::VertexBuffer> ResourceLoader::buffers = { };
 std::unordered_map<std::string, Render::Animation::Animation> ResourceLoader::animations = { };
-std::vector<Materials::Material*> ResourceLoader::materials = { };
+std::vector<Materials::MaterialBase*> ResourceLoader::materials = { };
 std::unordered_map<std::string, Primative::Model> ResourceLoader::models = { };
 std::string ResourceLoader::ShaderDirectory = "Resources/Shaders/";
 std::string ResourceLoader::TextureDirectory = "Resources/Textures";
@@ -148,19 +149,19 @@ Materials::PBR ResourceLoader::createPBR(String dirPath, std::vector<TextureType
         switch (type)
         {
         case TextureType::NormalMap:
-            res.getNormal() = textures[i];
+            res.setNormal(textures[i]);
             break;
         case TextureType::AlbedoMap:
-            res.getAlbedo() = textures[i];
+            res.setAlbedo(textures[i]);
             break;
         case TextureType::MetalicMap:
-            res.getMetalic() = textures[i];
+            res.setMetalic(textures[i]);
             break;
         case TextureType::AOMap:
-            res.getAO() = textures[i];
+            res.setAO(textures[i]);
             break;
         case TextureType::RoughnessMap:
-            res.getRoughness() = textures[i];
+            res.setRoughness(textures[i]);
             break;
         }
         i++;
@@ -411,7 +412,7 @@ Primative::Buffers::VertexBuffer& ResourceLoader::getBuffer(Unsigned index)
     return Utils::getElement(buffers, index);
 }
 
-Materials::Material* ResourceLoader::getMaterial(Int index)
+Materials::MaterialBase* ResourceLoader::getMaterial(Int index)
 {
     return Utils::getElement(materials, index);
 }
@@ -429,7 +430,7 @@ Render::Animation::Animation* ResourceLoader::getAnimation(String name)
 #pragma endregion
 
 #pragma region Adders
-void ResourceLoader::addMaterial(Materials::Material* mat)
+void ResourceLoader::addMaterial(Materials::MaterialBase* mat)
 {
     materials.push_back(mat);
 }

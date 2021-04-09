@@ -146,7 +146,9 @@
   <ItemGroup>
     <ClCompile Include="Componets\AudioReciever.cpp" />
     <ClCompile Include="Componets\Scripting.cpp" />
+    <ClCompile Include="Primatives\Materials\Forward.cpp" />
     <ClCompile Include="ParticleSystem\ParticleEmmiter.cpp" />
+    <ClCompile Include="Primatives\Materials\PBR.cpp" />
     <ClCompile Include="Primatives\Buffers\SoundStreamBuffer.cpp" />
     <ClCompile Include="Scripts\RainMakerScript.cpp" />
     <ClCompile Include="Scripts\DebugScreen.cpp" />
@@ -199,7 +201,7 @@
     <ClCompile Include="UI\Panes\Canvas.cpp" />
     <ClCompile Include="UI\Elements\Element.cpp" />
     <ClCompile Include="Scene\GameScene.cpp" />
-    <ClCompile Include="Primatives\Material.cpp" />
+    <ClCompile Include="Primatives\Materials\MaterialBase.cpp" />
     <ClCompile Include="Utils\AssimpWrapper.cpp" />
     <ClCompile Include="Componets\Componets.cpp" />
     <ClCompile Include="GameObject\GameObject.cpp" />
@@ -215,6 +217,9 @@
   <ItemGroup>
     <ClInclude Include="Componets\AudioReciever.h" />
     <ClInclude Include="Componets\Scripting.h" />
+    <ClInclude Include="Primatives\Materials\Forward.h" />
+    <ClInclude Include="Primatives\Materials\PBR.h" />
+    <ClInclude Include="Primatives\Materials\MatItem.h" />
     <ClInclude Include="ParticleSystem\ParticleEmmiter.h" />
     <ClInclude Include="Primatives\Buffers\SoundStreamBuffer.h" />
     <ClInclude Include="Scripts\RainMakerScript.h" />
@@ -271,7 +276,7 @@
     <ClInclude Include="UI\Panes\Canvas.h" />
     <ClInclude Include="UI\Elements\Element.h" />
     <ClInclude Include="Scene\GameScene.h" />
-    <ClInclude Include="Primatives\Material.h" />
+    <ClInclude Include="Primatives\Materials\MaterialBase.h" />
     <ClInclude Include="Utils\AssimpWrapper.h" />
     <ClInclude Include="Componets\Componets.h" />
     <ClInclude Include="GameObject\GameObject.h" />

@@ -34,6 +34,7 @@
 #include "Physics/ConstraintEngine/Constraints/DistanceConstraint.h"
 #include "Physics/ConstraintEngine/ConstraitnsSolver.h"
 
+#include "Primatives/Materials/PBR.h"
 #include "Primatives/Model.h"
 #include "Gizmos/GizmoRenderer.h"
 #include "Gizmos/GizmoShapes.h"
@@ -148,7 +149,9 @@ int main() {
     //Component::RenderMesh manR1 = Component::RenderMesh();
     //manR1.setModel(manModel);
     //Materials::PBR manMaterial1/* = Materials::PBR({ { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 0, 0, 0 } }, { { 0.15, 0, 0 } }, { { 0, 0, 0 } })*/;
-#define MI Materials::MatItem
+#define MI1 Materials::MatItem<float>
+#define MI3 Materials::MatItem<glm::vec3>
+#define MI4 Materials::MatItem<glm::vec4>
    // manR1.setMaterial(&armourMaterial);
     //manR1.setMaterialTo(&hairMaterial, "Hair");
     //manR1.setMaterialTo(&clothesMaterial, "Cloth");
@@ -189,11 +192,11 @@ int main() {
     GameObject minikit({ 0, 0, 0 }, { 0.5, 0.5, 0.5 });
     Component::RenderMesh minikitMesh;
     minikitMesh.setModel(minikitBuffer);
-    Materials::PBR minikitMatWhite(MI({ 1, 1, 1 }),       MI({ 1, 1, 1 }), MI({ 0.5, 0.5, 0.5 }), MI({ 0.5, 0, 0 }), MI({ 0, 0, 0 }));
-    Materials::PBR minikitMatGray( MI({ 0.5, 0.5, 0.5 }), MI({ 1, 1, 1 }), MI({ 0.5, 0.5, 0.5 }), MI({ 0.5, 0, 0 }), MI({ 0, 0, 0 }));
-    Materials::PBR minikitMatBlack(MI({ 0, 0, 0 }),       MI({ 1, 1, 1 }), MI({ 0.5, 0.5, 0.5 }), MI({ 0.5, 0, 0 }), MI({ 0, 0, 0 }));
-    Materials::PBR minikitMatGreen(MI({ 0, 0.75, 0 }),    MI({ 1, 1, 1 }), MI({ 0.5, 0.5, 0.5 }), MI({ 0.5, 0, 0 }), MI({ 0, 0, 0 }));
-    Materials::PBR minikitMatRed(  MI({ 0.75, 0, 0 }),    MI({ 1, 1, 1 }), MI({ 0.5, 0.5, 0.5 }), MI({ 0.5, 0, 0 }), MI({ 0, 0, 0 }));
+    Materials::PBR minikitMatWhite(MI4({ 1, 1, 1, 1 }),       MI3({ 1, 1, 1 }), MI1(0.5f), MI1(0.5f), MI1(0.0f));
+    Materials::PBR minikitMatGray( MI4({ 0.5, 0.5, 0.5, 1 }), MI3({ 1, 1, 1 }), MI1(0.5f), MI1(0.5f), MI1(0.0f));
+    Materials::PBR minikitMatBlack(MI4({ 0, 0, 0, 1 }),       MI3({ 1, 1, 1 }), MI1(0.5f), MI1(0.5f), MI1(0.0f));
+    Materials::PBR minikitMatGreen(MI4({ 0, 0.75, 0, 1 }),    MI3({ 1, 1, 1 }), MI1(0.5f), MI1(0.5f), MI1(0.0f));
+    Materials::PBR minikitMatRed(  MI4({ 0.75, 0, 0, 1 }),    MI3({ 1, 1, 1 }), MI1(0.5f), MI1(0.5f), MI1(0.0f));
     minikitMesh.setMaterialTo(&minikitMatWhite, "white");
     minikitMesh.setMaterialTo(&minikitMatGray,  "gray");
     minikitMesh.setMaterialTo(&minikitMatBlack, "black");

@@ -6,7 +6,7 @@
 #include "../Utils/ResourceLoader.h"
 #include "../Primatives/Buffers/VertexBuffer.h"
 #include "../GameObject/GameObject.h"
-#include "../Primatives/Material.h"
+#include "../Primatives/Materials/MaterialBase.h"
 
 Component::RenderMesh::RenderMesh() : model(), materials(), animatedComponet(nullptr), Component::ComponetBase(), isTransparent(false)
 {
@@ -32,10 +32,10 @@ void Component::RenderMesh::update(float deltaTime)
 	const auto& buffers = model.getBuffers();
 	for (short i = 0; i < buffers.size(); i++) {
 		Primative::Buffers::VertexBuffer& buffer = ResourceLoader::getBuffer(buffers[i]);
-		const Materials::Material* material = materials[i];
+		const Materials::MaterialBase* material = materials[i];
 		if (material) {
-			Render::Shading::Manager::setValue("material", material); // sets values to the samplers
 			material->activateTextures(); // activates the texture units and binds the ids
+			Render::Shading::Manager::setValue("material", material); // sets values to the samplers
 		}
 		buffer.render();
 	}
@@ -54,13 +54,13 @@ void Component::RenderMesh::setModel(const Primative::Model model, const GLenum 
 		buffer->setDrawType(draw_type);
 	}*/
 }
-void Component::RenderMesh::setMaterial(Materials::Material* material)
+void Component::RenderMesh::setMaterial(Materials::MaterialBase* material)
 {
 	for (unsigned i = 0; i < materials.size(); i++) {
 		materials[i] = material;
 	}
 }
-void Component::RenderMesh::setMaterialTo(Materials::Material* material, String meshName)
+void Component::RenderMesh::setMaterialTo(Materials::MaterialBase* material, String meshName)
 {
 	unsigned i = 0;
 	for (Unsigned buff : model.getBuffers()) {

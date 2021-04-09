@@ -218,6 +218,11 @@ namespace Utils {
 
     float random(float min = 0, float max = 1);
 
+    template<class T, class U>
+    bool isType(const T* a) {
+        return dynamic_cast<const U*>(a);
+    }
+
     class Timer {
     public:
         Timer(const std::string name);

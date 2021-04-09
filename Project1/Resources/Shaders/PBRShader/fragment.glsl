@@ -12,21 +12,32 @@ in VS_OUT {
     vec4 lsPos;
 } fs_in;
 
+struct MatItem4 {
+    vec4 raw;
+    sampler2D id;
+    float mixValue;
+};
+struct MatItem3 {
+    vec3 raw;
+    sampler2D id;
+    float mixValue;
+};
+struct MatItem1 {
+    float raw;
+    sampler2D id;
+    float mixValue;
+};
+
 struct Material {
-     vec4 albedo_vec;
-     sampler2D albedo_id;
+    MatItem4 albedo;
 
-     vec4 normal_vec;
-     sampler2D normal_id;
+    MatItem3 normal;
 
-     vec4 metalic_vec;
-     sampler2D metalic_id;
-     
-     vec4 roughness_vec;
-     sampler2D roughness_id;
+    MatItem1 metalic;
 
-     vec4 ao_vec;
-     sampler2D ao_id;
+    MatItem1 roughness;
+
+    MatItem1 ao;
 };
 
 uniform Material material;
@@ -42,17 +53,37 @@ const float PI = 3.14159265359f;
 // mapping the usual way for performance anways; I do plan make a note of this 
 // technique somewhere later in the normal mapping tutorial.
 
-vec3 getData(vec4 col, sampler2D id){
-    if (col.a == 0){
+vec4 sampleTex(sampler2D tex) {
+    return texture(tex, fs_in.texCoords);
+}
+
+vec4 getData(MatItem4 item){
+    return mix(item.raw, sampleTex(item.id), item.mixValue);
+    /*if (item.mixValue == 0){
         return texture(id, fs_in.texCoords).rgb;
     }
-    return col.rgb;
+    return col.rgb;*/
 }
-float getAlpha(vec4 col, sampler2D id){
-    if(col.a == 0){
+vec3 getData(MatItem3 item){
+    return mix(item.raw, sampleTex(item.id).rgb, 1.0 - item.mixValue);
+    /*if (item.mixValue == 0){
+        return texture(id, fs_in.texCoords).rgb;
+    }
+    return col.rgb;*/
+}
+float getData(MatItem1 item){
+    return mix(item.raw, sampleTex(item.id).r, 1.0 - item.mixValue);
+    /*if (col.a == 0){
+        return texture(id, fs_in.texCoords).rgb;
+    }
+    return col.rgb;*/
+}
+float getAlpha(MatItem4 item){
+    return mix(item.raw.a, sampleTex(item.id).a, 1.0 - item.mixValue);
+    /*if(col.a == 0){
         return texture(id, fs_in.texCoords).a;
     }
-    return col.a;
+    return col.a;*/
 }
 float ShadowCalculation(vec4 fragPosLightSpace)
 {
@@ -131,17 +162,14 @@ vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
 // ----------------------------------------------------------------------------
 void main()
 {
-    /*vec3 c = fs_in.ws.xyz;
-    c = normalize(c);
-    FragColor = vec4(c, 1);
-    return;*/
-    vec3 albedo = pow(getData(material.albedo_vec, material.albedo_id), vec3(2.2));
+    FragColor = getData(material.albedo);
+    vec3 albedo = pow(getData(material.albedo).rgb, vec3(2.2));
     
-    float metallic = getData(material.metalic_vec, material.metalic_id).r;
+    float metallic = getData(material.metalic);
 
-    float roughness = getData(material.roughness_vec, material.roughness_id).r;
+    float roughness = getData(material.roughness);
 
-    float ao = getData(material.ao_vec, material.ao_id).r;
+    float ao = getData(material.ao);
 
     vec3 N = getNormalFromMap();
     N = normalize(fs_in.normals);
@@ -211,7 +239,7 @@ void main()
     vec3 irradiance = texture(hdrMap, N).rgb;
     vec3 diffuse    = irradiance * albedo;
 
-    // sample both the pre-filter map and the BRDF lut and combine them together as per the Split-Sum approximation to get the IBL specular part.
+    // Tex both the pre-filter map and the BRDF lut and combine them together as per the Split-Sum approximation to get the IBL specular part.
     const float MAX_REFLECTION_LOD = 0.0;
     vec3 prefilteredColor = textureLod(lbrMap, R,  roughness * MAX_REFLECTION_LOD).rgb;    
     //prefilteredColor = vec3(1, 0, 0);
@@ -228,7 +256,8 @@ void main()
     color /= color + vec3(1.0);
     // gamma correct
     color = pow(color, vec3(1.0/2.2)); 
-    float a = getAlpha(material.albedo_vec, material.albedo_id);
+    float a = getAlpha(material.albedo);
+    a = 1;
     if (a < 0.1) {
         discard;
     }

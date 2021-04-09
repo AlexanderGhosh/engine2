@@ -14,9 +14,9 @@ namespace Utils {
 }
 
 namespace Materials {
-	class Material;
-	struct PBR;
-	struct Forward;
+	class MaterialBase;
+	class PBR;
+	class Forward;
 }
 namespace Primative {
 	namespace Buffers {
@@ -60,8 +60,8 @@ public:
 	static const Primative::Model createModel(std::vector<Primative::Mesh*>& meshes, String name, GLenum draw_type = GL_TRIANGLES, const bool deleteAble = true);
 	static const Primative::Model getModel(String name);
 	static Primative::Buffers::VertexBuffer& getBuffer(Unsigned index);
-	static Materials::Material* getMaterial(Int index);
-	static void addMaterial(Materials::Material* mat);
+	static Materials::MaterialBase* getMaterial(Int index);
+	static void addMaterial(Materials::MaterialBase* mat);
 	// animation
 	static const Render::Animation::Animation createAnimation(String filePath, const Render::Animation::Skeleton& skeleton);
 	static Render::Animation::Animation* getAnimation(String name);
@@ -76,7 +76,7 @@ private:
 	static std::unordered_map<std::string, Primative::Model> models;
 	static std::unordered_map<std::string, Render::Animation::Animation> animations;
 	static std::string defaultShaderName;
-	static std::vector<Materials::Material*> materials;
+	static std::vector<Materials::MaterialBase*> materials;
 	static std::vector<void*> roguePointers;
 
 	static const Primative::Model processMeshData(std::vector<Primative::Mesh*>& data, String name, GLenum draw_type, const bool deleteAble);
