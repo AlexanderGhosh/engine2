@@ -194,7 +194,7 @@ namespace Physics {
 		}
 		void setParent(GameObject* parent) {
 			Collider::setParent(parent);
-			const float m = mass * 0.5f;
+			const float m = mass / 12.0f;
 			const float w = pow(scale->x, 2.0f);
 			const float h = pow(scale->y, 2.0f);
 			const float d = pow(scale->z, 2.0f);

@@ -1,6 +1,9 @@
 #pragma once
 #include "Componets.h"
 namespace Physics {
+	namespace Constraints {
+		class Constraint;
+	}
 	class Collider;
 }
 namespace Component {
@@ -23,6 +26,7 @@ namespace Component {
 	public:
 		bool isKinimatic, hasGravity;
 	public:
+		std::vector<Physics::Constraints::Constraint*> constraints;
 		int counter = 0;
 		void update(float deltaTime) {
 			/*if(NOT isKinimatic)
@@ -48,12 +52,12 @@ namespace Component {
 		Vector3 getCOM() const;
 		Quaternion getRotation() const;
 		glm::mat3 getRotationMatrix() const;
-		Vector3 getVelocity() const;
-		Vector3 getAngularVelocity() const;
+		const glm::vec3 getVelocity(bool zeroKini = false) const;
+		const glm::vec3 getAngularVelocity(bool zeroKini = false) const;
 
-		Matrix3 getInvInertia_G() const;
-		const float& getInvMass() const;
-		const float& getMass() const;
+		const glm::mat3 getInvInertia_G(bool zeroKini = false) const;
+		const float getInvMass(bool zeroKini = false) const;
+		const float getMass(bool zeroKini = false) const;
 
 		// setters
 

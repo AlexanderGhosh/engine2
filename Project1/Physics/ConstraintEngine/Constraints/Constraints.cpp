@@ -4,8 +4,8 @@
 #include "../../../GameObject/GameObject.h"
 #include "../ConstraitnsSolver.h"
 
-Physics::Constraints::Constraint::Constraint(): Jacobian(), enabled(1), type(Type::None), body1(nullptr), body2(nullptr) {
-    // ConstraintsSolver::addConstraint(this);
+Physics::Constraints::Constraint::Constraint(): Jacobian(), enabled(1), type(Type::None), body1(nullptr), body2(nullptr), Bias(0), BaumgarteScalar(0.1f) {
+    ConstraintsSolver::addConstraint(this);
 }
 Physics::Constraints::Constraint::Constraint(Component::RigidBody* a, Component::RigidBody* b) : Constraint()
 {
@@ -29,11 +29,11 @@ void Physics::Constraints::Constraint::setBodies(Component::RigidBody* a, Compon
     body2 = b;
 }
 ;
-const float Physics::Constraints::Constraint::getLagrangian(const MATHS::Vector12& V, const MATHS::Matrix12& M, const CollisionManfold& manafoild) const
+const float Physics::Constraints::Constraint::getLagrangian(Vector12 V, Matrix12 M, const CollisionManfold& manafoild) const
 {
     const float b = getBias(manafoild);
-    const float neumerator = -((Jacobian * V) + b);
-    const float denominator = (Jacobian * MATHS::inverse(M)) * Jacobian; // the effective mass
+    const float neumerator =  b - BigMaths::dot(Jacobian, V);
+    const float denominator = BigMaths::dot((Jacobian * BigMaths::inverse(M)), Jacobian); // the effective mass
     return neumerator / (!denominator ? 1 : denominator);
 
 }
@@ -46,4 +46,18 @@ const float Physics::Constraints::Constraint::getBias(const Physics::CollisionMa
         glm::dot(-glm::vec3(aV[0], aV[1], aV[2]) - glm::cross({aV[0], aV[1], aV [2] }, manafold.getDeltaA()) +
             glm::vec3(bV[0], bV[1], bV[2]) + glm::cross(glm::vec3(bV[0], bV[1], bV[2]), manafold.getDeltaB()), manafold.normal);*/
     return -(1 * 60) * manafold.penetration;
+}
+
+const BigMaths::vec12 Physics::Constraints::Constraint::getVelocityVector() const
+{
+    if(body1 AND body2)
+        return BigMaths::vec12(body1->getVelocity(), body1->getAngularVelocity(), body2->getVelocity(), body2->getAngularVelocity());
+    return BigMaths::vec12(0);
+}
+
+const BigMaths::mat12 Physics::Constraints::Constraint::getInvMassMatrix() const
+{
+    if (body1 AND body2)
+        return BigMaths::mat12(glm::mat3(body1->getInvMass()), body1->getInvInertia_G(), glm::mat3(body2->getInvMass()), body2->getInvInertia_G());
+    return BigMaths::mat12(1);
 }

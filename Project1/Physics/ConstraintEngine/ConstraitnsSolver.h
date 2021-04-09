@@ -16,6 +16,7 @@ namespace Physics {
 			static void addConstraint(Constraint* c);
 			static void solveAll(const float& dt);
 			static void preSolveAll();
+			static Constraint* popConstraint();
 		};
 	};
 };

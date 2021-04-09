@@ -8,10 +8,9 @@ void Physics::Constraints::ConstraintsSolver::cleanUp()
 {
 	for (auto itt = constraints.begin(); itt != constraints.end();) {
 		(*itt)->cleanUp();
-		delete* itt;
+		// delete* itt;
 		itt = constraints.erase(itt);
 	}
-	constraints.clear();
 }
 
 void Physics::Constraints::ConstraintsSolver::addConstraint(Constraint* c)
@@ -20,8 +19,9 @@ void Physics::Constraints::ConstraintsSolver::addConstraint(Constraint* c)
 }
 void Physics::Constraints::ConstraintsSolver::solveAll(const float& dt)
 {
-	for (Constraint*& c : constraints)
+	for (Constraint*& c : constraints) {
 		c->solve(dt);
+	}
 }
 
 void Physics::Constraints::ConstraintsSolver::preSolveAll()
@@ -29,4 +29,11 @@ void Physics::Constraints::ConstraintsSolver::preSolveAll()
 	for (Constraint*& c : constraints) 
 		c->preSolve();
 	
+}
+
+Physics::Constraints::Constraint* Physics::Constraints::ConstraintsSolver::popConstraint()
+{
+	Constraint* back = constraints.back();
+	constraints.pop_back();
+	return back;
 }

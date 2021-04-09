@@ -96,6 +96,15 @@ glm::vec3 Utils::fill(const float& num) {
     return glm::vec3(num);
 }
 
+glm::mat3 Utils::getSkewMatrix(Vector3 a)
+{
+    glm::mat3 res(1);
+    res[0] = { 0, a.z, -a.y };
+    res[1] = { -a.z, 0, a.x };
+    res[2] = { a.y, -a.x, 0 };
+    return res;
+}
+
 const std::string Utils::getFileName(const std::string& filePath, const bool& includeExtension) {
     std::string dilimeter = "/";
     std::array<std::string, 2> possible = {
@@ -368,110 +377,6 @@ float Utils::Timer::calcDurration(const std::chrono::time_point<std::chrono::hig
     return std::chrono::duration_cast<std::chrono::microseconds>(e - s).count();
 }
 
-
-const Utils::BigMaths::Vector12 Utils::BigMaths::combine(const Utils::BigMaths::Vector6& a, const Utils::BigMaths::Vector6& b)
-{
-    Vector12 res{};
-    for (char i = 0; i < 6; i++) {
-        res[i] = a[i];
-        res[i + 6] = b[i];
-    }
-    // res[0] = a[0];
-    // res[1] = a[1];
-    // res[2] = a[2];
-    // res[3] = a[3];
-    // res[4] = a[4];
-    // res[5] = a[5];
-    // 
-    // res[6] =  b[0];
-    // res[7] =  b[1];
-    // res[8] =  b[2];
-    // res[9] =  b[3];
-    // res[10] = b[4];
-    // res[11] = b[5];
-    return res;
-}
-
-const Utils::BigMaths::Matrix12 Utils::BigMaths::combine(const Utils::BigMaths::MassMatrix6& a, const Utils::BigMaths::MassMatrix6& b)
-{
-    Matrix12 res{};
-    for (char i = 0; i < 6; i++) {
-        for (char j = 0; j < 6; j++) {
-            res[i][j] = a[i][j];
-            res[i + 6][j + 6] = b[i][j];
-        }
-    }
-    return res;
-}
-// 1/n element wise
-const Utils::BigMaths::Matrix12 Utils::BigMaths::inverse(const Utils::BigMaths::Matrix12& m)
-{
-    Matrix12 res{};
-    for (char i = 0; i < 12; i++) {
-        for (char j = 0; j < 12; j++) {
-            if (m[i][j] == 0) {
-                res[i][j] = 0;
-            }
-            else {
-                res[i][j] = 1.0f / m[i][j];
-            }
-        }
-    }
-    return res;
-}
-
-std::array<Utils::BigMaths::Vector6, 2> Utils::BigMaths::split(const Utils::BigMaths::Vector12& a) {
-    Vector6 r1{}, r2{};
-    for (char i = 0; i < 6; i++) {
-        r1[i] = a[i];
-        r2[i] = a[i + 6];
-    }
-    return { r1, r2 };
-}
-std::array<glm::vec3, 2> Utils::BigMaths::split(const Utils::BigMaths::Vector6& a) {
-    glm::vec3 r1{}, r2{};
-    for (char i = 0; i < 3; i++) {
-        r1[i] = a[i];
-        r2[i] = a[i + 3];
-    }
-    return { r1, r2 };
-}
-
-
-// dot product [1 x 1]
-float operator * (const Utils::BigMaths::Vector12& a, const Utils::BigMaths::Vector12& b)
-{
-    float res = 0;
-    for (char i = 0; i < 12; i++)
-        res += a[i] * b[i];
-    return res;
-}
-// element wise multiplication
-Utils::BigMaths::Vector12 operator * (const Utils::BigMaths::Vector12& a, const float& b)
-{
-    Utils::BigMaths::Vector12 res = a;
-    for (char i = 0; i < 12; i++)
-        res[i] *= b;
-    return res;
-}
-// dot product [12 x 1]
-Utils::BigMaths::Vector12 operator * (const Utils::BigMaths::Matrix12& a, const Utils::BigMaths::Vector12& b)
-{
-    Utils::BigMaths::Vector12 res{};
-    for (char i = 0; i < 12; i++)
-        for (char j = 0; j < 12; j++)
-            res[i] += a[i][j] * b[i];
-    return res;
-}
-// dot product [1 x 12]
-Utils::BigMaths::Vector12 operator * (const Utils::BigMaths::Vector12& a, const Utils::BigMaths::Matrix12& b)
-{
-    Utils::BigMaths::Vector12 res{};
-    for (char i = 0; i < 12; i++)
-        for (char j = 0; j < 12; j++)
-            res[i] += a[j] * b[j][i];
-    return res;
-}
 // dot product [3 x 1]
 glm::vec3 operator * (const glm::mat3& a, const glm::vec3& b)
 {
@@ -483,16 +388,3 @@ glm::vec3 operator * (const glm::mat3& a, const glm::vec3& b)
     }
     return res;
 }
-// element wise addition
-const Utils::BigMaths::Vector12 operator +(const Utils::BigMaths::Vector12& a, const Utils::BigMaths::Vector12& b)
-{
-    Utils::BigMaths::Vector12 res{};
-    for (char i = 0; i < 12; i++)
-        res[i] = a[i] + b[i];
-    return res;
-}
-// element wise division
-const Utils::BigMaths::Vector12 operator /(const Utils::BigMaths::Vector12& a, const float& b) {
-    return a * (1.0f / b);
-}
-

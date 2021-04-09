@@ -11,11 +11,14 @@ public:
 	void awake();
 	void update(float deltaTime);
 	void cleanUp();
-	GameObject* RedBlock;
+	GameObject* RedBlock, *BlueBlock;
 private:
 	glm::ivec2 screenDim;
 	float counter;
 	UI::Canvas mainCanvas;
-	UI::TextBlock fpsText, position, redBlockPosition, redBlockVelocity;
+	UI::TextBlock fpsText, position, redBlockPosition, redBlockVelocity, 
+		divider,
+		blueBlockPosition, blueBlockVelocity,
+		blockDistance;
 };
 

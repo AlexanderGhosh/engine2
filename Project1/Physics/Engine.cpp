@@ -44,7 +44,6 @@ void Physics::Engine::drawManafold(const Physics::CollisionManfold& manafold)
 
 void Physics::Engine::update()
 {
-
 	for (Component::RigidBody* rb : rigidbodies) {
 		rb->intergrateForces();
 	}
@@ -52,11 +51,11 @@ void Physics::Engine::update()
 	auto collisions = CollisionDetection::getCollisions();
 
 	for (Physics::CollisionManfold& manafold : collisions) {
-
+		break;
 		for (glm::vec3& p : manafold.points) {
 			//p.y = manafold.bodies[0]->position->y - 0.5f;
 		}
-		drawManafold(manafold);
+		//drawManafold(manafold);
 		//manafold.bodies[0]->getParent()->getRigidbody()->isKinimatic = true;
 		//manafold.bodies[1]->getParent()->getRigidbody()->isKinimatic = true;
 		//continue;
@@ -65,26 +64,26 @@ void Physics::Engine::update()
 		r1->counter = 0;
 
         resolution->resolve(r1, r2, manafold);
-		const float totalMass = 1.0f / (r1->getMass() + r2->getMass());
+		/*const float totalMass = 1.0f / (r1->getMass() + r2->getMass());
 		if (NOT r1->isKinimatic) {
 			r1->positionAdder(manafold.normal * manafold.penetration * (r2->getMass() * totalMass));
 		}
 		if (NOT r2->isKinimatic) {
 			r2->positionAdder(manafold.normal * manafold.penetration * (r1->getMass() * totalMass));
-		}
+		}*/
 
 		// r1->isKinimatic = true;
 		// r2->isKinimatic = true;
 	}
-
-	// Constraints::ConstraintsSolver::preSolveAll();
+	
+	Constraints::ConstraintsSolver::preSolveAll();
+	Constraints::ConstraintsSolver::solveAll(getDeltaTime());
 
 	for (Component::RigidBody* rb : rigidbodies) {
 
 		rb->intergrateVelocity();
 		rb->updateInertia();
 	}
-	// Constraints::ConstraintsSolver::solveAll(getDeltaTime());
 
 }
 

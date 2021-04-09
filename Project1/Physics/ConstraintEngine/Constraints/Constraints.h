@@ -2,11 +2,12 @@
 #include <array>
 #include <glm.hpp>
 #include "../../Collision/CollisionDetection.h"
+#include "../../../Utils/BigMaths.h"
+
 namespace Component {
 	class RigidBody;
 };
 namespace Physics {
-#define MATHS Utils::BigMaths
 	namespace Constraints {
 		enum class Type {
 			None,
@@ -15,7 +16,8 @@ namespace Physics {
 		};
 		class Constraint {
 		protected:
-			MATHS::Vector12 Jacobian;
+			BigMaths::vec12 Jacobian;
+			float Bias, BaumgarteScalar;
 			bool enabled;
 			Type type;
 			Component::RigidBody* body1, * body2;
@@ -29,9 +31,11 @@ namespace Physics {
 			void setBodyB(Component::RigidBody* b);
 			void setBodies(Component::RigidBody* a, Component::RigidBody* b);
 		protected:
-			virtual const float getLagrangian(const MATHS::Vector12& V, const MATHS::Matrix12& M, const CollisionManfold& manafoild) const;
+			virtual const float getLagrangian(Vector12 V, Matrix12 M, const CollisionManfold& manafoild) const;
 			virtual const float getBias(const Physics::CollisionManfold& d) const;
 			virtual void buildJacobian() = 0;
+			virtual const BigMaths::vec12 getVelocityVector() const;
+			virtual const BigMaths::mat12 getInvMassMatrix() const;
 		};
 	}
 };

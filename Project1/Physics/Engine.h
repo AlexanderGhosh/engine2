@@ -4,6 +4,7 @@
 #include "../Gizmos/GizmoShapes.h"
 
 #define E 1.0f
+#define COEF_REST 1.0f
 namespace Physics {
 	class Resolution;
 	class Engine

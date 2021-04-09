@@ -1,7 +1,10 @@
 #include "DistanceConstraint.h"
 #include "../../../Componets/Rigidbody.h"
+#include "../../Engine.h"
+#include <gtx/matrix_cross_product.hpp>
 
 Physics::Constraints::DistanceConstraint::DistanceConstraint(Vector3 relPosA, Vector3 relPosB, float targetLength) : Constraint(), relPosA(relPosA), relPosB(relPosB), targetLength(targetLength)
+, r1(), r2(), globalPosA(), globalPosB(), ab()
 {
 	type = Type::Seperation;
 }
@@ -14,67 +17,59 @@ Physics::Constraints::DistanceConstraint::DistanceConstraint(Component::RigidBod
 
 void Physics::Constraints::DistanceConstraint::solve(const float& dt)
 {
-	glm::vec3 r1 = body1->getRotation() * relPosA;
-	glm::vec3 r2 = body2->getRotation() * relPosB;
-
-	glm::vec3 globalOnA = r1 + body1->getCOM();
-	glm::vec3 globalOnB = r2 + body2->getCOM();
-
-	glm::vec3 ab = globalOnB - globalOnA;
-	glm::vec3 abn = glm::normalize(ab);
-
-	glm::vec3 v0 = body1->getVelocity() + glm::cross(body1->getAngularVelocity(), r1);
-	glm::vec3 v1 = body2->getVelocity() + glm::cross(body2->getAngularVelocity(), r2);
-
-	float abnVel = glm::dot(v0 - v1, abn);
-
-	float invConstraintMassLin = body1->getInvMass() + body2->getInvMass();
-
-	float invConstraintMassRot = 
-		glm::dot(abn, glm::cross(body1->getInvInertia_G() * glm::cross(r1, abn), r1)) +
-		glm::dot(abn, glm::cross(body2->getInvInertia_G() * glm::cross(r2, abn), r2));
-
-	float constraintMass = invConstraintMassLin + invConstraintMassRot;
-
-	if (constraintMass > 0) {
-		float b = 0.0f;
-		// -Optional -
-		float distance_offset = glm::length(ab) - targetLength;
-		float baumgarte_scalar = 0.1f;
-		b = -(baumgarte_scalar / dt) * distance_offset;
-		
-		// -Eof Optional -
-		
-		// Compute velocity impulse (jn)
-		// In order to satisfy the distance constraint we need
-		// to apply forces to ensure the relative velocity
-		// ( abnVel ) in the direction of the constraint is zero .
-		// So we take inverse of the current rel velocity and
-		// multiply it by how hard it will be to move the objects .
-		
-		// Note : We also add in any extra energy to the system
-		// here , e.g. baumgarte (and later elasticity )
-		
-		float jn = -(abnVel + b) / constraintMass;
-		
-		// Apply linear velocity impulse
-		
-		// std::cout << glm::to_string(abn * (body1->getInvMass() * jn)) << std::endl;
-
-		body1->velocityAdder(abn * (body1->getInvMass() * jn));
-		body2->velocityAdder(-abn * (body2->getInvMass() * jn));
-		
-		// Apply rotational velocity impulse
-		
-		body1->angularVelAdder((body1->getInvInertia_G() * glm::cross(r1, abn * jn)));
-		body2->angularVelAdder(-(body2->getInvInertia_G() * glm::cross(r2, abn * jn)));
+	const BigMaths::vec12 V = getVelocityVector();
+	const BigMaths::mat12 inv_M = getInvMassMatrix();
+	buildJacobian();
+	if (BigMaths::dot(Jacobian, V) == 0) {
+		return;
 	}
+	float lambda = getLagrangian(V, inv_M, {});
+	BigMaths::vec12 deltaV = (inv_M * Jacobian) * lambda;
+
+	float C = BigMaths::dot(Jacobian, V + deltaV);
+	Utils::Log("Velocity: " + std::to_string(C));
+	//assert(Utils::round(t, 4) == 0 AND "Constraint not corrected");
+	body1->velocityAdder(deltaV.get(2));
+	body2->velocityAdder(deltaV.get(0));
+
+	const glm::vec3 x1 = body1->getCOM() + relPosA * body1->getRotationMatrix();
+	const glm::vec3 x2 = body2->getCOM() + relPosB * body2->getRotationMatrix();
+	C = powf(glm::dot(x1 - x2, x1 - x2), 0.5f);
+	if (x2 == x1) C = 0;
+	Utils::Log("Positional: " + std::to_string(C));
+	Utils::Log("------------------------------------------------------------");
 }
+
 
 void Physics::Constraints::DistanceConstraint::cleanUp()
 {
+	body1 = nullptr;
+	body2 = nullptr;
 }
 
 void Physics::Constraints::DistanceConstraint::buildJacobian()
 {
+	const glm::vec3 x1 = body1->getCOM() + relPosA * body1->getRotationMatrix();
+	const glm::vec3 x2 = body2->getCOM() + relPosB * body2->getRotationMatrix();
+	const glm::vec3 d = Utils::normalize(x2 - x1);
+	Jacobian.set(0, -d);
+	Jacobian.set(1, -glm::cross(relPosA * body1->getRotationMatrix(), d));
+	Jacobian.set(2, d);
+	Jacobian.set(3, glm::cross(relPosB * body2->getRotationMatrix(), d));
+}
+
+const float Physics::Constraints::DistanceConstraint::getBias(const Physics::CollisionManfold& d) const
+{
+	const glm::vec3 x1 = body1->getCOM() + relPosA * body1->getRotationMatrix();
+	const glm::vec3 x2 = body2->getCOM() + relPosB * body2->getRotationMatrix();
+	float offset = glm::length(x2 - x1) - targetLength;
+	return -(BaumgarteScalar / Physics::Engine::getDeltaTime()) * offset;
+}
+
+const float Physics::Constraints::DistanceConstraint::getLagrangian(Vector12 V, Matrix12 M, const CollisionManfold& manafoild) const
+{
+	const BigMaths::vec12 t = Jacobian * M;
+	const float effectiveMass = BigMaths::dot(Jacobian, M * Jacobian);
+	const float numerator = -(BigMaths::dot(Jacobian, V) + getBias(manafoild));
+	return numerator / effectiveMass;
 }

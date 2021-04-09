@@ -10,7 +10,9 @@ namespace Physics {
 			ContactConstraint(Component::RigidBody* a, Component::RigidBody* b);
 			void solve(const float& dt);
 			void cleanUp();
-			void setCollisionData(CollisionManfold* data);
+			void setCollisionData(CollisionManfold* data); 
+			const float getLagrangian(Vector12 V, Matrix12 M, const CollisionManfold& manafoild) const; 
+			const float getBias(const Physics::CollisionManfold& d) const;
 			void buildJacobian();
 		};
 	};

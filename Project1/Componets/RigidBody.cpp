@@ -2,6 +2,7 @@
 #include "../Physics/Engine.h"
 #include "../GameObject/GameObject.h"
 #include "../Physics/Collision/Collider.h"
+#include "../Physics/ConstraintEngine/Constraints/Constraints.h"
 
 Component::RigidBody::RigidBody() : ComponetBase(), transform(nullptr), cos(0), rotation(0), velocity(0), angularVelocity(0), isKinimatic(false),
 force(0), torque(0), mass(0), invMass(0), l_inertia(1), l_invInertia(1), g_inertia(1), g_invInertia(1), colliders(), hasGravity(true)
@@ -26,9 +27,14 @@ void Component::RigidBody::addCollider(Physics::Collider* collider)
 void Component::RigidBody::updateInertia()
 {
 	auto g = getRotationMatrix();
+	if (g != glm::mat3(1)) {
+		char i = 0;
+	}
 	auto t = Utils::inverse(g);
 	g_inertia = l_inertia;
 	g_invInertia = Utils::inverse(g_inertia);
+	g_invInertia = Utils::inverse(g * g_inertia);
+	g_invInertia = Utils::inverse(g * g_inertia * Utils::inverse(g));
 }
 
 void Component::RigidBody::setParent(GameObject* parent)
@@ -50,7 +56,10 @@ void Component::RigidBody::cleanUp()
 	for (auto itt = colliders.begin(); itt != colliders.end();) {
 		itt = colliders.erase(itt);
 	}
-
+	for (auto itt = constraints.begin(); itt != constraints.end();) {
+		(*itt)->cleanUp();
+		itt = constraints.erase(itt);
+	}
 }
 
 void Component::RigidBody::addForce(Vector3 force, Vector3 at)
@@ -74,27 +83,37 @@ glm::mat3 Component::RigidBody::getRotationMatrix() const
 	return glm::mat3_cast(*rotation);
 }
 
-Vector3 Component::RigidBody::getVelocity() const
+const glm::vec3 Component::RigidBody::getVelocity(bool zeroKini) const
 {
+	if (isKinimatic AND zeroKini)
+		return glm::vec3(0);
 	return velocity;
 }
 
-Vector3 Component::RigidBody::getAngularVelocity() const
+const glm::vec3 Component::RigidBody::getAngularVelocity(bool zeroKini) const
 {
+	if (isKinimatic AND zeroKini)
+		return glm::vec3(0);
 	return angularVelocity;
 }
 
-Matrix3 Component::RigidBody::getInvInertia_G() const
+const glm::mat3 Component::RigidBody::getInvInertia_G(bool zeroKini) const
 {
+	if (isKinimatic AND zeroKini)
+		return glm::mat3(1);
 	return g_invInertia;
 }
 
-const float& Component::RigidBody::getInvMass() const
+const float Component::RigidBody::getInvMass(bool zeroKini) const
 {
+	if (isKinimatic AND zeroKini)
+		return 0;
 	return invMass;
 }
-const float& Component::RigidBody::getMass() const
+const float Component::RigidBody::getMass(bool zeroKini) const
 {
+	if (isKinimatic AND zeroKini)
+		return 0;
 	return 1.0f / invMass;
 }
 
@@ -106,8 +125,8 @@ void Component::RigidBody::positionAdder(Vector3 add)
 
 void Component::RigidBody::velocityAdder(Vector3 add)
 {
-	velocity *= -1;
-	// velocity += Utils::round(add, Physics::Engine::roundResolution);
+	// velocity *= -1;
+	velocity += Utils::round(add, Physics::Engine::roundResolution);
 }
 
 void Component::RigidBody::angularVelAdder(Vector3 add)
@@ -145,7 +164,11 @@ void Component::RigidBody::intergrateForces()
 void Component::RigidBody::intergrateVelocity()
 {	
 	if (isKinimatic)
+	{
+		velocity *= 0.0f;
+		angularVelocity *= 0.0f;
 		return;
+	}
 	const float& dt = Physics::Engine::getDeltaTime();
 	velocity = Utils::round(velocity, Physics::Engine::roundResolution);
 

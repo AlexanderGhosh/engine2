@@ -91,6 +91,7 @@ int main() {
     // const Primative::Model manModel    = ResourceLoader::createModel("Resources/Models/RFA_Model.fbx"); // RFA_Model
     const Primative::Model cubeBuffer  = ResourceLoader::createModel("Resources/Models/cube.dae"); // needed for the skybox
     const Primative::Model planeBuffer = ResourceLoader::createModel("Resources/Models/plane.dae");
+    const Primative::Model sphereBuffer = ResourceLoader::createModel("Resources/Models/sphere.dae");
     // const Primative::Model minikitBuffer = ResourceLoader::createModel("Resources/Models/minikit.fbx");
     timer.log();
 
@@ -229,23 +230,29 @@ int main() {
     // land.useTextureMap(false);
     // timer.log();
 
-    constexpr glm::vec3 BOX_OFFSET(0);
+    constexpr glm::vec3 BOX_OFFSET(0, -2, 0);
     // constexpr glm::vec3 BOX_OFFSET(-4, 1, -2);
     
-    GameObject topBox = GameObject(glm::vec3(0, 3, 0) + BOX_OFFSET, { 1, 1, 1 });
+    GameObject topBox = GameObject(glm::vec3(0, 3, 0) + BOX_OFFSET, glm::vec3(0.5));
     //topBox.getTransform()->rotate({ 0, 0, RADIANS(45) });
     Component::RenderMesh topCubeMesh;
-    topCubeMesh.setModel(cubeBuffer);
+    topCubeMesh.setModel(sphereBuffer);
     Materials::PBR topMat = Materials::PBR(MI({ 1, 0, 0 }), MI({ 1, 1, 1 }), MI({ 0.5, 0.5, 0.5 }), MI({ 0.5, 0, 0 }), MI({ 0, 0, 0 }));
     topCubeMesh.setMaterial(&topMat);
     topBox.addComponet(&topCubeMesh);
     Component::RigidBody rbTop;
+    rbTop.isKinimatic = true;
+    rbTop.hasGravity = true;
     Physics::BoxColliderSAT topCollider = Physics::BoxColliderSAT(10);
     topBox.addComponet(&rbTop);
     topBox.addComponet(&topCollider);
+
+    Physics::Constraints::DistanceConstraint distanceConstraint = Physics::Constraints::DistanceConstraint({ 0, 0, 0 }, { -0.5, 0.5, -0.5 }, 0); // { -0.5, 0.5, -0.5 }
+    distanceConstraint.setBodyA(&rbTop);
+    topBox.getRigidbody()->constraints.push_back(&distanceConstraint);
     
 
-    GameObject bottomBox = GameObject(glm::vec3(0) + BOX_OFFSET, { 1, 1, 1 });
+    GameObject bottomBox = GameObject(glm::vec3(0.5, 2.5, 0.5) + BOX_OFFSET, { 1, 1, 1 }); // glm::vec3(0.5, 2.5, 0.5)
     Component::RenderMesh bottomCubeMesh;
     bottomCubeMesh.setModel(cubeBuffer);
     Materials::PBR bottomMat = Materials::PBR(MI({ 0, 0, 1 }), MI({ 1, 1, 1 }), MI({ 0.5, 0.5, 0.5 }), MI({ 0.5, 0, 0 }), MI({ 0, 0, 0 }));
@@ -255,7 +262,10 @@ int main() {
     Physics::BoxColliderSAT bottomCollider = Physics::BoxColliderSAT(10);
     bottomBox.addComponet(&rbBottom);
     bottomBox.addComponet(&bottomCollider);
-    rbBottom.isKinimatic = true;
+    rbBottom.isKinimatic = false;
+    rbBottom.hasGravity = true;
+
+    distanceConstraint.setBodyB(&rbBottom);
 
     timer.start("Player");
     GameObject player = GameObject({ 0, 0, 5 }, { 1, 1, 1 });
@@ -265,6 +275,7 @@ int main() {
     player.addComponet(&playerScript);
     DebugScreen debugScript;
     debugScript.RedBlock = &topBox;
+    debugScript.BlueBlock = &bottomBox;
     player.addComponet(&debugScript);
     Component::AudioReciever recieverComp;
     player.addComponet(&recieverComp);
@@ -300,7 +311,7 @@ int main() {
     timer.start();
     Physics::CollisionDetection::setBroadphase<Physics::NSquared>();
     Physics::CollisionDetection::setNarrowphase< Physics::SAT3D>();
-    Physics::Engine::setResponse<Physics::ImpulseBased>();
+    Physics::Engine::setResponse<Physics::ConstraintsBased>();
     timer.log();
     // Physics::Constraints::ConstraintsSolver::addConstraint<Physics::Constraints::DistanceConstraint>(rb1, rb2, Utils::fill(0.5f), Utils::fill(-0.5f), 1.0f);
     // Physics::Constraints::ConstraintsSolver::addConstraint(DBG_NEW Physics::Constraints::DistanceConstraint(rb1, rb2, Utils::fill(0), Utils::fill(0), 1.5f));

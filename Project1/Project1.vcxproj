@@ -155,6 +155,7 @@
     <ClCompile Include="Scripts\SpinScript.cpp" />
     <ClCompile Include="Scripts\SoundControllerScript.cpp" />
     <ClCompile Include="Primatives\TextureChain.cpp" />
+    <ClCompile Include="Utils\BigMaths.cpp" />
     <ClCompile Include="Utils\NoiseGeneration.cpp" />
     <ClCompile Include="Primatives\Buffers\ArrayBuffer.cpp" />
     <ClCompile Include="Componets\Animated.cpp" />
@@ -225,6 +226,7 @@
     <ClInclude Include="Scripts\SoundControllerScript.h" />
     <ClInclude Include="Primatives\TextureChain.h" />
     <ClInclude Include="UI\Page.h" />
+    <ClInclude Include="Utils\BigMaths.h" />
     <ClInclude Include="Utils\NoiseGeneration.h" />
     <ClInclude Include="Primatives\Buffers\ArrayBuffer.h" />
     <ClInclude Include="Componets\Animated.h" />

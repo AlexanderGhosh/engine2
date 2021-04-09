@@ -95,6 +95,8 @@ namespace Utils {
 
     glm::vec3 fill(const float& num);
 
+    glm::mat3 getSkewMatrix(Vector3 a);
+
     const std::string getFileName(const std::string& filePath, const bool& includeExtension = false);
 
     template< typename T>
@@ -243,35 +245,5 @@ namespace Utils {
         std::chrono::time_point<std::chrono::high_resolution_clock> s, e;
         std::list<std::chrono::time_point<std::chrono::high_resolution_clock>> pausing;
     };
-    namespace BigMaths {
-        using Vector6 = std::array<float, 6>;
-        using Vector12 = std::array<float, 12>;
-        using MassMatrix6 = std::array<std::array<float, 6>, 6>;
-        using Matrix12 = std::array<std::array<float, 12>, 12>;
-
-        const Vector12 combine(const Vector6& a, const Vector6& b);
-
-        const Matrix12 combine(const MassMatrix6& a, const MassMatrix6& b);
-        // 1/n element wise
-        const Matrix12 inverse(const Matrix12& m);
-
-        std::array<Vector6, 2> split(const Vector12& a);
-        std::array<glm::vec3, 2> split(const Vector6& a);
-    };
 }
-
-// dot product [1 x 1]
-float operator * (const Utils::BigMaths::Vector12& a, const Utils::BigMaths::Vector12& b);
-// element wise multiplication
-Utils::BigMaths::Vector12 operator * (const Utils::BigMaths::Vector12& a, const float& b);
-// dot product [12 x 1]
-Utils::BigMaths::Vector12 operator * (const Utils::BigMaths::Matrix12& a, const Utils::BigMaths::Vector12& b);
-// dot product [1 x 12]
-Utils::BigMaths::Vector12 operator * (const Utils::BigMaths::Vector12& a, const Utils::BigMaths::Matrix12& b);
-// dot product [3 x 1]
-glm::vec3 operator * (const glm::mat3& a, const glm::vec3& b);
-// element wise addition
-const Utils::BigMaths::Vector12 operator +(const Utils::BigMaths::Vector12& a, const Utils::BigMaths::Vector12& b);
-// element wise division
-const Utils::BigMaths::Vector12 operator /(const Utils::BigMaths::Vector12& a, const float& b);
 

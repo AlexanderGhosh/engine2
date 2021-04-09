@@ -27,10 +27,10 @@ void PlayerControler::update(float deltaTime) {
 		speed *= 2;
 	}
 	if (EH::getKey(Key::W, Action::Down)) {
-		pos += camera->getForward() * glm::vec3(1, 0, 1) * deltaTime * speed;
+		pos += glm::normalize(camera->getForward() * glm::vec3(1, 0, 1)) * deltaTime * speed;
 	}
 	if (EH::getKey(Key::S, Action::Down)) {
-		pos -= camera->getForward() * glm::vec3(1, 0, 1) * deltaTime * speed;
+		pos -= glm::normalize(camera->getForward() * glm::vec3(1, 0, 1)) * deltaTime * speed;
 	}
 	if (EH::getKey(Key::A, Action::Down)) {
 		pos -= camera->getRight() * deltaTime * speed;
