@@ -30,7 +30,7 @@ namespace Render {
 			template<class T>
 			static inline bool setValue(const std::string& name, const Materials::MatItemBase<T>& item, unsigned& texUnit) {
 				bool valid = true;
-				valid = Render::Shading::Manager::setValue(name + ".id", static_cast<int>(item.getCurrentTexId())) AND valid; // set to texture unit
+				valid = Render::Shading::Manager::setValue(name + ".id", static_cast<int>(texUnit)) AND valid; // set to texture unit
 				valid = Render::Shading::Manager::setValue(name + ".raw", item.getCurrentRaw()) AND valid; // set the raw value
 				valid = Render::Shading::Manager::setValue(name + ".mixValue", item.getCurrentMixValue()) AND valid; // set the mix value
 				

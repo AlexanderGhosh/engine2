@@ -253,6 +253,15 @@ int main() {
     land.setHeightMap(hm);
     land.setNoiseBuffer(Utils::NoiseGeneration::getMap(100, { 1, 0.5, 0.1 }, { 1, 2, 3 }));
     land.useTextureMap(false);
+    MI3 lowestColour  = MI3(glm::vec3(0.5f));
+    lowestColour.useRaw();
+    MI3 middleColour  = MI3(glm::vec3(139, 69, 19) / 255.0f);
+    middleColour.useRaw();
+    MI3 highestColour = MI3(glm::vec3(0, 1, 0));
+    highestColour.useRaw();
+    land.setLowestTexture(&lowestColour);
+    land.setMiddleTexture(&middleColour);
+    land.setHighestTexture(&highestColour);
     timer.log();
 
 

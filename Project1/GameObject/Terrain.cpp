@@ -9,7 +9,7 @@ bool Terrain::gottenShader = false;
 unsigned Terrain::shaderMesh = 0;
 
 unsigned Terrain::shaderHM = 0;
-Terrain::Terrain() : resolution(), transform(), groundBuffer(), heightMap(0), useTexture(true)
+Terrain::Terrain() : resolution(), transform(), groundBuffer(), heightMap(0), useTexture(true), lowest(nullptr), middle(nullptr), highest(nullptr)
 {
 	if (NOT gottenShader) {
 		shaderHM = ResourceLoader::getShader("TerrainShaderHeightMap");
@@ -97,11 +97,24 @@ void Terrain::draw()
 	glDisable(GL_CULL_FACE);
 	Render::Shading::Manager::setActive(useTexture ? shaderHM : shaderMesh);
 	Render::Shading::Manager::setValue("model", transform.getModel());
-	
+
+	unsigned unit = 0;
 	if (useTexture) {
-		Render::Shading::Manager::setValue("hm", 0);
-		glActiveTexture(GL_TEXTURE0);
+		Render::Shading::Manager::setValue("hm", static_cast<int>(unit));
+		glActiveTexture(GL_TEXTURE0 + unit++);
 		glBindTexture(GL_TEXTURE_2D, heightMap);
+	}
+	if (lowest) {
+		Render::Shading::Manager::setValue("lowest", *lowest, unit);
+		lowest->tryBindTexture(unit);
+	}
+	if (middle) {
+		Render::Shading::Manager::setValue("middle", *middle, unit);
+		middle->tryBindTexture(unit);
+	}
+	if (highest) {
+		Render::Shading::Manager::setValue("highest", *highest, unit);
+		highest->tryBindTexture(unit);
 	}
 	
 	groundBuffer.render();
@@ -111,7 +124,11 @@ void Terrain::draw()
 
 void Terrain::cleanUp()
 {
+	highest->cleanUp();
+	middle->cleanUp();
+	lowest->cleanUp();
 	groundBuffer.cleanUp();
+	noise.clear();
 }
 
 void Terrain::setHeightMap(unsigned tex)
@@ -130,6 +147,21 @@ void Terrain::setNoiseBuffer(const Utils::NoiseMap& noise)
 void Terrain::useTextureMap(bool use)
 {
 	useTexture = use;
+}
+
+void Terrain::setLowestTexture(Materials::MatItemBase<glm::vec3>* low)
+{
+	lowest = low;
+}
+
+void Terrain::setMiddleTexture(Materials::MatItemBase<glm::vec3>* mid)
+{
+	middle = mid;
+}
+
+void Terrain::setHighestTexture(Materials::MatItemBase<glm::vec3>* high)
+{
+	highest = high;
 }
 
 Component::Transform& Terrain::getTransform()

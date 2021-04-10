@@ -6,24 +6,38 @@ in vec3 norm;
 in vec2 texCoords;
 in float height;
 
+struct MatItem3{
+    vec3 raw;
+    sampler2D id;
+    float mixValue;
+};
+vec3 getData(MatItem3 item){
+    return mix(item.raw, texture(item.id, texCoords).rgb, item.mixValue);
+};
+
 uniform sampler2D textures[3];
+
+uniform MatItem3 lowest;
+uniform MatItem3 middle;
+uniform MatItem3 highest;
+
 
 float map(float val, float low, float high, float l, float h){
     return l + ((h - l) / (high - low)) * (val - low);
 }
 
+vec3 mix3(vec3 a, vec3 b, vec3 c){
+    return 
+    a * ((1 - height) * 0.25) + 
+    b * ((3 - 3 * height) * 0.25) + 
+    c * height;
+}
+
 void main() {
 
-    // if you want multiple textures...0
-    vec3 t1 = vec3(0, 1, 0); // texture(textures[0], texCoords);
-    vec3 t2 = vec3(139,69,19) / 255; // texture(textures[1], texCoords);
-    vec3 t3 = vec3(0.5); // texture(textures[2], texCoords);
-    
-    // Blend cliff texture using the y component of the normal
-    float r = map(height, -0.5, 0.5, 0, 1);
-    //r = 1.0 / (1.0 - r) - 1;
-    vec3 col = mix(t2, t1, r);
+    vec3 low = getData(lowest);
+    vec3 mid = getData(middle);
+    vec3 high = getData(highest);
 
-
-    FragColor = vec4(0, col.g, 0, 1);
+    FragColor = vec4(mix3(low, mid, high), 1);
 }
