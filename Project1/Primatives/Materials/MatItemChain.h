@@ -52,7 +52,7 @@ namespace Materials {
 	inline const T& MatItemChain<T>::getCurrentRaw() const
 	{
 		if (NOT rawValues.size())
-			return 0;
+			return rawValues[0];
 		return rawValues[currentIndex];
 	}
 

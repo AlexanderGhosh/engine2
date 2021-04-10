@@ -32,8 +32,9 @@ void Component::RenderMesh::update(float deltaTime)
 	const auto& buffers = model.getBuffers();
 	for (short i = 0; i < buffers.size(); i++) {
 		Primative::Buffers::VertexBuffer& buffer = ResourceLoader::getBuffer(buffers[i]);
-		const Materials::MaterialBase* material = materials[i];
+		Materials::MaterialBase* material = materials[i];
 		if (material) {
+			material->update(deltaTime);
 			material->activateTextures(); // activates the texture units and binds the ids
 			Render::Shading::Manager::setValue("material", material); // sets values to the samplers
 		}

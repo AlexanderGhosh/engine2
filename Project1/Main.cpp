@@ -36,6 +36,7 @@
 
 #include "Primatives/Materials/PBR.h"
 #include "Primatives/Materials/MatItemSingle.h"
+#include "Primatives/Materials/MatItemChain.h"
 #include "Primatives/Model.h"
 #include "Gizmos/GizmoRenderer.h"
 #include "Gizmos/GizmoShapes.h"
@@ -210,7 +211,9 @@ int main() {
     Component::RenderMesh minikitMesh;
     minikitMesh.setModel(minikitBuffer);
 
-    Materials::PBR minikitMatWhite(&mi4s[0], &mi3s[0], &mi1s[0], &mi1s[0], &mi1s[1]);
+    Materials::MatItemChain<glm::vec4> whiteChain = Materials::MatItemChain<glm::vec4>({glm::vec4(1), glm::vec4(1, 0, 1, 1) }, {0, 0}, {0, 0}, {1, 1});
+
+    Materials::PBR minikitMatWhite(&whiteChain, &mi3s[0], &mi1s[0], &mi1s[0], &mi1s[1]);
     Materials::PBR minikitMatGray (&mi4s[1], &mi3s[0], &mi1s[0], &mi1s[0], &mi1s[1]);
     Materials::PBR minikitMatBlack(&mi4s[2], &mi3s[0], &mi1s[0], &mi1s[0], &mi1s[1]);
     Materials::PBR minikitMatGreen(&mi4s[3], &mi3s[0], &mi1s[0], &mi1s[0], &mi1s[1]);
