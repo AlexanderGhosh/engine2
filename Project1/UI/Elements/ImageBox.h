@@ -8,7 +8,7 @@ namespace UI {
 		ImageBox();
 		inline void setBackgroundImage(const unsigned& backgroundColor)
 		{
-			this->backgroundColor.setValue(backgroundColor);
+			this->backgroundColor->addValue(backgroundColor);
 		};
 		void drawContent() const;
 	};

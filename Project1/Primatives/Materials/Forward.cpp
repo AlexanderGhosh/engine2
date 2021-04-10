@@ -1,24 +1,25 @@
 #include "Forward.h"
+#include "MatItemBase.h"
 
-Materials::Forward::Forward()
+Materials::Forward::Forward() : diffuse(nullptr), normal(nullptr), specular(nullptr)
 {
 }
 
-Materials::Forward::Forward(const MatItem<glm::vec3>& diffuse, const MatItem<glm::vec3>& normal, const MatItem<float>& specular)
+Materials::Forward::Forward(MatItemBase<glm::vec3>* diffuse, MatItemBase<glm::vec3>* normal, MatItemBase<float>* specular) : Forward()
 {
 }
 
-const Materials::MatItem<glm::vec3>& Materials::Forward::getDiffuse() const
+const Materials::MatItemBase<glm::vec3>* Materials::Forward::getDiffuse() const
 {
 	return diffuse;
 }
 
-const Materials::MatItem<glm::vec3>& Materials::Forward::getNormals() const
+const Materials::MatItemBase<glm::vec3>* Materials::Forward::getNormals() const
 {
 	return normal;
 }
 
-const Materials::MatItem<float>& Materials::Forward::getSpecular() const
+const Materials::MatItemBase<float>* Materials::Forward::getSpecular() const
 {
 	return specular;
 }
@@ -26,11 +27,14 @@ const Materials::MatItem<float>& Materials::Forward::getSpecular() const
 void Materials::Forward::activateTextures(Int startUnit) const
 {
 	unsigned unit = startUnit;
-	diffuse.bindTexture(unit);
-	normal.bindTexture(unit);
-	specular.bindTexture(unit);
+	diffuse->tryBindTexture(unit);
+	normal->tryBindTexture(unit);
+	specular->tryBindTexture(unit);
 }
 
 void Materials::Forward::cleanUp()
 {
+	diffuse->cleanUp();
+	normal->cleanUp();
+	specular->cleanUp();
 }

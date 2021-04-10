@@ -6,6 +6,7 @@
 #include "AssimpWrapper.h"
 #include "../Primatives/Materials/PBR.h"
 #include "../Primatives/Materials/MaterialBase.h"
+#include "../Primatives/Materials/MatItemSingle.h"
 #include "../Rendering/Animation/Animation.h"
 #include "../Rendering/Animation/Bones.h"
 #include "../Primatives/Buffers/VertexBuffer.h"
@@ -138,36 +139,48 @@ std::string ResourceLoader::createShader(String filePath, bool hasGeom)
 #pragma endregion
 
 #pragma region Matrials
-Materials::PBR ResourceLoader::createPBR(String dirPath, std::vector<TextureType> types, std::vector<bool> flip)
+std::tuple<Materials::PBR, MIS1<glm::vec4>, MIS1<glm::vec3>, std::list<MIS1<float>>> ResourceLoader::createPBR(String dirPath, std::vector<TextureType> types, std::vector<bool> flip)
 {
+    std::tuple<Materials::PBR, MIS1<glm::vec4>, MIS1<glm::vec3>, std::list<MIS1<float>>> res;
+    Materials::PBR& material = std::get<0>(res);
+    MIS1<glm::vec4>& albe = std::get<1>(res);
+    MIS1<glm::vec3>& norm = std::get<2>(res);
+    std::list<MIS1<float>>&  mar = std::get<3>(res);
     const std::vector<unsigned> textures = loadTextureFile(dirPath, types, flip);
-    materials.push_back(new Materials::PBR());
-    materials.pop_back();
-    Materials::PBR& res = *dynamic_cast<Materials::PBR*>(materials.back());
+    materials.push_back(&std::get<0>(res));
     unsigned i = 0;
     for (TextureType& type : types) {
         switch (type)
         {
-        case TextureType::NormalMap:
-            res.setNormal(textures[i]);
-            break;
         case TextureType::AlbedoMap:
-            res.setAlbedo(textures[i]);
+            albe.addValue(textures[i]);
+            albe.useTexture();
+            material.setAlbedo(&albe);
+            break;
+        case TextureType::NormalMap:
+            norm.addValue(textures[i]);
+            norm.useTexture();
+            material.setNormal(&norm);
             break;
         case TextureType::MetalicMap:
-            res.setMetalic(textures[i]);
+            mar.front().addValue(textures[i]);
+            mar.front().useTexture();
+            material.setMetalic(&mar.front());
             break;
         case TextureType::AOMap:
-            res.setAO(textures[i]);
+            Utils::elementAt(mar, 1).addValue(textures[i]);
+            Utils::elementAt(mar, 1).useTexture();
+            material.setAO(&Utils::elementAt(mar, 1));
             break;
         case TextureType::RoughnessMap:
-            res.setRoughness(textures[i]);
+            mar.back().addValue(textures[i]);
+            mar.back().useTexture();
+            material.setRoughness(&mar.back());
             break;
         }
         i++;
     }
-    roguePointers.push_back(materials.back());
-    return *dynamic_cast<Materials::PBR*>(materials.back());
+    return res;
 }
 #pragma endregion
 

@@ -217,9 +217,11 @@
   <ItemGroup>
     <ClInclude Include="Componets\AudioReciever.h" />
     <ClInclude Include="Componets\Scripting.h" />
+    <ClInclude Include="Primatives\Materials\MatItemBase.h" />
+    <ClInclude Include="Primatives\Materials\MatItemChain.h" />
     <ClInclude Include="Primatives\Materials\Forward.h" />
     <ClInclude Include="Primatives\Materials\PBR.h" />
-    <ClInclude Include="Primatives\Materials\MatItem.h" />
+    <ClInclude Include="Primatives\Materials\MatItemSingle.h" />
     <ClInclude Include="ParticleSystem\ParticleEmmiter.h" />
     <ClInclude Include="Primatives\Buffers\SoundStreamBuffer.h" />
     <ClInclude Include="Scripts\RainMakerScript.h" />

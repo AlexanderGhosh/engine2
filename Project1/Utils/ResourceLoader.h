@@ -4,6 +4,7 @@
 #include <list>
 #include <glm.hpp>
 #include <GL/glew.h>
+#include <tuple>
 
 #include "General.h"
 // #include "../Rendering/Animation/Animation.h"
@@ -17,6 +18,13 @@ namespace Materials {
 	class MaterialBase;
 	class PBR;
 	class Forward;
+
+	template<class T>
+	class MatItemBase;
+	template<class T>
+	class MatItemSingle;
+	template<class T>
+	class MatItemChain;
 }
 namespace Primative {
 	namespace Buffers {
@@ -47,7 +55,8 @@ public:
 	static std::string createShader(String filePath, bool hasGeom = false);
 	static const unsigned getShader(String name, bool create = false);
 	// materials
-	static Materials::PBR createPBR(String dirPath, std::vector<TextureType> types, std::vector<bool> flip);
+#define MIS1 Materials::MatItemSingle
+	static std::tuple<Materials::PBR, MIS1<glm::vec4>, MIS1<glm::vec3>, std::list<MIS1<float>>> createPBR(String dirPath, std::vector<TextureType> types, std::vector<bool> flip);
 
 	// textures
 	static const std::vector<unsigned> loadTextureFile(String dirPath, std::vector<TextureType> types, std::vector<bool> flip);

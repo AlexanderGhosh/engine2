@@ -15,7 +15,6 @@ void Primative::TextureChain::update(float deltaTime)
 {
 	counter += deltaTime;
 }
-int i = 0;
 Unsigned Primative::TextureChain::getTexture()
 {
 	if (NOT textures.size())

@@ -1,8 +1,9 @@
 #include "Element.h"
 #include "../../EventSystem/Handler.h"
 #include "../../Utils/General.h"
+#include "../../Primatives/Materials/MatItemSingle.h"
 
-UI::Element::Element() : screenPos(0), width(0), height(0), name(""), cursorOver(0), mDown(0), margin(0)
+UI::Element::Element() : screenPos(0), width(0), height(0), name(""), cursorOver(0), mDown(0), margin(0), backgroundColor(nullptr)
 {
 	auto event = [](Element* sender) { };
 	mouseEnter = event;
@@ -11,6 +12,7 @@ UI::Element::Element() : screenPos(0), width(0), height(0), name(""), cursorOver
 
 	mouseDown = event;
 	mouseUp = event;
+	backgroundColor = new Materials::MatItemSingle<glm::vec3>({ 0, 0, 0 });
 }
 
 const glm::vec2& UI::Element::getPos() const
@@ -84,5 +86,9 @@ glm::mat4 UI::Element::getModel() const
 
 void UI::Element::cleanUp()
 {
-	backgroundColor.cleanUp();
+	if (backgroundColor) {
+		backgroundColor->cleanUp();
+		delete backgroundColor;
+		backgroundColor = nullptr;
+	}
 }

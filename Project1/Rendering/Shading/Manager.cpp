@@ -77,9 +77,9 @@ bool Render::Shading::Manager::setValue(const std::string& name, const Materials
 	 bool valid = true;
 	 unsigned unit = 1;
 
-	 valid = valid AND Render::Shading::Manager::setValue(name + ".diffuse", fwd.getDiffuse(), unit);
-	 valid = valid AND Render::Shading::Manager::setValue(name + ".normals", fwd.getNormals(), unit);
-	 valid = valid AND Render::Shading::Manager::setValue(name + ".specular", fwd.getSpecular(), unit);
+	 valid = valid AND Render::Shading::Manager::setValue(name + ".diffuse",  *fwd.getDiffuse(), unit);
+	 valid = valid AND Render::Shading::Manager::setValue(name + ".normals",  *fwd.getNormals(), unit);
+	 valid = valid AND Render::Shading::Manager::setValue(name + ".specular", *fwd.getSpecular(), unit);
 
 	 return valid;
 
@@ -98,11 +98,11 @@ bool Render::Shading::Manager::setValue(const std::string& name, const Materials
  {
 	 unsigned unit = 1;
 	 bool val = true;
-	 val = setValue(name + ".albedo", mat.getAlbedo(), unit) AND val;
-	 val = setValue(name + ".normal", mat.getNormal(), unit) AND val;
-	 val = setValue(name + ".metalic", mat.getMetalic(), unit) AND val;
-	 val = setValue(name + ".roughness", mat.getRoughness(), unit) AND val;
-	 val = setValue(name + ".ao", mat.getAO(), unit) AND val;
+	 val = setValue(name + ".albedo", *mat.getAlbedo(), unit) AND val;
+	 val = setValue(name + ".normal", *mat.getNormal(), unit) AND val;
+	 val = setValue(name + ".metalic", *mat.getMetalic(), unit) AND val;
+	 val = setValue(name + ".roughness", *mat.getRoughness(), unit) AND val;
+	 val = setValue(name + ".ao", *mat.getAO(), unit) AND val;
 
 	 /*std::string names[] = { ".albedo", ".normal", ".metalic", ".roughness", ".ao" };
 	 const auto all = mat.getAll();

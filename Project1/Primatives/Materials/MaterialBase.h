@@ -2,7 +2,7 @@
 #include <glm.hpp>
 #include <array>
 #include <GL/glew.h>
-#include "MatItem.h"
+#include "../../Utils/General.h"
 
 namespace Materials {
 	class MaterialBase {

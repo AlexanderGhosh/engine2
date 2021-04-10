@@ -1,11 +1,12 @@
 #include "PBR.h"
+#include "MatItemBase.h"
 
-Materials::PBR::PBR() : MaterialBase(), albedo(), normal(), metalic(), roughness(), ao(), brdfTex(0), lbrMap(0), hdrMap(0)
+Materials::PBR::PBR() : MaterialBase(), albedo(nullptr), normal(nullptr), metalic(nullptr), roughness(nullptr), ao(nullptr), brdfTex(0), lbrMap(0), hdrMap(0)
 {
 }
 
-Materials::PBR::PBR(const MatItem<glm::vec4>& albedo, const MatItem<glm::vec3>& normal, 
-	const MatItem<float>& metalic, const MatItem<float>& roughness, const MatItem<float>& ao) : PBR()
+Materials::PBR::PBR(MatItemBase<glm::vec4>* albedo, MatItemBase<glm::vec3>* normal, 
+	MatItemBase<float>* metalic, MatItemBase<float>* roughness, MatItemBase<float>* ao) : PBR()
 {
 	this->albedo = albedo;
 	this->normal = normal;
@@ -18,11 +19,11 @@ void Materials::PBR::activateTextures(Int startUnit) const
 {
 	unsigned unit = startUnit;
 
-	albedo.bindTexture(unit);
-	normal.bindTexture(unit);
-	metalic.bindTexture(unit);
-	roughness.bindTexture(unit);
-	ao.bindTexture(unit);
+	albedo->tryBindTexture(unit);
+	normal->tryBindTexture(unit);
+	metalic->tryBindTexture(unit);
+	roughness->tryBindTexture(unit);
+	ao->tryBindTexture(unit);
 
 	glActiveTexture(GL_TEXTURE0 + unit++);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, hdrMap);
@@ -34,29 +35,34 @@ void Materials::PBR::activateTextures(Int startUnit) const
 
 void Materials::PBR::cleanUp()
 {
+	albedo->cleanUp();
+	normal->cleanUp();
+	metalic->cleanUp();
+	roughness->cleanUp();
+	ao->cleanUp();
 }
 
-const Materials::MatItem<glm::vec4>& Materials::PBR::getAlbedo() const
+const Materials::MatItemBase<glm::vec4>* Materials::PBR::getAlbedo() const
 {
 	return albedo;
 }
 
-const Materials::MatItem<glm::vec3>& Materials::PBR::getNormal() const
+const Materials::MatItemBase<glm::vec3>* Materials::PBR::getNormal() const
 {
 	return normal;
 }
 
-const Materials::MatItem<float>& Materials::PBR::getMetalic() const
+const Materials::MatItemBase<float>* Materials::PBR::getMetalic() const
 {
 	return metalic;
 }
 
-const Materials::MatItem<float>& Materials::PBR::getRoughness() const
+const Materials::MatItemBase<float>* Materials::PBR::getRoughness() const
 {
 	return roughness;
 }
 
-const Materials::MatItem<float>& Materials::PBR::getAO() const
+const Materials::MatItemBase<float>* Materials::PBR::getAO() const
 {
 	return ao;
 }
@@ -91,27 +97,27 @@ void Materials::PBR::setBRDFtex(Unsigned id)
 	brdfTex = id;
 }
 
-void Materials::PBR::setAlbedo(const MatItem<glm::vec4>& albedo)
+void Materials::PBR::setAlbedo(MatItemBase<glm::vec4>* albedo)
 {
 	this->albedo = albedo;
 }
 
-void Materials::PBR::setNormal(const MatItem<glm::vec3>& normal)
+void Materials::PBR::setNormal(MatItemBase<glm::vec3>* normal)
 {
 	this->normal = normal;
 }
 
-void Materials::PBR::setMetalic(const MatItem<float>& metalic)
+void Materials::PBR::setMetalic(MatItemBase<float>* metalic)
 {
 	this->metalic = metalic;
 }
 
-void Materials::PBR::setRoughness(const MatItem<float>& roughness)
+void Materials::PBR::setRoughness(MatItemBase<float>* roughness)
 {
 	this->roughness = roughness;
 }
 
-void Materials::PBR::setAO(const MatItem<float>& ao)
+void Materials::PBR::setAO(MatItemBase<float>* ao)
 {
 	this->ao = ao;
 }

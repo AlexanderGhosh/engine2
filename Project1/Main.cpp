@@ -35,6 +35,7 @@
 #include "Physics/ConstraintEngine/ConstraitnsSolver.h"
 
 #include "Primatives/Materials/PBR.h"
+#include "Primatives/Materials/MatItemSingle.h"
 #include "Primatives/Model.h"
 #include "Gizmos/GizmoRenderer.h"
 #include "Gizmos/GizmoShapes.h"
@@ -149,9 +150,9 @@ int main() {
     //Component::RenderMesh manR1 = Component::RenderMesh();
     //manR1.setModel(manModel);
     //Materials::PBR manMaterial1/* = Materials::PBR({ { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 0, 0, 0 } }, { { 0.15, 0, 0 } }, { { 0, 0, 0 } })*/;
-#define MI1 Materials::MatItem<float>
-#define MI3 Materials::MatItem<glm::vec3>
-#define MI4 Materials::MatItem<glm::vec4>
+#define MI1 Materials::MatItemSingle<float>
+#define MI3 Materials::MatItemSingle<glm::vec3>
+#define MI4 Materials::MatItemSingle<glm::vec4>
    // manR1.setMaterial(&armourMaterial);
     //manR1.setMaterialTo(&hairMaterial, "Hair");
     //manR1.setMaterialTo(&clothesMaterial, "Cloth");
@@ -189,19 +190,38 @@ int main() {
     // plane_y.setMaterial(&planeMat_y);
     // yellowWindow.addComponet(&plane_y);
 
+
+    std::vector<MI1> mi1s = {
+        MI1(0.5f), MI1(0.0f)
+    };
+    std::vector<MI3> mi3s = {
+        MI3({1.0f, 1.0f, 1.0f})
+    };
+    std::vector<MI4> mi4s = {
+        MI4({ 1, 1, 1, 1 }), 
+        MI4({ 0.5, 0.5, 0.5, 1 }), 
+        MI4({ 0, 0, 0, 1 }),
+        MI4({ 0, 0.75, 0, 1 }),
+        MI4({ 0.75, 0, 0, 1 }),
+    };
+
+
     GameObject minikit({ 0, 0, 0 }, { 0.5, 0.5, 0.5 });
     Component::RenderMesh minikitMesh;
     minikitMesh.setModel(minikitBuffer);
-    Materials::PBR minikitMatWhite(MI4({ 1, 1, 1, 1 }),       MI3({ 1, 1, 1 }), MI1(0.5f), MI1(0.5f), MI1(0.0f));
-    Materials::PBR minikitMatGray( MI4({ 0.5, 0.5, 0.5, 1 }), MI3({ 1, 1, 1 }), MI1(0.5f), MI1(0.5f), MI1(0.0f));
-    Materials::PBR minikitMatBlack(MI4({ 0, 0, 0, 1 }),       MI3({ 1, 1, 1 }), MI1(0.5f), MI1(0.5f), MI1(0.0f));
-    Materials::PBR minikitMatGreen(MI4({ 0, 0.75, 0, 1 }),    MI3({ 1, 1, 1 }), MI1(0.5f), MI1(0.5f), MI1(0.0f));
-    Materials::PBR minikitMatRed(  MI4({ 0.75, 0, 0, 1 }),    MI3({ 1, 1, 1 }), MI1(0.5f), MI1(0.5f), MI1(0.0f));
+
+    Materials::PBR minikitMatWhite(&mi4s[0], &mi3s[0], &mi1s[0], &mi1s[0], &mi1s[1]);
+    Materials::PBR minikitMatGray (&mi4s[1], &mi3s[0], &mi1s[0], &mi1s[0], &mi1s[1]);
+    Materials::PBR minikitMatBlack(&mi4s[2], &mi3s[0], &mi1s[0], &mi1s[0], &mi1s[1]);
+    Materials::PBR minikitMatGreen(&mi4s[3], &mi3s[0], &mi1s[0], &mi1s[0], &mi1s[1]);
+    Materials::PBR minikitMatRed  (&mi4s[4], &mi3s[0], &mi1s[0], &mi1s[0], &mi1s[1]);
+
     minikitMesh.setMaterialTo(&minikitMatWhite, "white");
     minikitMesh.setMaterialTo(&minikitMatGray,  "gray");
     minikitMesh.setMaterialTo(&minikitMatBlack, "black");
     minikitMesh.setMaterialTo(&minikitMatGreen, "green");
     minikitMesh.setMaterialTo(&minikitMatRed,   "red");
+
     minikit.addComponet(&minikitMesh);
     SpinScript spinScript({ -1, 1, 0 }, 0.125);
     minikit.addComponet(&spinScript);

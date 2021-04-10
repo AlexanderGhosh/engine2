@@ -437,13 +437,19 @@
     <ClInclude Include="Primatives\TextureChain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Primatives\Materials\MatItem.h">
+    <ClInclude Include="Primatives\Materials\MatItemSingle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Primatives\Materials\PBR.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Primatives\Materials\Forward.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Primatives\Materials\MatItemChain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Primatives\Materials\MatItemBase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

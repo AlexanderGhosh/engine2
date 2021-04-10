@@ -43,10 +43,10 @@ void UI::UIRenderer::render(const UI::Canvas* pane) // draws the quads
 		model[3][1] = pane->getDimentions().y - model[3][1];
 		Render::Shading::Manager::setValue("model", model); 
 
-		const Materials::MatItem<glm::vec3>& bg = element->getBackgroundColor();
+		const Materials::MatItemBase<glm::vec3>* bg = element->getBackgroundColor();
 		unsigned unit = 0;
-		bg.bindTexture(unit);
-		Render::Shading::Manager::setValue("col", bg, unit);
+		bg->tryBindTexture(unit);
+		Render::Shading::Manager::setValue("col", *bg, unit);
 		/*if (NOT bg.hasTex()) {
 			Render::Shading::Manager::setValue("col_vec", glm::vec4(bg.getRaw(), 1));
 		}
@@ -73,10 +73,10 @@ void UI::UIRenderer::render(const Element* element)
 	// model[3][1] = pane->getDimentions().y - model[3][1];
 	Render::Shading::Manager::setValue("model", model);
 
-	const Materials::MatItem<glm::vec3>& bg = element->getBackgroundColor();
+	const Materials::MatItemBase<glm::vec3>* bg = element->getBackgroundColor();
 	unsigned unit = 0;
-	bg.bindTexture(unit);
-	Render::Shading::Manager::setValue("col", bg, unit);
+	bg->tryBindTexture(unit);
+	Render::Shading::Manager::setValue("col", *bg, unit);
 	/*if (!bg.hasTex()) {
 		Render::Shading::Manager::setValue("col_vec", glm::vec4(bg.getRaw(), 1));
 	}
