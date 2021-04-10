@@ -32,6 +32,13 @@ void Materials::Forward::activateTextures(Int startUnit) const
 	specular->tryBindTexture(unit);
 }
 
+void Materials::Forward::update(float deltaTime)
+{
+	diffuse->update(deltaTime);
+	normal->update(deltaTime);
+	specular->update(deltaTime);
+}
+
 void Materials::Forward::cleanUp()
 {
 	diffuse->cleanUp();

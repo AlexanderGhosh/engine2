@@ -16,6 +16,7 @@ namespace Materials {
 		const MatItemBase<glm::vec3>* getNormals() const;
 		const MatItemBase<float>* getSpecular() const;
 		void activateTextures(Int startUnit) const;
+		void update(float deltaTime);
 		void cleanUp();
 	};
 }

@@ -12,6 +12,7 @@ namespace Materials {
 		virtual void activateTextures(Int startUnit = 1) const = 0;
 		virtual void cleanUp() = 0;
 		~MaterialBase() = default;
+		virtual void update(float deltaTime) = 0;
 	};
 
 };

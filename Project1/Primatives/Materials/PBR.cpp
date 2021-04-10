@@ -42,6 +42,15 @@ void Materials::PBR::cleanUp()
 	ao->cleanUp();
 }
 
+void Materials::PBR::update(float deltaTime)
+{
+	albedo->update(deltaTime);
+	normal->update(deltaTime);
+	metalic->update(deltaTime);
+	roughness->update(deltaTime);
+	ao->update(deltaTime);
+}
+
 const Materials::MatItemBase<glm::vec4>* Materials::PBR::getAlbedo() const
 {
 	return albedo;

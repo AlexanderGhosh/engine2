@@ -17,7 +17,7 @@ namespace Materials {
 
 		// getters
 		const T& getCurrentRaw() const;
-		Unsigned getCurrentTexId() const; 
+		Unsigned getCurrentTexId() const;
 		Float getCurrentMixValue() const;
 
 		// adders
@@ -39,6 +39,7 @@ namespace Materials {
 		bool tryBindTexture(unsigned& unit) const;
 		bool tryBindTexture(Unsigned unit = 0) const;
 
+		void update(float deltaTime);
 		void cleanUp();
 	};
 
@@ -146,6 +147,11 @@ namespace Materials {
 			return true;
 		}
 		return false;
+	}
+
+	template<class T>
+	inline void MatItemSingle<T>::update(float deltaTime)
+	{
 	}
 
 	template<class T>

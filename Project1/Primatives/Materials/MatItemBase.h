@@ -23,6 +23,7 @@ namespace Materials {
 		virtual bool tryBindTexture(unsigned& unit) const = 0;
 		virtual bool tryBindTexture(Unsigned unit = 0) const = 0;
 
+		virtual void update(float deltaTime) = 0;
 		virtual void cleanUp() = 0;
 	};
 

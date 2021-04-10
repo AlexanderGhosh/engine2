@@ -17,6 +17,7 @@ namespace Materials {
 		PBR(MatItemBase<glm::vec4>* albedo, MatItemBase<glm::vec3>* normal, MatItemBase<float>* metalic, MatItemBase<float>* roughness, MatItemBase<float>* ao);
 		void activateTextures(Int startUnit) const;
 		void cleanUp();
+		void update(float deltaTime);
 
 		// getters
 		const MatItemBase<glm::vec4>* getAlbedo() const;
