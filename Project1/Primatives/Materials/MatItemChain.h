@@ -75,12 +75,24 @@ namespace Materials {
 	template<class T>
 	inline bool MatItemChain<T>::tryBindTexture(unsigned& unit) const
 	{
+		const unsigned texId = getCurrentTexId();
+		if (texId > 0) {
+			glActiveTexture(GL_TEXTURE0 + unit++);
+			glBindTexture(GL_TEXTURE_2D, texId);
+			return true;
+		}
 		return false;
 	}
 
 	template<class T>
 	inline bool MatItemChain<T>::tryBindTexture(Unsigned unit) const
 	{
+		const unsigned texId = getCurrentTexId();
+		if (texId > 0) {
+			glActiveTexture(GL_TEXTURE0 + unit);
+			glBindTexture(GL_TEXTURE_2D, texId);
+			return true;
+		}
 		return false;
 	}
 

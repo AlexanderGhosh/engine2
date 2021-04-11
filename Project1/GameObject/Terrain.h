@@ -33,7 +33,7 @@ public:
 	~Terrain() = default;
 	Terrain();
 	Terrain(Int res);
-	void draw();
+	void draw(float deltaTime);
 	void cleanUp();
 	void setHeightMap(unsigned tex);
 	void setNoiseBuffer(const Utils::NoiseMap& noise);

@@ -91,7 +91,7 @@ void Terrain::init()
 }
 
 
-void Terrain::draw()
+void Terrain::draw(float deltaTime)
 {
 	// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	glDisable(GL_CULL_FACE);
@@ -105,14 +105,17 @@ void Terrain::draw()
 		glBindTexture(GL_TEXTURE_2D, heightMap);
 	}
 	if (lowest) {
+		lowest->update(deltaTime);
 		Render::Shading::Manager::setValue("lowest", *lowest, unit);
 		lowest->tryBindTexture(unit);
 	}
 	if (middle) {
+		middle->update(deltaTime);
 		Render::Shading::Manager::setValue("middle", *middle, unit);
 		middle->tryBindTexture(unit);
 	}
 	if (highest) {
+		highest->update(deltaTime);
 		Render::Shading::Manager::setValue("highest", *highest, unit);
 		highest->tryBindTexture(unit);
 	}

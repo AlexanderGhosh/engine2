@@ -72,7 +72,7 @@ void GameScene::drawTransparent()
 void GameScene::drawTerrain()
 {
 	for (Terrain* terrain : this->terrain) {
-		terrain->draw();
+		terrain->draw(mainContext->getTime().deltaTime);
 	}
 }
 
