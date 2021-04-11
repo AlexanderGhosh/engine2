@@ -4,14 +4,17 @@
 namespace Materials {
 	template<class T>
 	class MatItemBase {
+	protected:
+		float repeatValue;
 	public:
-		MatItemBase();
+		MatItemBase(Float rv = 1.0f);
 		~MatItemBase() = default;
 
 		// getters
 		virtual const T& getCurrentRaw() const = 0;
 		virtual Unsigned getCurrentTexId() const = 0;
 		virtual Float getCurrentMixValue() const = 0;
+		Float getRepeatValue() const;
 
 		// adders
 		virtual void addValue(const T& raw) = 0;
@@ -29,8 +32,13 @@ namespace Materials {
 
 #pragma region Implementation
 	template<class T>
-	inline MatItemBase<T>::MatItemBase()
+	inline MatItemBase<T>::MatItemBase(Float rv) : repeatValue(rv)
 	{
-	};
+	}
+	template<class T>
+	inline Float MatItemBase<T>::getRepeatValue() const
+	{
+		return repeatValue;
+	}
 #pragma endregion
 };

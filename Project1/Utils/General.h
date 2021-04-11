@@ -129,6 +129,7 @@ namespace Utils {
     }
 
     glm::vec3 map(const glm::vec3& x, const glm::vec2& from, const glm::vec2& to);
+    float map(Float x, const glm::vec2& from, const glm::vec2& to);
 
     template<typename T>
     bool find(const std::list<T>& a, T& b) {

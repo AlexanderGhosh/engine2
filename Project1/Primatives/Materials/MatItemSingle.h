@@ -10,9 +10,9 @@ namespace Materials {
 		unsigned textureId;
 		float mixValue;
 	public:
-		MatItemSingle();
-		MatItemSingle(const T& raw);
-		MatItemSingle(Unsigned id);
+		MatItemSingle(bool def = true, Float repeatVal = 1.0f);
+		MatItemSingle(const T& raw, Float repeatVal = 1.0f);
+		MatItemSingle(Unsigned id, Float repeatVal = 1.0f);
 		~MatItemSingle() = default;
 
 		// getters
@@ -45,18 +45,18 @@ namespace Materials {
 
 #pragma region Implementation
 	template<class T>
-	inline MatItemSingle<T>::MatItemSingle() : MatItemBase<T>(), raw(), textureId(0), mixValue(0)
+	inline MatItemSingle<T>::MatItemSingle(bool def, Float repeatVal) : MatItemBase<T>(repeatVal), raw(), textureId(0), mixValue(0)
 	{
 	}
 
 	template<class T>
-	inline MatItemSingle<T>::MatItemSingle(const T& raw) : MatItemSingle()
+	inline MatItemSingle<T>::MatItemSingle(const T& raw, Float repeatVal) : MatItemSingle(true, repeatVal)
 	{
 		this->raw = raw;
 	}
 
 	template<class T>
-	inline MatItemSingle<T>::MatItemSingle(Unsigned id) : MatItemSingle()
+	inline MatItemSingle<T>::MatItemSingle(Unsigned id, Float repeatVal) : MatItemSingle(true, repeatVal)
 	{
 		this->textureId = id;
 	}

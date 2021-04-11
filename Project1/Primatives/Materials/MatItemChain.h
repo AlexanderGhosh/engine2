@@ -16,8 +16,8 @@ namespace Materials {
 		inline void addValue(const T& raw) { };
 		inline void addValue(Unsigned id) { };
 	public:
-		MatItemChain();
-		MatItemChain(const std::vector<T>& values, const std::vector<unsigned>& ids, const std::vector<float>& mixValues, const std::vector<float>& seperations);
+		MatItemChain(Float repeatVal = 1.0f);
+		MatItemChain(const std::vector<T>& values, const std::vector<unsigned>& ids, const std::vector<float>& mixValues, const std::vector<float>& seperations, Float repeatVal = 1.0f);
 		~MatItemChain() = default;
 		const T& getCurrentRaw() const;
 		Unsigned getCurrentTexId() const;
@@ -34,13 +34,13 @@ namespace Materials {
 	};
 
 	template<class T>
-	inline MatItemChain<T>::MatItemChain() : MatItemBase<T>(), rawValues(), textureIds(), mixValues(), counter(0), currentIndex(0)
+	inline MatItemChain<T>::MatItemChain(Float repeatVal) : MatItemBase<T>(repeatVal), rawValues(), textureIds(), mixValues(), counter(0), currentIndex(0)
 	{
 	}
 
 	template<class T>
 	inline MatItemChain<T>::MatItemChain(const std::vector<T>& values, const std::vector<unsigned>& ids, 
-		const std::vector<float>& mixValues, const std::vector<float>& seperations) : MatItemChain()
+		const std::vector<float>& mixValues, const std::vector<float>& seperations, Float repeatVal) : MatItemChain(repeatVal)
 	{
 		this->rawValues = values;
 		this->textureIds = ids;

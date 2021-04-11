@@ -124,6 +124,14 @@ glm::vec3 Utils::map(const glm::vec3& x, const glm::vec2& from, const glm::vec2&
     return ((c + d) + (d - c) * ((2.0f * x - (a + b)) / (b - a))) / 2.0f;
 }
 
+float Utils::map(Float x, const glm::vec2& from, const glm::vec2& to) {
+    float a = from.x;
+    float b = from.y;
+    float c = to.x;
+    float d = to.y;
+    return ((c + d) + (d - c) * ((2.0f * x - (a + b)) / (b - a))) / 2.0f;
+}
+
 /// <summary>
 /// returns true if any are nan or inf regardles of sign
 /// </summary>

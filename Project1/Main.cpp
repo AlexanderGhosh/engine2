@@ -109,6 +109,8 @@ int main() {
     const unsigned brdf = ResourceLoader::loadTexture("Resources/Textures/ibl brdf.png", TextureType::AlbedoMap, 0);
     const unsigned hm   = ResourceLoader::loadTexture("Resources/Textures/heightmap.png", TextureType::HeightMap, 0);
     const unsigned rainDrop = ResourceLoader::loadTexture("Resources/Textures/raindrop.png", TextureType::AlbedoMap, 0);
+    const unsigned grass = ResourceLoader::loadTexture("Resources/Textures/grass.jpg", TextureType::AlbedoMap, 0);
+    const unsigned dirt = ResourceLoader::loadTexture("Resources/Textures/dirt.png", TextureType::AlbedoMap, 0);
 
    //Materials::PBR armourMaterial = ResourceLoader::createPBR("Resources/Textures/RFATextures/Armour",
    //    { TextureType::AlbedoMap, TextureType::AOMap, TextureType::MetalicMap, TextureType::NormalMap, TextureType::RoughnessMap },
@@ -250,14 +252,14 @@ int main() {
     Terrain land(100);
     land.getTransform().Position.y = -1;
     land.getTransform().Scale = { 100, 10 ,100 };
-    land.setHeightMap(hm);
     land.setNoiseBuffer(Utils::NoiseGeneration::getMap(100, { 1, 0.5, 0.1 }, { 1, 2, 3 }));
     land.useTextureMap(false);
-    Materials::MatItemChain<glm::vec3> lowestColour({ glm::vec3(0.5f), glm::vec3(1.0f) }, { 0, 0 }, { 0, 0 }, { 2, 2 });
-    MI3 middleColour  = MI3(glm::vec3(139, 69, 19) / 255.0f);
-    middleColour.useRaw();
-    MI3 highestColour = MI3(glm::vec3(0, 1, 0));
-    highestColour.useRaw();
+    MI3 lowestColour(dirt);
+    lowestColour.useTexture();
+    MI3 middleColour(dirt);
+    middleColour.useTexture();
+    MI3 highestColour(grass, 10.0f);
+    highestColour.useTexture();
     land.setLowestTexture(&lowestColour);
     land.setMiddleTexture(&middleColour);
     land.setHighestTexture(&highestColour);
@@ -299,8 +301,8 @@ int main() {
 
     // SKYBOX //
     timer.start("Skybox");
-    ResourceLoader::loadCubeMap("Resources/Textures/Galaxy", ".png", 0);
-    SkyBox sb = SkyBox("Galaxy.cm");
+    ResourceLoader::loadCubeMap("Resources/Textures/DistantMtSB", ".png", 0);
+    SkyBox sb = SkyBox("DistantMtSB.cm");
     scene.setSkyBox(&sb);
     timer.log();
     // SKYBOX //

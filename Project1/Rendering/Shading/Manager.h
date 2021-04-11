@@ -33,6 +33,7 @@ namespace Render {
 				valid = Render::Shading::Manager::setValue(name + ".id", static_cast<int>(texUnit)) AND valid; // set to texture unit
 				valid = Render::Shading::Manager::setValue(name + ".raw", item.getCurrentRaw()) AND valid; // set the raw value
 				valid = Render::Shading::Manager::setValue(name + ".mixValue", item.getCurrentMixValue()) AND valid; // set the mix value
+				valid = Render::Shading::Manager::setValue(name + ".repeatValue", item.getRepeatValue()) AND valid; // set the mix value
 				
 				return valid;
 			};

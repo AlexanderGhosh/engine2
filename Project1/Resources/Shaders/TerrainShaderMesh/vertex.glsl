@@ -17,7 +17,7 @@ out float height;
 uniform mat4 model;
 
 void main() {
-    height = pos.y;
+    height = pos.y + 0.5;
     texCoords = tex;
 	gl_Position = projection * view * model * vec4(pos, 1);
     norm = normal;
