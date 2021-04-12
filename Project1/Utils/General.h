@@ -45,6 +45,7 @@ constexpr float INV_PI = 1.0f / PI;
 #define RADIANS(x) (x * PI * 0.00555555f)
 #define DEGREES(x) (x * INV_PI * 180)
 
+#define Vector2 const glm::vec2&
 #define Vector3 const glm::vec3&
 #define Vector4 const glm::vec4&
 #define Quaternion const glm::quat&
@@ -56,6 +57,10 @@ constexpr float INV_PI = 1.0f / PI;
 #define Int const int&
 
 namespace Utils {
+    void log(const std::vector<std::string>& msgs, String eol = "\n");
+    void log(String msg, String eol = "\n");
+
+    bool inRange(Float value, Float target, Vector2 range);
 
     std::vector<std::string> split(const std::string& str, const std::string& delim);
 

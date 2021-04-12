@@ -17,11 +17,12 @@
 #include "UI/UIRenderer.h"
 #include "EventSystem/Handler.h"
 #include "UI/TextRenderer.h"
+#include "Rendering/Rendering.h"
 #include "Componets/AudioSource.h"
 #include "Componets/Animated.h"
 #include "Componets/Camera.h"
-#include "Rendering/Rendering.h"
 #include "Componets/AudioReciever.h"
+#include "Componets/CharacterController.h"
 #include "ParticleSystem/ParticleEmmiter.h"
 
 #include "Physics/Engine.h"
@@ -271,12 +272,16 @@ int main() {
     GameObject player = GameObject({ 0, 0, 5 }, { 1, 1, 1 });
     Component::Camera playerCamera = Component::Camera();
     player.addComponet(&playerCamera);
+    Component::CharacterController cc;
+    player.addComponet(&cc);
     PlayerControler playerScript;
+    playerScript.ground = &land;
     player.addComponet(&playerScript);
     DebugScreen debugScript;
     player.addComponet(&debugScript);
     Component::AudioReciever recieverComp;
     player.addComponet(&recieverComp);
+
 
     timer.log();
 

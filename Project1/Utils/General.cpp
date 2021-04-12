@@ -1,5 +1,22 @@
 #include "General.h"
 
+
+void Utils::log(const std::vector<std::string>& msgs, String eol) {
+    std::string txt = "";
+    for (String msg : msgs) {
+        txt += msg;
+    }
+    std::cout << txt << eol;
+}
+
+void Utils::log(String msg, String eol) {
+    std::cout << msg << eol;
+}
+
+bool Utils::inRange(Float value, Float target, Vector2 range) {
+    return value > target - range.x AND value < target + range.y;
+}
+
 std::vector<std::string> Utils::split(const std::string& str, const std::string& delim)
 {
     std::vector<std::string> tokens;

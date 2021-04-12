@@ -144,6 +144,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Componets\CharacterController.cpp" />
     <ClCompile Include="Componets\AudioReciever.cpp" />
     <ClCompile Include="Componets\Scripting.cpp" />
     <ClCompile Include="Primatives\Materials\Forward.cpp" />
@@ -215,6 +216,7 @@
     <ClCompile Include="Primatives\Buffers\VertexBuffer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Componets\CharacterController.h" />
     <ClInclude Include="Componets\AudioReciever.h" />
     <ClInclude Include="Componets\Scripting.h" />
     <ClInclude Include="Primatives\Materials\MatItemBase.h" />

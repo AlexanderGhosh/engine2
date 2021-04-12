@@ -42,17 +42,6 @@ void Terrain::getIndices(std::vector<unsigned>& indices, int resolution) {
 		}
 	}
 }
-float Terrain::getHeight(glm::vec2 pos) const
-{
-	pos *= resolution;
-	if (glm::any(glm::greaterThan(pos, glm::vec2(resolution - 1)) OR glm::lessThan(pos, glm::vec2(0)))) {
-		return 0.5f;
-	}
-	if(NOT noise.size())
-		return 0.5f;
-	glm::ivec2 p = static_cast<glm::ivec2>(pos);
-	return noise[p.x * resolution + p.y] + 0.5f;
-}
 glm::vec3 Terrain::getNormal(glm::vec2 pos) const
 {
 	pos *= resolution;
@@ -170,4 +159,28 @@ void Terrain::setHighestTexture(Materials::MatItemBase<glm::vec3>* high)
 Component::Transform& Terrain::getTransform()
 {
 	return transform;
+}
+
+float Terrain::getHeight(const glm::vec2& position, bool scaled) const
+{
+	glm::vec2 pos = position;
+	if (NOT scaled) {
+		pos /= glm::vec2(transform.Scale.x, transform.Scale.z);	
+		pos += 0.5f;
+	}
+	pos *= resolution;
+	if (glm::any(glm::greaterThan(pos, glm::vec2(resolution - 1)) OR glm::lessThan(pos, glm::vec2(0)))) {
+		return 0.5f;
+	}
+	if (NOT noise.size())
+		return 0.5f;
+	glm::ivec2 p = static_cast<glm::ivec2>(pos);
+	if(scaled)
+		return noise[p.x * resolution + p.y] + 0.5f;
+	return (noise[p.x * resolution + p.y]) * transform.Scale.y;
+}
+
+float Terrain::getHeight(Float x, Float z, bool scaled) const
+{
+	return getHeight({ x, z }, scaled);
 }

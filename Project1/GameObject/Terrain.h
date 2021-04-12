@@ -14,7 +14,6 @@ class Terrain
 private:
 	void init();
 	void getIndices(std::vector<unsigned>& indices, int resolution);
-	float getHeight(glm::vec2 pos) const;
 	glm::vec3 getNormal(glm::vec2 pos) const;
 	int resolution;
 	Component::Transform transform;
@@ -39,10 +38,14 @@ public:
 	void setNoiseBuffer(const Utils::NoiseMap& noise);
 	void useTextureMap(bool use);
 
+	// setters
 	void setLowestTexture(Materials::MatItemBase<glm::vec3>* low);
 	void setMiddleTexture(Materials::MatItemBase<glm::vec3>* mid);
 	void setHighestTexture(Materials::MatItemBase<glm::vec3>* high);
 
+	// getters
 	Component::Transform& getTransform();
+	float getHeight(const glm::vec2& position, bool scaled = true) const;
+	float getHeight(Float x, Float z, bool scaled = true) const;
 };
 
