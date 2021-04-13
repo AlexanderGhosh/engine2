@@ -14,8 +14,7 @@ namespace Component {
 	public:
 		RenderMesh();
 		~RenderMesh() = default;
-
-		void update(float deltaTime);
+		void render(float deltaTime);
 		void setModel(const Primative::Model model, const GLenum draw_type = GL_TRIANGLES);
 		void setMaterial(Materials::MaterialBase* material);
 		void setMaterialTo(Materials::MaterialBase* material, String meshName);

@@ -16,7 +16,7 @@ void UI::Canvas::addElement(Element& element)
 	elements.push_back(&element);
 }
 
-void UI::Canvas::update(float deltaTime)
+void UI::Canvas::render(float deltaTime)
 {
 	for (Element* element : elements) {
 		element->checkEvents();

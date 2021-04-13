@@ -44,7 +44,7 @@ void GameScene::drawOpaque()
 {
 	for (Component::RenderMesh* mesh : opaque) {
 		if(mesh->getParent()->isAlive())
-			mesh->update(mainContext->getTime().deltaTime);
+			mesh->render(mainContext->getTime().deltaTime);
 	}
 }
 
@@ -80,7 +80,7 @@ void GameScene::drawTerrain()
 void GameScene::drawUI()
 {
 	for (UI::Canvas* canvas : uiStuff) {
-		canvas->update(mainContext->getTime().deltaTime);
+		canvas->render(mainContext->getTime().deltaTime);
 	}
 }
 

@@ -12,7 +12,7 @@ Component::RenderMesh::RenderMesh() : model(), materials(), animatedComponet(nul
 {
 }
 
-void Component::RenderMesh::update(float deltaTime)
+void Component::RenderMesh::render(float deltaTime)
 {
 	glm::mat4 m(1);
 	if(parent)
