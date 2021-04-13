@@ -20,7 +20,7 @@
 std::vector<GameEventsTypes> GameScene::getCurrentEvents() const
 {
 	std::vector<GameEventsTypes> res = {
-		GameEventsTypes::Update, GameEventsTypes::Render
+		GameEventsTypes::Update
 	};
 	if (isFirstLoop) 
 		res.insert(res.begin(), GameEventsTypes::Start);
