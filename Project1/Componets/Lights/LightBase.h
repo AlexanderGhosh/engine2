@@ -2,16 +2,20 @@
 #include "../Componets.h"
 namespace Component {
 	enum class LightType {
-		Directional, Point
+		Directional, Point, Spot
 	};
 	class LightBase : public ComponetBase
 	{
 	public:
-		virtual LightType getLightType() const = 0;
+		LightBase();
+		~LightBase() = default;
 		Type getType() const { return Type::Light; };
-		virtual ~LightBase() = default;
+		virtual LightType getLightType() const = 0;
+		void setParent(GameObject* parent);
+		virtual void cleanUp() = 0;
 	protected:
-		LightBase() { };
+		glm::vec3* position;
+		glm::vec3 colour;
 	};
 };
 

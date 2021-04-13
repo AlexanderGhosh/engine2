@@ -17,6 +17,7 @@ namespace Component {
 	class Camera;
 	class RenderMesh;
 	class ParticleEmmiter;
+	class LightBase;
 }
 namespace Primative {
 	class Model;
@@ -27,6 +28,7 @@ namespace Primative {
 }
 enum class GameEventsTypes {
 	Update, FixedUpdate, MouseToggle, MouseMove, KeyToggle,
+	Render,
 	Awake, // will occour when object is added to the scene
 	Start  // will occout before first game loop
 };
@@ -42,6 +44,7 @@ private:
 	std::map<float, Component::RenderMesh*> transparent;
 	std::vector<UI::Canvas*> uiStuff;
 	std::vector<Component::ParticleEmmiter*> emmiters;
+	std::vector<Component::LightBase*> lightSources;
 
 	std::vector<GameObject*> objects;
 	std::unordered_map<std::string, unsigned> preProcessingLayers;

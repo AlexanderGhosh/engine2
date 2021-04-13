@@ -12,6 +12,9 @@ namespace Materials {
 	class Forward;
 	class PBR;
 }
+namespace Component {
+	class LightBase;
+}
 namespace Render {
 	namespace Animation {
 		struct KeyFrame;
@@ -20,15 +23,19 @@ namespace Render {
 		class Manager
 		{
 		public:
-			static bool setValue(const std::string& name, int val);
-			static bool setValue(const std::string& name, float val);
-			static bool setValue(const std::string& name, glm::vec2 val);
-			static bool setValue(const std::string& name, glm::vec3 val);
-			static bool setValue(const std::string& name, glm::vec4 val);
-			static bool setValue(const std::string& name, glm::mat3 val);
-			static bool setValue(const std::string& name, glm::mat4 val);
+			// primatives
+			static bool setValue(String name, int val);
+			static bool setValue(String name, float val);
+			// vectors
+			static bool setValue(String name, glm::vec2 val);
+			static bool setValue(String name, glm::vec3 val);
+			static bool setValue(String name, glm::vec4 val);
+			static bool setValue(String name, glm::mat3 val);
+			static bool setValue(String name, glm::mat4 val);
+			// complex
+			// MatItem
 			template<class T>
-			static inline bool setValue(const std::string& name, const Materials::MatItemBase<T>& item, unsigned& texUnit) {
+			static inline bool setValue(String name, const Materials::MatItemBase<T>& item, unsigned& texUnit) {
 				bool valid = true;
 				valid = Render::Shading::Manager::setValue(name + ".id", static_cast<int>(texUnit)) AND valid; // set to texture unit
 				valid = Render::Shading::Manager::setValue(name + ".raw", item.getCurrentRaw()) AND valid; // set the raw value
@@ -37,14 +44,20 @@ namespace Render {
 				
 				return valid;
 			};
-			static bool setValue(const std::string& name, const Materials::MaterialBase*mat);
-			static bool setValue(const std::string& name, const Render::Animation::KeyFrame& frame);
-			static bool setValue(const std::string& name, const std::vector<glm::mat4>& matrices);
+			// Materials
+			static bool setValue(String name, const Materials::MaterialBase*mat);
+			// KeyFrame
+			static bool setValue(String name, const Render::Animation::KeyFrame& frame);
+			// Matrix4 collection
+			static bool setValue(String name, const std::vector<glm::mat4>& matrices);
+			// LightBase
+			static bool setValue(String name, const Component::LightBase* light);
+
 			static void setActive(const unsigned& shaderId);
 			static void cleanUp();
 		private:
-			static bool setValue(const std::string& name, const Materials::Forward& fwd);
-			static bool setValue(const std::string& name, const Materials::PBR& mat);
+			static bool setValue(String name, const Materials::Forward& fwd);
+			static bool setValue(String name, const Materials::PBR& mat);
 			static unsigned active;
 		};
 	}

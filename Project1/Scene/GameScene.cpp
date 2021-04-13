@@ -15,6 +15,7 @@
 #include "../UI/UIRenderer.h"
 #include "../UI/Panes/Canvas.h"
 #include "../ParticleSystem/ParticleEmmiter.h"
+#include "../Componets/Lights/LightBase.h"
 
 std::vector<GameEventsTypes> GameScene::getCurrentEvents() const
 {
@@ -34,7 +35,7 @@ std::vector<GameEventsTypes> GameScene::getCurrentEvents() const
 
 GameScene::GameScene() : objects(), preProcessingLayers(), currentTick(0), postProcShaderId(0), FBOs(), backgroundColour(0),
 							skybox(nullptr), mainContext(nullptr), opaque(), transparent(), mainCamera(nullptr), terrain(), 
-							quadModel(), isFirstLoop(false), closing(false), uiStuff(), screenDimentions(0), emmiters()
+							quadModel(), isFirstLoop(false), closing(false), uiStuff(), screenDimentions(0), emmiters(), lightSources()
 {
 	quadModel = ResourceLoader::getModel("plane.dae");
 }
@@ -115,14 +116,21 @@ void GameScene::processComponet(Component::ComponetBase* comp)
 		else {
 			opaque.push_back(mesh);
 		}
+		return;
 	}
 	UI::Canvas* canv = dynamic_cast<UI::Canvas*>(comp);
 	if (canv) {
 		uiStuff.push_back(canv);
+		return;
 	}
 	Component::ParticleEmmiter* part = dynamic_cast<Component::ParticleEmmiter*>(comp);
 	if (part) {
 		emmiters.push_back(part);
+		return;
+	}
+	Component::LightBase* light = dynamic_cast<Component::LightBase*>(comp);
+	if (light) {
+		lightSources.push_back(light);
 	}
 }
 
@@ -374,6 +382,10 @@ void GameScene::cleanUp()
 	for (auto itt = emmiters.begin(); itt != emmiters.end();) {
 		(*itt)->cleanUp();
 		itt = emmiters.erase(itt);
+	}
+	for (auto itt = lightSources.begin(); itt != lightSources.end();) {
+		(*itt)->cleanUp();
+		itt = lightSources.erase(itt);
 	}
 
 	FBOs.clear();
