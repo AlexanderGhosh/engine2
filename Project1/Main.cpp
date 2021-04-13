@@ -100,6 +100,7 @@ int main() {
     const Primative::Model cubeBuffer  = ResourceLoader::createModel("Resources/Models/cube.obj"); // needed for the skybox
     const Primative::Model planeBuffer = ResourceLoader::createModel("Resources/Models/plane.dae");
     const Primative::Model minikitBuffer = ResourceLoader::createModel("Resources/Models/minikit.fbx");
+    const Primative::Model orbBuiffer = ResourceLoader::createModel("Resources/Models/sphere.obj");
     timer.log();
 
     timer.start("Animations");
@@ -117,6 +118,8 @@ int main() {
     const unsigned grass = ResourceLoader::loadTexture("Resources/Textures/grass.jpg", TextureType::AlbedoMap, 0);
     const unsigned dirt = ResourceLoader::loadTexture("Resources/Textures/dirt.png", TextureType::AlbedoMap, 0);
 
+    auto waterMaterialInfo = ResourceLoader::createPBRInfo("Resources/Textures/Water", { TextureType::AlbedoMap, TextureType::MetalicMap, TextureType::NormalMap, TextureType::AOMap, TextureType::RoughnessMap }, { 0, 0, 0, 0, 0 });
+    auto waterMaterial = ResourceLoader::createPBR(waterMaterialInfo);
    //Materials::PBR armourMaterial = ResourceLoader::createPBR("Resources/Textures/RFATextures/Armour",
    //    { TextureType::AlbedoMap, TextureType::AOMap, TextureType::MetalicMap, TextureType::NormalMap, TextureType::RoughnessMap },
    //    { 0, 0, 0, 0, 0 });
@@ -199,7 +202,7 @@ int main() {
     // yellowWindow.addComponet(&plane_y);
 
 
-    std::vector<MI1> mi1s = {
+    /*std::vector<MI1> mi1s = {
         MI1(0.5f), MI1(0.0f)
     };
     std::vector<MI3> mi3s = {
@@ -249,7 +252,16 @@ int main() {
     minikit.addComponet(&emitter);
     emitter.setTexture(Primative::TextureChain({ rainDrop, hm }, { 1, 1 }));
     RainMakerScript rain;
-    minikit.addComponet(&rain);
+    minikit.addComponet(&rain);*/
+
+
+    GameObject orb;
+    orb.getTransform()->Position.y = 3.5;
+    Component::RenderMesh orbMesh = Component::RenderMesh();
+    orbMesh.setModel(orbBuiffer);
+    orbMesh.setMaterial(&waterMaterial);
+    orb.addComponet(&orbMesh);
+
 
     timer.log();
 
@@ -261,7 +273,7 @@ int main() {
     MI3 highestColour(grass, 10.0f);
     highestColour.useTexture();
 
-    const int landSize = 10;
+    const int landSize = 2;
     const float scale = 100;
     const int landRes = 100;
     std::vector<Terrain> allLand;
@@ -328,7 +340,7 @@ int main() {
     // scene.addObject(&manObject);
     // scene.addObject(&redWindow);
     // scene.addObject(&yellowWindow);
-    scene.addObject(&minikit);
+    scene.addObject(&orb);
     for (Terrain& land : allLand) {
         scene.addTerrain(&land);
     }

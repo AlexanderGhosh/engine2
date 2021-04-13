@@ -139,15 +139,16 @@ std::string ResourceLoader::createShader(String filePath, bool hasGeom)
 #pragma endregion
 
 #pragma region Matrials
-std::tuple<Materials::PBR, MIS1<glm::vec4>, MIS1<glm::vec3>, std::list<MIS1<float>>> ResourceLoader::createPBR(String dirPath, std::vector<TextureType> types, std::vector<bool> flip)
+ResourceLoader::PBRInfo ResourceLoader::createPBRInfo(String dirPath, std::vector<TextureType> types, std::vector<bool> flip)
 {
     std::tuple<Materials::PBR, MIS1<glm::vec4>, MIS1<glm::vec3>, std::list<MIS1<float>>> res;
     Materials::PBR& material = std::get<0>(res);
     MIS1<glm::vec4>& albe = std::get<1>(res);
     MIS1<glm::vec3>& norm = std::get<2>(res);
     std::list<MIS1<float>>&  mar = std::get<3>(res);
+    mar.resize(2);
     const std::vector<unsigned> textures = loadTextureFile(dirPath, types, flip);
-    materials.push_back(&std::get<0>(res));
+    // materials.push_back(&std::get<0>(res));
     unsigned i = 0;
     for (TextureType& type : types) {
         switch (type)
@@ -180,14 +181,26 @@ std::tuple<Materials::PBR, MIS1<glm::vec4>, MIS1<glm::vec3>, std::list<MIS1<floa
         }
         i++;
     }
+    materials.pop_back();
     return res;
+}
+Materials::PBR& ResourceLoader::createPBR(PBRInfo& info)
+{
+    auto& mat = std::get<0>(info);
+    mat.setAlbedo(&std::get<1>(info));
+    mat.setNormal(&std::get<2>(info));
+    mat.setMetalic(&std::get<3>(info).front());
+    mat.setAO(&Utils::elementAt(std::get<3>(info), 1));
+    mat.setRoughness(&std::get<3>(info).back());
+    materials.push_back(&mat);
+    return mat;
 }
 #pragma endregion
 
 #pragma region Textures
 const std::vector<unsigned> ResourceLoader::loadTextureFile(String dirPath, std::vector<TextureType> types, std::vector<bool> flip)
 {
-    const int s = Utils::countFiles(dirPath) - 1;
+    const int s = Utils::countFiles(dirPath);
     types.reserve(s);
     flip.reserve(s);
     while (types.size() < s) {
@@ -211,12 +224,9 @@ const std::vector<unsigned> ResourceLoader::loadTextureFile(String dirPath, std:
     int i = 0;
     for (auto& file : dirIter)
     {
-        i++;
-        if (i == 1)
+        if (types[i] == TextureType::CubeMap)
             continue;
-        if (types[i - 2] == TextureType::CubeMap)
-            continue;
-        res.push_back(loadTexture(file.path().string(), types[i - 2], flip[i - 2]));
+        res.push_back(loadTexture(file.path().string(), types[i], flip[i]));
     }
     return res;
 }

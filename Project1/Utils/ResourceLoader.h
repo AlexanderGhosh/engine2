@@ -49,14 +49,16 @@ enum class TextureType {
 class ResourceLoader
 {
 public:
+#define MIS1 Materials::MatItemSingle
+	using PBRInfo = std::tuple<Materials::PBR, MIS1<glm::vec4>, MIS1<glm::vec3>, std::list<MIS1<float>>>;
 	// shaders
 	static std::vector<std::string> createShaders(const std::vector<std::string>& shaders, std::vector<bool>& geoms);
 	static std::vector<std::string> createShaders(const std::vector<std::string>& shaders);
 	static std::string createShader(String filePath, bool hasGeom = false);
 	static const unsigned getShader(String name, bool create = false);
 	// materials
-#define MIS1 Materials::MatItemSingle
-	static std::tuple<Materials::PBR, MIS1<glm::vec4>, MIS1<glm::vec3>, std::list<MIS1<float>>> createPBR(String dirPath, std::vector<TextureType> types, std::vector<bool> flip);
+	static PBRInfo createPBRInfo(String dirPath, std::vector<TextureType> types, std::vector<bool> flip);
+	static Materials::PBR& createPBR(PBRInfo& info);
 
 	// textures
 	static const std::vector<unsigned> loadTextureFile(String dirPath, std::vector<TextureType> types, std::vector<bool> flip);
