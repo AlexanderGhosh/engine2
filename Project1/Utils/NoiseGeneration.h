@@ -6,7 +6,7 @@ namespace Utils{
 	class NoiseGeneration
 	{
 	public:
-		static NoiseMap getMap(Int resolution, const std::vector<float>& ratios, const std::vector<float>& frequencys);
-		static NoiseMatrix getMatrix(Int resolution, const std::vector<float>& ratios, const std::vector<float>& frequencys);
+		static NoiseMap getMap(Vector3 position, Int resolution, const std::vector<float>& ratios, const std::vector<float>& frequencys);
+		static NoiseMatrix getMatrix(Vector3 position, Int resolution, const std::vector<float>& ratios, const std::vector<float>& frequencys);
 	};
 }

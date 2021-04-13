@@ -23,8 +23,8 @@ uniform MatItem3 highest;
 
 vec3 mix3(vec3 a, vec3 b, vec3 c){
     return 
-    a * ((1.0 - 1.0 * height) * 0.25) + 
-    b * ((3.0 - 3.0 * height) * 0.25) + 
+    a * ((0.0 - 0.0 * height) * 0.25) + 
+    b * ((4.0 - 4.0 * height) * 0.25) + 
     c * height;
 }
 

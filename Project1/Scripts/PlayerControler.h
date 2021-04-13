@@ -9,14 +9,14 @@ public:
 	~PlayerControler() = default;
 	void update(float deltaTime);
 	void mouseMove(float deltaTime);
-	Terrain* ground;
+	std::vector<Terrain> ground;
 private:
 	/// <summary>
 	/// will move player to the ground hight if y < h
 	/// </summary>
 	/// <returns></returns>
-	bool isGrounded();
+	bool isGrounded(float dt);
 	bool firstMouse;
-	float lastX, lastY;
+	float lastX, lastY, yOffset;
 };
 

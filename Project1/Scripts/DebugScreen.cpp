@@ -14,11 +14,11 @@ void DebugScreen::awake()
 		canvas = &mainCanvas;
 	}
 	fpsText.setText("FPS: 1000");
-	fpsText.setForgroundColor({ 1, 1, 1 });
+	fpsText.setForgroundColor({ 0, 0, 0 });
 	fpsText.setPos({ 115, 0 });
 	canvas->addElement(fpsText);
 	position.setText("Position: " + Utils::to_string_precision(parent->getTransform()->Position, 2));
-	position.setForgroundColor({ 1, 1, 1 });
+	position.setForgroundColor({ 0, 0, 0 });
 	position.setPos({ 115, 0 });
 	canvas->addElement(position);
 }

@@ -9,7 +9,7 @@ bool Terrain::gottenShader = false;
 unsigned Terrain::shaderMesh = 0;
 
 unsigned Terrain::shaderHM = 0;
-Terrain::Terrain() : resolution(), transform(), groundBuffer(), heightMap(0), useTexture(true), lowest(nullptr), middle(nullptr), highest(nullptr)
+Terrain::Terrain() : resolution(), transform(), groundBuffer(), heightMap(0), useTexture(true), lowest(nullptr), middle(nullptr), highest(nullptr), renderWireframe(false)
 {
 	if (NOT gottenShader) {
 		shaderHM = ResourceLoader::getShader("TerrainShaderHeightMap");
@@ -19,7 +19,7 @@ Terrain::Terrain() : resolution(), transform(), groundBuffer(), heightMap(0), us
 
 Terrain::Terrain(Int res) : Terrain()
 {
-	resolution = res;
+	resolution = res + 1;
 	init(); // creates the plane
 }
 void Terrain::getIndices(std::vector<unsigned>& indices, int resolution) {
@@ -44,6 +44,7 @@ void Terrain::getIndices(std::vector<unsigned>& indices, int resolution) {
 }
 glm::vec3 Terrain::getNormal(glm::vec2 pos) const
 {
+	return glm::vec3(0, 1, 0);
 	pos *= resolution;
 	glm::vec3 off(1.0, 1.0, 0.0);
 	glm::vec2 off1(1, 0);
@@ -64,11 +65,12 @@ void Terrain::init()
 {
 	groundBuffer.cleanUp();
 	Primative::Mesh mesh;
-	for (int y = 0; y < resolution; y++) {
-		for (int x = 0; x < resolution; x++) {
+	const float adder = 1.0f / static_cast<float>(resolution-1);
+	for (float y = 0; y <= 1; y += adder) {
+		for (float x = 0; x <= 1; x += adder) {
 			glm::vec2 tex(x, y);
-			tex.x /= resolution;
-			tex.y /= resolution;
+			// tex.x /= resolution;
+			// tex.y /= resolution;
 			glm::vec3 pos(tex.x, getHeight(tex), tex.y);
 			pos -= 0.5f;
 			Primative::Vertex vertex(pos, tex, getNormal(tex));
@@ -82,7 +84,8 @@ void Terrain::init()
 
 void Terrain::draw(float deltaTime)
 {
-	// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	if (renderWireframe)
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	glDisable(GL_CULL_FACE);
 	Render::Shading::Manager::setActive(useTexture ? shaderHM : shaderMesh);
 	Render::Shading::Manager::setValue("model", transform.getModel());
@@ -111,7 +114,8 @@ void Terrain::draw(float deltaTime)
 	
 	groundBuffer.render();
 	glEnable(GL_CULL_FACE);
-	// glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	if(renderWireframe)
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
 void Terrain::cleanUp()
@@ -156,6 +160,16 @@ void Terrain::setHighestTexture(Materials::MatItemBase<glm::vec3>* high)
 	highest = high;
 }
 
+void Terrain::setPosition(Vector3 pos)
+{
+	transform.Position = pos;
+}
+
+void Terrain::setScale(Vector3 scale)
+{
+	transform.Scale = scale;
+}
+
 Component::Transform& Terrain::getTransform()
 {
 	return transform;
@@ -165,11 +179,12 @@ float Terrain::getHeight(const glm::vec2& position, bool scaled) const
 {
 	glm::vec2 pos = position;
 	if (NOT scaled) {
+		pos -= glm::vec2(transform.Position.x, transform.Position.z);
 		pos /= glm::vec2(transform.Scale.x, transform.Scale.z);	
 		pos += 0.5f;
 	}
 	pos *= resolution;
-	if (glm::any(glm::greaterThan(pos, glm::vec2(resolution - 1)) OR glm::lessThan(pos, glm::vec2(0)))) {
+	if (glm::any(glm::greaterThan(pos, glm::vec2(resolution)) OR glm::lessThan(pos, glm::vec2(0)))) {
 		return 0.5f;
 	}
 	if (NOT noise.size())
@@ -183,4 +198,14 @@ float Terrain::getHeight(const glm::vec2& position, bool scaled) const
 float Terrain::getHeight(Float x, Float z, bool scaled) const
 {
 	return getHeight({ x, z }, scaled);
+}
+
+Vector3 Terrain::getPosition() const
+{
+	return transform.Position;
+}
+
+Vector3 Terrain::getScale() const
+{
+	return transform.Scale;
 }

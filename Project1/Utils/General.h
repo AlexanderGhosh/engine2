@@ -56,6 +56,8 @@ constexpr float INV_PI = 1.0f / PI;
 #define Unsigned const unsigned&
 #define Int const int&
 
+extern long SEED;
+
 namespace Utils {
     void log(const std::vector<std::string>& msgs, String eol = "\n");
     void log(String msg, String eol = "\n");

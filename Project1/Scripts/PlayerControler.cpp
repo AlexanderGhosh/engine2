@@ -11,7 +11,7 @@ using Key = Events::Key;
 using Cursor = Events::Cursor;
 using Action = Events::Action;
 
-PlayerControler::PlayerControler() : Component::Scripting(), firstMouse(true), lastX(0), lastY(0), ground(nullptr)
+PlayerControler::PlayerControler() : Component::Scripting(), firstMouse(true), lastX(0), lastY(0), yOffset(1.5f)
 {
 }
 
@@ -26,29 +26,32 @@ void PlayerControler::update(float deltaTime) {
 	if (EH::getKey(Key::Escape, Action::Down)) {
 		parent->getScene()->close();
 	}
-	float speed = 5;
+	const float baseSpeed = 0.5;
+	const float speedMultiplyer = 4;
+	float speed = baseSpeed * deltaTime;
 	if (EH::getCursor(Events::Cursor::Middle, Events::Action::Down)) {
-		speed *= 2;
+		speed = speedMultiplyer * baseSpeed * deltaTime;
 	}
 	if (EH::getKey(Key::W, Action::Down)) {
-		pos += fwd * glm::vec3(1, 0, 1) * deltaTime * speed;
+		pos += fwd * glm::vec3(1, 0, 1) * speed;
 	}
 	if (EH::getKey(Key::S, Action::Down)) {
-		pos -= fwd * glm::vec3(1, 0, 1) * deltaTime * speed;
+		pos -= fwd * glm::vec3(1, 0, 1) * speed;
 	}
 	if (EH::getKey(Key::A, Action::Down)) {
-		pos -= camera->getRight() * deltaTime * speed;
+		pos -= camera->getRight() * speed;
 	}
 	if (EH::getKey(Key::D, Action::Down)) {
-		pos += camera->getRight() * deltaTime * speed;
+		pos += camera->getRight() * speed;
 	}
-	cc->setIsGrounded(isGrounded());
-	if (EH::getKey(Key::Space, Action::Down) AND isGrounded()) {
-		// pos += Utils::yAxis() * deltaTime * speed;
+	const bool grounded = isGrounded(deltaTime);
+	cc->setIsGrounded(grounded);
+	if (EH::getKey(Key::Space, Action::Down) AND grounded) {
+		// pos += Utils::yAxis() * speed;
 		cc->addVelocity(Utils::yAxis(10));
 	}
 	if (EH::getKey(Key::L_Shift, Action::Down)) {
-		pos -= Utils::yAxis() * deltaTime * speed;
+		pos -= Utils::yAxis() * speed;
 	}
 }
 
@@ -71,17 +74,33 @@ void PlayerControler::mouseMove(float deltaTime)
 	camera->ProcessMouseMovement(xoffset, yoffset);
 }
 
-bool PlayerControler::isGrounded()
+bool PlayerControler::isGrounded(float dt)
 {
-	const float yOffset = 1.5f;
+	if (dt == 0)
+		dt = 1;
+	Terrain currentGround = ground[0];
 	Component::CharacterController* cc = parent->getComponet<Component::CharacterController>();
-	float h = ground->getHeight(cc->getPosition().x, cc->getPosition().z, false);
-	h += ground->getTransform().Position.y;
+	for (Terrain land : ground) {
+		Vector3 landPos = land.getPosition();
+		glm::vec3 landScale = land.getScale() / 2.0f;
+		Vector3 pos = cc->getPosition();
+		if (landPos.x - landScale.x < pos.x AND landPos.x + landScale.x > pos.x) {
+			if (landPos.z - landScale.z < pos.z AND landPos.z + landScale.z > pos.z) {
+				currentGround = land;
+				break;
+			}
+		}
+	}
+	float h = currentGround.getHeight(cc->getPosition().x, cc->getPosition().z, false);
+	h += currentGround.getPosition().y;
 	float y = cc->getPosition().y - yOffset;
 	if (y <= h) {
 		glm::vec3 p = cc->getPosition();
-		p.y = h + yOffset;
-		cc->setPosition(p);
+		float delta = (h + yOffset) - p.y;
+		if (dt == 0) {
+			int i = 0;
+		}
+		cc->addPosition(Utils::yAxis(delta));
 		return true;
 	}
 	return false;

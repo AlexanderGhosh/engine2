@@ -3,6 +3,8 @@
 #include <GL/glew.h>
 #include <iostream>
 #include <string>
+#include <cstdlib>
+#include <ctime>
 
 #include <glm.hpp>
 #include <gtc/matrix_transform.hpp>
@@ -57,9 +59,11 @@
 #include "Context.h"
 
 constexpr glm::ivec2 SCREEN_DIMENTIONS = glm::ivec2(1280, 720);
-
+long SEED;
 int main() {
-    srand(time(0));
+    SEED = time(0);
+    SEED = 1;
+    srand(SEED);
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
     // _crtBreakAlloc = 69450;
 
@@ -250,32 +254,57 @@ int main() {
     timer.log();
 
     timer.start("Terrain");
-    Terrain land(100);
-    land.getTransform().Position.y = -1;
-    land.getTransform().Scale = { 100, 10 ,100 };
-    land.setNoiseBuffer(Utils::NoiseGeneration::getMap(100, { 1, 0.5, 0.1 }, { 1, 2, 3 }));
-    land.useTextureMap(false);
     MI3 lowestColour(dirt);
     lowestColour.useTexture();
     MI3 middleColour(dirt);
     middleColour.useTexture();
     MI3 highestColour(grass, 10.0f);
     highestColour.useTexture();
+
+    const int landSize = 10;
+    const float scale = 100;
+    const int landRes = 100;
+    std::vector<Terrain> allLand;
+    allLand.reserve(landSize * landSize);
+    for (char i = 0; i < landSize; i++) {
+        for (char j = 0; j < landSize; j++) {
+
+            Terrain land(landRes);
+            land.renderWireframe = false;
+
+            land.setPosition(glm::vec3(i * scale, -0.5f, j * scale));
+            land.setScale({ scale, 10, scale });
+            land.setNoiseBuffer(Utils::NoiseGeneration::getMap(glm::vec3(i, j, 0), landRes + 1, { 1, 0.5, 0.1 }, { 1, 2, 3 }));
+            land.setHeightMap(hm);
+            land.useTextureMap(false);
+
+            land.setLowestTexture(&lowestColour);
+            land.setMiddleTexture(&middleColour);
+            land.setHighestTexture(&highestColour);
+
+            allLand.push_back(land);
+        }
+    }
+    /*Terrain land(100);
+    land.setPosition(Utils::yAxis(-1));
+    land.setScale({ 10, 10, 10 });
+    land.setNoiseBuffer(Utils::NoiseGeneration::getMap({ 0, 0 }, 101, { 1, 0.5, 0.1 }, { 1, 2, 3 }));
+    land.useTextureMap(false);
     land.setLowestTexture(&lowestColour);
     land.setMiddleTexture(&middleColour);
-    land.setHighestTexture(&highestColour);
+    land.setHighestTexture(&highestColour);*/
     timer.log();
 
 
 
     timer.start("Player");
-    GameObject player = GameObject({ 0, 0, 5 }, { 1, 1, 1 });
+    GameObject player = GameObject({ 0, 0, 0 }, { 1, 1, 1 });
     Component::Camera playerCamera = Component::Camera();
     player.addComponet(&playerCamera);
     Component::CharacterController cc;
     player.addComponet(&cc);
     PlayerControler playerScript;
-    playerScript.ground = &land;
+    playerScript.ground = allLand;
     player.addComponet(&playerScript);
     DebugScreen debugScript;
     player.addComponet(&debugScript);
@@ -300,7 +329,10 @@ int main() {
     // scene.addObject(&redWindow);
     // scene.addObject(&yellowWindow);
     scene.addObject(&minikit);
-    scene.addTerrain(&land);
+    for (Terrain& land : allLand) {
+        scene.addTerrain(&land);
+    }
+    // scene.addTerrain(&land);
 
     timer.log();
 
@@ -326,7 +358,7 @@ int main() {
     // cube2->getRigidbody()->hasGravity = true;
     //cube2->getRigidbody()->velocityAdder({ 1, -1, 0 });
 
-    Gizmos::Sphere gizmo1 = Gizmos::Sphere({ 0, 0, 0 }, { 1, 0, 0 });
+    Gizmos::Sphere gizmo1 = Gizmos::Sphere({ 50, -1, 50 }, { 1, 0, 0 });
     gizmo1.setRadius(0.25);
     gizmo1.setThickness(2);
     Gizmos::GizmoRenderer::addGizmo(&gizmo1);
