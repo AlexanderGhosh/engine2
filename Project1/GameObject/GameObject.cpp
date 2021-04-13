@@ -57,6 +57,9 @@ void GameObject::raiseEvents(const std::vector<GameEventsTypes>& events, Float d
 		for (const GameEventsTypes& type : events) {
 			switch (type)
 			{
+			case GameEventsTypes::Render:
+				comp->render(deltaTime);
+				break;
 			case GameEventsTypes::Update:
 				comp->update(deltaTime);
 				break;
