@@ -120,7 +120,7 @@ int main() {
 
     auto waterMaterialInfo = ResourceLoader::createPBRInfo("Resources/Textures/Water", { TextureType::AlbedoMap, TextureType::MetalicMap, TextureType::NormalMap, TextureType::AOMap, TextureType::RoughnessMap }, { 0, 0, 0, 0, 0 });
     auto waterMaterial = ResourceLoader::createPBR(waterMaterialInfo);
-   //Materials::PBR armourMaterial = ResourceLoader::createPBR("Resources/Textures/RFATextures/Armour",
+  //Materials::PBR armourMaterial = ResourceLoader::createPBR("Resources/Textures/RFATextures/Armour",
    //    { TextureType::AlbedoMap, TextureType::AOMap, TextureType::MetalicMap, TextureType::NormalMap, TextureType::RoughnessMap },
    //    { 0, 0, 0, 0, 0 });
    //armourMaterial.setHDRmap(hdr);
