@@ -77,6 +77,10 @@ public:
 	void gameLoop();
 	void cleanUp();
 	void close();
+	/// <summary>
+	/// binds the lights to the active shader
+	/// </summary>
+	void bindLights();
 
 	// adders
 	void addPreProcLayer(const std::string& name, const unsigned& shaderId);

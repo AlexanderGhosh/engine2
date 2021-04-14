@@ -40,6 +40,10 @@ struct Material {
     MatItem1 ao;
 };
 
+struct PointLight{
+    
+}
+
 uniform Material material;
 uniform samplerCube hdrMap;
 uniform samplerCube lbrMap;

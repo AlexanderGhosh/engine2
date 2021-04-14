@@ -404,6 +404,13 @@ void GameScene::close()
 	closing = true;
 }
 
+void GameScene::bindLights()
+{
+	for (Component::LightBase* light : lightSources) {
+		
+	}
+}
+
 void GameScene::addPreProcLayer(const std::string& name, const unsigned& shaderId)
 {
 	this->preProcessingLayers[name] = shaderId;	
