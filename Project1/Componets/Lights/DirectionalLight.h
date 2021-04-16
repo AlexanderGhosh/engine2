@@ -10,6 +10,7 @@ namespace Component {
 		DirectionalLight();
 		~DirectionalLight() = default;
 		LightType getLightType() const;
+		void cleanUp();
 	};
 }
 

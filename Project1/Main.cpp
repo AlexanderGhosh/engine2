@@ -25,6 +25,7 @@
 #include "Componets/Camera.h"
 #include "Componets/AudioReciever.h"
 #include "Componets/CharacterController.h"
+#include "Componets/Lights/PointLight.h"
 #include "ParticleSystem/ParticleEmmiter.h"
 
 #include "Physics/Engine.h"
@@ -80,7 +81,7 @@ int main() {
     timer.start("Shaders");
     Gizmos::GizmoRenderer::init();
     std::vector<std::string> shaders = {
-        "PBRShader", "TransparentShader", "ShadowShader", "UIShader", "TextShader", "TerrainShaderHeightMap", "TerrainShaderMesh", "PostShader", "ParticleShader"
+        "PBRShader", "TransparentShader", "ShadowShader", "UIShader", "TextShader", "TerrainShaderHeightMap", "TerrainShaderMesh", "PostShader", "ParticleShader", "DeferredFinalShader", "DeferredShader"
     };
     ResourceLoader::createShaders(shaders);
     timer.log();
@@ -99,8 +100,8 @@ int main() {
     // const Primative::Model manModel    = ResourceLoader::createModel("Resources/Models/RFA_Model.fbx"); // RFA_Model
     const Primative::Model cubeBuffer  = ResourceLoader::createModel("Resources/Models/cube.obj"); // needed for the skybox
     const Primative::Model planeBuffer = ResourceLoader::createModel("Resources/Models/plane.dae");
-    const Primative::Model minikitBuffer = ResourceLoader::createModel("Resources/Models/minikit.fbx");
-    const Primative::Model orbBuiffer = ResourceLoader::createModel("Resources/Models/sphere.obj");
+    // const Primative::Model minikitBuffer = ResourceLoader::createModel("Resources/Models/minikit.fbx");
+    const Primative::Model orbBuffer = ResourceLoader::createModel("Resources/Models/sphere.obj");
     timer.log();
 
     timer.start("Animations");
@@ -110,16 +111,29 @@ int main() {
     timer.start("Textures");
     // const unsigned wi   = ResourceLoader::loadTexture("Resources/Textures/window.png", TextureType::AlbedoMap, 0);
     // const unsigned wiy  = ResourceLoader::loadTexture("Resources/Textures/yellowWindow.png", TextureType::AlbedoMap, 0);
-    const unsigned hdr  = ResourceLoader::loadCubeMap("Resources/Textures/Galaxy hdr", ".png", 0);
-    const unsigned ibl  = ResourceLoader::loadCubeMap("Resources/Textures/Galaxy ibl", ".png", 0);
-    const unsigned brdf = ResourceLoader::loadTexture("Resources/Textures/ibl brdf.png", TextureType::AlbedoMap, 0);
-    const unsigned hm   = ResourceLoader::loadTexture("Resources/Textures/heightmap.png", TextureType::HeightMap, 0);
-    const unsigned rainDrop = ResourceLoader::loadTexture("Resources/Textures/raindrop.png", TextureType::AlbedoMap, 0);
-    const unsigned grass = ResourceLoader::loadTexture("Resources/Textures/grass.jpg", TextureType::AlbedoMap, 0);
-    const unsigned dirt = ResourceLoader::loadTexture("Resources/Textures/dirt.png", TextureType::AlbedoMap, 0);
+    const unsigned hdr      = ResourceLoader::loadCubeMap("Resources/Textures/Galaxy hdr", ".png", 0);
+    const unsigned ibl      = ResourceLoader::loadCubeMap("Resources/Textures/Galaxy ibl", ".png", 0);
+    const unsigned brdf     = ResourceLoader::loadTexture("Resources/Textures/ibl brdf.png", TextureType::AlbedoMap, 0);
+    // const unsigned hm       = ResourceLoader::loadTexture("Resources/Textures/heightmap.png", TextureType::HeightMap, 0);
+    // const unsigned rainDrop = ResourceLoader::loadTexture("Resources/Textures/raindrop.png", TextureType::AlbedoMap, 0);
+    const unsigned grass    = ResourceLoader::loadTexture("Resources/Textures/grass.jpg", TextureType::AlbedoMap, 0);
+    const unsigned dirt     = ResourceLoader::loadTexture("Resources/Textures/dirt.png", TextureType::AlbedoMap, 0);
 
-    auto waterMaterialInfo = ResourceLoader::createPBRInfo("Resources/Textures/Water", { TextureType::AlbedoMap, TextureType::MetalicMap, TextureType::NormalMap, TextureType::AOMap, TextureType::RoughnessMap }, { 0, 0, 0, 0, 0 });
+    auto waterMaterialInfo = ResourceLoader::createPBRInfo("Resources/Textures/Water", { TextureType::AlbedoMap, TextureType::RoughnessMap, TextureType::NormalMap, TextureType::AOMap, TextureType::MetalicMap }, { 0, 0, 0, 0, 0 });
     auto waterMaterial = ResourceLoader::createPBR(waterMaterialInfo);
+    // Materials::MatItemSingle<glm::vec4> waterAlbedo({ 0, 0, 1, 1 });
+    // waterAlbedo.useRaw();
+    // Materials::MatItemSingle<float> waterMetalic(0.5f);
+    // waterMetalic.useRaw();
+    // Materials::MatItemSingle<float> waterRoughness(0.5f);
+    // waterRoughness.useRaw();
+    // Materials::MatItemSingle<float> waterAO(0.5f);
+    // waterAO.useRaw();
+
+    // waterMaterial.setAlbedo(&waterAlbedo);
+    // waterMaterial.setMetalic(&waterMetalic);
+    // waterMaterial.setRoughness(&waterRoughness);
+    // waterMaterial.setAO(&waterAO);
   //Materials::PBR armourMaterial = ResourceLoader::createPBR("Resources/Textures/RFATextures/Armour",
    //    { TextureType::AlbedoMap, TextureType::AOMap, TextureType::MetalicMap, TextureType::NormalMap, TextureType::RoughnessMap },
    //    { 0, 0, 0, 0, 0 });
@@ -258,7 +272,7 @@ int main() {
     GameObject orb;
     orb.getTransform()->Position.y = 3.5;
     Component::RenderMesh orbMesh = Component::RenderMesh();
-    orbMesh.setModel(orbBuiffer);
+    orbMesh.setModel(orbBuffer);
     orbMesh.setMaterial(&waterMaterial);
     orb.addComponet(&orbMesh);
 
@@ -287,7 +301,6 @@ int main() {
             land.setPosition(glm::vec3(i * scale, -0.5f, j * scale));
             land.setScale({ scale, 10, scale });
             land.setNoiseBuffer(Utils::NoiseGeneration::getMap(glm::vec3(i, j, 0), landRes + 1, { 1, 0.5, 0.1 }, { 1, 2, 3 }));
-            land.setHeightMap(hm);
             land.useTextureMap(false);
 
             land.setLowestTexture(&lowestColour);
@@ -310,7 +323,7 @@ int main() {
 
 
     timer.start("Player");
-    GameObject player = GameObject({ 0, 0, 0 }, { 1, 1, 1 });
+    GameObject player = GameObject({ 0, 0, 5 }, { 1, 1, 1 });
     Component::Camera playerCamera = Component::Camera();
     player.addComponet(&playerCamera);
     Component::CharacterController cc;
@@ -322,6 +335,11 @@ int main() {
     player.addComponet(&debugScript);
     Component::AudioReciever recieverComp;
     player.addComponet(&recieverComp);
+
+
+    GameObject lightSource({ 1, 5, 0 }, { 1, 1, 1 });
+    Component::PointLight light(glm::vec3(1));
+    lightSource.addComponet(&light);
 
 
     timer.log();
@@ -337,6 +355,7 @@ int main() {
     scene.initalize();
 
     scene.addObject(&player);
+    scene.addObject(&lightSource);
     // scene.addObject(&manObject);
     // scene.addObject(&redWindow);
     // scene.addObject(&yellowWindow);
@@ -350,9 +369,9 @@ int main() {
 
     // SKYBOX //
     timer.start("Skybox");
-    ResourceLoader::loadCubeMap("Resources/Textures/DistantMtSB", ".png", 0);
-    SkyBox sb = SkyBox("DistantMtSB.cm");
-    scene.setSkyBox(&sb);
+    // ResourceLoader::loadCubeMap("Resources/Textures/DistantMtSB", ".png", 0);
+    // SkyBox sb = SkyBox("DistantMtSB.cm");
+    // scene.setSkyBox(&sb);
     timer.log();
     // SKYBOX //
     
@@ -370,7 +389,7 @@ int main() {
     // cube2->getRigidbody()->hasGravity = true;
     //cube2->getRigidbody()->velocityAdder({ 1, -1, 0 });
 
-    Gizmos::Sphere gizmo1 = Gizmos::Sphere({ 50, -1, 50 }, { 1, 0, 0 });
+    Gizmos::Sphere gizmo1 = Gizmos::Sphere({ 0, 4, 0 }, { 1, 0, 0 });
     gizmo1.setRadius(0.25);
     gizmo1.setThickness(2);
     Gizmos::GizmoRenderer::addGizmo(&gizmo1);

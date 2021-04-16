@@ -8,6 +8,7 @@ namespace Component {
 		SpotLight();
 		~SpotLight() = default;
 		LightType getLightType() const;
+		void cleanUp();
 	};
 }
 

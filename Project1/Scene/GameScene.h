@@ -56,6 +56,7 @@ private:
 	bool isFirstLoop, closing;
 	glm::ivec2 screenDimentions;
 
+
 	void clearFBO() const;
 	void drawObjects(Unsigned shaderId); // just moved
 	void drawSkyBox();
@@ -68,11 +69,11 @@ private:
 	// polling evetns
 	std::vector<GameEventsTypes> getCurrentEvents() const;
 public:
+	bool USE_DEFFERED;	
 	GameScene();
 	void preProcess();
 	void postProcess();
 	void updateObjects();
-	const Primative::Buffers::FrameBuffer& getFBO(const std::string& name);
 	void initalize();
 	void gameLoop();
 	void cleanUp();
@@ -104,5 +105,6 @@ public:
 	/// <param name="name"></param>
 	/// <returns></returns>
 	GameObject* getObject(String name);
+	Primative::Buffers::FrameBuffer& getFBO(const std::string& name);
 };
 

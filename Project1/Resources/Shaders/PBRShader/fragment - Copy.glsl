@@ -65,21 +65,21 @@ vec4 getData(MatItem4 item){
     return col.rgb;*/
 }
 vec3 getData(MatItem3 item){
-    return mix(item.raw, sampleTex(item.id).rgb, 1.0 - item.mixValue);
+    return mix(item.raw, sampleTex(item.id).rgb, item.mixValue);
     /*if (item.mixValue == 0){
         return texture(id, fs_in.texCoords).rgb;
     }
     return col.rgb;*/
 }
 float getData(MatItem1 item){
-    return mix(item.raw, sampleTex(item.id).r, 1.0 - item.mixValue);
+    return mix(item.raw, sampleTex(item.id).r, item.mixValue);
     /*if (col.a == 0){
         return texture(id, fs_in.texCoords).rgb;
     }
     return col.rgb;*/
 }
 float getAlpha(MatItem4 item){
-    return mix(item.raw.a, sampleTex(item.id).a, 1.0 - item.mixValue);
+    return mix(item.raw.a, sampleTex(item.id).a, item.mixValue);
     /*if(col.a == 0){
         return texture(id, fs_in.texCoords).a;
     }
@@ -186,7 +186,7 @@ void main()
     // reflectance equation
     vec3 Lo = vec3(0.0);
     vec3 lightPositions[1] = {
-        vec3(0, 1 ,0.5)
+        vec3(1, 5 ,0)
     };
     vec3 lightColors[1] = {
         vec3(1, 1, 1)
@@ -200,7 +200,7 @@ void main()
 
         float distance    = length(lightPositions[i] - fs_in.worldPos);
         float attenuation = 1.0 / (distance * distance);
-        attenuation = 1;
+        //attenuation = 1;
         vec3 radiance     = lightColors[i] * attenuation;
 
         // Cook-Torrance BRDF
@@ -250,7 +250,7 @@ void main()
 
     vec3 ambient    = ((kD * diffuse + specular) * ao);
 
-    vec3 color = ambient + (1 - 0) * Lo;
+    vec3 color = ambient + Lo;
 
     // HDR tonemapping
     color /= color + vec3(1.0);
@@ -261,5 +261,5 @@ void main()
     if (a < 0.1) {
         discard;
     }
-    FragColor = vec4(color, a);
+    FragColor = vec4(color, 1);
 }

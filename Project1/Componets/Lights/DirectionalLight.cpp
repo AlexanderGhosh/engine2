@@ -8,3 +8,7 @@ Component::LightType Component::DirectionalLight::getLightType() const
 {
 	return LightType::Directional;
 }
+void Component::DirectionalLight::cleanUp()
+{
+	LightBase::cleanUp();
+}

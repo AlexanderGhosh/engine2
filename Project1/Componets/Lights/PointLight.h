@@ -6,8 +6,10 @@ namespace Component {
 	{
 	public:
 		PointLight();
+		PointLight(Vector3 colour, Float brightness = 1);
 		~PointLight() = default;
 		LightType getLightType() const;
+		void cleanUp();
 	};
 }
 

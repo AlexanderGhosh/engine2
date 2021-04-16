@@ -25,7 +25,11 @@ namespace Primative {
 			void bind() const;
 			void unBind() const;
 			void clearBits() const;
-
+			/// <summary>
+			/// will active the colour unit textures and add to the unit
+			/// </summary>
+			/// <param name="unit"></param>
+			void activateColourTextures(int& unit, const std::vector<std::string>& names);
 			Unsigned getTexture(String name);
 		};
 	}
