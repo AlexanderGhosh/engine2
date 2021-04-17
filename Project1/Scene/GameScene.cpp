@@ -51,7 +51,8 @@ void GameScene::drawOpaque()
 
 void GameScene::drawTransparent()
 {
-	Render::Shading::Manager::setActive(ResourceLoader::getShader("TransparentShader"));
+	Render::Shading::Manager::setActive(ResourceLoader::getShader("TransparentShader")); 
+	bindLights();
 	assert(mainCamera);
 	if (NOT transparent.size()) {
 		return;
@@ -63,7 +64,7 @@ void GameScene::drawTransparent()
 		float dist = (*itt).first;
 		Component::RenderMesh* mesh = (*itt).second;
 		if (mesh->getParent()->isAlive())
-			mesh->update(mainContext->getTime().deltaTime);
+			mesh->render(mainContext->getTime().deltaTime);
 		dist = glm::length2(mesh->getParent()->getTransform()->Position - mainCamera->getPos());
 		sorted[dist] = mesh;
 	}
@@ -178,7 +179,9 @@ void GameScene::preProcess()
 			fbo.unBind(GL_DRAW_FRAMEBUFFER);
 			fbo.bind();
 
+
 			drawSkyBox();
+			drawTransparent();
 			drawUI();
 		}
 		/*else if(NOT USE_DEFFERED) {

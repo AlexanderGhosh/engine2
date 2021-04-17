@@ -347,10 +347,31 @@ int main() {
     lightSource2.addComponet(&light2);
 
 
-    GameObject window1(glm::vec3(0, 3.5, 3));
-    Component::RenderMesh windowMesh;
-    windowMesh.setModel(planeBuffer);
+    Materials::MatItemSingle<glm::vec4> windowAlbedo(wi);
+    Materials::MatItemSingle<glm::vec3> windowNormal(glm::vec3(0, 1, 0));
+    Materials::MatItemSingle<float> windowMetalic(0.5f);
+    Materials::MatItemSingle<float> windowRoughness(0.5f);
+    Materials::MatItemSingle<float> windowAO(0.5f);
 
+    Materials::PBR windowMat1(&windowAlbedo, &windowNormal, &windowMetalic, &windowRoughness, &windowAO);
+
+    Materials::MatItemSingle<glm::vec4> windowAlbedo2(wiy);
+
+    Materials::PBR windowMat2(&windowAlbedo2, &windowNormal, &windowMetalic, &windowRoughness, &windowAO);
+
+    GameObject window1(glm::vec3(0, 3.5, 3));
+    Component::RenderMesh windowMesh1;
+    windowMesh1.setModel(planeBuffer);
+    windowMesh1.setMaterial(&windowMat1);
+    windowMesh1.setTransparent(true);
+    window1.addComponet(&windowMesh1);
+
+    GameObject window2(glm::vec3(0.5, 3.5, 4));
+    Component::RenderMesh windowMesh2;
+    windowMesh2.setModel(planeBuffer);
+    windowMesh2.setMaterial(&windowMat2);
+    windowMesh2.setTransparent(true);
+    window2.addComponet(&windowMesh2);
 
     timer.log();
 
@@ -367,9 +388,9 @@ int main() {
     scene.addObject(&player);
     scene.addObject(&lightSource);
     scene.addObject(&lightSource2);
-    // scene.addObject(&manObject);
-    // scene.addObject(&redWindow);
-    // scene.addObject(&yellowWindow);
+    scene.addObject(&window1);
+    scene.addObject(&window2);
+
     scene.addObject(&orb);
     for (Terrain& land : allLand) {
         scene.addTerrain(&land);
