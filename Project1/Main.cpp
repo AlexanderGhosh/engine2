@@ -26,6 +26,7 @@
 #include "Componets/AudioReciever.h"
 #include "Componets/CharacterController.h"
 #include "Componets/Lights/PointLight.h"
+#include "Componets/Lights/DirectionalLight.h"
 #include "ParticleSystem/ParticleEmmiter.h"
 
 #include "Physics/Engine.h"
@@ -338,12 +339,12 @@ int main() {
     player.addComponet(&recieverComp);
 
 
-    GameObject lightSource(glm::vec3(1, 5, 0));
+    GameObject lightSource(glm::vec3(1, 100, 0));
     Component::PointLight light(glm::vec3(1));
     lightSource.addComponet(&light);
 
-    GameObject lightSource2(glm::vec3(-1, 3, 0));
-    Component::PointLight light2(glm::vec3(1)); 
+    GameObject lightSource2(glm::vec3(1));
+    Component::DirectionalLight light2 = Component::DirectionalLight(glm::vec3(-1), glm::vec3(1, 0,0), 1.0f);
     lightSource2.addComponet(&light2);
 
 
@@ -359,14 +360,14 @@ int main() {
 
     Materials::PBR windowMat2(&windowAlbedo2, &windowNormal, &windowMetalic, &windowRoughness, &windowAO);
 
-    GameObject window1(glm::vec3(0, 3.5, 3));
+    GameObject window1(glm::vec3(0, 3.5, -3));
     Component::RenderMesh windowMesh1;
     windowMesh1.setModel(planeBuffer);
     windowMesh1.setMaterial(&windowMat1);
     windowMesh1.setTransparent(true);
     window1.addComponet(&windowMesh1);
 
-    GameObject window2(glm::vec3(0.5, 3.5, 4));
+    GameObject window2(glm::vec3(0.5, 3.5, -4));
     Component::RenderMesh windowMesh2;
     windowMesh2.setModel(planeBuffer);
     windowMesh2.setMaterial(&windowMat2);

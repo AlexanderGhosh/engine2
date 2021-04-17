@@ -43,8 +43,8 @@ uniform DirectionalLight directionalLights[maxDirectionalLights];
 vec3 ProcessPointLight(PointLight light, vec3 WFP, vec3 VD, vec3 N, vec3 RS, vec3 AD, float A2, float R, float M, float dotNV);
 vec3 PointLights(PointLight pointLights[maxPointLights], int numberOfPointLights, vec3 WFP, vec3 VD, vec3 N, vec3 RS, vec3 AD, float A2, float R, float M, float dotNV);
 // DIRECTIONAL LIGHTS
-vec3 ProcessDirectionalLight(DirectionalLight light);
-vec3 DirectionalLights(DirectionalLight directionalLights[maxDirectionalLights]);
+vec3 ProcessDirectionalLight(DirectionalLight light, vec3 VD, vec3 N, vec3 RS, vec3 AD, float A2, float R, float M, float dotNV);
+vec3 DirectionalLights(DirectionalLight directionalLights[maxDirectionalLights], int numberOfDirectionalLights, vec3 VD, vec3 N, vec3 RS, vec3 AD, float A2, float R, float M, float dotNV);
 // SPOT LIGHTS
 
 uniform sampler2D positionTex;
@@ -77,8 +77,10 @@ void main() {
     // surface reflection at when looking from 0 degrees
     vec3 realSpecular = mix(vec3(0.04), Albedo, Metallic); // 0.04 assumption for metals
 
-
+    // POINT LIGHTS
     vec3 accumlativeLight = PointLights(pointLights, numberOfPointLights, WorldFragmentPosition, viewDirection, Normal, realSpecular, albedoDiffuse, alpha2, Roughness, Metallic, dotNV);
+    // DIRECTIONAL LIGHTS
+    accumlativeLight += DirectionalLights(directionalLights, numberOfDirectionalLights, viewDirection, Normal, realSpecular, albedoDiffuse, alpha2, Roughness, Metallic, dotNV);
 
 
     vec3 ambient = vec3(0.03) * Albedo * AO;
@@ -123,6 +125,34 @@ vec3 PointLights(PointLight pointLights[maxPointLights], int numberOfPointLights
     return accumlativeLight;
 }
 
+vec3 ProcessDirectionalLight(DirectionalLight light, vec3 VD, vec3 N, vec3 RS, vec3 AD, float A2, float R, float M, float dotNV){
+    // constants
+    vec3 lightDirection = normalize(-light.direction);
+    vec3 H = normalize(VD + lightDirection);
+    float dotNL = max(dot(N, lightDirection), 0.0);
+    float dotNH = max(dot(N, H), 0.0);
+    float dotVH = max(dot(VD, H), 0.0);
+
+    // functions
+    vec3 specularData[2];
+    SpecularTerm(dotNH, A2, dotVH, RS, dotNV, 
+                                    dotNL, R, specularData);
+
+    vec3 specular = specularData[0];
+    vec3 ks = specularData[1];
+    vec3 kd = vec3(1.0) - ks;  
+    kd *= 1.0 - M;
+
+    return (kd * AD + specular) * light.colour * clamp(dotNL, 0.0, 1.0) * light.brightness;
+}
+
+vec3 DirectionalLights(DirectionalLight directionalLights[maxDirectionalLights], int numberOfDirectionalLights, vec3 VD, vec3 N, vec3 RS, vec3 AD, float A2, float R, float M, float dotNV){
+    vec3 accumlativeLight = vec3(0);
+    for(int i = 0; i < numberOfDirectionalLights; i++){
+        accumlativeLight += ProcessDirectionalLight(directionalLights[i], VD, N, RS, AD, A2, R, M, dotNV);
+    }
+    return accumlativeLight;
+}
 
 vec3 GammaCorrect(vec3 col) {
     return pow(col, vec3(1.0/2.2));

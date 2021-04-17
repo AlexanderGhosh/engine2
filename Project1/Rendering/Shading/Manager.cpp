@@ -138,7 +138,7 @@ bool Render::Shading::Manager::setValue(String name, const Component::Directiona
 {
 	bool valid = true;
 	const std::string txt = name + "[" + std::to_string(index) + "].";
-	valid = setValue(txt + "position", light->getPosition()) AND valid;
+	valid = setValue(txt + "direction", light->getDirection()) AND valid;
 	valid = setValue(txt + "colour", light->getColour()) AND valid;
 	valid = setValue(txt + "brightness", light->getBrightness()) AND valid;
 	return valid;

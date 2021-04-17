@@ -67,6 +67,6 @@ void main()
     MetRouAOOut = vec4(metalic, roughness, ao, 1.0);
 
     albedoOut = vec4(0.0, 1.0, 0.0, 1.0);
-    normalOut = vec4(0.0, 1.0, 0.0, 1.0);
+    normalOut = vec4(Normal, 1.0);
     MetRouAOOut = vec4(0.5, 0.5, 0.5, 1.0);
 }  
