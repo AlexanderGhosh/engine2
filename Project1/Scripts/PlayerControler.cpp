@@ -49,6 +49,7 @@ void PlayerControler::update(float deltaTime) {
 	if (EH::getKey(Key::Enter, Action::Down) && c_out >= 0.2f) {
 		c_out = 0;
 		parent->getScene()->USE_DEFFERED = !parent->getScene()->USE_DEFFERED;
+		parent->getScene()->USE_DEFFERED = true;
 		Utils::log("Differed: " + std::to_string(parent->getScene()->USE_DEFFERED), "\r");
 	}
 	const bool grounded = isGrounded(deltaTime);

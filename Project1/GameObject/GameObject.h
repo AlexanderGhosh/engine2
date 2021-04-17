@@ -25,7 +25,7 @@ protected:
 	std::string name;
 public:
 	GameObject(String name = "");
-	GameObject(Vector3 postion, Vector3 scale);
+	GameObject(Vector3 postion, Vector3 scale = glm::vec3(1));
 	~GameObject() = default;
 	void addComponet(Component::ComponetBase* componet);
 	/// <summary>

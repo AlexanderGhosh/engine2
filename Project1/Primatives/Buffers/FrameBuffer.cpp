@@ -22,7 +22,6 @@ Primative::Buffers::FrameBuffer::FrameBuffer(const std::vector<std::string>& tex
 	if (Utils::contains(textures, std::string("depth_stencil"))) {
 		clearMask = clearMask | GL_STENCIL_BUFFER_BIT;
 	}
-
 	glGenFramebuffers(1, &fbo);
 	bind();
 	clearBits();
@@ -80,11 +79,11 @@ void Primative::Buffers::FrameBuffer::initalize()
 
 		glBindRenderbuffer(GL_RENDERBUFFER, depthStencilRBO);
 
-		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, dimentions.x, dimentions.y);
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, dimentions.x, dimentions.y);
+
+		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthStencilRBO);
 
 		glBindRenderbuffer(GL_RENDERBUFFER, 0);
-
-		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, depthStencilRBO);
 	}
 }
 
@@ -130,15 +129,15 @@ void Primative::Buffers::FrameBuffer::cleanUp()
 	glDeleteFramebuffers(1, &fbo);
 }
 
-void Primative::Buffers::FrameBuffer::bind() const
+void Primative::Buffers::FrameBuffer::bind(const long& target) const
 {
 	glViewport(0, 0, dimentions.x, dimentions.y);
-	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+	glBindFramebuffer(target, fbo);
 }
 
-void Primative::Buffers::FrameBuffer::unBind() const
+void Primative::Buffers::FrameBuffer::unBind(const long& target) const
 {
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindFramebuffer(target, 0);
 }
 
 void Primative::Buffers::FrameBuffer::clearBits() const
@@ -166,6 +165,11 @@ void Primative::Buffers::FrameBuffer::activateColourTextures(int& unit, const st
 				return;
 		}
 	}
+}
+
+Vector3 Primative::Buffers::FrameBuffer::getDimentions() const
+{
+	return backgroundColour;
 }
 
 Unsigned Primative::Buffers::FrameBuffer::getTexture(String name)

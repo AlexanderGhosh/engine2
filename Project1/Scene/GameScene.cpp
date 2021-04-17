@@ -143,9 +143,9 @@ void GameScene::setBG(Vector3 col)
 void GameScene::preProcess()
 {
 	for (const auto& layer : preProcessingLayers) {
-		const std::string& name = layer.first;
-		const unsigned& shaderId = layer.second;
-		auto& fbo = getFBO(name);
+		String name = layer.first;
+		Unsigned shaderId = layer.second;
+		Primative::Buffers::FrameBuffer& fbo = getFBO(name);
 		fbo.bind();
 		fbo.clearBits();
 		Render::Shading::Manager::setActive(shaderId);
@@ -155,25 +155,30 @@ void GameScene::preProcess()
 			drawOpaque();
 			glCullFace(GL_BACK);
 		}
-		else if(name == "G-Buffer" AND USE_DEFFERED)
+		else if(name == "G-Buffer")
 		{
 			drawOpaque();
-			// drawTerrain();
+			drawTerrain();
+			drawParticles();
 		}
-		else if (name == "LightingPass" AND USE_DEFFERED) {
+		else if (name == "LightingPass") {
 			int unit = 0;
 			bindLights();
-			FBOs["G-Buffer"].activateColourTextures(unit, { "positionTex", "albedoTex", "normalTex", "MetRouAOTex" });
+			Primative::Buffers::FrameBuffer& gBuffer = FBOs["G-Buffer"];
+			gBuffer.activateColourTextures(unit, { "positionTex", "albedoTex", "normalTex", "MetRouAOTex" });
+
 			const Primative::Buffers::VertexBuffer& buffer = ResourceLoader::getBuffer(quadModel.getBuffers()[0]);
 			buffer.render();
+
+			
 		}
-		else if(NOT USE_DEFFERED) {
+		/*else if(NOT USE_DEFFERED) {
 			drawOpaque();
 			/*drawSkyBox();
 			drawObjects(shaderId);
 			drawUI();
-			drawParticles();*/
-		}
+			drawParticles();
+		}*/
 		fbo.unBind();
 	}
 }
@@ -188,15 +193,21 @@ void GameScene::postProcess()
 	
 	glActiveTexture(GL_TEXTURE0);
 
-	if(USE_DEFFERED)
-		glBindTexture(GL_TEXTURE_2D, FBOs["LightingPass"].getTexture("col0"));
-	else
-		glBindTexture(GL_TEXTURE_2D, FBOs["final"].getTexture("col0"));
+	glBindTexture(GL_TEXTURE_2D, FBOs["LightingPass"].getTexture("col0"));
 
 	Render::Shading::Manager::setValue("tex", 0);
 	
 	const Primative::Buffers::VertexBuffer& buffer = ResourceLoader::getBuffer(quadModel.getBuffers()[0]);
 	buffer.render();
+
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, FBOs["G-Buffer"].fbo);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	glBlitFramebuffer(0, 0, screenDimentions.x, screenDimentions.y, 0, 0, screenDimentions.x, screenDimentions.y, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0); // default fbo
+
+	drawSkyBox();
+	drawUI();
+
 }
 
 void GameScene::updateObjects()
@@ -230,13 +241,11 @@ void GameScene::drawSkyBox()
 {
 	if (!skybox)
 		return;
-	mainContext->disable(GL_DEPTH_TEST);
 	mainContext->disable(GL_CULL_FACE);
-	//glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
+	glDepthFunc(GL_LEQUAL);
 	skybox->draw();
-	//glDepthFunc(GL_LESS); // set depth function back to default
+	glDepthFunc(GL_LESS);
 	mainContext->enable(GL_CULL_FACE);
-	mainContext->enable(GL_DEPTH_TEST);
 }
 
 Primative::Buffers::FrameBuffer& GameScene::getFBO(const std::string& name)
@@ -255,17 +264,16 @@ Primative::Buffers::FrameBuffer& GameScene::getFBO(const std::string& name)
 
 void GameScene::initalize()
 {
-	if (USE_DEFFERED OR true) {
-		Primative::Buffers::FrameBuffer g_buffer_FBO({ "col0", "col1", "col2", "col3" }, screenDimentions, { 0, 0, 0 });
-		Primative::Buffers::FrameBuffer lighting_FBO({ "col0" }, screenDimentions, { 0, 0, 0 });
+	Primative::Buffers::FrameBuffer g_buffer_FBO({ "col0", "col1", "col2", "col3" }, screenDimentions, { 0, 0, 0 });
+	Primative::Buffers::FrameBuffer lighting_FBO({ "col0" }, screenDimentions, { 0, 0, 0 });
 
-		addFBO("G-Buffer", g_buffer_FBO);
-		addPreProcLayer("G-Buffer", ResourceLoader::getShader("DeferredShader"));
+	addFBO("G-Buffer", g_buffer_FBO);
+	addPreProcLayer("G-Buffer", ResourceLoader::getShader("DeferredOpaque"));
 
-		addFBO("LightingPass", lighting_FBO);
-		addPreProcLayer("LightingPass", ResourceLoader::getShader("DeferredFinalShader"));
-	}
-	if(NOT USE_DEFFERED OR true) {
+	addFBO("LightingPass", lighting_FBO);
+	addPreProcLayer("LightingPass", ResourceLoader::getShader("DeferredFinal"));
+	
+	/*if(NOT USE_DEFFERED OR true) {
 		Primative::Buffers::FrameBuffer shadowFBO({ "depth" }, screenDimentions, { 1, 0, 1 });
 		Primative::Buffers::FrameBuffer finalFBO({ "col0" }, screenDimentions, { 0, 0, 0 });
 		addFBO("shadows", shadowFBO);
@@ -273,7 +281,7 @@ void GameScene::initalize()
 
 		addFBO("final", finalFBO);
 		addPreProcLayer("final", ResourceLoader::getShader("PBRShader"));
-	}
+	}*/
 
 	setPostProcShader(ResourceLoader::getShader("PostShader")); // PBRShader  PostShader
 	

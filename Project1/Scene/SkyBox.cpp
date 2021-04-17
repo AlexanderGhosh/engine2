@@ -59,4 +59,9 @@ void SkyBox::setTexture(const std::string& name)
 	texId = ResourceLoader::getTexture(name);
 }
 
+Int SkyBox::getTextureId() const
+{
+	return texId;
+}
+
 

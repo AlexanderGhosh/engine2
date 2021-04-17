@@ -12,8 +12,8 @@ unsigned Terrain::shaderHM = 0;
 Terrain::Terrain() : resolution(), transform(), groundBuffer(), heightMap(0), useTexture(true), lowest(nullptr), middle(nullptr), highest(nullptr), renderWireframe(false)
 {
 	if (NOT gottenShader) {
-		shaderHM = ResourceLoader::getShader("TerrainShaderHeightMap");
-		shaderMesh = ResourceLoader::getShader("TerrainShaderMesh");
+		shaderHM = ResourceLoader::getShader("DeferredTerrainMap");
+		shaderMesh = ResourceLoader::getShader("DeferredTerrainMesh");
 	}
 }
 

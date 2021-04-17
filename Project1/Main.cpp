@@ -81,7 +81,8 @@ int main() {
     timer.start("Shaders");
     Gizmos::GizmoRenderer::init();
     std::vector<std::string> shaders = {
-        "PBRShader", "TransparentShader", "ShadowShader", "UIShader", "TextShader", "TerrainShaderHeightMap", "TerrainShaderMesh", "PostShader", "ParticleShader", "DeferredFinalShader", "DeferredShader"
+        "PBRShader", "TransparentShader", "ShadowShader", "UIShader", "TextShader", "DeferredRendering/G Pass/DeferredTerrainMap", "DeferredRendering/G Pass/DeferredTerrainMesh", "PostShader", "ParticleShader", 
+        "DeferredRendering/DeferredFinal", "DeferredRendering/G Pass/DeferredOpaque"
     };
     ResourceLoader::createShaders(shaders);
     timer.log();
@@ -323,7 +324,7 @@ int main() {
 
 
     timer.start("Player");
-    GameObject player = GameObject({ 0, 0, 5 }, { 1, 1, 1 });
+    GameObject player = GameObject(glm::vec3(0, 0, 5));
     Component::Camera playerCamera = Component::Camera();
     player.addComponet(&playerCamera);
     Component::CharacterController cc;
@@ -337,12 +338,12 @@ int main() {
     player.addComponet(&recieverComp);
 
 
-    GameObject lightSource({ 1, 5, 0 }, { 1, 1, 1 });
+    GameObject lightSource(glm::vec3(1, 5, 0));
     Component::PointLight light(glm::vec3(1));
     lightSource.addComponet(&light);
 
-    GameObject lightSource2({ -1, 2, 0 }, { 1, 1, 1 });
-    Component::PointLight light2(glm::vec3(1), 10.0f);
+    GameObject lightSource2(glm::vec3(-1, 3, 0));
+    Component::PointLight light2(glm::vec3(1)); 
     lightSource2.addComponet(&light2);
 
 
@@ -374,9 +375,9 @@ int main() {
 
     // SKYBOX //
     timer.start("Skybox");
-    // ResourceLoader::loadCubeMap("Resources/Textures/DistantMtSB", ".png", 0);
-    // SkyBox sb = SkyBox("DistantMtSB.cm");
-    // scene.setSkyBox(&sb);
+    ResourceLoader::loadCubeMap("Resources/Textures/DistantMtSB", ".png", 0);
+    SkyBox sb = SkyBox("DistantMtSB.cm");
+    scene.setSkyBox(&sb);
     timer.log();
     // SKYBOX //
     
