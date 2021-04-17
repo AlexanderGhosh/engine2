@@ -167,9 +167,9 @@ void Primative::Buffers::FrameBuffer::activateColourTextures(int& unit, const st
 	}
 }
 
-Vector3 Primative::Buffers::FrameBuffer::getDimentions() const
+Vector2 Primative::Buffers::FrameBuffer::getDimentions() const
 {
-	return backgroundColour;
+	return dimentions;
 }
 
 Unsigned Primative::Buffers::FrameBuffer::getTexture(String name)

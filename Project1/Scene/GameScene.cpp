@@ -170,7 +170,16 @@ void GameScene::preProcess()
 			const Primative::Buffers::VertexBuffer& buffer = ResourceLoader::getBuffer(quadModel.getBuffers()[0]);
 			buffer.render();
 
-			
+			gBuffer.bind(GL_READ_FRAMEBUFFER);
+			fbo.bind(GL_DRAW_FRAMEBUFFER);
+			glBlitFramebuffer(0, 0, gBuffer.getDimentions().x, gBuffer.getDimentions().y, 0, 0, screenDimentions.x, screenDimentions.y, GL_DEPTH_BUFFER_BIT, GL_NEAREST); 
+			fbo.unBind();
+			gBuffer.unBind(GL_READ_FRAMEBUFFER);
+			fbo.unBind(GL_DRAW_FRAMEBUFFER);
+			fbo.bind();
+
+			drawSkyBox();
+			drawUI();
 		}
 		/*else if(NOT USE_DEFFERED) {
 			drawOpaque();
@@ -193,21 +202,15 @@ void GameScene::postProcess()
 	
 	glActiveTexture(GL_TEXTURE0);
 
-	glBindTexture(GL_TEXTURE_2D, FBOs["LightingPass"].getTexture("col0"));
+	// if(USE_DEFFERED)
+		glBindTexture(GL_TEXTURE_2D, FBOs["LightingPass"].getTexture("col0"));
+	/*else
+		glBindTexture(GL_TEXTURE_2D, FBOs["final"].getTexture("col0"));*/
 
 	Render::Shading::Manager::setValue("tex", 0);
 	
 	const Primative::Buffers::VertexBuffer& buffer = ResourceLoader::getBuffer(quadModel.getBuffers()[0]);
 	buffer.render();
-
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, FBOs["G-Buffer"].fbo);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-	glBlitFramebuffer(0, 0, screenDimentions.x, screenDimentions.y, 0, 0, screenDimentions.x, screenDimentions.y, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0); // default fbo
-
-	drawSkyBox();
-	drawUI();
-
 }
 
 void GameScene::updateObjects()

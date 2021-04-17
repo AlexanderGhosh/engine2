@@ -110,8 +110,8 @@ int main() {
     timer.log();
 
     timer.start("Textures");
-    // const unsigned wi   = ResourceLoader::loadTexture("Resources/Textures/window.png", TextureType::AlbedoMap, 0);
-    // const unsigned wiy  = ResourceLoader::loadTexture("Resources/Textures/yellowWindow.png", TextureType::AlbedoMap, 0);
+    const unsigned wi   = ResourceLoader::loadTexture("Resources/Textures/window.png", TextureType::AlbedoMap, 0);
+    const unsigned wiy  = ResourceLoader::loadTexture("Resources/Textures/yellowWindow.png", TextureType::AlbedoMap, 0);
     const unsigned hdr      = ResourceLoader::loadCubeMap("Resources/Textures/Galaxy hdr", ".png", 0);
     const unsigned ibl      = ResourceLoader::loadCubeMap("Resources/Textures/Galaxy ibl", ".png", 0);
     const unsigned brdf     = ResourceLoader::loadTexture("Resources/Textures/ibl brdf.png", TextureType::AlbedoMap, 0);
@@ -345,6 +345,11 @@ int main() {
     GameObject lightSource2(glm::vec3(-1, 3, 0));
     Component::PointLight light2(glm::vec3(1)); 
     lightSource2.addComponet(&light2);
+
+
+    GameObject window1(glm::vec3(0, 3.5, 3));
+    Component::RenderMesh windowMesh;
+    windowMesh.setModel(planeBuffer);
 
 
     timer.log();

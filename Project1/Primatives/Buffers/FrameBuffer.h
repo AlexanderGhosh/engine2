@@ -31,7 +31,7 @@ namespace Primative {
 			/// <param name="unit"></param>
 			void activateColourTextures(int& unit, const std::vector<std::string>& names);
 			Unsigned getTexture(String name);
-			Vector3 getDimentions() const;
+			Vector2 getDimentions() const;
 		};
 	}
 }
