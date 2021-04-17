@@ -12,7 +12,7 @@ layout(std140, binding = 0) uniform Matrices
 out vec3 texCoords;
 
 void main() {
-    vec4 p = projection * mat4(mat3(view)) * vec4(pos, 1);
-    gl_Position = p;
+    vec4 p = projection * mat4(mat3(view)) * vec4(pos, 1.0);
+    gl_Position = p.xyww;
     texCoords = pos;
 }

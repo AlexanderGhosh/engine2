@@ -8,17 +8,18 @@ DebugScreen::DebugScreen() : mainCanvas(), fpsText(), counter(0), position(), sc
 
 void DebugScreen::awake()
 {
+	glm::vec3 TextColour = glm::vec3(1);
 	UI::Canvas* canvas = parent->getComponet<UI::Canvas>();
 	if (NOT canvas) {
 		parent->addComponet(&mainCanvas);
 		canvas = &mainCanvas;
 	}
 	fpsText.setText("FPS: 1000");
-	fpsText.setForgroundColor({ 0, 0, 0 });
+	fpsText.setForgroundColor(TextColour);
 	fpsText.setPos({ 115, 0 });
 	canvas->addElement(fpsText);
 	position.setText("Position: " + Utils::to_string_precision(parent->getTransform()->Position, 2));
-	position.setForgroundColor({ 0, 0, 0 });
+	position.setForgroundColor(TextColour);
 	position.setPos({ 115, 0 });
 	canvas->addElement(position);
 }

@@ -1,6 +1,7 @@
 #pragma once
 #include <glm.hpp>
 #include <string>
+#include "../Utils/General.h"
 
 namespace Component {
 	class RenderMesh;
@@ -23,5 +24,8 @@ public:
 	// setters
 	void setTexture(const int& texId);
 	void setTexture(const std::string& name);
+
+	// getters
+	Int getTextureId() const;
 };
 

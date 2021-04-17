@@ -7,7 +7,6 @@ namespace Primative {
 	namespace Buffers {
 		class FrameBuffer {
 		private:
-			unsigned fbo;
 			std::unordered_map<std::string, unsigned> textures;
 			unsigned depthStencilRBO;
 			glm::vec3 backgroundColour;
@@ -17,16 +16,22 @@ namespace Primative {
 			void initalize();
 			std::array<int, 4> getBufferData(String type, unsigned& colAttach) const;
 		public:
+			unsigned fbo;
 			FrameBuffer();
 			FrameBuffer(const std::vector<std::string>& textures, const glm::ivec2& dimentions, const glm::vec3& bgColour);
 			~FrameBuffer() = default;
 			void cleanUp();
 
-			void bind() const;
-			void unBind() const;
+			void bind(const long& target = GL_FRAMEBUFFER) const;
+			void unBind(const long& target = GL_FRAMEBUFFER) const;
 			void clearBits() const;
-
+			/// <summary>
+			/// will active the colour unit textures and add to the unit
+			/// </summary>
+			/// <param name="unit"></param>
+			void activateColourTextures(int& unit, const std::vector<std::string>& names);
 			Unsigned getTexture(String name);
+			Vector2 getDimentions() const;
 		};
 	}
 }

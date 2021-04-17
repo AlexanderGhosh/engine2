@@ -146,7 +146,7 @@ ResourceLoader::PBRInfo ResourceLoader::createPBRInfo(String dirPath, std::vecto
     MIS1<glm::vec4>& albe = std::get<1>(res);
     MIS1<glm::vec3>& norm = std::get<2>(res);
     std::list<MIS1<float>>&  mar = std::get<3>(res);
-    mar.resize(2);
+    mar.resize(3);
     const std::vector<unsigned> textures = loadTextureFile(dirPath, types, flip);
     // materials.push_back(&std::get<0>(res));
     unsigned i = 0;
@@ -227,6 +227,7 @@ const std::vector<unsigned> ResourceLoader::loadTextureFile(String dirPath, std:
         if (types[i] == TextureType::CubeMap)
             continue;
         res.push_back(loadTexture(file.path().string(), types[i], flip[i]));
+        i++;
     }
     return res;
 }

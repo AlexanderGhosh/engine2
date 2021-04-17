@@ -14,6 +14,7 @@ namespace Component {
 		// event callbacks
 		virtual void awake() { };
 		virtual void start() { };
+		virtual void render(float deltaTime) { }; // every tick (may change later)
 		virtual void update(float deltaTime) { }; // every tick
 		virtual void fixedUpdate(float deltaTime) { }; // every x ticks
 		virtual void mouseMove(float deltaTime) { };

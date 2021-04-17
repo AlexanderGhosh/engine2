@@ -1,4 +1,5 @@
 #include "FrameBuffer.h"
+#include "../../Rendering/Shading/Manager.h"
 
 
 Primative::Buffers::FrameBuffer::FrameBuffer() : fbo(), textures(), backgroundColour(), dimentions(), clearMask(GL_DEPTH_BUFFER_BIT), depthStencilRBO(0)
@@ -21,7 +22,6 @@ Primative::Buffers::FrameBuffer::FrameBuffer(const std::vector<std::string>& tex
 	if (Utils::contains(textures, std::string("depth_stencil"))) {
 		clearMask = clearMask | GL_STENCIL_BUFFER_BIT;
 	}
-
 	glGenFramebuffers(1, &fbo);
 	bind();
 	clearBits();
@@ -50,8 +50,8 @@ void Primative::Buffers::FrameBuffer::initalize()
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 		glTexImage2D(GL_TEXTURE_2D, 0, data[0], dimentions.x, dimentions.y, 0, data[1], data[3], NULL);
 
@@ -68,16 +68,22 @@ void Primative::Buffers::FrameBuffer::initalize()
 		glDrawBuffer(GL_NONE);
 		glReadBuffer(GL_NONE);
 	}
+	else {
+		std::vector<unsigned int> attachments;
+		for (unsigned i = 0; i < colAttach; i++)
+			attachments.push_back(GL_COLOR_ATTACHMENT0 + i);
+		glDrawBuffers(attachments.size(), attachments.data());
+	}
 	if (NOT has_depth) {
 		glGenRenderbuffers(1, &depthStencilRBO);
 
 		glBindRenderbuffer(GL_RENDERBUFFER, depthStencilRBO);
 
-		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, dimentions.x, dimentions.y);
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, dimentions.x, dimentions.y);
+
+		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthStencilRBO);
 
 		glBindRenderbuffer(GL_RENDERBUFFER, 0);
-
-		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, depthStencilRBO);
 	}
 }
 
@@ -85,8 +91,8 @@ std::array<int, 4> Primative::Buffers::FrameBuffer::getBufferData(String type, u
 {
 	std::array<int, 4> res{};
 	if (Utils::contains(type, "col")) {
-		res[0] = GL_RGB;
-		res[1] = GL_RGB;
+		res[0] = GL_RGBA16F;
+		res[1] = GL_RGBA;
 		res[2] = GL_COLOR_ATTACHMENT0 + colAttach++;
 		res[3] = GL_UNSIGNED_BYTE;
 	}
@@ -123,21 +129,47 @@ void Primative::Buffers::FrameBuffer::cleanUp()
 	glDeleteFramebuffers(1, &fbo);
 }
 
-void Primative::Buffers::FrameBuffer::bind() const
+void Primative::Buffers::FrameBuffer::bind(const long& target) const
 {
 	glViewport(0, 0, dimentions.x, dimentions.y);
-	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+	glBindFramebuffer(target, fbo);
 }
 
-void Primative::Buffers::FrameBuffer::unBind() const
+void Primative::Buffers::FrameBuffer::unBind(const long& target) const
 {
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindFramebuffer(target, 0);
 }
 
 void Primative::Buffers::FrameBuffer::clearBits() const
 {
 	glClearColor(backgroundColour.x, backgroundColour.y, backgroundColour.z, 1);
 	glClear(clearMask);
+}
+
+void Primative::Buffers::FrameBuffer::activateColourTextures(int& unit, const std::vector<std::string>& names)
+{
+	const unsigned s = textures.size();
+	textures["col0"];
+	if (textures.size() != s) {
+		textures.erase("col0");
+		return;
+	}
+	int i = 0;
+	for (const auto& pair : textures) {
+		if (Utils::contains(pair.first, "col")) {
+			glActiveTexture(GL_TEXTURE0 + unit);
+			glBindTexture(GL_TEXTURE_2D, pair.second);
+			bool suc = Render::Shading::Manager::setValue(names[i++], unit);
+			if (suc) unit++;
+			if (i >= names.size())
+				return;
+		}
+	}
+}
+
+Vector2 Primative::Buffers::FrameBuffer::getDimentions() const
+{
+	return dimentions;
 }
 
 Unsigned Primative::Buffers::FrameBuffer::getTexture(String name)

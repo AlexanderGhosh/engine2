@@ -3,60 +3,64 @@
 #include "../../Primatives/Materials/Forward.h"
 #include "../../Primatives/Materials/PBR.h"
 #include "../Animation/Animation.h"
+#include "../../Componets/Lights/DirectionalLight.h"
+#include "../../Componets/Lights/PointLight.h"
+#include "../../Componets/Lights/SpotLight.h"
+
 unsigned Render::Shading::Manager::active = 0;
 
-bool Render::Shading::Manager::setValue(const std::string& name, int val) {
+bool Render::Shading::Manager::setValue(String name, int val) {
 	int loc = glGetUniformLocation(Render::Shading::Manager::active, name.c_str());
 	if (loc < 0) return false;
 	glUniform1i(loc, val);
 	return true;
 };
-bool Render::Shading::Manager::setValue(const std::string& name, float val) {
+bool Render::Shading::Manager::setValue(String name, float val) {
 	int loc = glGetUniformLocation(Render::Shading::Manager::active, name.c_str());
 	if (loc < 0) return false;
 	glUniform1f(loc, val);
 	return true;
 };
-bool Render::Shading::Manager::setValue(const std::string& name, glm::vec2 val) {
+bool Render::Shading::Manager::setValue(String name, glm::vec2 val) {
 	int loc = glGetUniformLocation(Render::Shading::Manager::active, name.c_str());
 	if (loc < 0) return false;
 	glUniform2f(loc, val[0], val[1]);
 	return true;
 };
-bool Render::Shading::Manager::setValue(const std::string& name, glm::vec3 val) {
+bool Render::Shading::Manager::setValue(String name, glm::vec3 val) {
 	int loc = glGetUniformLocation(Render::Shading::Manager::active, name.c_str());
 	if (loc < 0) return false;
 	glUniform3f(loc, val[0], val[1], val[2]);
 	return true;
 };
-bool Render::Shading::Manager::setValue(const std::string& name, glm::vec4 val) {
+bool Render::Shading::Manager::setValue(String name, glm::vec4 val) {
 	int loc = glGetUniformLocation(Render::Shading::Manager::active, name.c_str());
 	if (loc < 0) return false;
 	glUniform4f(loc, val[0], val[1], val[2], val[3]);
 	return true;
 };
-bool Render::Shading::Manager::setValue(const std::string& name, glm::mat3 val) {
+bool Render::Shading::Manager::setValue(String name, glm::mat3 val) {
 	int loc = glGetUniformLocation(Render::Shading::Manager::active, name.c_str());
 	if (loc < 0) return false;
 	glUniformMatrix3fv(loc, 1, GL_FALSE, glm::value_ptr(val));
 	return true;
 };
-bool Render::Shading::Manager::setValue(const std::string& name, glm::mat4 val) {
+bool Render::Shading::Manager::setValue(String name, glm::mat4 val) {
 	int loc = glGetUniformLocation(Render::Shading::Manager::active, name.c_str());
 	if (loc < 0) return false;
 	glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(val));
 	return true;
 }
-bool Render::Shading::Manager::setValue(const std::string& name, const Materials::MaterialBase* mat)
+bool Render::Shading::Manager::setValue(String name, const Materials::MaterialBase* mat, unsigned& unit)
  {
 	 if (Utils::isType<Materials::MaterialBase, Materials::Forward>(mat)) {
-		 return setValue(name, *dynamic_cast<const Materials::Forward*>(mat));
+		 return setValue(name, *dynamic_cast<const Materials::Forward*>(mat), unit);
 	 }
 	 else {
-		 return setValue(name, *dynamic_cast<const Materials::PBR*>(mat));
+		 return setValue(name, *dynamic_cast<const Materials::PBR*>(mat), unit);
 	 }
  }
-bool Render::Shading::Manager::setValue(const std::string& name, const Render::Animation::KeyFrame& frame)
+bool Render::Shading::Manager::setValue(String name, const Render::Animation::KeyFrame& frame)
  {
 	 if (frame.translations.size() == 0)
 		 return true;
@@ -65,17 +69,31 @@ bool Render::Shading::Manager::setValue(const std::string& name, const Render::A
 	 glUniformMatrix4fv(loc, frame.translations.size(), GL_FALSE, glm::value_ptr(frame.translations[0])); 
 	 return true;
  }
-bool Render::Shading::Manager::setValue(const std::string& name, const std::vector<glm::mat4>& matrices)
+bool Render::Shading::Manager::setValue(String name, const std::vector<glm::mat4>& matrices)
  {
 	 int loc = glGetUniformLocation(Render::Shading::Manager::active, name.c_str());
 	 if (loc < 0) return false;
 	 glUniformMatrix4fv(loc, matrices.size(), GL_FALSE, glm::value_ptr(matrices[0]));
 	 return true;
  }
-bool Render::Shading::Manager::setValue(const std::string& name, const Materials::Forward& fwd)
+bool Render::Shading::Manager::setValue(String type, const Component::LightBase* light, Int lightIndex)
+{
+	if (type == "" OR lightIndex < 0) {
+		return false;
+	}
+	switch (light->getLightType())
+	{
+	case Component::LightType::Directional:
+		return setValue(type + "Lights", dynamic_cast<const Component::DirectionalLight*>(light), lightIndex);
+	case Component::LightType::Point:
+		return setValue(type + "Lights", dynamic_cast<const Component::PointLight*>(light), lightIndex);
+	case Component::LightType::Spot:
+		return setValue(type + "Lights", dynamic_cast<const Component::SpotLight*>(light), lightIndex);
+	}
+}
+bool Render::Shading::Manager::setValue(String name, const Materials::Forward& fwd, unsigned& unit)
  {
 	 bool valid = true;
-	 unsigned unit = 1;
 
 	 valid = valid AND Render::Shading::Manager::setValue(name + ".diffuse",  *fwd.getDiffuse(), unit);
 	 valid = valid AND Render::Shading::Manager::setValue(name + ".normals",  *fwd.getNormals(), unit);
@@ -94,9 +112,8 @@ bool Render::Shading::Manager::setValue(const std::string& name, const Materials
 
 	 return vals[0] && vals[1] && vals[2] && vals[3];*/
  }
-bool Render::Shading::Manager::setValue(const std::string& name, const Materials::PBR& mat)
+bool Render::Shading::Manager::setValue(String name, const Materials::PBR& mat, unsigned& unit)
  {
-	 unsigned unit = 1;
 	 bool val = true;
 	 val = setValue(name + ".albedo", *mat.getAlbedo(), unit) AND val;
 	 val = setValue(name + ".normal", *mat.getNormal(), unit) AND val;
@@ -116,6 +133,36 @@ bool Render::Shading::Manager::setValue(const std::string& name, const Materials
 	 val = setValue("brdfLUT", static_cast<int>(unit)) AND val;
 	 return val;
  }
+
+bool Render::Shading::Manager::setValue(String name, const Component::DirectionalLight* light, Int index)
+{
+	bool valid = true;
+	const std::string txt = name + "[" + std::to_string(index) + "].";
+	valid = setValue(txt + "direction", light->getDirection()) AND valid;
+	valid = setValue(txt + "colour", light->getColour()) AND valid;
+	valid = setValue(txt + "brightness", light->getBrightness()) AND valid;
+	return valid;
+}
+
+bool Render::Shading::Manager::setValue(String name, const Component::PointLight* light, Int index)
+{
+	bool valid = true;
+	const std::string txt = name + "[" + std::to_string(index) + "].";
+	valid = setValue(txt + "position", light->getPosition()) AND valid;
+	valid = setValue(txt + "colour", light->getColour()) AND valid;
+	valid = setValue(txt + "brightness", light->getBrightness()) AND valid;
+	return valid;
+}
+
+bool Render::Shading::Manager::setValue(String name, const Component::SpotLight* light, Int index)
+{
+	bool valid = true;
+	const std::string txt = name + "[" + std::to_string(index) + "].";
+	valid = setValue(txt + "position", light->getPosition()) AND valid;
+	valid = setValue(txt + "colour", light->getColour()) AND valid;
+	valid = setValue(txt + "brightness", light->getBrightness()) AND valid;
+	return valid;
+}
 
 void Render::Shading::Manager::setActive(const unsigned& shaderId)
  {

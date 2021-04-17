@@ -12,7 +12,7 @@ Component::RenderMesh::RenderMesh() : model(), materials(), animatedComponet(nul
 {
 }
 
-void Component::RenderMesh::update(float deltaTime)
+void Component::RenderMesh::render(float deltaTime)
 {
 	glm::mat4 m(1);
 	if(parent)
@@ -35,8 +35,10 @@ void Component::RenderMesh::update(float deltaTime)
 		Materials::MaterialBase* material = materials[i];
 		if (material) {
 			material->update(deltaTime);
-			material->activateTextures(); // activates the texture units and binds the ids
-			Render::Shading::Manager::setValue("material", material); // sets values to the samplers
+			int unitI = 1;
+			unsigned unitU = unitI;
+			material->activateTextures(unitI); // activates the texture units and binds the ids
+			Render::Shading::Manager::setValue("material", material, unitU); // sets values to the samplers
 		}
 		buffer.render();
 	}

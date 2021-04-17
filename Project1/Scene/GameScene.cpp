@@ -15,6 +15,8 @@
 #include "../UI/UIRenderer.h"
 #include "../UI/Panes/Canvas.h"
 #include "../ParticleSystem/ParticleEmmiter.h"
+#include "../Componets/Lights/LightBase.h"
+
 
 std::vector<GameEventsTypes> GameScene::getCurrentEvents() const
 {
@@ -34,7 +36,7 @@ std::vector<GameEventsTypes> GameScene::getCurrentEvents() const
 
 GameScene::GameScene() : objects(), preProcessingLayers(), currentTick(0), postProcShaderId(0), FBOs(), backgroundColour(0),
 							skybox(nullptr), mainContext(nullptr), opaque(), transparent(), mainCamera(nullptr), terrain(), 
-							quadModel(), isFirstLoop(false), closing(false), uiStuff(), screenDimentions(0), emmiters()
+							quadModel(), isFirstLoop(false), closing(false), uiStuff(), screenDimentions(0), emmiters(), lightSources(), USE_DEFFERED(1)
 {
 	quadModel = ResourceLoader::getModel("plane.dae");
 }
@@ -43,13 +45,14 @@ void GameScene::drawOpaque()
 {
 	for (Component::RenderMesh* mesh : opaque) {
 		if(mesh->getParent()->isAlive())
-			mesh->update(mainContext->getTime().deltaTime);
+			mesh->render(mainContext->getTime().deltaTime);
 	}
 }
 
 void GameScene::drawTransparent()
 {
-	Render::Shading::Manager::setActive(ResourceLoader::getShader("TransparentShader"));
+	Render::Shading::Manager::setActive(ResourceLoader::getShader("TransparentShader")); 
+	bindLights();
 	assert(mainCamera);
 	if (NOT transparent.size()) {
 		return;
@@ -61,7 +64,7 @@ void GameScene::drawTransparent()
 		float dist = (*itt).first;
 		Component::RenderMesh* mesh = (*itt).second;
 		if (mesh->getParent()->isAlive())
-			mesh->update(mainContext->getTime().deltaTime);
+			mesh->render(mainContext->getTime().deltaTime);
 		dist = glm::length2(mesh->getParent()->getTransform()->Position - mainCamera->getPos());
 		sorted[dist] = mesh;
 	}
@@ -79,7 +82,7 @@ void GameScene::drawTerrain()
 void GameScene::drawUI()
 {
 	for (UI::Canvas* canvas : uiStuff) {
-		canvas->update(mainContext->getTime().deltaTime);
+		canvas->render(mainContext->getTime().deltaTime);
 	}
 }
 
@@ -115,14 +118,21 @@ void GameScene::processComponet(Component::ComponetBase* comp)
 		else {
 			opaque.push_back(mesh);
 		}
+		return;
 	}
 	UI::Canvas* canv = dynamic_cast<UI::Canvas*>(comp);
 	if (canv) {
 		uiStuff.push_back(canv);
+		return;
 	}
 	Component::ParticleEmmiter* part = dynamic_cast<Component::ParticleEmmiter*>(comp);
 	if (part) {
 		emmiters.push_back(part);
+		return;
+	}
+	Component::LightBase* light = dynamic_cast<Component::LightBase*>(comp);
+	if (light) {
+		lightSources.push_back(light);
 	}
 }
 
@@ -134,24 +144,53 @@ void GameScene::setBG(Vector3 col)
 void GameScene::preProcess()
 {
 	for (const auto& layer : preProcessingLayers) {
-		const std::string& name = layer.first;
-		const unsigned& shaderId = layer.second;
-		const auto& fbo = getFBO(name);
+		String name = layer.first;
+		Unsigned shaderId = layer.second;
+		Primative::Buffers::FrameBuffer& fbo = getFBO(name);
 		fbo.bind();
 		fbo.clearBits();
 		Render::Shading::Manager::setActive(shaderId);
 
-		if (name == "shadows") {
+		if (name == "shadows" AND NOT USE_DEFFERED) {
 			glCullFace(GL_FRONT);
 			drawOpaque();
 			glCullFace(GL_BACK);
 		}
-		else {
+		else if(name == "G-Buffer")
+		{
+			drawOpaque();
+			drawTerrain();
+			drawParticles();
+		}
+		else if (name == "LightingPass") {
+			int unit = 0;
+			bindLights();
+			Primative::Buffers::FrameBuffer& gBuffer = FBOs["G-Buffer"];
+			gBuffer.activateColourTextures(unit, { "positionTex", "albedoTex", "normalTex", "MetRouAOTex" });
+
+			const Primative::Buffers::VertexBuffer& buffer = ResourceLoader::getBuffer(quadModel.getBuffers()[0]);
+			buffer.render();
+
+			gBuffer.bind(GL_READ_FRAMEBUFFER);
+			fbo.bind(GL_DRAW_FRAMEBUFFER);
+			glBlitFramebuffer(0, 0, gBuffer.getDimentions().x, gBuffer.getDimentions().y, 0, 0, screenDimentions.x, screenDimentions.y, GL_DEPTH_BUFFER_BIT, GL_NEAREST); 
+			fbo.unBind();
+			gBuffer.unBind(GL_READ_FRAMEBUFFER);
+			fbo.unBind(GL_DRAW_FRAMEBUFFER);
+			fbo.bind();
+
+
 			drawSkyBox();
+			drawTransparent();
+			drawUI();
+		}
+		/*else if(NOT USE_DEFFERED) {
+			drawOpaque();
+			/*drawSkyBox();
 			drawObjects(shaderId);
 			drawUI();
 			drawParticles();
-		}
+		}*/
 		fbo.unBind();
 	}
 }
@@ -165,17 +204,16 @@ void GameScene::postProcess()
 	Render::Shading::Manager::setActive(postProcShaderId);
 	
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, FBOs["final"].getTexture("col0"));
+
+	// if(USE_DEFFERED)
+		glBindTexture(GL_TEXTURE_2D, FBOs["LightingPass"].getTexture("col0"));
+	/*else
+		glBindTexture(GL_TEXTURE_2D, FBOs["final"].getTexture("col0"));*/
+
 	Render::Shading::Manager::setValue("tex", 0);
 	
 	const Primative::Buffers::VertexBuffer& buffer = ResourceLoader::getBuffer(quadModel.getBuffers()[0]);
-	//drawSkyBox();
 	buffer.render();
-	//drawUI();
-
-
-	// drawSkyBox();
-	// drawObjects(postProcShaderId);
 }
 
 void GameScene::updateObjects()
@@ -209,38 +247,50 @@ void GameScene::drawSkyBox()
 {
 	if (!skybox)
 		return;
-	mainContext->disable(GL_DEPTH_TEST);
 	mainContext->disable(GL_CULL_FACE);
-	//glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
+	glDepthFunc(GL_LEQUAL);
 	skybox->draw();
-	//glDepthFunc(GL_LESS); // set depth function back to default
+	glDepthFunc(GL_LESS);
 	mainContext->enable(GL_CULL_FACE);
-	mainContext->enable(GL_DEPTH_TEST);
 }
 
-const Primative::Buffers::FrameBuffer& GameScene::getFBO(const std::string& name)
+Primative::Buffers::FrameBuffer& GameScene::getFBO(const std::string& name)
 {
 	if (name == "any") {
 		return (*FBOs.begin()).second;
 	}
 	const unsigned& s = FBOs.size();
-	const auto& r = FBOs[name];
+	auto& r = FBOs[name];
 	if (s < FBOs.size()) {
 		FBOs.erase(name);
-		return {};
+		return (*(FBOs.begin()++)).second;
 	}
 	return r;
 }
 
 void GameScene::initalize()
 {
-	Primative::Buffers::FrameBuffer shadowFBO({ "depth" }, screenDimentions, { 1, 0, 1 });
-	Primative::Buffers::FrameBuffer finalFBO({ "col0" }, screenDimentions, { 0, 0, 1 });
-	addFBO("shadows", shadowFBO);
-	addPreProcLayer("shadows", ResourceLoader::getShader("ShadowShader"));
-	addFBO("final", finalFBO);
-	addPreProcLayer("final", ResourceLoader::getShader("PBRShader"));
+	Primative::Buffers::FrameBuffer g_buffer_FBO({ "col0", "col1", "col2", "col3" }, screenDimentions, { 0, 0, 0 });
+	Primative::Buffers::FrameBuffer lighting_FBO({ "col0" }, screenDimentions, { 0, 0, 0 });
+
+	addFBO("G-Buffer", g_buffer_FBO);
+	addPreProcLayer("G-Buffer", ResourceLoader::getShader("DeferredOpaque"));
+
+	addFBO("LightingPass", lighting_FBO);
+	addPreProcLayer("LightingPass", ResourceLoader::getShader("DeferredFinal"));
+	
+	/*if(NOT USE_DEFFERED OR true) {
+		Primative::Buffers::FrameBuffer shadowFBO({ "depth" }, screenDimentions, { 1, 0, 1 });
+		Primative::Buffers::FrameBuffer finalFBO({ "col0" }, screenDimentions, { 0, 0, 0 });
+		addFBO("shadows", shadowFBO);
+		addPreProcLayer("shadows", ResourceLoader::getShader("ShadowShader"));
+
+		addFBO("final", finalFBO);
+		addPreProcLayer("final", ResourceLoader::getShader("PBRShader"));
+	}*/
+
 	setPostProcShader(ResourceLoader::getShader("PostShader")); // PBRShader  PostShader
+	
 
 
 	Primative::Buffers::StaticBuffer mainBuffer("m4, m4, v3, f", 0);
@@ -294,51 +344,8 @@ void GameScene::gameLoop()
 
 		preProcess(); // shadows and scene quad
 		postProcess();// render to screen
-		// UI::UIRenderer::render(&tb);
 		Gizmos::GizmoRenderer::drawAll();
 
-
-		// PHYSICS-----------------------------------------------------------------------------------------------------------------------------------------------
-
-		// cube2->getTransform()->Position.x -= 0.01;
-		// Physics::Engine::update();
-		// 
-		// // EVENTS-----------------------------------------------------------------------------------------------------------------------------------------------
-		// float speed = 1;
-		// if (Events::Handler::getCursor(Events::Cursor::Middle, Events::Action::Down)) {
-		// 	speed = 10;
-		// }
-		// if (Events::Handler::getKey(Events::Key::W, Events::Action::Down)) {
-		// 	cam.setPos(cam.getPos() + cam.getForward() * glm::vec3(1, 0, 1) * main.getTime().deltaTime * speed);
-		// }
-		// if (Events::Handler::getKey(Events::Key::S, Events::Action::Down)) {
-		// 	cam.setPos(cam.getPos() - cam.getForward() * glm::vec3(1, 0, 1) * main.getTime().deltaTime * speed);
-		// }
-		// if (Events::Handler::getKey(Events::Key::A, Events::Action::Down)) {
-		// 	cam.setPos(cam.getPos() - cam.getRight() * main.getTime().deltaTime * speed);
-		// }
-		// if (Events::Handler::getKey(Events::Key::D, Events::Action::Down)) {
-		// 	cam.setPos(cam.getPos() + cam.getRight() * main.getTime().deltaTime * speed);
-		// }
-		// if (Events::Handler::getKey(Events::Key::Space, Events::Action::Down)) {
-		// 	cam.setPos(cam.getPos() + Utils::yAxis() * main.getTime().deltaTime * speed);
-		// }
-		// if (Events::Handler::getKey(Events::Key::L_Shift, Events::Action::Down)) {
-		// 	cam.setPos(cam.getPos() - Utils::yAxis() * main.getTime().deltaTime * speed);
-		// }
-		// counter += main.getTime().deltaTime;
-		// if (counter >= 0.2 AND Events::Handler::getKey(Events::Key::Enter, Events::Action::Down)) {
-		// 	counter = 0;
-		// 	// manAnimatedComp.togglePlay();
-		// 	manAnimatedComp.startAnimation("");
-		// }
-		// if (Events::Handler::getKey(Events::Key::Backspace, Events::Action::Down))
-		// 	manAnimatedComp.startAnimation(AnimationLoaded);
-		// 
-		// if (Events::Handler::getKey(Events::Key::Escape, Events::Action::Down)) {
-		// 	break;
-		// }
-		// COLOR BUFFERS----------------------------------------------------------------------------------------------------------------------------------------
 		// sound->update();
 
 		mainContext->update();
@@ -375,6 +382,10 @@ void GameScene::cleanUp()
 		(*itt)->cleanUp();
 		itt = emmiters.erase(itt);
 	}
+	for (auto itt = lightSources.begin(); itt != lightSources.end();) {
+		(*itt)->cleanUp();
+		itt = lightSources.erase(itt);
+	}
 
 	FBOs.clear();
 	if(skybox)
@@ -390,6 +401,36 @@ void GameScene::cleanUp()
 void GameScene::close()
 {
 	closing = true;
+}
+
+void GameScene::bindLights()
+{
+	int directional = 0;
+	int point = 0;
+	int spot = 0;
+	for (Component::LightBase* light : lightSources) {
+		int count = -1;
+		std::string type = "";
+		switch (light->getLightType())
+		{
+		case Component::LightType::Directional:
+			count = directional++;
+			type = "directional";
+			break;
+		case Component::LightType::Point:
+			count = point++;
+			type = "point";
+			break;
+		case Component::LightType::Spot:
+			count = spot++;
+			type = "spot";
+			break;
+		}
+		Render::Shading::Manager::setValue(type, light, count);
+	}
+	Render::Shading::Manager::setValue("numberOfDirectionalLights", directional);
+	Render::Shading::Manager::setValue("numberOfPointLights", point);
+	Render::Shading::Manager::setValue("numberOfSpotLights", spot);
 }
 
 void GameScene::addPreProcLayer(const std::string& name, const unsigned& shaderId)

@@ -21,42 +21,6 @@ float Geometry(float dotNV, float dotNL, float Roughness);
 float CorrectionFactor(float dotNV, float dotNL);
 
 
-//Material Data Structures
-struct MatItem4 {
-    vec4 raw;
-    sampler2D id;
-    float mixValue;
-};
-struct MatItem3 {
-    vec3 raw;
-    sampler2D id;
-    float mixValue;
-};
-struct MatItem1 {
-    float raw;
-    sampler2D id;
-    float mixValue;
-};
-
-struct Material {
-    MatItem4 albedo;
-
-    MatItem3 normal;
-
-    MatItem1 metalic;
-
-    MatItem1 roughness;
-
-    MatItem1 ao;
-};
-
-// Material Functions
-vec3 getData(MatItem4 item);
-vec3 getData(MatItem3 item);
-vec3 getNormal(MatItem3 item, vec3 normal);
-float getData(MatItem1 item);
-float getAlpha(MatItem4 item);
-
 // Light Source Data Structures
 struct PointLight {
     vec3 position;
@@ -79,29 +43,32 @@ uniform DirectionalLight directionalLights[maxDirectionalLights];
 vec3 ProcessPointLight(PointLight light, vec3 WFP, vec3 VD, vec3 N, vec3 RS, vec3 AD, float A2, float R, float M, float dotNV);
 vec3 PointLights(PointLight pointLights[maxPointLights], int numberOfPointLights, vec3 WFP, vec3 VD, vec3 N, vec3 RS, vec3 AD, float A2, float R, float M, float dotNV);
 // DIRECTIONAL LIGHTS
-vec3 ProcessDirectionalLight(DirectionalLight light);
-vec3 DirectionalLights(DirectionalLight directionalLights[maxDirectionalLights]);
+vec3 ProcessDirectionalLight(DirectionalLight light, vec3 VD, vec3 N, vec3 RS, vec3 AD, float A2, float R, float M, float dotNV);
+vec3 DirectionalLights(DirectionalLight directionalLights[maxDirectionalLights], int numberOfDirectionalLights, vec3 VD, vec3 N, vec3 RS, vec3 AD, float A2, float R, float M, float dotNV);
 // SPOT LIGHTS
 
-uniform Material material;
+uniform sampler2D positionTex;
+uniform sampler2D albedoTex;
+uniform sampler2D normalTex;
+uniform sampler2D MetRouAOTex;
 
-in vec3 WorldFragmentPosition;
-in vec3 CameraPosition;
-in vec3 NormalIn;
 in vec2 TextureCoords;
+in vec3 cameraPosition;
 
 void main() {
-    // vec3  = texture(positionTex, TextureCoords).xyz;
-    vec3 Albedo     = pow(getData(material.albedo), vec3(2.2)); // PBR gamma corrects
-    vec3 Normal     = normalize(getNormal(material.normal, NormalIn));
+    vec3 WorldFragmentPosition = texture(positionTex, TextureCoords).xyz;
+    vec3 Albedo                = pow(texture(albedoTex, TextureCoords).xyz, vec3(2.2)); // PBR gamma corrects
+    vec3 Normal                = normalize(texture(normalTex, TextureCoords).xyz);
 
-    float Metallic  = getData(material.metalic);
-    float Roughness = getData(material.roughness);
-    float AO        = getData(material.ao);
+    vec3 metRouAO              = texture(MetRouAOTex, TextureCoords).xyz;
+
+    float Metallic             = metRouAO.x;
+    float Roughness            = metRouAO.y;
+    float AO                   = metRouAO.z;
 
 
     // constants
-    vec3 viewDirection = normalize(CameraPosition - WorldFragmentPosition);
+    vec3 viewDirection = normalize(cameraPosition - WorldFragmentPosition);
     float dotNV = max(dot(Normal, viewDirection), 0.0);
     float alpha = Roughness * Roughness;
     float alpha2 = max(0.001, alpha * alpha);
@@ -110,21 +77,19 @@ void main() {
     // surface reflection at when looking from 0 degrees
     vec3 realSpecular = mix(vec3(0.04), Albedo, Metallic); // 0.04 assumption for metals
 
-
+    // POINT LIGHTS
     vec3 accumlativeLight = PointLights(pointLights, numberOfPointLights, WorldFragmentPosition, viewDirection, Normal, realSpecular, albedoDiffuse, alpha2, Roughness, Metallic, dotNV);
+    // DIRECTIONAL LIGHTS
+    // accumlativeLight += DirectionalLights(directionalLights, numberOfDirectionalLights, viewDirection, Normal, realSpecular, albedoDiffuse, alpha2, Roughness, Metallic, dotNV);
 
 
     vec3 ambient = vec3(0.03) * Albedo * AO;
     vec3 colour = ambient + accumlativeLight;
 
-
     colour /= colour + vec3(1.0); // HDR
     colour = GammaCorrect(colour);
-    
-    colour = Albedo;
 
-    float alphaValue = getAlpha(material.albedo);
-    FragColour = vec4(colour, alphaValue);
+    FragColour = vec4(colour, 1.0);
 };
 
 vec3 ProcessPointLight(PointLight light, vec3 WFP, vec3 VD, vec3 N, vec3 RS, vec3 AD, float A2, float R, float M, float dotNV){
@@ -142,8 +107,7 @@ vec3 ProcessPointLight(PointLight light, vec3 WFP, vec3 VD, vec3 N, vec3 RS, vec
 
     // functions
     vec3 specularData[2];
-    SpecularTerm(dotNH, A2, dotVH, RS, dotNV, 
-                                    dotNL, R, specularData);
+    SpecularTerm(dotNH, A2, dotVH, RS, dotNV, dotNL, R, specularData);
 
     vec3 specular = specularData[0];
     vec3 ks = specularData[1];
@@ -160,6 +124,33 @@ vec3 PointLights(PointLight pointLights[maxPointLights], int numberOfPointLights
     return accumlativeLight;
 }
 
+vec3 ProcessDirectionalLight(DirectionalLight light, vec3 VD, vec3 N, vec3 RS, vec3 AD, float A2, float R, float M, float dotNV){
+    // constants
+    vec3 lightDirection = abs(normalize(light.direction));
+    vec3 H = normalize(VD + lightDirection);
+    float dotNL = max(dot(N, lightDirection), 0.0);
+    float dotNH = max(dot(N, H), 0.0);
+    float dotVH = max(dot(VD, H), 0.0);
+
+    // functions
+    vec3 specularData[2];
+    SpecularTerm(dotNH, A2, dotVH, RS, dotNV, dotNL, R, specularData);
+
+    vec3 specular = specularData[0];
+    vec3 ks = specularData[1];
+    vec3 kd = vec3(1.0) - ks;  
+    kd *= 1.0 - M;
+
+    return (kd * AD + specular) * light.colour * dotNL * light.brightness;
+}
+
+vec3 DirectionalLights(DirectionalLight directionalLights[maxDirectionalLights], int numberOfDirectionalLights, vec3 VD, vec3 N, vec3 RS, vec3 AD, float A2, float R, float M, float dotNV){
+    vec3 accumlativeLight = vec3(0);
+    for(int i = 0; i < numberOfDirectionalLights; i++){
+        accumlativeLight += ProcessDirectionalLight(directionalLights[i], VD, N, RS, AD, A2, R, M, dotNV);
+    }
+    return accumlativeLight;
+}
 
 vec3 GammaCorrect(vec3 col) {
     return pow(col, vec3(1.0/2.2));
@@ -203,19 +194,3 @@ void SpecularTerm(float dotNH, float a2, float cosTheta, vec3 F0, float dotNV,
     info[0] = numerator / CorrectionFactor(dotNV, dotNL);
     info[1] = F;
 };
-
-vec3 getData(MatItem4 item) {
-    return mix(item.raw, texture(item.id, TextureCoords), item.mixValue).rgb;
-}
-vec3 getData(MatItem3 item) {
-    return mix(item.raw, texture(item.id, TextureCoords).rgb, item.mixValue);
-}
-vec3 getNormal(MatItem3 item, vec3 normal) {
-    return mix(normal, texture(item.id, TextureCoords).rgb, item.mixValue);
-}
-float getData(MatItem1 item) {
-    return mix(item.raw, texture(item.id, TextureCoords).r, item.mixValue);
-}
-float getAlpha(MatItem4 item) {
-    return mix(item.raw, texture(item.id, TextureCoords), item.mixValue).a;
-}

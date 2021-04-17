@@ -37,7 +37,7 @@ void SkyBox::draw()
 	Render::Shading::Manager::setValue("skybox", 0);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, texId);
-	mesh->update(0);
+	mesh->render(0);
 }
 
 void SkyBox::cleanUp()
@@ -57,6 +57,11 @@ void SkyBox::setTexture(const int& texId)
 void SkyBox::setTexture(const std::string& name)
 {
 	texId = ResourceLoader::getTexture(name);
+}
+
+Int SkyBox::getTextureId() const
+{
+	return texId;
 }
 
 

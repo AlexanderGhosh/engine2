@@ -17,6 +17,7 @@ namespace Component {
 	class Camera;
 	class RenderMesh;
 	class ParticleEmmiter;
+	class LightBase;
 }
 namespace Primative {
 	class Model;
@@ -27,6 +28,7 @@ namespace Primative {
 }
 enum class GameEventsTypes {
 	Update, FixedUpdate, MouseToggle, MouseMove, KeyToggle,
+	Render,
 	Awake, // will occour when object is added to the scene
 	Start  // will occout before first game loop
 };
@@ -42,6 +44,7 @@ private:
 	std::map<float, Component::RenderMesh*> transparent;
 	std::vector<UI::Canvas*> uiStuff;
 	std::vector<Component::ParticleEmmiter*> emmiters;
+	std::vector<Component::LightBase*> lightSources;
 
 	std::vector<GameObject*> objects;
 	std::unordered_map<std::string, unsigned> preProcessingLayers;
@@ -52,6 +55,7 @@ private:
 	std::vector<Primative::Buffers::StaticBuffer> uniformBuffers;
 	bool isFirstLoop, closing;
 	glm::ivec2 screenDimentions;
+
 
 	void clearFBO() const;
 	void drawObjects(Unsigned shaderId); // just moved
@@ -65,15 +69,19 @@ private:
 	// polling evetns
 	std::vector<GameEventsTypes> getCurrentEvents() const;
 public:
+	bool USE_DEFFERED;	
 	GameScene();
 	void preProcess();
 	void postProcess();
 	void updateObjects();
-	const Primative::Buffers::FrameBuffer& getFBO(const std::string& name);
 	void initalize();
 	void gameLoop();
 	void cleanUp();
 	void close();
+	/// <summary>
+	/// binds the lights to the active shader
+	/// </summary>
+	void bindLights();
 
 	// adders
 	void addPreProcLayer(const std::string& name, const unsigned& shaderId);
@@ -97,5 +105,6 @@ public:
 	/// <param name="name"></param>
 	/// <returns></returns>
 	GameObject* getObject(String name);
+	Primative::Buffers::FrameBuffer& getFBO(const std::string& name);
 };
 

@@ -12,15 +12,13 @@ layout(std140, binding = 0) uniform Matrices
 };
 uniform mat4 model;
 
-out vec3 WorldFragmentPosition;
-out vec3 CameraPosition;
-out vec3 NormalIn;
-out vec2 TextureCoords;
+out vec2 TexCoords;
+out vec3 WorldPosition;
+out vec3 Normal;
 
 void main() {
+    WorldPosition = vec3(model * vec4(pos, 1));
 	gl_Position = projection * view * model * vec4(pos, 1);
-    WorldFragmentPosition = vec3(model * vec4(pos, 1));
-    TextureCoords = tex;
-    NormalIn = norm;
-    CameraPosition = viewPosition;
+    TexCoords = tex;
+    Normal = norm;
 }

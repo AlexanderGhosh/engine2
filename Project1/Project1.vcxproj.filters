@@ -225,6 +225,18 @@
     <ClCompile Include="Componets\CharacterController.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Componets\Lights\DirectionalLight.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Componets\Lights\SpotLight.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Componets\Lights\PointLight.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Componets\Lights\LightBase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Rendering\Rendering.h">
@@ -456,6 +468,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Componets\CharacterController.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Componets\Lights\DirectionalLight.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Componets\Lights\SpotLight.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Componets\Lights\PointLight.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

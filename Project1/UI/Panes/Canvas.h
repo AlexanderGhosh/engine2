@@ -15,7 +15,7 @@ namespace UI {
 		virtual void addElement(Element* element);
 		virtual void addElement(Element& element);
 
-		virtual void update(float deltaTime);
+		virtual void render(float deltaTime);
 		const std::vector<Element*>& getElements() const;
 		const glm::ivec2 getDimentions() const;
 		inline Component::Type getType() const { return Component::Type::Canvas; };

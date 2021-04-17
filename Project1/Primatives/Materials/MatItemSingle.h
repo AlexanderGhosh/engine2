@@ -53,12 +53,14 @@ namespace Materials {
 	inline MatItemSingle<T>::MatItemSingle(const T& raw, Float repeatVal) : MatItemSingle(true, repeatVal)
 	{
 		this->raw = raw;
+		useRaw();
 	}
 
 	template<class T>
 	inline MatItemSingle<T>::MatItemSingle(Unsigned id, Float repeatVal) : MatItemSingle(true, repeatVal)
 	{
 		this->textureId = id;
+		useTexture();
 	}
 
 	template<class T>
