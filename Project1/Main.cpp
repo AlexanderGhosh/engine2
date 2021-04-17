@@ -279,7 +279,7 @@ int main() {
 
     timer.log();
 
-    timer.start("Terrain");
+    timer.start("Terrain"); 
     MI3 lowestColour(dirt);
     lowestColour.useTexture();
     MI3 middleColour(dirt);
@@ -341,6 +341,10 @@ int main() {
     Component::PointLight light(glm::vec3(1));
     lightSource.addComponet(&light);
 
+    GameObject lightSource2({ -1, 2, 0 }, { 1, 1, 1 });
+    Component::PointLight light2(glm::vec3(1), 10.0f);
+    lightSource2.addComponet(&light2);
+
 
     timer.log();
 
@@ -356,6 +360,7 @@ int main() {
 
     scene.addObject(&player);
     scene.addObject(&lightSource);
+    scene.addObject(&lightSource2);
     // scene.addObject(&manObject);
     // scene.addObject(&redWindow);
     // scene.addObject(&yellowWindow);

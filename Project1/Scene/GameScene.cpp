@@ -414,6 +414,9 @@ void GameScene::bindLights()
 		}
 		Render::Shading::Manager::setValue(type, light, count);
 	}
+	Render::Shading::Manager::setValue("numberOfDirectionalLights", directional);
+	Render::Shading::Manager::setValue("numberOfPointLights", point);
+	Render::Shading::Manager::setValue("numberOfSpotLights", spot);
 }
 
 void GameScene::addPreProcLayer(const std::string& name, const unsigned& shaderId)

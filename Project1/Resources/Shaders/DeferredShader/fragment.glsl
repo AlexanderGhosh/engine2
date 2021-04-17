@@ -48,17 +48,20 @@ vec3 getData(MatItem3 item){
 float getData(MatItem1 item){
     return mix(item.raw, texture(item.id, TexCoords).r, item.mixValue);
 }
+vec3 getNormal(MatItem3 item){
+    return mix(Normal, texture(item.id, TexCoords).rgb, item.mixValue);
+}
 
 void main()
 {    
     vec3 albedo     = getData(material.albedo);
-    vec3 normal     = getData(material.normal);
+    vec3 normal     = getNormal(material.normal);
     float metalic   = getData(material.metalic);
     float roughness = getData(material.roughness);
     float ao        = getData(material.ao);
 
     positionOut = vec4(WorldPosition, 1.0);
     albedoOut   = vec4(albedo, 1.0);
-    normalOut   = vec4(Normal, 1.0);
+    normalOut   = vec4(normal, 1.0);
     MetRouAOOut = vec4(metalic, roughness, ao, 1.0);
 }  

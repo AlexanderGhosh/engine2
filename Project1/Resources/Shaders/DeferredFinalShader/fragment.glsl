@@ -3,24 +3,49 @@ precision highp float;
 
 out vec4 FragColour;
 
+// constants
 const float PI = 3.14159265359;
+const int maxPointLights = 100;
+const int maxDirectionalLights = 5;
+const int maxSpotLights = 100;
 
 void SpecularTerm(float dotNH, float a2, float cosTheta, vec3 F0, float dotNV, 
                 float dotNL, float Roughness, inout vec3 info[2]);
 vec3 GammaCorrect(vec3 col);
 
+
+// PBR Functions
 float Distribution(float dotNH, float a2);
 vec3 Reflectance(float cosTheta, vec3 F0);
 float Geometry(float dotNV, float dotNL, float Roughness);
 float CorrectionFactor(float dotNV, float dotNL);
 
+
+// Light Source Data Structures
 struct PointLight {
     vec3 position;
     vec3 colour;
     float brightness;
 };
-const int numberOfPoints = 100;
-uniform PointLight pointLights[numberOfPoints];
+uniform int numberOfPointLights;
+uniform PointLight pointLights[maxPointLights];
+
+struct DirectionalLight {
+    vec3 direction;
+    vec3 colour;
+    float brightness;
+};
+uniform int numberOfDirectionalLights;
+uniform DirectionalLight directionalLights[maxDirectionalLights];
+
+// Light Source Functions
+// POINT LIGHTS
+vec3 ProcessPointLight(PointLight light, vec3 WFP, vec3 VD, vec3 N, vec3 RS, vec3 AD, float A2, float R, float M, float dotNV);
+vec3 PointLights(PointLight pointLights[maxPointLights], int numberOfPointLights, vec3 WFP, vec3 VD, vec3 N, vec3 RS, vec3 AD, float A2, float R, float M, float dotNV);
+// DIRECTIONAL LIGHTS
+vec3 ProcessDirectionalLight(DirectionalLight light);
+vec3 DirectionalLights(DirectionalLight directionalLights[maxDirectionalLights]);
+// SPOT LIGHTS
 
 uniform sampler2D positionTex;
 uniform sampler2D albedoTex;
@@ -33,16 +58,13 @@ in vec3 cameraPosition;
 void main() {
     vec3 WorldFragmentPosition = texture(positionTex, TextureCoords).xyz;
     vec3 Albedo                = pow(texture(albedoTex, TextureCoords).xyz, vec3(2.2)); // PBR gamma corrects
-    vec3 Normal                = texture(normalTex, TextureCoords).xyz;
+    vec3 Normal                = normalize(texture(normalTex, TextureCoords).xyz);
 
     vec3 metRouAO              = texture(MetRouAOTex, TextureCoords).xyz;
 
     float Metallic             = metRouAO.x;
     float Roughness            = metRouAO.y;
     float AO                   = metRouAO.z;
-    Metallic = 0.5;
-    Roughness = 0.5;
-    AO = 0.5;
 
 
     // constants
@@ -55,34 +77,9 @@ void main() {
     // surface reflection at when looking from 0 degrees
     vec3 realSpecular = mix(vec3(0.04), Albedo, Metallic); // 0.04 assumption for metals
 
-    vec3 accumlativeLight = vec3(0);
-    // Spot Light
-    for(int i = 0; i < 1; i++){
-        PointLight light = pointLights[i];
-        // constants
-        vec3 lightDirection = normalize(light.position - WorldFragmentPosition);
-        vec3 H = normalize(viewDirection + lightDirection);
-        float dotNL = max(dot(Normal, lightDirection), 0.0);
-        float dotNH = max(dot(Normal, H), 0.0);
-        float dotVH = max(dot(viewDirection, H), 0.0);
 
-        // light radiance
-        float dist = length(light.position - WorldFragmentPosition);
-        float attenuation = 1.0 / pow(dist, 2.0);
-        vec3 radiance = light.colour * attenuation;
+    vec3 accumlativeLight = PointLights(pointLights, numberOfPointLights, WorldFragmentPosition, viewDirection, Normal, realSpecular, albedoDiffuse, alpha2, Roughness, Metallic, dotNV);
 
-        // functions
-        vec3 specularData[2];
-        SpecularTerm(dotNH, alpha2, dotVH, realSpecular, dotNV, 
-                                        dotNL, Roughness, specularData);
-
-        vec3 specular = specularData[0];
-        vec3 ks = specularData[1];
-        vec3 kd = vec3(1.0) - ks;  
-        kd *= 1.0 - Metallic;
-
-        accumlativeLight += (kd * albedoDiffuse + specular) * radiance * dotNL * light.brightness;
-    }
 
     vec3 ambient = vec3(0.03) * Albedo * AO;
     vec3 colour = ambient + accumlativeLight;
@@ -92,6 +89,40 @@ void main() {
 
     FragColour = vec4(colour, 1.0);
 };
+
+vec3 ProcessPointLight(PointLight light, vec3 WFP, vec3 VD, vec3 N, vec3 RS, vec3 AD, float A2, float R, float M, float dotNV){
+    // constants
+    vec3 lightDirection = normalize(light.position - WFP);
+    vec3 H = normalize(VD + lightDirection);
+    float dotNL = max(dot(N, lightDirection), 0.0);
+    float dotNH = max(dot(N, H), 0.0);
+    float dotVH = max(dot(VD, H), 0.0);
+
+    // light radiance
+    float dist = length(light.position - WFP);
+    float attenuation = 1.0 / pow(dist, 2.0);
+    vec3 radiance = light.colour * attenuation;
+
+    // functions
+    vec3 specularData[2];
+    SpecularTerm(dotNH, A2, dotVH, RS, dotNV, 
+                                    dotNL, R, specularData);
+
+    vec3 specular = specularData[0];
+    vec3 ks = specularData[1];
+    vec3 kd = vec3(1.0) - ks;  
+    kd *= 1.0 - M;
+
+    return (kd * AD + specular) * radiance * dotNL * light.brightness;
+}
+vec3 PointLights(PointLight pointLights[maxPointLights], int numberOfPointLights, vec3 WFP, vec3 VD, vec3 N, vec3 RS, vec3 AD, float A2, float R, float M, float dotNV) {
+    vec3 accumlativeLight = vec3(0);
+    for(int i = 0; i < numberOfPointLights; i++){
+        accumlativeLight += ProcessPointLight(pointLights[i], WFP, VD, N, RS, AD, A2, R, M, dotNV);
+    }
+    return accumlativeLight;
+}
+
 
 vec3 GammaCorrect(vec3 col) {
     return pow(col, vec3(1.0/2.2));
