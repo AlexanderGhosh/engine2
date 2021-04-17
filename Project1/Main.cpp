@@ -344,7 +344,7 @@ int main() {
     lightSource.addComponet(&light);
 
     GameObject lightSource2(glm::vec3(1));
-    Component::DirectionalLight light2 = Component::DirectionalLight(glm::vec3(-1), glm::vec3(1, 0,0), 1.0f);
+    Component::DirectionalLight light2 = Component::DirectionalLight(glm::vec3(1, -1, -1), glm::vec3(1, 0,0), 1.0f);
     lightSource2.addComponet(&light2);
 
 

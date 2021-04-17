@@ -80,7 +80,7 @@ void main() {
     // POINT LIGHTS
     vec3 accumlativeLight = PointLights(pointLights, numberOfPointLights, WorldFragmentPosition, viewDirection, Normal, realSpecular, albedoDiffuse, alpha2, Roughness, Metallic, dotNV);
     // DIRECTIONAL LIGHTS
-    accumlativeLight += DirectionalLights(directionalLights, numberOfDirectionalLights, viewDirection, Normal, realSpecular, albedoDiffuse, alpha2, Roughness, Metallic, dotNV);
+    // accumlativeLight += DirectionalLights(directionalLights, numberOfDirectionalLights, viewDirection, Normal, realSpecular, albedoDiffuse, alpha2, Roughness, Metallic, dotNV);
 
 
     vec3 ambient = vec3(0.03) * Albedo * AO;
@@ -107,8 +107,7 @@ vec3 ProcessPointLight(PointLight light, vec3 WFP, vec3 VD, vec3 N, vec3 RS, vec
 
     // functions
     vec3 specularData[2];
-    SpecularTerm(dotNH, A2, dotVH, RS, dotNV, 
-                                    dotNL, R, specularData);
+    SpecularTerm(dotNH, A2, dotVH, RS, dotNV, dotNL, R, specularData);
 
     vec3 specular = specularData[0];
     vec3 ks = specularData[1];
@@ -127,7 +126,7 @@ vec3 PointLights(PointLight pointLights[maxPointLights], int numberOfPointLights
 
 vec3 ProcessDirectionalLight(DirectionalLight light, vec3 VD, vec3 N, vec3 RS, vec3 AD, float A2, float R, float M, float dotNV){
     // constants
-    vec3 lightDirection = normalize(-light.direction);
+    vec3 lightDirection = abs(normalize(light.direction));
     vec3 H = normalize(VD + lightDirection);
     float dotNL = max(dot(N, lightDirection), 0.0);
     float dotNH = max(dot(N, H), 0.0);
@@ -135,15 +134,14 @@ vec3 ProcessDirectionalLight(DirectionalLight light, vec3 VD, vec3 N, vec3 RS, v
 
     // functions
     vec3 specularData[2];
-    SpecularTerm(dotNH, A2, dotVH, RS, dotNV, 
-                                    dotNL, R, specularData);
+    SpecularTerm(dotNH, A2, dotVH, RS, dotNV, dotNL, R, specularData);
 
     vec3 specular = specularData[0];
     vec3 ks = specularData[1];
     vec3 kd = vec3(1.0) - ks;  
     kd *= 1.0 - M;
 
-    return (kd * AD + specular) * light.colour * clamp(dotNL, 0.0, 1.0) * light.brightness;
+    return (kd * AD + specular) * light.colour * dotNL * light.brightness;
 }
 
 vec3 DirectionalLights(DirectionalLight directionalLights[maxDirectionalLights], int numberOfDirectionalLights, vec3 VD, vec3 N, vec3 RS, vec3 AD, float A2, float R, float M, float dotNV){
