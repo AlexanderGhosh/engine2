@@ -25,6 +25,8 @@
 #include "Componets/Camera.h"
 #include "Componets/AudioReciever.h"
 #include "Componets/CharacterController.h"
+#include "Componets/Lights/PointLight.h"
+#include "Componets/Lights/DirectionalLight.h"
 #include "ParticleSystem/ParticleEmmiter.h"
 
 #include "Physics/Engine.h"
@@ -80,7 +82,8 @@ int main() {
     timer.start("Shaders");
     Gizmos::GizmoRenderer::init();
     std::vector<std::string> shaders = {
-        "PBRShader", "TransparentShader", "ShadowShader", "UIShader", "TextShader", "TerrainShaderHeightMap", "TerrainShaderMesh", "PostShader", "ParticleShader"
+        "PBRShader", "TransparentShader", "ShadowShader", "UIShader", "TextShader", "DeferredRendering/G Pass/DeferredTerrainMap", "DeferredRendering/G Pass/DeferredTerrainMesh", "PostShader", "ParticleShader", 
+        "DeferredRendering/DeferredFinal", "DeferredRendering/G Pass/DeferredOpaque"
     };
     ResourceLoader::createShaders(shaders);
     timer.log();
@@ -99,8 +102,8 @@ int main() {
     // const Primative::Model manModel    = ResourceLoader::createModel("Resources/Models/RFA_Model.fbx"); // RFA_Model
     const Primative::Model cubeBuffer  = ResourceLoader::createModel("Resources/Models/cube.obj"); // needed for the skybox
     const Primative::Model planeBuffer = ResourceLoader::createModel("Resources/Models/plane.dae");
-    const Primative::Model minikitBuffer = ResourceLoader::createModel("Resources/Models/minikit.fbx");
-    const Primative::Model orbBuiffer = ResourceLoader::createModel("Resources/Models/sphere.obj");
+    // const Primative::Model minikitBuffer = ResourceLoader::createModel("Resources/Models/minikit.fbx");
+    const Primative::Model orbBuffer = ResourceLoader::createModel("Resources/Models/sphere.obj");
     timer.log();
 
     timer.start("Animations");
@@ -108,19 +111,32 @@ int main() {
     timer.log();
 
     timer.start("Textures");
-    // const unsigned wi   = ResourceLoader::loadTexture("Resources/Textures/window.png", TextureType::AlbedoMap, 0);
-    // const unsigned wiy  = ResourceLoader::loadTexture("Resources/Textures/yellowWindow.png", TextureType::AlbedoMap, 0);
-    const unsigned hdr  = ResourceLoader::loadCubeMap("Resources/Textures/Galaxy hdr", ".png", 0);
-    const unsigned ibl  = ResourceLoader::loadCubeMap("Resources/Textures/Galaxy ibl", ".png", 0);
-    const unsigned brdf = ResourceLoader::loadTexture("Resources/Textures/ibl brdf.png", TextureType::AlbedoMap, 0);
-    const unsigned hm   = ResourceLoader::loadTexture("Resources/Textures/heightmap.png", TextureType::HeightMap, 0);
-    const unsigned rainDrop = ResourceLoader::loadTexture("Resources/Textures/raindrop.png", TextureType::AlbedoMap, 0);
-    const unsigned grass = ResourceLoader::loadTexture("Resources/Textures/grass.jpg", TextureType::AlbedoMap, 0);
-    const unsigned dirt = ResourceLoader::loadTexture("Resources/Textures/dirt.png", TextureType::AlbedoMap, 0);
+    const unsigned wi   = ResourceLoader::loadTexture("Resources/Textures/window.png", TextureType::AlbedoMap, 0);
+    const unsigned wiy  = ResourceLoader::loadTexture("Resources/Textures/yellowWindow.png", TextureType::AlbedoMap, 0);
+    const unsigned hdr      = ResourceLoader::loadCubeMap("Resources/Textures/Galaxy hdr", ".png", 0);
+    const unsigned ibl      = ResourceLoader::loadCubeMap("Resources/Textures/Galaxy ibl", ".png", 0);
+    const unsigned brdf     = ResourceLoader::loadTexture("Resources/Textures/ibl brdf.png", TextureType::AlbedoMap, 0);
+    // const unsigned hm       = ResourceLoader::loadTexture("Resources/Textures/heightmap.png", TextureType::HeightMap, 0);
+    // const unsigned rainDrop = ResourceLoader::loadTexture("Resources/Textures/raindrop.png", TextureType::AlbedoMap, 0);
+    const unsigned grass    = ResourceLoader::loadTexture("Resources/Textures/grass.jpg", TextureType::AlbedoMap, 0);
+    const unsigned dirt     = ResourceLoader::loadTexture("Resources/Textures/dirt.png", TextureType::AlbedoMap, 0);
 
-    auto waterMaterialInfo = ResourceLoader::createPBRInfo("Resources/Textures/Water", { TextureType::AlbedoMap, TextureType::MetalicMap, TextureType::NormalMap, TextureType::AOMap, TextureType::RoughnessMap }, { 0, 0, 0, 0, 0 });
+    auto waterMaterialInfo = ResourceLoader::createPBRInfo("Resources/Textures/Water", { TextureType::AlbedoMap, TextureType::RoughnessMap, TextureType::NormalMap, TextureType::AOMap, TextureType::MetalicMap }, { 0, 0, 0, 0, 0 });
     auto waterMaterial = ResourceLoader::createPBR(waterMaterialInfo);
-   //Materials::PBR armourMaterial = ResourceLoader::createPBR("Resources/Textures/RFATextures/Armour",
+    // Materials::MatItemSingle<glm::vec4> waterAlbedo({ 0, 0, 1, 1 });
+    // waterAlbedo.useRaw();
+    // Materials::MatItemSingle<float> waterMetalic(0.5f);
+    // waterMetalic.useRaw();
+    // Materials::MatItemSingle<float> waterRoughness(0.5f);
+    // waterRoughness.useRaw();
+    // Materials::MatItemSingle<float> waterAO(0.5f);
+    // waterAO.useRaw();
+
+    // waterMaterial.setAlbedo(&waterAlbedo);
+    // waterMaterial.setMetalic(&waterMetalic);
+    // waterMaterial.setRoughness(&waterRoughness);
+    // waterMaterial.setAO(&waterAO);
+  //Materials::PBR armourMaterial = ResourceLoader::createPBR("Resources/Textures/RFATextures/Armour",
    //    { TextureType::AlbedoMap, TextureType::AOMap, TextureType::MetalicMap, TextureType::NormalMap, TextureType::RoughnessMap },
    //    { 0, 0, 0, 0, 0 });
    //armourMaterial.setHDRmap(hdr);
@@ -258,14 +274,14 @@ int main() {
     GameObject orb;
     orb.getTransform()->Position.y = 3.5;
     Component::RenderMesh orbMesh = Component::RenderMesh();
-    orbMesh.setModel(orbBuiffer);
+    orbMesh.setModel(orbBuffer);
     orbMesh.setMaterial(&waterMaterial);
     orb.addComponet(&orbMesh);
 
 
     timer.log();
 
-    timer.start("Terrain");
+    timer.start("Terrain"); 
     MI3 lowestColour(dirt);
     lowestColour.useTexture();
     MI3 middleColour(dirt);
@@ -287,7 +303,6 @@ int main() {
             land.setPosition(glm::vec3(i * scale, -0.5f, j * scale));
             land.setScale({ scale, 10, scale });
             land.setNoiseBuffer(Utils::NoiseGeneration::getMap(glm::vec3(i, j, 0), landRes + 1, { 1, 0.5, 0.1 }, { 1, 2, 3 }));
-            land.setHeightMap(hm);
             land.useTextureMap(false);
 
             land.setLowestTexture(&lowestColour);
@@ -310,7 +325,7 @@ int main() {
 
 
     timer.start("Player");
-    GameObject player = GameObject({ 0, 0, 0 }, { 1, 1, 1 });
+    GameObject player = GameObject(glm::vec3(0, 0, 5));
     Component::Camera playerCamera = Component::Camera();
     player.addComponet(&playerCamera);
     Component::CharacterController cc;
@@ -323,6 +338,41 @@ int main() {
     Component::AudioReciever recieverComp;
     player.addComponet(&recieverComp);
 
+
+    GameObject lightSource(glm::vec3(1, 100, 0));
+    Component::PointLight light(glm::vec3(1));
+    lightSource.addComponet(&light);
+
+    GameObject lightSource2(glm::vec3(1));
+    Component::DirectionalLight light2 = Component::DirectionalLight(glm::vec3(1, -1, -1), glm::vec3(1, 0,0), 1.0f);
+    lightSource2.addComponet(&light2);
+
+
+    Materials::MatItemSingle<glm::vec4> windowAlbedo(wi);
+    Materials::MatItemSingle<glm::vec3> windowNormal(glm::vec3(0, 1, 0));
+    Materials::MatItemSingle<float> windowMetalic(0.5f);
+    Materials::MatItemSingle<float> windowRoughness(0.5f);
+    Materials::MatItemSingle<float> windowAO(0.5f);
+
+    Materials::PBR windowMat1(&windowAlbedo, &windowNormal, &windowMetalic, &windowRoughness, &windowAO);
+
+    Materials::MatItemSingle<glm::vec4> windowAlbedo2(wiy);
+
+    Materials::PBR windowMat2(&windowAlbedo2, &windowNormal, &windowMetalic, &windowRoughness, &windowAO);
+
+    GameObject window1(glm::vec3(0, 3.5, -3));
+    Component::RenderMesh windowMesh1;
+    windowMesh1.setModel(planeBuffer);
+    windowMesh1.setMaterial(&windowMat1);
+    windowMesh1.setTransparent(true);
+    window1.addComponet(&windowMesh1);
+
+    GameObject window2(glm::vec3(0.5, 3.5, -4));
+    Component::RenderMesh windowMesh2;
+    windowMesh2.setModel(planeBuffer);
+    windowMesh2.setMaterial(&windowMat2);
+    windowMesh2.setTransparent(true);
+    window2.addComponet(&windowMesh2);
 
     timer.log();
 
@@ -337,9 +387,11 @@ int main() {
     scene.initalize();
 
     scene.addObject(&player);
-    // scene.addObject(&manObject);
-    // scene.addObject(&redWindow);
-    // scene.addObject(&yellowWindow);
+    scene.addObject(&lightSource);
+    scene.addObject(&lightSource2);
+    scene.addObject(&window1);
+    scene.addObject(&window2);
+
     scene.addObject(&orb);
     for (Terrain& land : allLand) {
         scene.addTerrain(&land);
@@ -370,7 +422,7 @@ int main() {
     // cube2->getRigidbody()->hasGravity = true;
     //cube2->getRigidbody()->velocityAdder({ 1, -1, 0 });
 
-    Gizmos::Sphere gizmo1 = Gizmos::Sphere({ 50, -1, 50 }, { 1, 0, 0 });
+    Gizmos::Sphere gizmo1 = Gizmos::Sphere({ 0, 4, 0 }, { 1, 0, 0 });
     gizmo1.setRadius(0.25);
     gizmo1.setThickness(2);
     Gizmos::GizmoRenderer::addGizmo(&gizmo1);
