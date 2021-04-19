@@ -12,6 +12,7 @@ const int maxSpotLights = 100;
 void SpecularTerm(float dotNH, float a2, float cosTheta, vec3 F0, float dotNV, 
                 float dotNL, float Roughness, inout vec3 info[2]);
 vec3 GammaCorrect(vec3 col);
+vec3 ToneMap(vec3 a);
 
 
 // PBR Functions
@@ -52,6 +53,7 @@ uniform sampler2D albedoTex;
 uniform sampler2D normalTex;
 uniform sampler2D MetRouAOTex;
 
+in float CameraExposure;
 in vec2 TextureCoords;
 in vec3 cameraPosition;
 
@@ -86,7 +88,7 @@ void main() {
     vec3 ambient = vec3(0.03) * Albedo * AO;
     vec3 colour = ambient + accumlativeLight;
 
-    colour /= colour + vec3(1.0); // HDR
+    colour = ToneMap(colour); // HDR
     colour = GammaCorrect(colour);
 
     FragColour = vec4(colour, 1.0);
@@ -155,6 +157,11 @@ vec3 DirectionalLights(DirectionalLight directionalLights[maxDirectionalLights],
 vec3 GammaCorrect(vec3 col) {
     return pow(col, vec3(1.0/2.2));
 };
+
+vec3 ToneMap(vec3 a){
+    return vec3(1.0) - exp(-a * CameraExposure); // more controll
+    return a / (a + vec3(1.0)); // less controll
+}
 
 float Distribution(float dotNH, float a2) {
     // Micro Geometry Distribution Function

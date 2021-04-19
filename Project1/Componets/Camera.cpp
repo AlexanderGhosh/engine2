@@ -39,3 +39,13 @@ Vector3 Component::Camera::getPos() const
 {
 	return parent->getTransform()->Position;
 }
+
+Float Component::Camera::getExposure() const
+{
+	return exposure;
+}
+
+void Component::Camera::setExposure(Float expo)
+{
+	exposure = expo;
+}

@@ -94,7 +94,7 @@ std::array<int, 4> Primative::Buffers::FrameBuffer::getBufferData(String type, u
 		res[0] = GL_RGBA16F;
 		res[1] = GL_RGBA;
 		res[2] = GL_COLOR_ATTACHMENT0 + colAttach++;
-		res[3] = GL_UNSIGNED_BYTE;
+		res[3] = GL_FLOAT;
 	}
 	else if (type == "depth") {
 		res[0] = GL_DEPTH_COMPONENT;

@@ -295,7 +295,7 @@ void GameScene::initalize()
 	
 
 
-	Primative::Buffers::StaticBuffer mainBuffer("m4, m4, v3, f", 0);
+	Primative::Buffers::StaticBuffer mainBuffer("m4, m4, v3, f, f", 0);
 	// view    | matrix 4
 	// proj    | matrix 4
 	// viewPos | vector 3
@@ -306,6 +306,8 @@ void GameScene::initalize()
 	mainBuffer.fill(1, glm::value_ptr(projection));
 	float gamma = 2.2f;
 	mainBuffer.fill(3, &gamma);
+	if(mainCamera)
+		mainBuffer.fill(4, &mainCamera->getExposure());
 
 	Primative::Buffers::StaticBuffer lsUBO("m4", 1);
 	// lspaceM | matrix 4
@@ -464,6 +466,8 @@ void GameScene::setContext(Context* context)
 void GameScene::setMainCamera(Component::Camera* camera)
 {
 	mainCamera = camera;
+	if(uniformBuffers.size())
+		uniformBuffers.front().fill(4, &mainCamera->getExposure());
 }
 
 const glm::ivec2& GameScene::getScreenDimentions() const

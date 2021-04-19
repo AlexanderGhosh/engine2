@@ -8,8 +8,10 @@ layout(std140, binding = 0) uniform Matrices
     mat4 projection;
     vec3 viewPosition;
     float gamma;
+    float camExposure;
 };
 
+out float CameraExposure;
 out vec2 TextureCoords;
 out vec3 cameraPosition;
 
@@ -18,4 +20,5 @@ void main() {
     TextureCoords = tex;
     TextureCoords.y *= -1;
     cameraPosition = viewPosition;
+    CameraExposure = camExposure;
 }
