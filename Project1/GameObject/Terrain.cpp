@@ -45,22 +45,37 @@ void Terrain::getIndices(std::vector<unsigned>& indices, int resolution) {
 }
 glm::vec3 Terrain::getNormal(glm::vec2 pos) const
 {
-	return glm::vec3(0, 1, 0);
-	pos *= resolution;
-	glm::vec3 off(1.0, 1.0, 0.0);
-	glm::vec2 off1(1, 0);
-	glm::vec2 off2(0, 1);
+	const float adder = 1.0f / static_cast<float>(resolution - 1);
+	glm::vec2 off1(adder, 0.0);
+	glm::vec2 off2(0.0, adder);
 	float hL = getHeight(pos - off1);
 	float hR = getHeight(pos + off1);
 	float hD = getHeight(pos - off2);
 	float hU = getHeight(pos + off2);
 
 	// deduce terrain normal
-	glm::vec3 norm(hL - hR, hD - hU, 2);
-	norm.x = hL - hR;
-	norm.y = hD - hU;
-	norm.z = 2.0;
-	return Utils::normalize(norm);
+	auto res = Utils::normalize(glm::vec3(hL - hR, 2, hD - hU));
+	return res;
+
+	/*
+	
+		// # P.xy store the position for which we want to calculate the normals
+		// # height() here is a function that return the height at a point in the terrain
+	
+		// read neightbor heights using an arbitrary small offset
+		vec3 off = vec3(1.0, 1.0, 0.0);
+		float hL = height(P.xy - off.xz);
+		float hR = height(P.xy + off.xz);
+		float hD = height(P.xy - off.zy);
+		float hU = height(P.xy + off.zy);
+	
+		// deduce terrain normal
+		N.x = hL - hR;
+		N.y = hD - hU;
+		N.z = 2.0;
+		N = normalize(N);
+
+	*/
 }
 void Terrain::init()
 {

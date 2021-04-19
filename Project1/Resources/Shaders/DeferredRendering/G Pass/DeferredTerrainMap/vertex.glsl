@@ -32,8 +32,8 @@ vec3 calcNormal(vec2 position){
     // deduce terrain normal
     vec3 normal = vec3(0);
     normal.x = hL - hR;
-    normal.y = hD - hU;
-    normal.z = 2.0;
+    normal.y = 2.0;
+    normal.z = hD - hU;
     return normalize(normal);
 }
 

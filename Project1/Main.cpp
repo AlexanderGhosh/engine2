@@ -345,7 +345,7 @@ int main() {
 
 
     GameObject lightSource(glm::vec3(0.5, 3.5, -2.5));
-    Component::PointLight light(glm::vec3(1), 1);
+    Component::PointLight light(glm::vec3(1), 100.0f);
     lightSource.addComponet(&light);
 
     GameObject lightSource2(glm::vec3(1));
