@@ -83,7 +83,7 @@ int main() {
     Gizmos::GizmoRenderer::init();
     std::vector<std::string> shaders = {
         "PBRShader", "TransparentShader", "ShadowShader", "UIShader", "TextShader", "DeferredRendering/G Pass/DeferredTerrainMap", "DeferredRendering/G Pass/DeferredTerrainMesh", "PostShader", "ParticleShader", 
-        "DeferredRendering/DeferredFinal", "DeferredRendering/G Pass/DeferredOpaque"
+        "DeferredRendering/DeferredFinal", "DeferredRendering/G Pass/DeferredOpaque", "GausianBlur"
     };
     ResourceLoader::createShaders(shaders);
     timer.log();
@@ -286,7 +286,7 @@ int main() {
     MI3 middleColour(dirt);
     MI3 highestColour(grass, 10.0f);
 
-    Materials::MatItemSingle<glm::vec4> landAlbedo(grass, 10.0f);
+    Materials::MatItemSingle<glm::vec4> landAlbedo(grass, 20.0f);
     Materials::MatItemSingle<glm::vec3> landNormal(glm::vec3(0, 1, 0));
     Materials::MatItemSingle<float> landMetalic(0.4f);
     Materials::MatItemSingle<float> landRoughness(0.7f);
@@ -388,7 +388,7 @@ int main() {
     GameScene scene;
     scene.setMainCamera(&playerCamera);
     scene.setContext(&main);
-    scene.setBG({ 1, 0, 0 });
+    scene.setBG({ 1, 0.5, 0.25 });
     scene.initalize();
 
     scene.addObject(&player);

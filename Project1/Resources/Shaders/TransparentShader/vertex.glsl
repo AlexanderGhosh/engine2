@@ -9,6 +9,7 @@ layout(std140, binding = 0) uniform Matrices
     mat4 projection;
     vec3 viewPosition;
     float gamma;
+    float camExposure;
 };
 uniform mat4 model;
 
@@ -16,6 +17,8 @@ out vec3 WorldFragmentPosition;
 out vec3 CameraPosition;
 out vec3 NormalIn;
 out vec2 TextureCoords;
+out float CameraExposure;
+out float GammaValue;
 
 void main() {
 	gl_Position = projection * view * model * vec4(pos, 1);
@@ -23,4 +26,6 @@ void main() {
     TextureCoords = tex;
     NormalIn = norm;
     CameraPosition = viewPosition;
+    CameraExposure = camExposure;
+    GammaValue = gamma;
 }

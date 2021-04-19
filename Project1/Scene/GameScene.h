@@ -5,6 +5,9 @@
 #include "../Primatives/Model.h"
 #include "../Utils/General.h"
 
+#define BLUR_ITTERATIONS 10
+#define USES_BLUR false
+
 class SkyBox;
 class Context;
 class GameObject;
@@ -48,8 +51,10 @@ private:
 
 	std::vector<GameObject*> objects;
 	std::unordered_map<std::string, unsigned> preProcessingLayers;
+	std::unordered_map<std::string, unsigned> postProcessingLayers;
 	unsigned currentTick, postProcShaderId;
-	std::unordered_map<std::string, Primative::Buffers::FrameBuffer> FBOs;
+	std::unordered_map<std::string, Primative::Buffers::FrameBuffer> FBOs_pre;
+	std::unordered_map<std::string, std::vector<Primative::Buffers::FrameBuffer>> FBOs_post;
 	glm::vec3 backgroundColour;
 	Context* mainContext;
 	std::vector<Primative::Buffers::StaticBuffer> uniformBuffers;
@@ -84,15 +89,17 @@ public:
 	void bindLights();
 
 	// adders
-	void addPreProcLayer(const std::string& name, const unsigned& shaderId);
-	void addFBO(const std::string& layerName, Primative::Buffers::FrameBuffer fbo);
+	void addPreProcLayer(String name, Unsigned shaderId);
+	void addPostProcLayer(String name, Unsigned shaderId);
+	void addFBO_Pre(String layerName, Primative::Buffers::FrameBuffer fbo);
+	void addFBO_Post(String layerName, Primative::Buffers::FrameBuffer fbo);
 	void addObject(GameObject* obj);
 	void addTerrain(Terrain* terrain);
 	void processComponet(Component::ComponetBase* comp);
 
 	// setters
 	void setBG(Vector3 col);
-	void setPostProcShader(const unsigned& shaderId);
+	void setPostProcShader(Unsigned shaderId);
 	void setSkyBox(SkyBox* sb);
 	void setContext(Context* context);
 	void setMainCamera(Component::Camera* camera);
@@ -105,6 +112,7 @@ public:
 	/// <param name="name"></param>
 	/// <returns></returns>
 	GameObject* getObject(String name);
-	Primative::Buffers::FrameBuffer& getFBO(const std::string& name);
+	Primative::Buffers::FrameBuffer& getFBO(String name);
+	std::vector<Primative::Buffers::FrameBuffer>& getFBOs(String name);
 };
 

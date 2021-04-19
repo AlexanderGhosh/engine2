@@ -18,7 +18,7 @@ namespace Primative {
 			std::array<int, 4> getBufferData(String type, unsigned& colAttach) const;
 		public:
 			FrameBuffer();
-			FrameBuffer(const std::vector<std::string>& textures, const glm::ivec2& dimentions, const glm::vec3& bgColour);
+			FrameBuffer(const std::vector<std::string>& textures, const glm::ivec2& dimentions, const glm::vec3& bgColour = Utils::zero());
 			~FrameBuffer() = default;
 			void cleanUp();
 

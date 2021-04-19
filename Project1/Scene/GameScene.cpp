@@ -34,7 +34,7 @@ std::vector<GameEventsTypes> GameScene::getCurrentEvents() const
 	return res;
 }
 
-GameScene::GameScene() : objects(), preProcessingLayers(), currentTick(0), postProcShaderId(0), FBOs(), backgroundColour(0),
+GameScene::GameScene() : objects(), preProcessingLayers(), currentTick(0), postProcShaderId(0), FBOs_pre(), backgroundColour(0),
 							skybox(nullptr), mainContext(nullptr), opaque(), transparent(), mainCamera(nullptr), terrain(), 
 							quadModel(), isFirstLoop(false), closing(false), uiStuff(), screenDimentions(0), emmiters(), lightSources(), USE_DEFFERED(1)
 {
@@ -167,7 +167,7 @@ void GameScene::preProcess()
 		else if (name == "LightingPass") {
 			int unit = 0;
 			bindLights();
-			Primative::Buffers::FrameBuffer& gBuffer = FBOs["G-Buffer"];
+			Primative::Buffers::FrameBuffer& gBuffer = FBOs_pre["G-Buffer"];
 			gBuffer.activateColourTextures(unit, { "positionTex", "albedoTex", "normalTex", "MetRouAOTex" });
 
 			const Primative::Buffers::VertexBuffer& buffer = ResourceLoader::getBuffer(quadModel.getBuffers()[0]);
@@ -199,22 +199,51 @@ void GameScene::preProcess()
 
 void GameScene::postProcess()
 {
+	const Primative::Buffers::VertexBuffer& buffer = ResourceLoader::getBuffer(quadModel.getBuffers()[0]);
+	for (auto& layer : postProcessingLayers) {
+		String layerName = layer.first;
+		Unsigned shaderId = layer.second;
+		auto& fbos = getFBOs(layerName);
+		Render::Shading::Manager::setActive(shaderId);
+		if (layerName == "Blur" AND USES_BLUR) {
+			bool first_itteration = true;
+			bool horizontal = true;
+			for (int i = 0; i < BLUR_ITTERATIONS; i++) {
+				auto& fbo = fbos[horizontal];
+				fbo.bind();
+				fbo.clearBits();
+				Render::Shading::Manager::setValue("horizontal", horizontal);
+				horizontal = NOT horizontal;
+				int unit = 0;
+				if (first_itteration) {
+					glActiveTexture(GL_TEXTURE0);
+					glBindTexture(GL_TEXTURE_2D, FBOs_pre["LightingPass"].getTexture("col1"));
+				}
+				else {
+					fbos[horizontal].activateColourTextures(unit, { "tex" });
+				}
+				buffer.render();
+				first_itteration = false;
+			}
+		}
+	}
+
 	glBindFramebuffer(GL_FRAMEBUFFER, 0); // default fbo
 	clearFBO();
-
-
+	
 	Render::Shading::Manager::setActive(postProcShaderId);
 	
 	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, FBOs_pre["LightingPass"].getTexture("col0"));
+	if (USES_BLUR) {
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, FBOs_post["Blur"][0].getTexture("col0"));
+		Render::Shading::Manager::setValue("bloomBlur", 1);
+	}
 
-	// if(USE_DEFFERED)
-		glBindTexture(GL_TEXTURE_2D, FBOs["LightingPass"].getTexture("col0"));
-	/*else
-		glBindTexture(GL_TEXTURE_2D, FBOs["final"].getTexture("col0"));*/
-
-	Render::Shading::Manager::setValue("tex", 0);
+	Render::Shading::Manager::setValue("scene", 0);
+	Render::Shading::Manager::setValue("Blur", USES_BLUR);
 	
-	const Primative::Buffers::VertexBuffer& buffer = ResourceLoader::getBuffer(quadModel.getBuffers()[0]);
 	buffer.render();
 }
 
@@ -256,45 +285,67 @@ void GameScene::drawSkyBox()
 	mainContext->enable(GL_CULL_FACE);
 }
 
-Primative::Buffers::FrameBuffer& GameScene::getFBO(const std::string& name)
+Primative::Buffers::FrameBuffer& GameScene::getFBO(String name)
 {
 	if (name == "any") {
-		return (*FBOs.begin()).second;
+		return (*FBOs_pre.begin()).second;
 	}
-	const unsigned& s = FBOs.size();
-	auto& r = FBOs[name];
-	if (s < FBOs.size()) {
-		FBOs.erase(name);
-		return (*(FBOs.begin()++)).second;
+	Unsigned s = FBOs_pre.size();
+	auto& r = FBOs_pre[name];
+	if (s < FBOs_pre.size()) {
+		FBOs_pre.erase(name);
+		return (*(FBOs_pre.begin()++)).second;
+	}
+	return r;
+}
+
+std::vector<Primative::Buffers::FrameBuffer>& GameScene::getFBOs(String name)
+{
+	const int s = FBOs_post.size();
+	auto& r = FBOs_post[name];
+	if (s != FBOs_post.size()) {
+		FBOs_post.erase(name);
+		return (*(FBOs_post.begin()++)).second;
 	}
 	return r;
 }
 
 void GameScene::initalize()
 {
-	Primative::Buffers::FrameBuffer g_buffer_FBO({ "col0", "col1", "col2", "col3" }, screenDimentions, { 0, 0, 0 });
-	Primative::Buffers::FrameBuffer lighting_FBO({ "col0" }, screenDimentions, { 0, 0, 0 });
+#pragma region Pre Processing
+	Primative::Buffers::FrameBuffer g_buffer_FBO({ "col0", "col1", "col2", "col3" }, screenDimentions);
+	Primative::Buffers::FrameBuffer lighting_FBO({ "col0", "col1" }, screenDimentions);
 
-	addFBO("G-Buffer", g_buffer_FBO);
+	addFBO_Pre("G-Buffer", g_buffer_FBO);
 	addPreProcLayer("G-Buffer", ResourceLoader::getShader("DeferredOpaque"));
 
-	addFBO("LightingPass", lighting_FBO);
+	addFBO_Pre("LightingPass", lighting_FBO);
 	addPreProcLayer("LightingPass", ResourceLoader::getShader("DeferredFinal"));
-	
+
 	/*if(NOT USE_DEFFERED OR true) {
 		Primative::Buffers::FrameBuffer shadowFBO({ "depth" }, screenDimentions, { 1, 0, 1 });
 		Primative::Buffers::FrameBuffer finalFBO({ "col0" }, screenDimentions, { 0, 0, 0 });
-		addFBO("shadows", shadowFBO);
+		addFBO_Pre("shadows", shadowFBO);
 		addPreProcLayer("shadows", ResourceLoader::getShader("ShadowShader"));
 
-		addFBO("final", finalFBO);
+		addFBO_Pre("final", finalFBO);
 		addPreProcLayer("final", ResourceLoader::getShader("PBRShader"));
 	}*/
 
 	setPostProcShader(ResourceLoader::getShader("PostShader")); // PBRShader  PostShader
+#pragma endregion
+
+#pragma region Post Processing
+	if (USES_BLUR) {
+		Primative::Buffers::FrameBuffer blur1_FBO({ "col0" }, screenDimentions);
+		Primative::Buffers::FrameBuffer blur2_FBO({ "col0" }, screenDimentions);
+		addFBO_Post("Blur", blur1_FBO);
+		addFBO_Post("Blur", blur2_FBO);
+		addPostProcLayer("Blur", ResourceLoader::getShader("GausianBlur"));
+	}
+#pragma endregion
+
 	
-
-
 	Primative::Buffers::StaticBuffer mainBuffer("m4, m4, v3, f, f", 0);
 	// view    | matrix 4
 	// proj    | matrix 4
@@ -366,9 +417,15 @@ void GameScene::cleanUp()
 		obj = nullptr;
 	}
 	objects.clear();
-	for (auto& pair : FBOs) {
+	for (auto& pair : FBOs_pre) {
 		Primative::Buffers::FrameBuffer& fbo = pair.second;
 		fbo.cleanUp();
+	}
+	for (auto& pair : FBOs_post) {
+		for (auto itt = pair.second.begin(); itt != pair.second.end();) {
+			(*itt).cleanUp();
+			itt = pair.second.erase(itt);
+		}
 	}
 	for (auto itt = uniformBuffers.begin(); itt != uniformBuffers.end();) {
 		(*itt).cleanUp();
@@ -391,7 +448,8 @@ void GameScene::cleanUp()
 		itt = lightSources.erase(itt);
 	}
 
-	FBOs.clear();
+	FBOs_pre.clear();
+	FBOs_post.clear();
 	if(skybox)
 		skybox->cleanUp();
 	skybox = nullptr;
@@ -437,17 +495,26 @@ void GameScene::bindLights()
 	Render::Shading::Manager::setValue("numberOfSpotLights", spot);
 }
 
-void GameScene::addPreProcLayer(const std::string& name, const unsigned& shaderId)
+void GameScene::addPreProcLayer(String name, Unsigned shaderId)
 {
 	this->preProcessingLayers[name] = shaderId;	
 }
 
-void GameScene::addFBO(const std::string& layerName, Primative::Buffers::FrameBuffer fbo)
+void GameScene::addPostProcLayer(String name, Unsigned shaderId)
 {
-	FBOs.insert({ layerName, fbo });
-};
+	this->postProcessingLayers[name] = shaderId;
+}
 
-void GameScene::setPostProcShader(const unsigned& shaderId)
+void GameScene::addFBO_Pre(String layerName, Primative::Buffers::FrameBuffer fbo)
+{
+	FBOs_pre[layerName] = fbo;
+}
+void GameScene::addFBO_Post(String layerName, Primative::Buffers::FrameBuffer fbo)
+{
+	FBOs_post[layerName].push_back(fbo);
+}
+
+void GameScene::setPostProcShader(Unsigned shaderId)
 {
 	postProcShaderId = shaderId;
 };

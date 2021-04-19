@@ -1,7 +1,7 @@
 #version 460 core
 precision highp float;
-
-out vec4 FragColour;
+layout (location = 0) out vec4 FragColour;
+layout (location = 1) out vec4 BrightColor; 
 
 // constants
 const float PI = 3.14159265359;
@@ -11,8 +11,9 @@ const int maxSpotLights = 100;
 
 void SpecularTerm(float dotNH, float a2, float cosTheta, vec3 F0, float dotNV, 
                 float dotNL, float Roughness, inout vec3 info[2]);
-vec3 GammaCorrect(vec3 col);
-vec3 ToneMap(vec3 a);
+/*vec3 GammaCorrect(vec3 col);
+vec3 ToneMap(vec3 a);*/
+void ProcessOutputs(vec3 colour);
 
 
 // PBR Functions
@@ -54,12 +55,13 @@ uniform sampler2D normalTex;
 uniform sampler2D MetRouAOTex;
 
 in float CameraExposure;
+in float GammaValue;
 in vec2 TextureCoords;
 in vec3 cameraPosition;
 
 void main() {
     vec3 WorldFragmentPosition = texture(positionTex, TextureCoords).xyz;
-    vec3 Albedo                = pow(texture(albedoTex, TextureCoords).xyz, vec3(2.2)); // PBR gamma corrects
+    vec3 Albedo                = pow(texture(albedoTex, TextureCoords).xyz, vec3(GammaValue)); // PBR gamma corrects
     vec3 Normal                = normalize(texture(normalTex, TextureCoords).xyz);
 
     vec3 metRouAO              = texture(MetRouAOTex, TextureCoords).xyz;
@@ -88,10 +90,13 @@ void main() {
     vec3 ambient = vec3(0.03) * Albedo * AO;
     vec3 colour = ambient + accumlativeLight;
 
-    colour = ToneMap(colour); // HDR
-    colour = GammaCorrect(colour);
+    /*colour = ToneMap(colour); // HDR
+    colour = GammaCorrect(colour);*/
 
+    ProcessOutputs(colour);
     FragColour = vec4(colour, 1.0);
+
+
 };
 
 vec3 ProcessPointLight(PointLight light, vec3 WFP, vec3 VD, vec3 N, vec3 RS, vec3 AD, float A2, float R, float M, float dotNV){
@@ -154,14 +159,26 @@ vec3 DirectionalLights(DirectionalLight directionalLights[maxDirectionalLights],
     return accumlativeLight;
 }
 
-vec3 GammaCorrect(vec3 col) {
-    return pow(col, vec3(1.0/2.2));
+/*vec3 GammaCorrect(vec3 col) {
+    return pow(col, vec3(1.0/GammaValue));
 };
 
 vec3 ToneMap(vec3 a){
     return vec3(1.0) - exp(-a * CameraExposure); // more controll
     return a / (a + vec3(1.0)); // less controll
+}*/
+
+void ProcessOutputs(vec3 colour){
+    FragColour = vec4(colour, 1.0);    
+
+    float brightness = dot(FragColour.rgb, vec3(0.2126, 0.7152, 0.0722));
+
+    if(brightness > 1.0)
+        BrightColor = vec4(FragColour.rgb, 1.0);
+    else
+        BrightColor = vec4(0.0, 0.0, 0.0, 1.0);
 }
+
 
 float Distribution(float dotNH, float a2) {
     // Micro Geometry Distribution Function

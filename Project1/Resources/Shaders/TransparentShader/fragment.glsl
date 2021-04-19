@@ -1,7 +1,8 @@
 #version 460 core
 precision highp float;
+layout (location = 0) out vec4 FragColour;
+layout (location = 1) out vec4 BrightColor; 
 
-out vec4 FragColour;
 
 // constants
 const float PI = 3.14159265359;
@@ -11,7 +12,9 @@ const int maxSpotLights = 100;
 
 void SpecularTerm(float dotNH, float a2, float cosTheta, vec3 F0, float dotNV, 
                 float dotNL, float Roughness, inout vec3 info[2]);
-vec3 GammaCorrect(vec3 col);
+/*vec3 GammaCorrect(vec3 col);
+vec3 ToneMap(vec3 a);*/
+void ProcessOutputs(vec3 colour, float alphaValue);
 
 
 // PBR Functions
@@ -85,10 +88,12 @@ vec3 DirectionalLights(DirectionalLight directionalLights[maxDirectionalLights])
 
 uniform Material material;
 
+in float CameraExposure;
 in vec3 WorldFragmentPosition;
 in vec3 CameraPosition;
 in vec3 NormalIn;
 in vec2 TextureCoords;
+in float GammaValue;
 
 void main() {
     // vec3  = texture(positionTex, TextureCoords).xyz;
@@ -121,12 +126,12 @@ void main() {
     vec3 colour = ambient + accumlativeLight;
 
 
-    colour /= colour + vec3(1.0); // HDR
-    colour = GammaCorrect(colour);
+    /*colour = ToneMap(colour);
+    colour = GammaCorrect(colour);*/
     
     //colour = Albedo;
 
-    FragColour = vec4(colour, alphaValue);
+    ProcessOutputs(colour, alphaValue);
 };
 
 vec3 ProcessPointLight(PointLight light, vec3 WFP, vec3 VD, vec3 N, vec3 RS, vec3 AD, float A2, float R, float M, float dotNV, float alphaValue){
@@ -163,9 +168,25 @@ vec3 PointLights(PointLight pointLights[maxPointLights], int numberOfPointLights
 }
 
 
-vec3 GammaCorrect(vec3 col) {
-    return pow(col, vec3(1.0/2.2));
+/*vec3 GammaCorrect(vec3 col) {
+    return pow(col, vec3(1.0/GammaValue));
 };
+
+vec3 ToneMap(vec3 a){
+    return vec3(1.0) - exp(-a * CameraExposure); // more controll
+    return a / (a + vec3(1.0)); // less controll
+}*/
+
+void ProcessOutputs(vec3 colour, float alphaValue){
+    FragColour = vec4(colour, alphaValue);    
+
+    float brightness = dot(FragColour.rgb, vec3(0.2126, 0.7152, 0.0722));
+
+    if(brightness > 1.0)
+        BrightColor = vec4(FragColour.rgb, 1.0);
+    else
+        BrightColor = vec4(0.0, 0.0, 0.0, 1.0);
+}
 
 float Distribution(float dotNH, float a2) {
     // Micro Geometry Distribution Function

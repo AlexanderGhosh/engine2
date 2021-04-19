@@ -12,6 +12,7 @@ layout(std140, binding = 0) uniform Matrices
 };
 
 out float CameraExposure;
+out float GammaValue;
 out vec2 TextureCoords;
 out vec3 cameraPosition;
 
@@ -21,4 +22,5 @@ void main() {
     TextureCoords.y *= -1;
     cameraPosition = viewPosition;
     CameraExposure = camExposure;
+    GammaValue = gamma;
 }
