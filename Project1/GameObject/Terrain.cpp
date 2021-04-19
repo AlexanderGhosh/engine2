@@ -14,7 +14,8 @@ Terrain::Terrain() : resolution(), transform(), groundBuffer(), heightMap(0), us
 {
 	if (NOT gottenShader) {
 		shaderHM = ResourceLoader::getShader("DeferredTerrainMap");
-		shaderMesh = ResourceLoader::getShader("DeferredTerrainMesh");
+		// shaderMesh = ResourceLoader::getShader("DeferredTerrainMesh");
+		shaderMesh = ResourceLoader::getShader("DeferredOpaque");
 	}
 }
 

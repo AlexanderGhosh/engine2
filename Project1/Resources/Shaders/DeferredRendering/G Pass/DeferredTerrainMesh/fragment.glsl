@@ -66,6 +66,6 @@ void main()
     positionOut = vec4(WorldPosition, 1.0);
 
     albedoOut   = vec4(albedo, 1.0);
-    normalOut   = vec4(Normal, 1.0);
+    normalOut   = vec4(normal, 1.0);
     MetRouAOOut = vec4(metalic, roughness, ao, 1.0);
 }  
