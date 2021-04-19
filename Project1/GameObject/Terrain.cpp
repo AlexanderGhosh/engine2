@@ -4,12 +4,13 @@
 #include "../Rendering/Shading/Manager.h"
 #include "../Utils/ResourceLoader.h"
 #include "../Utils/NoiseGeneration.h"
+#include "../Primatives/Materials/MaterialBase.h"
 
 bool Terrain::gottenShader = false;
 unsigned Terrain::shaderMesh = 0;
 
 unsigned Terrain::shaderHM = 0;
-Terrain::Terrain() : resolution(), transform(), groundBuffer(), heightMap(0), useTexture(true), lowest(nullptr), middle(nullptr), highest(nullptr), renderWireframe(false)
+Terrain::Terrain() : resolution(), transform(), groundBuffer(), heightMap(0), useTexture(true), /*lowest(nullptr), middle(nullptr), highest(nullptr),*/ renderWireframe(false), material(nullptr)
 {
 	if (NOT gottenShader) {
 		shaderHM = ResourceLoader::getShader("DeferredTerrainMap");
@@ -90,13 +91,19 @@ void Terrain::draw(float deltaTime)
 	Render::Shading::Manager::setActive(useTexture ? shaderHM : shaderMesh);
 	Render::Shading::Manager::setValue("model", transform.getModel());
 
-	unsigned unit = 0;
+	int unit = 0;
 	if (useTexture) {
-		Render::Shading::Manager::setValue("hm", static_cast<int>(unit));
+		Render::Shading::Manager::setValue("hm", unit);
 		glActiveTexture(GL_TEXTURE0 + unit++);
 		glBindTexture(GL_TEXTURE_2D, heightMap);
 	}
-	if (lowest) {
+	if (material) {
+		material->activateTextures(unit);
+		unsigned u = unit;
+		Render::Shading::Manager::setValue("material", material, u);
+	}
+
+	/*if (lowest) {
 		lowest->update(deltaTime);
 		Render::Shading::Manager::setValue("lowest", *lowest, unit);
 		lowest->tryBindTexture(unit);
@@ -110,7 +117,7 @@ void Terrain::draw(float deltaTime)
 		highest->update(deltaTime);
 		Render::Shading::Manager::setValue("highest", *highest, unit);
 		highest->tryBindTexture(unit);
-	}
+	}*/
 	
 	groundBuffer.render();
 	glEnable(GL_CULL_FACE);
@@ -120,9 +127,9 @@ void Terrain::draw(float deltaTime)
 
 void Terrain::cleanUp()
 {
-	highest->cleanUp();
+	/*highest->cleanUp();
 	middle->cleanUp();
-	lowest->cleanUp();
+	lowest->cleanUp();*/
 	groundBuffer.cleanUp();
 	noise.clear();
 }
@@ -145,7 +152,12 @@ void Terrain::useTextureMap(bool use)
 	useTexture = use;
 }
 
-void Terrain::setLowestTexture(Materials::MatItemBase<glm::vec3>* low)
+void Terrain::setMaterial(Materials::MaterialBase* material)
+{
+	this->material = material;
+}
+
+/*void Terrain::setLowestTexture(Materials::MatItemBase<glm::vec3>* low)
 {
 	lowest = low;
 }
@@ -158,7 +170,7 @@ void Terrain::setMiddleTexture(Materials::MatItemBase<glm::vec3>* mid)
 void Terrain::setHighestTexture(Materials::MatItemBase<glm::vec3>* high)
 {
 	highest = high;
-}
+}*/
 
 void Terrain::setPosition(Vector3 pos)
 {
@@ -184,7 +196,7 @@ float Terrain::getHeight(const glm::vec2& position, bool scaled) const
 		pos += 0.5f;
 	}
 	pos *= resolution;
-	if (glm::any(glm::greaterThan(pos, glm::vec2(resolution)) OR glm::lessThan(pos, glm::vec2(0)))) {
+	if (glm::any(glm::greaterThanEqual(pos, glm::vec2(resolution)) OR glm::lessThan(pos, glm::vec2(0)))) {
 		return 0.5f;
 	}
 	if (NOT noise.size())
@@ -208,4 +220,9 @@ Vector3 Terrain::getPosition() const
 Vector3 Terrain::getScale() const
 {
 	return transform.Scale;
+}
+
+const Materials::MaterialBase* Terrain::getMaterial() const
+{
+	return material;
 }

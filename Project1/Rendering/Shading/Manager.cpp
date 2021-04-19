@@ -121,16 +121,9 @@ bool Render::Shading::Manager::setValue(String name, const Materials::PBR& mat, 
 	 val = setValue(name + ".roughness", *mat.getRoughness(), unit) AND val;
 	 val = setValue(name + ".ao", *mat.getAO(), unit) AND val;
 
-	 /*std::string names[] = { ".albedo", ".normal", ".metalic", ".roughness", ".ao" };
-	 const auto all = mat.getAll();
-	 bool val = true;
-	 for (short i = 0; i < 5; i++) {
-		 val = val AND Render::Shading::Manager::setValue(name + names[i], all[i], unit);
-		 unit++;
-	 }*/
-	 val = setValue("hdrMap", static_cast<int>(unit++)) AND val;
+	 /*val = setValue("hdrMap", static_cast<int>(unit++)) AND val;
 	 val = setValue("iblMap", static_cast<int>(unit++)) AND val;
-	 val = setValue("brdfLUT", static_cast<int>(unit)) AND val;
+	 val = setValue("brdfLUT", static_cast<int>(unit)) AND val;*/
 	 return val;
  }
 

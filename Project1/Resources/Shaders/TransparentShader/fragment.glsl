@@ -76,8 +76,8 @@ uniform DirectionalLight directionalLights[maxDirectionalLights];
 
 // Light Source Functions
 // POINT LIGHTS
-vec3 ProcessPointLight(PointLight light, vec3 WFP, vec3 VD, vec3 N, vec3 RS, vec3 AD, float A2, float R, float M, float dotNV);
-vec3 PointLights(PointLight pointLights[maxPointLights], int numberOfPointLights, vec3 WFP, vec3 VD, vec3 N, vec3 RS, vec3 AD, float A2, float R, float M, float dotNV);
+vec3 ProcessPointLight(PointLight light, vec3 WFP, vec3 VD, vec3 N, vec3 RS, vec3 AD, float A2, float R, float M, float dotNV, float alphaValue);
+vec3 PointLights(PointLight pointLights[maxPointLights], int numberOfPointLights, vec3 WFP, vec3 VD, vec3 N, vec3 RS, vec3 AD, float A2, float R, float M, float dotNV, float alphaValue);
 // DIRECTIONAL LIGHTS
 vec3 ProcessDirectionalLight(DirectionalLight light);
 vec3 DirectionalLights(DirectionalLight directionalLights[maxDirectionalLights]);
@@ -94,8 +94,10 @@ void main() {
     // vec3  = texture(positionTex, TextureCoords).xyz;
     vec3 Albedo     = pow(getData(material.albedo), vec3(2.2)); // PBR gamma corrects
     vec3 Normal     = normalize(getNormal(material.normal, NormalIn));
+    Normal = normalize(NormalIn);
 
     float Metallic  = getData(material.metalic);
+    Metallic = 0.5;
     float Roughness = getData(material.roughness);
     float AO        = getData(material.ao);
 
@@ -105,13 +107,14 @@ void main() {
     float dotNV = max(dot(Normal, viewDirection), 0.0);
     float alpha = Roughness * Roughness;
     float alpha2 = max(0.001, alpha * alpha);
-    vec3 albedoDiffuse = Albedo / PI;
+    float alphaValue = getAlpha(material.albedo);
+    vec3 albedoDiffuse = (Albedo * alphaValue) / PI;
     
     // surface reflection at when looking from 0 degrees
     vec3 realSpecular = mix(vec3(0.04), Albedo, Metallic); // 0.04 assumption for metals
 
 
-    vec3 accumlativeLight = PointLights(pointLights, numberOfPointLights, WorldFragmentPosition, viewDirection, Normal, realSpecular, albedoDiffuse, alpha2, Roughness, Metallic, dotNV);
+    vec3 accumlativeLight = PointLights(pointLights, numberOfPointLights, WorldFragmentPosition, viewDirection, Normal, realSpecular, albedoDiffuse, alpha2, Roughness, Metallic, dotNV, alphaValue);
 
 
     vec3 ambient = vec3(0.03) * Albedo * AO;
@@ -121,13 +124,12 @@ void main() {
     colour /= colour + vec3(1.0); // HDR
     colour = GammaCorrect(colour);
     
-    colour = Albedo;
+    //colour = Albedo;
 
-    float alphaValue = getAlpha(material.albedo);
     FragColour = vec4(colour, alphaValue);
 };
 
-vec3 ProcessPointLight(PointLight light, vec3 WFP, vec3 VD, vec3 N, vec3 RS, vec3 AD, float A2, float R, float M, float dotNV){
+vec3 ProcessPointLight(PointLight light, vec3 WFP, vec3 VD, vec3 N, vec3 RS, vec3 AD, float A2, float R, float M, float dotNV, float alphaValue){
     // constants
     vec3 lightDirection = normalize(light.position - WFP);
     vec3 H = normalize(VD + lightDirection);
@@ -152,10 +154,10 @@ vec3 ProcessPointLight(PointLight light, vec3 WFP, vec3 VD, vec3 N, vec3 RS, vec
 
     return (kd * AD + specular) * radiance * dotNL * light.brightness;
 }
-vec3 PointLights(PointLight pointLights[maxPointLights], int numberOfPointLights, vec3 WFP, vec3 VD, vec3 N, vec3 RS, vec3 AD, float A2, float R, float M, float dotNV) {
+vec3 PointLights(PointLight pointLights[maxPointLights], int numberOfPointLights, vec3 WFP, vec3 VD, vec3 N, vec3 RS, vec3 AD, float A2, float R, float M, float dotNV, float alphaValue) {
     vec3 accumlativeLight = vec3(0);
     for(int i = 0; i < numberOfPointLights; i++){
-        accumlativeLight += ProcessPointLight(pointLights[i], WFP, VD, N, RS, AD, A2, R, M, dotNV);
+        accumlativeLight += ProcessPointLight(pointLights[i], WFP, VD, N, RS, AD, A2, R, M, dotNV, alphaValue);
     }
     return accumlativeLight;
 }
@@ -205,17 +207,17 @@ void SpecularTerm(float dotNH, float a2, float cosTheta, vec3 F0, float dotNV,
 };
 
 vec3 getData(MatItem4 item) {
-    return mix(item.raw, texture(item.id, TextureCoords), item.mixValue).rgb;
+    return mix(item.raw, texture(item.id, TextureCoords), vec4(item.mixValue)).rgb;
 }
 vec3 getData(MatItem3 item) {
-    return mix(item.raw, texture(item.id, TextureCoords).rgb, item.mixValue);
+    return mix(item.raw, texture(item.id, TextureCoords).rgb, vec3(item.mixValue));
 }
 vec3 getNormal(MatItem3 item, vec3 normal) {
-    return mix(normal, texture(item.id, TextureCoords).rgb, item.mixValue);
+    return mix(normal, texture(item.id, TextureCoords).rgb, vec3(item.mixValue));
 }
 float getData(MatItem1 item) {
     return mix(item.raw, texture(item.id, TextureCoords).r, item.mixValue);
 }
 float getAlpha(MatItem4 item) {
-    return mix(item.raw, texture(item.id, TextureCoords), item.mixValue).a;
+    return mix(item.raw, texture(item.id, TextureCoords), vec4(item.mixValue)).a;
 }

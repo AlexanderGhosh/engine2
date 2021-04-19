@@ -13,16 +13,19 @@ struct MatItem4 {
     vec4 raw;
     sampler2D id;
     float mixValue;
+    float repeatValue;
 };
 struct MatItem3 {
     vec3 raw;
     sampler2D id;
     float mixValue;
+    float repeatValue;
 };
 struct MatItem1 {
     float raw;
     sampler2D id;
     float mixValue;
+    float repeatValue;
 };
 
 struct Material {
@@ -40,16 +43,16 @@ struct Material {
 uniform Material material;
 
 vec3 getData(MatItem4 item){
-    return mix(item.raw, texture(item.id, TexCoords), item.mixValue).rgb;
+    return mix(item.raw, texture(item.id, TexCoords * item.repeatValue), item.mixValue).rgb;
 }
 vec3 getData(MatItem3 item){
-    return mix(item.raw, texture(item.id, TexCoords).rgb, item.mixValue);
+    return mix(item.raw, texture(item.id, TexCoords * item.repeatValue).rgb, item.mixValue);
 }
 float getData(MatItem1 item){
-    return mix(item.raw, texture(item.id, TexCoords).r, item.mixValue);
+    return mix(item.raw, texture(item.id, TexCoords * item.repeatValue).r, item.mixValue);
 }
 vec3 getNormal(MatItem3 item){
-    return mix(Normal, texture(item.id, TexCoords).rgb, item.mixValue);
+    return mix(Normal, texture(item.id, TexCoords * item.repeatValue).rgb, item.mixValue);
 }
 
 void main()

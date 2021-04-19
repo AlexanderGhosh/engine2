@@ -12,11 +12,11 @@ namespace Primative {
 			glm::vec3 backgroundColour;
 			glm::ivec2 dimentions;
 			GLbitfield clearMask;
+			unsigned fbo;
 
 			void initalize();
 			std::array<int, 4> getBufferData(String type, unsigned& colAttach) const;
 		public:
-			unsigned fbo;
 			FrameBuffer();
 			FrameBuffer(const std::vector<std::string>& textures, const glm::ivec2& dimentions, const glm::vec3& bgColour);
 			~FrameBuffer() = default;

@@ -12,13 +12,13 @@ void Component::CharacterController::cleanUp()
 
 void Component::CharacterController::intergrateVelocity(Float deltaTime)
 {
-	if (hasGravity) {
+	/*if (hasGravity) {
 		velocity += Physics::Engine::getGravity() * deltaTime;
 	}
 	if (isGrounded) {
 		velocity -= Physics::Engine::getGravity() * deltaTime;
-	}
-	(*position) += velocity * deltaTime;
+	}*/
+	//(*position) += velocity * deltaTime;
 }
 
 Vector3 Component::CharacterController::getVelocity() const

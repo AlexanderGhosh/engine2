@@ -64,7 +64,7 @@ constexpr glm::ivec2 SCREEN_DIMENTIONS = glm::ivec2(1280, 720);
 long SEED;
 int main() {
     SEED = time(0);
-    SEED = 1;
+    //SEED = 1;
     srand(SEED);
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
     // _crtBreakAlloc = 69450;
@@ -283,11 +283,16 @@ int main() {
 
     timer.start("Terrain"); 
     MI3 lowestColour(dirt);
-    lowestColour.useTexture();
     MI3 middleColour(dirt);
-    middleColour.useTexture();
     MI3 highestColour(grass, 10.0f);
-    highestColour.useTexture();
+
+    Materials::MatItemSingle<glm::vec4> landAlbedo(grass, 10.0f);
+    Materials::MatItemSingle<glm::vec3> landNormal(glm::vec3(0, 1, 0));
+    Materials::MatItemSingle<float> landMetalic(0.4f);
+    Materials::MatItemSingle<float> landRoughness(0.7f);
+    Materials::MatItemSingle<float> landAO(0.5f);
+
+    Materials::PBR landMaterial = Materials::PBR(&landAlbedo, &landNormal, &landMetalic, &landRoughness, &landAO);
 
     const int landSize = 2;
     const float scale = 100;
@@ -304,10 +309,10 @@ int main() {
             land.setScale({ scale, 10, scale });
             land.setNoiseBuffer(Utils::NoiseGeneration::getMap(glm::vec3(i, j, 0), landRes + 1, { 1, 0.5, 0.1 }, { 1, 2, 3 }));
             land.useTextureMap(false);
-
-            land.setLowestTexture(&lowestColour);
+            land.setMaterial(&landMaterial);
+            /*land.setLowestTexture(&lowestColour);
             land.setMiddleTexture(&middleColour);
-            land.setHighestTexture(&highestColour);
+            land.setHighestTexture(&highestColour);*/
 
             allLand.push_back(land);
         }
@@ -339,8 +344,8 @@ int main() {
     player.addComponet(&recieverComp);
 
 
-    GameObject lightSource(glm::vec3(1, 100, 0));
-    Component::PointLight light(glm::vec3(1));
+    GameObject lightSource(glm::vec3(0.5, 3.5, -2.5));
+    Component::PointLight light(glm::vec3(1), 1);
     lightSource.addComponet(&light);
 
     GameObject lightSource2(glm::vec3(1));
@@ -351,7 +356,7 @@ int main() {
     Materials::MatItemSingle<glm::vec4> windowAlbedo(wi);
     Materials::MatItemSingle<glm::vec3> windowNormal(glm::vec3(0, 1, 0));
     Materials::MatItemSingle<float> windowMetalic(0.5f);
-    Materials::MatItemSingle<float> windowRoughness(0.5f);
+    Materials::MatItemSingle<float> windowRoughness(0.0f);
     Materials::MatItemSingle<float> windowAO(0.5f);
 
     Materials::PBR windowMat1(&windowAlbedo, &windowNormal, &windowMetalic, &windowRoughness, &windowAO);
@@ -367,12 +372,12 @@ int main() {
     windowMesh1.setTransparent(true);
     window1.addComponet(&windowMesh1);
 
-    GameObject window2(glm::vec3(0.5, 3.5, -4));
+    /*GameObject window2(glm::vec3(0.5, 3.5, -4));
     Component::RenderMesh windowMesh2;
     windowMesh2.setModel(planeBuffer);
     windowMesh2.setMaterial(&windowMat2);
     windowMesh2.setTransparent(true);
-    window2.addComponet(&windowMesh2);
+    window2.addComponet(&windowMesh2);*/
 
     timer.log();
 
@@ -390,7 +395,7 @@ int main() {
     scene.addObject(&lightSource);
     scene.addObject(&lightSource2);
     scene.addObject(&window1);
-    scene.addObject(&window2);
+    // scene.addObject(&window2);
 
     scene.addObject(&orb);
     for (Terrain& land : allLand) {

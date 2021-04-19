@@ -27,8 +27,8 @@ void PlayerControler::update(float deltaTime) {
 	if (EH::getKey(Key::Escape, Action::Down)) {
 		parent->getScene()->close();
 	}
-	const float baseSpeed = 0.5;
-	const float speedMultiplyer = 4;
+	const float baseSpeed = 3;
+	const float speedMultiplyer = 6;
 	float speed = baseSpeed * deltaTime;
 	if (EH::getCursor(Events::Cursor::Middle, Events::Action::Down)) {
 		speed = speedMultiplyer * baseSpeed * deltaTime;
@@ -54,9 +54,9 @@ void PlayerControler::update(float deltaTime) {
 	}
 	const bool grounded = isGrounded(deltaTime);
 	cc->setIsGrounded(grounded);
-	if (EH::getKey(Key::Space, Action::Down) AND grounded) {
-		// pos += Utils::yAxis() * speed;
-		cc->addVelocity(Utils::yAxis(10));
+	if (EH::getKey(Key::Space, Action::Down)) {
+		pos += Utils::yAxis() * speed;
+		// cc->addVelocity(Utils::yAxis(10));
 	}
 	if (EH::getKey(Key::L_Shift, Action::Down)) {
 		pos -= Utils::yAxis() * speed;

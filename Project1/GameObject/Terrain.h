@@ -8,6 +8,7 @@ namespace Utils {
 namespace Materials {
 	template<class T>
 	class MatItemBase;
+	class MaterialBase;
 }
 class Terrain
 {
@@ -24,10 +25,10 @@ private:
 
 	static bool gottenShader;
 	static unsigned shaderHM, shaderMesh;
-
-	Materials::MatItemBase<glm::vec3>* lowest;
+	Materials::MaterialBase* material;
+	/*Materials::MatItemBase<glm::vec3>* lowest;
 	Materials::MatItemBase<glm::vec3>* middle;
-	Materials::MatItemBase<glm::vec3>* highest;
+	Materials::MatItemBase<glm::vec3>* highest;*/
 public:
 	~Terrain() = default;
 	Terrain();
@@ -40,11 +41,12 @@ public:
 	bool renderWireframe;
 
 	// setters
-	void setLowestTexture(Materials::MatItemBase<glm::vec3>* low);
+	/*void setLowestTexture(Materials::MatItemBase<glm::vec3>* low);
 	void setMiddleTexture(Materials::MatItemBase<glm::vec3>* mid);
-	void setHighestTexture(Materials::MatItemBase<glm::vec3>* high);
+	void setHighestTexture(Materials::MatItemBase<glm::vec3>* high);*/
 	void setPosition(Vector3 pos);
 	void setScale(Vector3 scale);
+	void setMaterial(Materials::MaterialBase* material);
 
 	// getters
 	Component::Transform& getTransform();
@@ -52,5 +54,6 @@ public:
 	float getHeight(Float x, Float z, bool scaled = true) const;
 	Vector3 getPosition() const;
 	Vector3 getScale() const;
+	const Materials::MaterialBase* getMaterial() const;
 };
 

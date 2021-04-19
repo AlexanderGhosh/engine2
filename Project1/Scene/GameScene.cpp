@@ -51,6 +51,8 @@ void GameScene::drawOpaque()
 
 void GameScene::drawTransparent()
 {
+	/*glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, 0);*/
 	Render::Shading::Manager::setActive(ResourceLoader::getShader("TransparentShader")); 
 	bindLights();
 	assert(mainCamera);
