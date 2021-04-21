@@ -94,9 +94,6 @@ void main() {
     colour = GammaCorrect(colour);*/
 
     ProcessOutputs(colour);
-    FragColour = vec4(colour, 1.0);
-
-
 };
 
 vec3 ProcessPointLight(PointLight light, vec3 WFP, vec3 VD, vec3 N, vec3 RS, vec3 AD, float A2, float R, float M, float dotNV){

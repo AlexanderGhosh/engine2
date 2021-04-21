@@ -1,40 +1,51 @@
 #pragma once
+#include <map>
 #include "../Componets/Componets.h"
-#include "../Utils/General.h"
 #include "../Primatives/Buffers/VertexBuffer.h"
-#include "../Primatives/TextureChain.h"
+#include "Particle.h"
 
+namespace Particles {
+	class Particle;
+	class DistributionBase;
+}
+namespace Materials {
+	template<class T>
+	class MatItemBase;
+}
 namespace Component {
 #define MAX_PARTICLES 200
 
-	class ParticleEmmiter : public ComponetBase
-	{
+	class ParticleEmmiter : public ComponetBase {
 	private:
-		std::vector<Component::Transform> particleTransforms;
-		std::vector<float> life;
-		Primative::TextureChain textures;
-		int maxParticelCount, maxLife;
-		glm::vec3 velocity, orgiCenter, oridRadii;
-		glm::vec4 colour;
-		bool doLoop;
 		static int shader;
 		static Primative::Buffers::VertexBuffer quadBuffer;
-
-		void spawn();
+		std::map<float, Particles::Particle> particles;
+		bool looping, playing;
+		int particleCount, numberAlive;
+		float duration, spawnRate, lifeTime, timeBetweenSpawn;
+		glm::vec3* position;
+		glm::vec3 offset;
+		Materials::MatItemBase<glm::vec4>* albedo;
+		Particles::DistributionBase* shape;
+		glm::vec3 getParticlePosition(const Particles::Particle& particle);
+		glm::vec3 getVelocityDistributed() const;
+		void sortParticles();
 	public:
 		ParticleEmmiter();
-		ParticleEmmiter(Unsigned numberOfParticles, Unsigned life, Vector3 center, Vector3 radii);
+		ParticleEmmiter(Int numberOfParticels, Float duration, bool looping, Float spawnRate = 1);
 		~ParticleEmmiter() = default;
-		void update(float deltaTime);
-		void drawParticles();
+
+		void setParent(GameObject* parent);
+		
 		inline Type getType() const { return Type::ParticleEmmiter; };
-		void cleanUp();
+		void update(float deltaTime);
+		void render(float deltaTime);
 		void restart();
-		void loop();
-		bool isDead() const;
-		void setCenter(Vector3 center);
-		void setTexture(const Primative::TextureChain& tex);
-		void setColour(Vector4 col);
+		void cleanUp();
+
+		// setters
+		void setAlbedo(Materials::MatItemBase<glm::vec4>* albedo);
+		void setShape(Particles::DistributionBase* shape);
 	};
 }
 

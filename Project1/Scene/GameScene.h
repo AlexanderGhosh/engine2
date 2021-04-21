@@ -114,5 +114,6 @@ public:
 	GameObject* getObject(String name);
 	Primative::Buffers::FrameBuffer& getFBO(String name);
 	std::vector<Primative::Buffers::FrameBuffer>& getFBOs(String name);
+	Component::Camera* getMainCamera();
 };
 

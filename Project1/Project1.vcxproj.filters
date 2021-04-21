@@ -210,9 +210,6 @@
     <ClCompile Include="ParticleSystem\ParticleEmmiter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Scripts\RainMakerScript.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Primatives\TextureChain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -235,6 +232,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Componets\Lights\LightBase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ParticleSystem\Particle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ParticleSystem\Distributions\DistributionBase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ParticleSystem\Distributions\ConeDistribution.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -446,9 +452,6 @@
     <ClInclude Include="ParticleSystem\ParticleEmmiter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Scripts\RainMakerScript.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Primatives\TextureChain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -477,6 +480,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Componets\Lights\PointLight.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ParticleSystem\Particle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ParticleSystem\Distributions\DistributionBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ParticleSystem\Distributions\ConeDistribution.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

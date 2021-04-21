@@ -3,123 +3,122 @@
 #include "../Rendering/Shading/Manager.h"
 #include "../Primatives/Model.h"
 #include "../GameObject/GameObject.h"
+#include "../Scene/GameScene.h"
+#include "../Componets/Camera.h"
+#include "Distributions/DistributionBase.h"
 
 int Component::ParticleEmmiter::shader = 0;
 Primative::Buffers::VertexBuffer Component::ParticleEmmiter::quadBuffer = {};
 
-void Component::ParticleEmmiter::spawn()
+Component::ParticleEmmiter::ParticleEmmiter() : ComponetBase(), particleCount(0), particles(), looping(false), duration(0.0f), position(nullptr),
+	offset(0.0f), albedo(nullptr), spawnRate(1.0f), lifeTime(0.0f), timeBetweenSpawn(0.0f), numberAlive(0), playing(false), shape(nullptr)
 {
-	particleTransforms.reserve(maxParticelCount);
-	particleTransforms.resize(maxParticelCount);
-	life.reserve(maxParticelCount);
-	life.resize(maxParticelCount);
-	for (unsigned i = 0; i < maxParticelCount; i++) {
-		Transform& transform = particleTransforms[i];
-		transform.Position = orgiCenter;
-		for (char j = 0; j < 3; j++) {
-			transform.Position[j] += Utils::random(0, 2 * oridRadii[j]) - oridRadii[j];
-			transform.Scale *= 0.25f;
-		}
-		this->life[i] = maxLife;
-	}
-}
+	timeBetweenSpawn = 1.0f / lifeTime;
 
-Component::ParticleEmmiter::ParticleEmmiter() : ComponetBase(), particleTransforms(), life(), maxParticelCount(0), velocity(0, -1, 0), doLoop(false), oridRadii(), orgiCenter(), maxLife(), colour(1), textures()
-{
 	if (NOT shader) {
 		shader = ResourceLoader::getShader("ParticleShader");
 		quadBuffer = ResourceLoader::getBuffer(ResourceLoader::getModel("plane.dae").getBuffers()[0]);
 	}
 }
 
-Component::ParticleEmmiter::ParticleEmmiter(Unsigned numberOfParticles, Unsigned life, Vector3 center, Vector3 radii) : ParticleEmmiter()
+void Component::ParticleEmmiter::sortParticles()
 {
-	maxLife = life;
-	orgiCenter = center;
-	oridRadii = radii;
-	maxParticelCount = numberOfParticles % (MAX_PARTICLES + 1);
+	return;
+}
 
-	spawn();
+Component::ParticleEmmiter::ParticleEmmiter(Int numberOfParticels, Float duration, bool looping, Float spawnRate) : ParticleEmmiter()
+{
+	this->particleCount = numberOfParticels;
+	this->duration = duration;
+	this->looping = looping;
+	this->spawnRate = spawnRate;
+	for (int i = 0; i < numberOfParticels; i++) {
+		particles[i] = Particles::Particle();
+	}
+	playing = true;
+}
+
+glm::vec3 Component::ParticleEmmiter::getParticlePosition(const Particles::Particle& particle)
+{
+	return particle.getRelativePosition() + offset + *position;
+}
+
+glm::vec3 Component::ParticleEmmiter::getVelocityDistributed() const
+{
+	if (NOT shape) {
+		return glm::vec3(0);
+	}
+	return shape->getNormalised() * 2.0f;
+}
+
+void Component::ParticleEmmiter::setParent(GameObject* parent) {
+	ComponetBase::setParent(parent);
+	position = &parent->getTransform()->Position;
 }
 
 void Component::ParticleEmmiter::update(float deltaTime)
 {
-	if (doLoop AND isDead())
-		spawn();
-	for (unsigned i = 0; i < particleTransforms.size(); i++) {
-		float& l = life[i];
-		Component::Transform& transform = particleTransforms[i];
-		//l -= deltaTime;
-		if (l <= 0) {
-			Utils::removeAt(life, i);
-			Utils::removeAt(particleTransforms, i);
-			i--;
-		}
-		else {
-			//transform.Position += velocity * deltaTime;
+	if (playing) {
+		lifeTime += deltaTime;
+		bool canSpawn = lifeTime >= spawnRate * numberAlive;
+		for (auto itt = particles.begin(); itt != particles.end(); itt++) {
+			Particles::Particle& part = (*itt).second;
+			part.update(deltaTime);
+			if (NOT part.getIsAlive() AND canSpawn) {
+				glm::vec3 vel = getVelocityDistributed();
+				vel = glm::normalize(vel) * 2.0f;
+				part.spawn(vel);
+				// part.setRelativePosition(getVelocityDistributed());
+				numberAlive++;
+				canSpawn = false;
+			}
 		}
 	}
-	textures.update(deltaTime);
-	drawParticles();
+
 }
-
-void Component::ParticleEmmiter::drawParticles()
+void Component::ParticleEmmiter::render(float deltaTime)
 {
+	sortParticles();
 	Render::Shading::Manager::setActive(shader);
-	for (int i = 0; i < particleTransforms.size(); i++) {
-		glm::quat rot = particleTransforms[i].Rotation;
-
-		Render::Shading::Manager::setValue("center[" + std::to_string(i) + "]", particleTransforms[i].Position);
-		Render::Shading::Manager::setValue("scale[" + std::to_string(i) + "]", particleTransforms[i].Scale);
-		particleTransforms[i].Rotation = rot;
+	int i = 0;
+	for (auto itt = particles.begin(); itt != particles.end(); itt++) {
+		Particles::Particle& part = (*itt).second;
+		if (NOT part.getIsAlive())
+			continue;
+		Render::Shading::Manager::setValue("positions[" + std::to_string(i) + "]", getParticlePosition(part));
+		i++;
 	}
-	Render::Shading::Manager::setValue("col", colour);
-	Render::Shading::Manager::setValue("mix_val", (textures.hasTextures() ? 0.0f : 1.0f));
-	Render::Shading::Manager::setValue("tex", 0);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, textures.getTexture());
+	unsigned unit = 0;
+	if (albedo) {
+		albedo->tryBindTexture(unit);
+		unit = 0;
+		Render::Shading::Manager::setValue("albedo", *albedo, unit);
+	}
 	quadBuffer.bind();
-	glDrawElementsInstanced(quadBuffer.getDrawType(), quadBuffer.getIndicesCount(), GL_UNSIGNED_INT, 0, particleTransforms.size());
+	glDrawElementsInstanced(quadBuffer.getDrawType(), quadBuffer.getIndicesCount(), GL_UNSIGNED_INT, 0, i);
 	quadBuffer.unBind();
 }
-
-void Component::ParticleEmmiter::cleanUp()
-{
-	particleTransforms.clear();
-	life.clear();
-}
-
 void Component::ParticleEmmiter::restart()
 {
-	spawn();
-}
-
-void Component::ParticleEmmiter::loop()
-{
-	doLoop = true;
-}
-
-bool Component::ParticleEmmiter::isDead() const
-{
-	return NOT life.size();
-}
-
-void Component::ParticleEmmiter::setCenter(Vector3 center)
-{
-	return;
-	for (Component::Transform& trans : particleTransforms) {
-		trans.Position -= orgiCenter;
-		trans.Position += center;
+	for (auto itt = particles.begin(); itt != particles.end(); itt++) {
+		Particles::Particle& part = (*itt).second;
+		part.reset();
 	}
-	orgiCenter = center;
+}
+void Component::ParticleEmmiter::cleanUp()
+{
+	for (auto itt = particles.begin(); itt != particles.end(); itt++) {
+		Particles::Particle& part = (*itt).second;
+		part.cleanUp();
+	}
 }
 
-void Component::ParticleEmmiter::setTexture(const Primative::TextureChain& tex)
+void Component::ParticleEmmiter::setAlbedo(Materials::MatItemBase<glm::vec4>* albedo)
 {
-	this->textures = tex;
+	this->albedo = albedo;
 }
 
-void Component::ParticleEmmiter::setColour(Vector4 col)
+void Component::ParticleEmmiter::setShape(Particles::DistributionBase* shape)
 {
-	colour = col;
+	this->shape = shape;
 }

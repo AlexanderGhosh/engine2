@@ -91,7 +91,7 @@ void GameScene::drawUI()
 void GameScene::drawParticles()
 {
 	for (Component::ParticleEmmiter* part : emmiters) {
-		part->update(mainContext->getTime().deltaTime);
+		part->render(mainContext->getTime().deltaTime);
 	}
 }
 
@@ -162,7 +162,6 @@ void GameScene::preProcess()
 		{
 			drawOpaque();
 			drawTerrain();
-			drawParticles();
 		}
 		else if (name == "LightingPass") {
 			int unit = 0;
@@ -184,6 +183,7 @@ void GameScene::preProcess()
 
 			drawSkyBox();
 			drawTransparent();
+			drawParticles();
 			drawUI();
 		}
 		/*else if(NOT USE_DEFFERED) {
@@ -308,6 +308,11 @@ std::vector<Primative::Buffers::FrameBuffer>& GameScene::getFBOs(String name)
 		return (*(FBOs_post.begin()++)).second;
 	}
 	return r;
+}
+
+Component::Camera* GameScene::getMainCamera()
+{
+	return mainCamera;
 }
 
 void GameScene::initalize()

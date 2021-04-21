@@ -150,11 +150,13 @@
     <ClCompile Include="Componets\Scripting.cpp" />
     <ClCompile Include="Componets\Lights\DirectionalLight.cpp" />
     <ClCompile Include="Componets\Lights\PointLight.cpp" />
+    <ClCompile Include="ParticleSystem\Distributions\ConeDistribution.cpp" />
+    <ClCompile Include="ParticleSystem\Particle.cpp" />
+    <ClCompile Include="ParticleSystem\Distributions\DistributionBase.cpp" />
     <ClCompile Include="Primatives\Materials\Forward.cpp" />
     <ClCompile Include="ParticleSystem\ParticleEmmiter.cpp" />
     <ClCompile Include="Primatives\Materials\PBR.cpp" />
     <ClCompile Include="Primatives\Buffers\SoundStreamBuffer.cpp" />
-    <ClCompile Include="Scripts\RainMakerScript.cpp" />
     <ClCompile Include="Scripts\DebugScreen.cpp" />
     <ClCompile Include="Scripts\HoverScript.cpp" />
     <ClCompile Include="Scripts\PlayerControler.cpp" />
@@ -225,6 +227,9 @@
     <ClInclude Include="Componets\Scripting.h" />
     <ClInclude Include="Componets\Lights\DirectionalLight.h" />
     <ClInclude Include="Componets\Lights\PointLight.h" />
+    <ClInclude Include="ParticleSystem\Distributions\ConeDistribution.h" />
+    <ClInclude Include="ParticleSystem\Particle.h" />
+    <ClInclude Include="ParticleSystem\Distributions\DistributionBase.h" />
     <ClInclude Include="Primatives\Materials\MatItemBase.h" />
     <ClInclude Include="Primatives\Materials\MatItemChain.h" />
     <ClInclude Include="Primatives\Materials\Forward.h" />
@@ -232,7 +237,6 @@
     <ClInclude Include="Primatives\Materials\MatItemSingle.h" />
     <ClInclude Include="ParticleSystem\ParticleEmmiter.h" />
     <ClInclude Include="Primatives\Buffers\SoundStreamBuffer.h" />
-    <ClInclude Include="Scripts\RainMakerScript.h" />
     <ClInclude Include="Scripts\DebugScreen.h" />
     <ClInclude Include="Scripts\HoverScript.h" />
     <ClInclude Include="Scripts\PlayerControler.h" />

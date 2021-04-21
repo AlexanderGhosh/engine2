@@ -27,7 +27,9 @@
 #include "Componets/CharacterController.h"
 #include "Componets/Lights/PointLight.h"
 #include "Componets/Lights/DirectionalLight.h"
+
 #include "ParticleSystem/ParticleEmmiter.h"
+#include "ParticleSystem/Distributions/ConeDistribution.h"
 
 #include "Physics/Engine.h"
 #include "Physics/Collision/Broadphase/NSquared.h"
@@ -56,7 +58,6 @@
 #include "Scripts/SpinScript.h"
 #include "Scripts/HoverScript.h"
 #include "Scripts/SoundControllerScript.h"
-#include "Scripts/RainMakerScript.h"
 
 #include "Context.h"
 
@@ -113,29 +114,22 @@ int main() {
     timer.start("Textures");
     const unsigned wi   = ResourceLoader::loadTexture("Resources/Textures/window.png", TextureType::AlbedoMap, 0);
     const unsigned wiy  = ResourceLoader::loadTexture("Resources/Textures/yellowWindow.png", TextureType::AlbedoMap, 0);
-    const unsigned hdr      = ResourceLoader::loadCubeMap("Resources/Textures/Galaxy hdr", ".png", 0);
-    const unsigned ibl      = ResourceLoader::loadCubeMap("Resources/Textures/Galaxy ibl", ".png", 0);
-    const unsigned brdf     = ResourceLoader::loadTexture("Resources/Textures/ibl brdf.png", TextureType::AlbedoMap, 0);
     // const unsigned hm       = ResourceLoader::loadTexture("Resources/Textures/heightmap.png", TextureType::HeightMap, 0);
-    // const unsigned rainDrop = ResourceLoader::loadTexture("Resources/Textures/raindrop.png", TextureType::AlbedoMap, 0);
+    const unsigned rainDrop = ResourceLoader::loadTexture("Resources/Textures/raindrop.png", TextureType::AlbedoMap, 0);
     const unsigned grass    = ResourceLoader::loadTexture("Resources/Textures/grass.jpg", TextureType::AlbedoMap, 0);
     const unsigned dirt     = ResourceLoader::loadTexture("Resources/Textures/dirt.png", TextureType::AlbedoMap, 0);
 
     auto waterMaterialInfo = ResourceLoader::createPBRInfo("Resources/Textures/Water", { TextureType::AlbedoMap, TextureType::RoughnessMap, TextureType::NormalMap, TextureType::AOMap, TextureType::MetalicMap }, { 0, 0, 0, 0, 0 });
     auto waterMaterial = ResourceLoader::createPBR(waterMaterialInfo);
-    // Materials::MatItemSingle<glm::vec4> waterAlbedo({ 0, 0, 1, 1 });
-    // waterAlbedo.useRaw();
-    // Materials::MatItemSingle<float> waterMetalic(0.5f);
-    // waterMetalic.useRaw();
-    // Materials::MatItemSingle<float> waterRoughness(0.5f);
-    // waterRoughness.useRaw();
-    // Materials::MatItemSingle<float> waterAO(0.5f);
-    // waterAO.useRaw();
+    Materials::MatItemSingle<glm::vec4> waterAlbedo({ 0, 0, 1, 1 });
+    Materials::MatItemSingle<float> waterMetalic(0.5f);
+    Materials::MatItemSingle<float> waterRoughness(0.5f);
+    Materials::MatItemSingle<float> waterAO(0.5f);
 
-    // waterMaterial.setAlbedo(&waterAlbedo);
-    // waterMaterial.setMetalic(&waterMetalic);
-    // waterMaterial.setRoughness(&waterRoughness);
-    // waterMaterial.setAO(&waterAO);
+    waterMaterial.setAlbedo(&waterAlbedo);
+    waterMaterial.setMetalic(&waterMetalic);
+    waterMaterial.setRoughness(&waterRoughness);
+    waterMaterial.setAO(&waterAO);
   //Materials::PBR armourMaterial = ResourceLoader::createPBR("Resources/Textures/RFATextures/Armour",
    //    { TextureType::AlbedoMap, TextureType::AOMap, TextureType::MetalicMap, TextureType::NormalMap, TextureType::RoughnessMap },
    //    { 0, 0, 0, 0, 0 });
@@ -278,6 +272,12 @@ int main() {
     orbMesh.setMaterial(&waterMaterial);
     orb.addComponet(&orbMesh);
 
+    Particles::ConeDistribution distribution = Particles::ConeDistribution(1, 2);
+    Component::ParticleEmmiter emmiter = Component::ParticleEmmiter(10, 10, true, 0.25);
+    Materials::MatItemSingle<glm::vec4> particleAlbedo(rainDrop);
+    emmiter.setAlbedo(&particleAlbedo);
+    emmiter.setShape(&distribution);
+    orb.addComponet(&emmiter);
 
     timer.log();
 
@@ -344,13 +344,10 @@ int main() {
     player.addComponet(&recieverComp);
 
 
-    GameObject lightSource(glm::vec3(0.5, 3.5, -2.5));
+    GameObject lightSource(glm::vec3(0.5, 1, -01));
     Component::PointLight light(glm::vec3(1), 100.0f);
     lightSource.addComponet(&light);
 
-    GameObject lightSource2(glm::vec3(1));
-    Component::DirectionalLight light2 = Component::DirectionalLight(glm::vec3(1, -1, -1), glm::vec3(1, 0,0), 1.0f);
-    lightSource2.addComponet(&light2);
 
 
     Materials::MatItemSingle<glm::vec4> windowAlbedo(wi);
@@ -393,7 +390,6 @@ int main() {
 
     scene.addObject(&player);
     scene.addObject(&lightSource);
-    scene.addObject(&lightSource2);
     scene.addObject(&window1);
     // scene.addObject(&window2);
 
