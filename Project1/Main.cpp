@@ -105,6 +105,7 @@ int main() {
     const Primative::Model planeBuffer = ResourceLoader::createModel("Resources/Models/plane.dae");
     // const Primative::Model minikitBuffer = ResourceLoader::createModel("Resources/Models/minikit.fbx");
     const Primative::Model orbBuffer = ResourceLoader::createModel("Resources/Models/sphere.obj");
+    const Primative::Model cityBuffer = ResourceLoader::createModel("Resources/Models/city.obj");
     timer.log();
 
     timer.start("Animations");
@@ -118,6 +119,7 @@ int main() {
     const unsigned rainDrop = ResourceLoader::loadTexture("Resources/Textures/raindrop.png", TextureType::AlbedoMap, 0);
     const unsigned grass    = ResourceLoader::loadTexture("Resources/Textures/grass.jpg", TextureType::AlbedoMap, 0);
     const unsigned dirt     = ResourceLoader::loadTexture("Resources/Textures/dirt.png", TextureType::AlbedoMap, 0);
+    const unsigned cityTex  = ResourceLoader::loadTexture("Resources/Textures/City Tex.png", TextureType::AlbedoMap, 0);
 
     auto waterMaterialInfo = ResourceLoader::createPBRInfo("Resources/Textures/Water", { TextureType::AlbedoMap, TextureType::RoughnessMap, TextureType::NormalMap, TextureType::AOMap, TextureType::MetalicMap }, { 0, 0, 0, 0, 0 });
     auto waterMaterial = ResourceLoader::createPBR(waterMaterialInfo);
@@ -344,9 +346,27 @@ int main() {
     player.addComponet(&recieverComp);
 
 
-    GameObject lightSource(glm::vec3(0.5, 1, -01));
+    GameObject lightSource(glm::vec3(0, 12.5, 0));
     Component::PointLight light(glm::vec3(1), 100.0f);
     lightSource.addComponet(&light);
+
+    GameObject lightSource2(glm::vec3(0, 12.5, 0));
+    Component::DirectionalLight light2 = Component::DirectionalLight({ 1, 1, 1 }, { 1, 1, 1 }, 1);
+    lightSource2.addComponet(&light2);
+
+   /* Materials::MatItemSingle<glm::vec4> cityAlbedo({ 0, 1, 0, 1 });
+    Materials::MatItemSingle<glm::vec3> cityNorm({ 0, 1, 0 });
+    Materials::MatItemSingle<float> cityMetalic(0.5f);
+    Materials::MatItemSingle<float> cityRoughness(0.5f);
+    Materials::MatItemSingle<float> cityAO(0.5f);
+    Materials::PBR cityMaterial(&cityAlbedo, &cityNorm, &cityMetalic, &cityRoughness, &cityAO);
+
+    GameObject city(glm::vec3(0, 10, 0));
+    Component::RenderMesh cityMesh;
+    cityMesh.setModel(cityBuffer);
+    cityMesh.setMaterial(&cityMaterial);
+    city.addComponet(&cityMesh);*/
+
 
 
 
@@ -390,8 +410,9 @@ int main() {
 
     scene.addObject(&player);
     scene.addObject(&lightSource);
+    scene.addObject(&lightSource2);
     scene.addObject(&window1);
-    // scene.addObject(&window2);
+    //scene.addObject(&city);
 
     scene.addObject(&orb);
     for (Terrain& land : allLand) {

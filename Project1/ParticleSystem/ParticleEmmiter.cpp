@@ -1,4 +1,5 @@
 #include "ParticleEmmiter.h"
+#include <algorithm>
 #include "../Utils/ResourceLoader.h"
 #include "../Rendering/Shading/Manager.h"
 #include "../Primatives/Model.h"
@@ -11,7 +12,7 @@ int Component::ParticleEmmiter::shader = 0;
 Primative::Buffers::VertexBuffer Component::ParticleEmmiter::quadBuffer = {};
 
 Component::ParticleEmmiter::ParticleEmmiter() : ComponetBase(), particleCount(0), particles(), looping(false), duration(0.0f), position(nullptr),
-	offset(0.0f), albedo(nullptr), spawnRate(1.0f), lifeTime(0.0f), timeBetweenSpawn(0.0f), numberAlive(0), playing(false), shape(nullptr)
+offset(0.0f), albedo(nullptr), spawnRate(1.0f), lifeTime(0.0f), timeBetweenSpawn(0.0f), numberAlive(0), playing(false), shape(nullptr), itteration(1)
 {
 	timeBetweenSpawn = 1.0f / lifeTime;
 
@@ -23,7 +24,14 @@ Component::ParticleEmmiter::ParticleEmmiter() : ComponetBase(), particleCount(0)
 
 void Component::ParticleEmmiter::sortParticles()
 {
-	return;
+	Vector3 camPos = parent->getScene()->getMainCamera()->getPos();
+	std::sort(particles.begin(), particles.end(), [&](Particles::Particle& a, Particles::Particle& b)
+		{
+			float dist1 = glm::length2(getParticlePosition(a) - camPos);
+			float dist2 = glm::length2(getParticlePosition(b) - camPos);
+			return dist1 > dist2;
+		}
+	);
 }
 
 Component::ParticleEmmiter::ParticleEmmiter(Int numberOfParticels, Float duration, bool looping, Float spawnRate) : ParticleEmmiter()
@@ -32,8 +40,9 @@ Component::ParticleEmmiter::ParticleEmmiter(Int numberOfParticels, Float duratio
 	this->duration = duration;
 	this->looping = looping;
 	this->spawnRate = spawnRate;
+	particles.reserve(numberOfParticels);
 	for (int i = 0; i < numberOfParticels; i++) {
-		particles[i] = Particles::Particle();
+		particles.push_back(Particles::Particle());
 	}
 	playing = true;
 }
@@ -60,15 +69,16 @@ void Component::ParticleEmmiter::update(float deltaTime)
 {
 	if (playing) {
 		lifeTime += deltaTime;
-		bool canSpawn = lifeTime >= spawnRate * numberAlive;
-		for (auto itt = particles.begin(); itt != particles.end(); itt++) {
-			Particles::Particle& part = (*itt).second;
+		if (lifeTime >= duration * itteration) {
+			itteration++;
+		}
+		bool canSpawn = lifeTime >= spawnRate * numberAlive AND (looping OR lifeTime <= duration);
+		for (auto& part : particles) {
 			part.update(deltaTime);
 			if (NOT part.getIsAlive() AND canSpawn) {
 				glm::vec3 vel = getVelocityDistributed();
 				vel = glm::normalize(vel) * 2.0f;
 				part.spawn(vel);
-				// part.setRelativePosition(getVelocityDistributed());
 				numberAlive++;
 				canSpawn = false;
 			}
@@ -81,8 +91,7 @@ void Component::ParticleEmmiter::render(float deltaTime)
 	sortParticles();
 	Render::Shading::Manager::setActive(shader);
 	int i = 0;
-	for (auto itt = particles.begin(); itt != particles.end(); itt++) {
-		Particles::Particle& part = (*itt).second;
+	for (auto& part : particles) {
 		if (NOT part.getIsAlive())
 			continue;
 		Render::Shading::Manager::setValue("positions[" + std::to_string(i) + "]", getParticlePosition(part));
@@ -100,17 +109,29 @@ void Component::ParticleEmmiter::render(float deltaTime)
 }
 void Component::ParticleEmmiter::restart()
 {
-	for (auto itt = particles.begin(); itt != particles.end(); itt++) {
-		Particles::Particle& part = (*itt).second;
+	for (auto& part : particles) {
 		part.reset();
 	}
 }
 void Component::ParticleEmmiter::cleanUp()
 {
-	for (auto itt = particles.begin(); itt != particles.end(); itt++) {
-		Particles::Particle& part = (*itt).second;
+	for (auto& part : particles) {
 		part.cleanUp();
 	}
+}
+
+void Component::ParticleEmmiter::play()
+{
+	lifeTime = 0;
+	playing = true;
+}
+void Component::ParticleEmmiter::pause()
+{
+	playing = false; 
+}
+void Component::ParticleEmmiter::togglePlay()
+{
+	playing = NOT playing;
 }
 
 void Component::ParticleEmmiter::setAlbedo(Materials::MatItemBase<glm::vec4>* albedo)

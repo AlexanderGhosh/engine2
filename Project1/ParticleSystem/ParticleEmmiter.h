@@ -5,7 +5,6 @@
 #include "Particle.h"
 
 namespace Particles {
-	class Particle;
 	class DistributionBase;
 }
 namespace Materials {
@@ -19,9 +18,9 @@ namespace Component {
 	private:
 		static int shader;
 		static Primative::Buffers::VertexBuffer quadBuffer;
-		std::map<float, Particles::Particle> particles;
+		std::vector<Particles::Particle> particles;
 		bool looping, playing;
-		int particleCount, numberAlive;
+		int particleCount, numberAlive, itteration;
 		float duration, spawnRate, lifeTime, timeBetweenSpawn;
 		glm::vec3* position;
 		glm::vec3 offset;
@@ -42,6 +41,10 @@ namespace Component {
 		void render(float deltaTime);
 		void restart();
 		void cleanUp();
+
+		void play();
+		void pause();
+		void togglePlay();
 
 		// setters
 		void setAlbedo(Materials::MatItemBase<glm::vec4>* albedo);

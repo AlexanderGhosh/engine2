@@ -1,26 +1,22 @@
 #pragma once
 #include "DistributionBase.h"
 namespace Particles {
-	class ConeDistribution : public DistributionBase
+	class SphereDisribution : public DistributionBase
 	{
 	private:
-		float height, radius;
-		float r_div_h;
+		float radius;
 	public:
-		ConeDistribution();
-		ConeDistribution(Float h, Float r);
-		~ConeDistribution() = default;
+		SphereDisribution();
+		SphereDisribution(Float r);
+		~SphereDisribution() = default;
 		const ParticleDistribution getDistribution() const;
 		void cleanUp();
 
 		// setters
-		void setHeight(Float h);
 		void setRadius(Float r);
 
 		// getters
 		glm::vec3 getPoint() const;
-		Float getHeight() const;
 		Float getRadius() const;
 	};
-};
-
+}

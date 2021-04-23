@@ -43,11 +43,6 @@ glm::vec3 Particles::ConeDistribution::getPoint() const
 	return res;
 }
 
-glm::vec3 Particles::ConeDistribution::getNormalised() const
-{
-	return glm::normalize(getPoint());
-}
-
 Float Particles::ConeDistribution::getHeight() const
 {
 	return height;

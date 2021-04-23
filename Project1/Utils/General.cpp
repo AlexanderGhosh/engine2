@@ -296,7 +296,7 @@ std::string Utils::to_string_precision(Vector3 vec, Int dp) {
 float Utils::random(float min, float max)
 {
     assert(min >= 0);
-    return (static_cast<float>(rand()) / static_cast<float>(RAND_MAX)) * (max - min) + min;
+    return (static_cast<float>(rand()) * INV_RAND_MAX) * (max - min) + min;
 }
 
 

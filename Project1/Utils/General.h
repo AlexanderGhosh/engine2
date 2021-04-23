@@ -42,6 +42,7 @@
 #define PI 3.14159265359f
 constexpr float TWO_PI = 2.0f * PI;
 constexpr float INV_PI = 1.0f / PI;
+constexpr float INV_RAND_MAX = 1.0f / static_cast<float>(RAND_MAX);
 #define RADIANS(x) (x * PI * 0.00555555f)
 #define DEGREES(x) (x * INV_PI * 180)
 
