@@ -243,7 +243,7 @@
     <ClCompile Include="ParticleSystem\Distributions\ConeDistribution.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ParticleSystem\Distributions\DomeDisribution.cpp">
+    <ClCompile Include="ParticleSystem\Distributions\DomeDistribution.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ParticleSystem\Distributions\SphereDistribution.cpp">
@@ -497,7 +497,7 @@
     <ClInclude Include="ParticleSystem\Distributions\ConeDistribution.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ParticleSystem\Distributions\DomeDisribution.h">
+    <ClInclude Include="ParticleSystem\Distributions\DomeDistribution.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ParticleSystem\Distributions\SphereDistribution.h">

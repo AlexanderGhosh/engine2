@@ -45,3 +45,10 @@ void Materials::Forward::cleanUp()
 	normal->cleanUp();
 	specular->cleanUp();
 }
+
+void Materials::Forward::setRepeatValue(Float mul)
+{
+	diffuse->setRepeatValue(mul);
+	normal->setRepeatValue(mul);
+	specular->setRepeatValue(mul);
+}

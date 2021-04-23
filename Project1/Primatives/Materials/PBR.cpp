@@ -1,7 +1,7 @@
 #include "PBR.h"
 #include "MatItemBase.h"
 
-Materials::PBR::PBR() : MaterialBase(), albedo(nullptr), normal(nullptr), metalic(nullptr), roughness(nullptr), ao(nullptr), brdfTex(0), lbrMap(0), hdrMap(0)
+Materials::PBR::PBR() : MaterialBase(), albedo(nullptr), normal(nullptr), metalic(nullptr), roughness(nullptr), ao(nullptr)
 {
 }
 
@@ -24,13 +24,6 @@ void Materials::PBR::activateTextures(Int startUnit) const
 	metalic->tryBindTexture(unit);
 	roughness->tryBindTexture(unit);
 	ao->tryBindTexture(unit);
-
-	glActiveTexture(GL_TEXTURE0 + unit++);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, hdrMap);
-	glActiveTexture(GL_TEXTURE0 + unit++);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, lbrMap);
-	glActiveTexture(GL_TEXTURE0 + unit);
-	glBindTexture(GL_TEXTURE_2D, brdfTex);
 }
 
 void Materials::PBR::cleanUp()
@@ -76,36 +69,6 @@ const Materials::MatItemBase<float>* Materials::PBR::getAO() const
 	return ao;
 }
 
-Unsigned Materials::PBR::getHDRmap() const
-{
-	return hdrMap;
-}
-
-Unsigned Materials::PBR::getIBLmap() const
-{
-	return lbrMap;
-}
-
-Unsigned Materials::PBR::getBRDFtex() const
-{
-	return brdfTex;
-}
-
-void Materials::PBR::setHDRmap(Unsigned id)
-{
-	hdrMap = id;
-}
-
-void Materials::PBR::setIBLmap(Unsigned id)
-{
-	lbrMap = id;
-}
-
-void Materials::PBR::setBRDFtex(Unsigned id)
-{
-	brdfTex = id;
-}
-
 void Materials::PBR::setAlbedo(MatItemBase<glm::vec4>* albedo)
 {
 	this->albedo = albedo;
@@ -129,4 +92,13 @@ void Materials::PBR::setRoughness(MatItemBase<float>* roughness)
 void Materials::PBR::setAO(MatItemBase<float>* ao)
 {
 	this->ao = ao;
+}
+
+void Materials::PBR::setRepeatValue(Float mul)
+{
+	albedo->setRepeatValue(mul);
+	normal->setRepeatValue(mul);
+	metalic->setRepeatValue(mul);
+	roughness->setRepeatValue(mul);
+	ao->setRepeatValue(mul);
 }

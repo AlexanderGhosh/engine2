@@ -16,6 +16,9 @@ namespace Materials {
 		virtual Float getCurrentMixValue() const = 0;
 		Float getRepeatValue() const;
 
+		// setters
+		virtual void setRepeatValue(Float val);
+
 		// adders
 		virtual void addValue(const T& raw) = 0;
 		virtual void addValue(Unsigned id) = 0;
@@ -39,6 +42,11 @@ namespace Materials {
 	inline Float MatItemBase<T>::getRepeatValue() const
 	{
 		return repeatValue;
+	}
+	template<class T>
+	inline void MatItemBase<T>::setRepeatValue(Float val)
+	{
+		repeatValue = val;
 	}
 #pragma endregion
 };

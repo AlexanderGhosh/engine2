@@ -30,6 +30,8 @@
 
 #include "ParticleSystem/ParticleEmmiter.h"
 #include "ParticleSystem/Distributions/ConeDistribution.h"
+#include "ParticleSystem/Distributions/DomeDistribution.h"
+#include "ParticleSystem/Distributions/SphereDistribution.h"
 
 #include "Physics/Engine.h"
 #include "Physics/Collision/Broadphase/NSquared.h"
@@ -117,9 +119,12 @@ int main() {
     const unsigned wiy  = ResourceLoader::loadTexture("Resources/Textures/yellowWindow.png", TextureType::AlbedoMap, 0);
     // const unsigned hm       = ResourceLoader::loadTexture("Resources/Textures/heightmap.png", TextureType::HeightMap, 0);
     const unsigned rainDrop = ResourceLoader::loadTexture("Resources/Textures/raindrop.png", TextureType::AlbedoMap, 0);
-    const unsigned grass    = ResourceLoader::loadTexture("Resources/Textures/grass.jpg", TextureType::AlbedoMap, 0);
     const unsigned dirt     = ResourceLoader::loadTexture("Resources/Textures/dirt.png", TextureType::AlbedoMap, 0);
     const unsigned cityTex  = ResourceLoader::loadTexture("Resources/Textures/City Tex.png", TextureType::AlbedoMap, 0);
+
+    auto grassMaterialInfo = ResourceLoader::createPBRInfo("Resources/Textures/Grass", { TextureType::AlbedoMap, TextureType::AOMap, TextureType::MetalicMap, TextureType::NormalMap, TextureType::RoughnessMap }, { 0, 0, 0, 0, 0 });
+    auto grassMaterial = ResourceLoader::createPBR(grassMaterialInfo);
+    grassMaterial.setRepeatValue(10);
 
     auto waterMaterialInfo = ResourceLoader::createPBRInfo("Resources/Textures/Water", { TextureType::AlbedoMap, TextureType::RoughnessMap, TextureType::NormalMap, TextureType::AOMap, TextureType::MetalicMap }, { 0, 0, 0, 0, 0 });
     auto waterMaterial = ResourceLoader::createPBR(waterMaterialInfo);
@@ -274,7 +279,7 @@ int main() {
     orbMesh.setMaterial(&waterMaterial);
     orb.addComponet(&orbMesh);
 
-    Particles::ConeDistribution distribution = Particles::ConeDistribution(1, 2);
+    Particles::DomeDistribution distribution = Particles::DomeDistribution(1.0f);
     Component::ParticleEmmiter emmiter = Component::ParticleEmmiter(10, 10, true, 0.25);
     Materials::MatItemSingle<glm::vec4> particleAlbedo(rainDrop);
     emmiter.setAlbedo(&particleAlbedo);
@@ -284,7 +289,7 @@ int main() {
     timer.log();
 
     timer.start("Terrain"); 
-    MI3 lowestColour(dirt);
+    /*MI3 lowestColour(dirt);
     MI3 middleColour(dirt);
     MI3 highestColour(grass, 10.0f);
 
@@ -294,7 +299,7 @@ int main() {
     Materials::MatItemSingle<float> landRoughness(0.7f);
     Materials::MatItemSingle<float> landAO(0.5f);
 
-    Materials::PBR landMaterial = Materials::PBR(&landAlbedo, &landNormal, &landMetalic, &landRoughness, &landAO);
+    Materials::PBR landMaterial = Materials::PBR(&landAlbedo, &landNormal, &landMetalic, &landRoughness, &landAO);*/
 
     const int landSize = 2;
     const float scale = 100;
@@ -311,7 +316,7 @@ int main() {
             land.setScale({ scale, 10, scale });
             land.setNoiseBuffer(Utils::NoiseGeneration::getMap(glm::vec3(i, j, 0), landRes + 1, { 1, 0.5, 0.1 }, { 1, 2, 3 }));
             land.useTextureMap(false);
-            land.setMaterial(&landMaterial);
+            land.setMaterial(&grassMaterial);
             /*land.setLowestTexture(&lowestColour);
             land.setMiddleTexture(&middleColour);
             land.setHighestTexture(&highestColour);*/

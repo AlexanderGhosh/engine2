@@ -13,6 +13,7 @@ namespace Materials {
 		virtual void cleanUp() = 0;
 		~MaterialBase() = default;
 		virtual void update(float deltaTime) = 0;
+		virtual void setRepeatValue(Float mul) = 0;
 	};
 
 };

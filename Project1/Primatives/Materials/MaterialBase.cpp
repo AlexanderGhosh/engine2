@@ -6,3 +6,4 @@ Materials::MaterialBase::MaterialBase()
 {
 	ResourceLoader::addMaterial(this);
 }
+

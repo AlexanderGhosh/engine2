@@ -150,7 +150,7 @@
     <ClCompile Include="Componets\Scripting.cpp" />
     <ClCompile Include="Componets\Lights\DirectionalLight.cpp" />
     <ClCompile Include="Componets\Lights\PointLight.cpp" />
-    <ClCompile Include="ParticleSystem\Distributions\DomeDisribution.cpp" />
+    <ClCompile Include="ParticleSystem\Distributions\DomeDistribution.cpp" />
     <ClCompile Include="ParticleSystem\Distributions\ConeDistribution.cpp" />
     <ClCompile Include="ParticleSystem\Distributions\SphereDistribution.cpp" />
     <ClCompile Include="ParticleSystem\Particle.cpp" />
@@ -229,7 +229,7 @@
     <ClInclude Include="Componets\Scripting.h" />
     <ClInclude Include="Componets\Lights\DirectionalLight.h" />
     <ClInclude Include="Componets\Lights\PointLight.h" />
-    <ClInclude Include="ParticleSystem\Distributions\DomeDisribution.h" />
+    <ClInclude Include="ParticleSystem\Distributions\DomeDistribution.h" />
     <ClInclude Include="ParticleSystem\Distributions\ConeDistribution.h" />
     <ClInclude Include="ParticleSystem\Distributions\SphereDistribution.h" />
     <ClInclude Include="ParticleSystem\Particle.h" />

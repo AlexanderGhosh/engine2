@@ -60,7 +60,7 @@ void main()
     vec3 albedo     = getData(material.albedo);
     vec3 normal     = getNormal(material.normal);
     float metalic   = getData(material.metalic);
-    float roughness = getData(material.roughness);
+    float roughness = 1.0 - getData(material.roughness);
     float ao        = getData(material.ao);
 
     positionOut = vec4(WorldPosition, 1.0);

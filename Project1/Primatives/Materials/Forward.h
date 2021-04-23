@@ -18,6 +18,7 @@ namespace Materials {
 		void activateTextures(Int startUnit) const;
 		void update(float deltaTime);
 		void cleanUp();
+		void setRepeatValue(Float mul);
 	};
 }
 
