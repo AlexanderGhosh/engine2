@@ -94,10 +94,10 @@ void main() {
     // DIRECTIONAL LIGHTS
     accumlativeLight += DirectionalLights(directionalLights, numberOfDirectionalLights, viewDirection, Normal, realSpecular, albedoDiffuse, alpha2, Roughness, Metallic, dotNV);
 
-    float shadow = CalculateShadowValue(LSFragmentPosition, Normal);
+    float shadow = 1.0 - CalculateShadowValue(LSFragmentPosition, Normal);
 
     vec3 ambient = vec3(0.3) * Albedo;
-    vec3 colour = ambient + (1.0 - shadow) * accumlativeLight;
+    vec3 colour = ambient + shadow * accumlativeLight;
 
     /*colour = ToneMap(colour); // HDR
     colour = GammaCorrect(colour);*/

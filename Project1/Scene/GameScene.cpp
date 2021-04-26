@@ -192,13 +192,10 @@ void GameScene::preProcess()
 			glBindTexture(GL_TEXTURE_2D, shadowBuffer.getTexture("depth"));
 			bool suc = Render::Shading::Manager::setValue("ShadowMap", unit);
 
-			float shadowMixValue = 0;
 			if (mainShadowCaster) {
 				Render::Shading::Manager::setValue("LSMatrix", lsMatrix);
 				Render::Shading::Manager::setValue("ShadowCasterPosition", mainShadowCaster->getPosition());
-				shadowMixValue = 1;
 			}
-			Render::Shading::Manager::setValue("ShadowMixValue", shadowMixValue);
 			// the deferred quad
 			const Primative::Buffers::VertexBuffer& buffer = ResourceLoader::getBuffer(quadModel.getBuffers()[0]);
 			buffer.render();
@@ -214,7 +211,10 @@ void GameScene::preProcess()
 
 
 			drawSkyBox();
-			drawTransparent();
+			Render::Shading::Manager::setActive(ResourceLoader::getShader("TransparentShader"));
+			Render::Shading::Manager::setValue("LSMatrix", lsMatrix);
+			Render::Shading::Manager::setValue("ShadowCasterPosition", mainShadowCaster->getPosition());
+			drawTransparent(false);
 			drawParticles();
 			drawUI();
 		}

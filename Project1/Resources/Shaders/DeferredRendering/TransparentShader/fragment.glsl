@@ -79,12 +79,18 @@ uniform DirectionalLight directionalLights[maxDirectionalLights];
 
 // Light Source Functions
 // POINT LIGHTS
-vec3 ProcessPointLight(PointLight light, vec3 WFP, vec3 VD, vec3 N, vec3 RS, vec3 AD, float A2, float R, float M, float dotNV, float alphaValue);
-vec3 PointLights(PointLight pointLights[maxPointLights], int numberOfPointLights, vec3 WFP, vec3 VD, vec3 N, vec3 RS, vec3 AD, float A2, float R, float M, float dotNV, float alphaValue);
+vec3 ProcessPointLight(PointLight light, vec3 WFP, vec3 VD, vec3 N, vec3 RS, vec3 AD, float A2, float R, float M, float dotNV);
+vec3 PointLights(PointLight pointLights[maxPointLights], int numberOfPointLights, vec3 WFP, vec3 VD, vec3 N, vec3 RS, vec3 AD, float A2, float R, float M, float dotNV);
 // DIRECTIONAL LIGHTS
-vec3 ProcessDirectionalLight(DirectionalLight light);
-vec3 DirectionalLights(DirectionalLight directionalLights[maxDirectionalLights]);
+vec3 ProcessDirectionalLight(DirectionalLight light, vec3 VD, vec3 N, vec3 RS, vec3 AD, float A2, float R, float M, float dotNV);
+vec3 DirectionalLights(DirectionalLight directionalLights[maxDirectionalLights], int numberOfDirectionalLights, vec3 VD, vec3 N, vec3 RS, vec3 AD, float A2, float R, float M, float dotNV);
 // SPOT LIGHTS
+
+// Shadows
+float CalculateShadowValue(vec4 LSFragmentPosition, vec3 Normal);
+uniform sampler2D ShadowMap;
+uniform mat4 LSMatrix;
+uniform vec3 ShadowCasterPosition;
 
 uniform Material material;
 
@@ -106,6 +112,8 @@ void main() {
     float Roughness = getData(material.roughness);
     float AO        = getData(material.ao);
 
+    // shadows
+    vec4 LSFragmentPosition    = LSMatrix * vec4(WorldFragmentPosition, 1.0);
 
     // constants
     vec3 viewDirection = normalize(CameraPosition - WorldFragmentPosition);
@@ -118,23 +126,26 @@ void main() {
     // surface reflection at when looking from 0 degrees
     vec3 realSpecular = mix(vec3(0.04), Albedo, Metallic); // 0.04 assumption for metals
 
+    // POINT LIGHTS
+    vec3 accumlativeLight = PointLights(pointLights, numberOfPointLights, WorldFragmentPosition, viewDirection, Normal, realSpecular, albedoDiffuse, alpha2, Roughness, Metallic, dotNV);
+    // DIRECTIONAL LIGHTS
+    accumlativeLight += DirectionalLights(directionalLights, numberOfDirectionalLights, viewDirection, Normal, realSpecular, albedoDiffuse, alpha2, Roughness, Metallic, dotNV);
 
-    vec3 accumlativeLight = PointLights(pointLights, numberOfPointLights, WorldFragmentPosition, viewDirection, Normal, realSpecular, albedoDiffuse, alpha2, Roughness, Metallic, dotNV, alphaValue);
-
-
+    float shadow = (1.0 - CalculateShadowValue(LSFragmentPosition, Normal)) * (1.0 - alphaValue);
+    shadow = 1;
     vec3 ambient = vec3(0.03) * Albedo * AO;
-    vec3 colour = ambient + accumlativeLight;
+    vec3 colour = ambient + shadow * accumlativeLight;
 
 
     /*colour = ToneMap(colour);
     colour = GammaCorrect(colour);*/
     
-    //colour = Albedo;
+    // colour = Albedo;
 
     ProcessOutputs(colour, alphaValue);
 };
 
-vec3 ProcessPointLight(PointLight light, vec3 WFP, vec3 VD, vec3 N, vec3 RS, vec3 AD, float A2, float R, float M, float dotNV, float alphaValue){
+vec3 ProcessPointLight(PointLight light, vec3 WFP, vec3 VD, vec3 N, vec3 RS, vec3 AD, float A2, float R, float M, float dotNV){
     // constants
     vec3 lightDirection = normalize(light.position - WFP);
     vec3 H = normalize(VD + lightDirection);
@@ -159,23 +170,67 @@ vec3 ProcessPointLight(PointLight light, vec3 WFP, vec3 VD, vec3 N, vec3 RS, vec
 
     return (kd * AD + specular) * radiance * dotNL * light.brightness;
 }
-vec3 PointLights(PointLight pointLights[maxPointLights], int numberOfPointLights, vec3 WFP, vec3 VD, vec3 N, vec3 RS, vec3 AD, float A2, float R, float M, float dotNV, float alphaValue) {
+vec3 PointLights(PointLight pointLights[maxPointLights], int numberOfPointLights, vec3 WFP, vec3 VD, vec3 N, vec3 RS, vec3 AD, float A2, float R, float M, float dotNV) {
     vec3 accumlativeLight = vec3(0);
     for(int i = 0; i < numberOfPointLights; i++){
-        accumlativeLight += ProcessPointLight(pointLights[i], WFP, VD, N, RS, AD, A2, R, M, dotNV, alphaValue);
+        accumlativeLight += ProcessPointLight(pointLights[i], WFP, VD, N, RS, AD, A2, R, M, dotNV);
     }
     return accumlativeLight;
 }
 
+vec3 ProcessDirectionalLight(DirectionalLight light, vec3 VD, vec3 N, vec3 RS, vec3 AD, float A2, float R, float M, float dotNV){
+    // constants
+    vec3 lightDirection = abs(normalize(light.direction));
+    vec3 H = normalize(VD + lightDirection);
+    float dotNL = max(dot(N, lightDirection), 0.0);
+    float dotNH = max(dot(N, H), 0.0);
+    float dotVH = max(dot(VD, H), 0.0);
 
-/*vec3 GammaCorrect(vec3 col) {
-    return pow(col, vec3(1.0/GammaValue));
-};
+    // functions
+    vec3 specularData[2];
+    SpecularTerm(dotNH, A2, dotVH, RS, dotNV, dotNL, R, specularData);
 
-vec3 ToneMap(vec3 a){
-    return vec3(1.0) - exp(-a * CameraExposure); // more controll
-    return a / (a + vec3(1.0)); // less controll
-}*/
+    vec3 specular = specularData[0];
+    vec3 ks = specularData[1];
+    vec3 kd = vec3(1.0) - ks;  
+    kd *= 1.0 - M;
+
+    return (kd * AD + specular) * light.colour * dotNL * light.brightness;
+}
+
+vec3 DirectionalLights(DirectionalLight directionalLights[maxDirectionalLights], int numberOfDirectionalLights, vec3 VD, vec3 N, vec3 RS, vec3 AD, float A2, float R, float M, float dotNV){
+    vec3 accumlativeLight = vec3(0);
+    for(int i = 0; i < numberOfDirectionalLights; i++){
+        accumlativeLight += ProcessDirectionalLight(directionalLights[i], VD, N, RS, AD, A2, R, M, dotNV);
+    }
+    return accumlativeLight;
+}
+
+float CalculateShadowValue(vec4 LSFragmentPosition, vec3 Normal) {
+    vec3 projCoords = LSFragmentPosition.xyz / LSFragmentPosition.w;
+    projCoords = 0.5 * projCoords + 0.5;
+
+    float currentDepth = projCoords.z;
+
+    if (currentDepth > 1.0)
+        return 0.0;
+
+    float bias = max(0.05 * (1.0 - dot(Normal, ShadowCasterPosition)), 0.005);
+    
+    float shadow = 0.0;
+    vec2 texelSize = 1.0 / textureSize(ShadowMap, 0);
+    for(int x = -1; x <= 1; ++x)
+    {
+        for(int y = -1; y <= 1; ++y)
+        {
+            float pcfDepth = texture(ShadowMap, projCoords.xy + vec2(x, y) * texelSize).r; 
+            shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;        
+        }    
+    }
+    shadow /= 9;
+
+    return shadow;
+}
 
 void ProcessOutputs(vec3 colour, float alphaValue){
     FragColour = vec4(colour, alphaValue);    

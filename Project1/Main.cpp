@@ -86,7 +86,7 @@ int main() {
     timer.start("Shaders");
     Gizmos::GizmoRenderer::init();
     std::vector<std::string> shaders = {
-        "PBRShader", "TransparentShader", "Shadows/ShadowShader", "UIShader", "TextShader", "DeferredRendering/G Pass/DeferredTerrainMap", "DeferredRendering/G Pass/DeferredTerrainMesh", "PostShader", "ParticleShader", 
+        "PBRShader", "DeferredRendering/TransparentShader", "Shadows/ShadowShader", "UIShader", "TextShader", "DeferredRendering/G Pass/DeferredTerrainMap", "DeferredRendering/G Pass/DeferredTerrainMesh", "PostShader", "ParticleShader", 
         "DeferredRendering/DeferredFinal", "DeferredRendering/G Pass/DeferredOpaque", "GausianBlur"
     };
     ResourceLoader::createShaders(shaders);
@@ -279,12 +279,12 @@ int main() {
     orbMesh.setMaterial(&waterMaterial);
     orb.addComponet(&orbMesh);
 
-    Particles::DomeDistribution distribution = Particles::DomeDistribution(1.0f);
+    /*Particles::DomeDistribution distribution = Particles::DomeDistribution(1.0f);
     Component::ParticleEmmiter emmiter = Component::ParticleEmmiter(10, 10, true, 0.25);
     Materials::MatItemSingle<glm::vec4> particleAlbedo(rainDrop);
     emmiter.setAlbedo(&particleAlbedo);
     emmiter.setShape(&distribution);
-    orb.addComponet(&emmiter);
+    orb.addComponet(&emmiter);*/
 
     timer.log();
 
@@ -343,7 +343,7 @@ int main() {
     player.addComponet(&recieverComp);
 
 
-    GameObject lightSource(glm::vec3(0, 12.5, 0));
+    GameObject lightSource(glm::vec3(0, 1.5, -2.5));
     Component::PointLight light(glm::vec3(1), 100.0f);
     lightSource.addComponet(&light);
 
