@@ -21,6 +21,7 @@ namespace Component {
 	class RenderMesh;
 	class ParticleEmmiter;
 	class LightBase;
+	class ShadowCaster;
 }
 namespace Primative {
 	class Model;
@@ -48,6 +49,7 @@ private:
 	std::vector<UI::Canvas*> uiStuff;
 	std::vector<Component::ParticleEmmiter*> emmiters;
 	std::vector<Component::LightBase*> lightSources;
+	Component::ShadowCaster* mainShadowCaster;
 
 	std::vector<GameObject*> objects;
 	std::unordered_map<std::string, unsigned> preProcessingLayers;
@@ -66,15 +68,15 @@ private:
 	void drawObjects(Unsigned shaderId); // just moved
 	void drawSkyBox();
 	void drawOpaque();
-	void drawTransparent();
-	void drawTerrain();
+	void drawTransparent(bool bindShader = true);
+	void drawTerrain(bool bindShader = true);
 	void drawUI();
 	void drawParticles();
 
 	// polling evetns
 	std::vector<GameEventsTypes> getCurrentEvents() const;
-public:
-	bool USE_DEFFERED;	
+public:	
+	bool USE_SHADOWS;
 	GameScene();
 	void preProcess();
 	void postProcess();
@@ -103,17 +105,18 @@ public:
 	void setSkyBox(SkyBox* sb);
 	void setContext(Context* context);
 	void setMainCamera(Component::Camera* camera);
+	void setShadowCaster(Component::ShadowCaster* caster);
 
 	// getters
 	const glm::ivec2& getScreenDimentions() const;
 	/// <summary>
 	/// returns the first gameobject with the given name
 	/// </summary>
-	/// <param name="name"></param>
-	/// <returns></returns>
 	GameObject* getObject(String name);
 	Primative::Buffers::FrameBuffer& getFBO(String name);
 	std::vector<Primative::Buffers::FrameBuffer>& getFBOs(String name);
 	Component::Camera* getMainCamera();
+	const Component::ShadowCaster* getShadowCaster() const;
+	Context* getContext() const;
 };
 

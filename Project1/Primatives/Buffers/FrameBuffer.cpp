@@ -6,7 +6,7 @@ Primative::Buffers::FrameBuffer::FrameBuffer() : fbo(), textures(), backgroundCo
 {
 }
 
-Primative::Buffers::FrameBuffer::FrameBuffer(const std::vector<std::string>& textures, const glm::ivec2& dimentions, const glm::vec3& bgColour) : FrameBuffer()
+Primative::Buffers::FrameBuffer::FrameBuffer(const std::vector<std::string>& textures, const glm::ivec2& dimentions, long texture_param, const glm::vec3& bgColour) : FrameBuffer()
 {
 	this->dimentions = dimentions;
 	this->backgroundColour = bgColour;
@@ -25,14 +25,14 @@ Primative::Buffers::FrameBuffer::FrameBuffer(const std::vector<std::string>& tex
 	glGenFramebuffers(1, &fbo);
 	bind();
 	clearBits();
-	initalize();
+	initalize(texture_param);
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
 		std::cout << "Failed to create FBO" << std::endl;
 	}
 	unBind();
 }
 
-void Primative::Buffers::FrameBuffer::initalize()
+void Primative::Buffers::FrameBuffer::initalize(long texture_param)
 {
 	unsigned colAttach = 0;
 	bool has_colour = false;
@@ -47,8 +47,12 @@ void Primative::Buffers::FrameBuffer::initalize()
 		glGenTextures(1, &tex);
 		glBindTexture(GL_TEXTURE_2D, tex);
 
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, texture_param);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, texture_param);
+		if (texture_param == GL_CLAMP_TO_BORDER) {
+			glm::vec4 bgcol(1);
+			glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, &bgcol[0]);
+		}
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);

@@ -1,6 +1,4 @@
 #include "Camera.h"
-#include <iostream>
-#include <gtx/string_cast.hpp>
 #include "../GameObject/GameObject.h"
 
 const glm::mat4 Component::Camera::getView() const
@@ -25,10 +23,10 @@ void Component::Camera::ProcessMouseMovement(float xOffset, float yOffset, bool 
 	this->update(0);
 }
 void Component::Camera::update(float deltaTime) {
-	glm::vec3 front;
-	front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-	front.y = sin(glm::radians(pitch));
-	front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+	glm::vec3 front(0);
+	front.x = cosf(glm::radians(yaw)) * cosf(glm::radians(pitch));
+	front.y = sinf(glm::radians(pitch));
+	front.z = sinf(glm::radians(yaw)) * cosf(glm::radians(pitch));
 
 	fwd = glm::normalize(front);
 	right = glm::normalize(glm::cross(fwd, Utils::yAxis()));
@@ -43,6 +41,14 @@ Vector3 Component::Camera::getPos() const
 Float Component::Camera::getExposure() const
 {
 	return exposure;
+}
+
+glm::mat4 Component::Camera::getRotationMatrix() const
+{
+	glm::mat4 res(1);
+	res = glm::rotate(res, RADIANS(yaw), Utils::yAxis());
+	res = glm::rotate(res, RADIANS(pitch), Utils::xAxis());
+	return res;
 }
 
 void Component::Camera::setExposure(Float expo)

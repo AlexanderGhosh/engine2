@@ -27,6 +27,7 @@
 #include "Componets/CharacterController.h"
 #include "Componets/Lights/PointLight.h"
 #include "Componets/Lights/DirectionalLight.h"
+#include "Componets/Lights/ShadowCaster.h"
 
 #include "ParticleSystem/ParticleEmmiter.h"
 #include "ParticleSystem/Distributions/ConeDistribution.h"
@@ -67,7 +68,7 @@ constexpr glm::ivec2 SCREEN_DIMENTIONS = glm::ivec2(1280, 720);
 long SEED;
 int main() {
     SEED = time(0);
-    //SEED = 1;
+    SEED = 1;
     srand(SEED);
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
     // _crtBreakAlloc = 69450;
@@ -107,7 +108,7 @@ int main() {
     const Primative::Model planeBuffer = ResourceLoader::createModel("Resources/Models/plane.dae");
     // const Primative::Model minikitBuffer = ResourceLoader::createModel("Resources/Models/minikit.fbx");
     const Primative::Model orbBuffer = ResourceLoader::createModel("Resources/Models/sphere.obj");
-    const Primative::Model cityBuffer = ResourceLoader::createModel("Resources/Models/city.obj");
+    //const Primative::Model cityBuffer = ResourceLoader::createModel("Resources/Models/city.obj");
     timer.log();
 
     timer.start("Animations");
@@ -120,7 +121,7 @@ int main() {
     // const unsigned hm       = ResourceLoader::loadTexture("Resources/Textures/heightmap.png", TextureType::HeightMap, 0);
     const unsigned rainDrop = ResourceLoader::loadTexture("Resources/Textures/raindrop.png", TextureType::AlbedoMap, 0);
     const unsigned dirt     = ResourceLoader::loadTexture("Resources/Textures/dirt.png", TextureType::AlbedoMap, 0);
-    const unsigned cityTex  = ResourceLoader::loadTexture("Resources/Textures/City Tex.png", TextureType::AlbedoMap, 0);
+    //const unsigned cityTex  = ResourceLoader::loadTexture("Resources/Textures/City Tex.png", TextureType::AlbedoMap, 0);
 
     auto grassMaterialInfo = ResourceLoader::createPBRInfo("Resources/Textures/Grass", { TextureType::AlbedoMap, TextureType::AOMap, TextureType::MetalicMap, TextureType::NormalMap, TextureType::RoughnessMap }, { 0, 0, 0, 0, 0 });
     auto grassMaterial = ResourceLoader::createPBR(grassMaterialInfo);
@@ -324,14 +325,6 @@ int main() {
             allLand.push_back(land);
         }
     }
-    /*Terrain land(100);
-    land.setPosition(Utils::yAxis(-1));
-    land.setScale({ 10, 10, 10 });
-    land.setNoiseBuffer(Utils::NoiseGeneration::getMap({ 0, 0 }, 101, { 1, 0.5, 0.1 }, { 1, 2, 3 }));
-    land.useTextureMap(false);
-    land.setLowestTexture(&lowestColour);
-    land.setMiddleTexture(&middleColour);
-    land.setHighestTexture(&highestColour);*/
     timer.log();
 
 
@@ -355,9 +348,12 @@ int main() {
     Component::PointLight light(glm::vec3(1), 100.0f);
     lightSource.addComponet(&light);
 
-    GameObject lightSource2(glm::vec3(0, 12.5, 0));
+    GameObject lightSource2(glm::vec3(0, 3.75, 0));
     Component::DirectionalLight light2 = Component::DirectionalLight({ 1, 1, 1 }, { 1, 1, 1 }, 1);
     lightSource2.addComponet(&light2);
+    Component::ShadowCaster shadowCaster = Component::ShadowCaster();
+    shadowCaster.setLightSource(&light2);
+    lightSource2.addComponet(&shadowCaster);
 
    /* Materials::MatItemSingle<glm::vec4> cityAlbedo({ 0, 1, 0, 1 });
     Materials::MatItemSingle<glm::vec3> cityNorm({ 0, 1, 0 });
@@ -425,6 +421,8 @@ int main() {
     }
     // scene.addTerrain(&land);
 
+    scene.setShadowCaster(&shadowCaster);
+
     timer.log();
 
     // SKYBOX //
@@ -454,6 +452,7 @@ int main() {
     gizmo1.setThickness(2);
     Gizmos::GizmoRenderer::addGizmo(&gizmo1);
 
+    Utils::log("Started Loop");
     scene.gameLoop();
 
     /*while (!main.shouldClose())

@@ -53,6 +53,12 @@ uniform sampler2D positionTex;
 uniform sampler2D albedoTex;
 uniform sampler2D normalTex;
 uniform sampler2D MetRouAOTex;
+// Shadows
+float CalculateShadowValue(vec4 LSFragmentPosition, vec3 Normal);
+uniform sampler2D ShadowMap;
+uniform float ShadowMixValue;
+uniform mat4 LSMatrix;
+uniform vec3 ShadowCasterPosition;
 
 in float CameraExposure;
 in float GammaValue;
@@ -70,6 +76,8 @@ void main() {
     float Roughness            = metRouAO.y;
     float AO                   = metRouAO.z;
 
+    // shadows
+    vec4 LSFragmentPosition    = LSMatrix * vec4(WorldFragmentPosition, 1.0);
 
     // constants
     vec3 viewDirection = normalize(cameraPosition - WorldFragmentPosition);
@@ -86,14 +94,18 @@ void main() {
     // DIRECTIONAL LIGHTS
     accumlativeLight += DirectionalLights(directionalLights, numberOfDirectionalLights, viewDirection, Normal, realSpecular, albedoDiffuse, alpha2, Roughness, Metallic, dotNV);
 
+    float shadow = CalculateShadowValue(LSFragmentPosition, Normal);
 
-    vec3 ambient = vec3(0.03) * Albedo * AO;
-    vec3 colour = ambient + accumlativeLight;
+    vec3 ambient = vec3(0.3) * Albedo;
+    vec3 colour = ambient + (1.0 - shadow) * accumlativeLight;
 
     /*colour = ToneMap(colour); // HDR
     colour = GammaCorrect(colour);*/
 
     ProcessOutputs(colour);
+    shadow = texture(ShadowMap, TextureCoords).r;
+    // FragColour = vec4(vec3(shadow), 1.0);
+    // FragColour = vec4(LSFragmentPosition.xyz + 0.5, 1.0);
 };
 
 vec3 ProcessPointLight(PointLight light, vec3 WFP, vec3 VD, vec3 N, vec3 RS, vec3 AD, float A2, float R, float M, float dotNV){
@@ -156,14 +168,31 @@ vec3 DirectionalLights(DirectionalLight directionalLights[maxDirectionalLights],
     return accumlativeLight;
 }
 
-/*vec3 GammaCorrect(vec3 col) {
-    return pow(col, vec3(1.0/GammaValue));
-};
+float CalculateShadowValue(vec4 LSFragmentPosition, vec3 Normal){
+    vec3 projCoords = LSFragmentPosition.xyz / LSFragmentPosition.w;
+    projCoords = 0.5 * projCoords + 0.5;
 
-vec3 ToneMap(vec3 a){
-    return vec3(1.0) - exp(-a * CameraExposure); // more controll
-    return a / (a + vec3(1.0)); // less controll
-}*/
+    float currentDepth = projCoords.z;
+
+    if (currentDepth > 1.0)
+        return 0.0;
+
+    float bias = max(0.05 * (1.0 - dot(Normal, ShadowCasterPosition)), 0.005);
+    
+    float shadow = 0.0;
+    vec2 texelSize = 1.0 / textureSize(ShadowMap, 0);
+    for(int x = -1; x <= 1; ++x)
+    {
+        for(int y = -1; y <= 1; ++y)
+        {
+            float pcfDepth = texture(ShadowMap, projCoords.xy + vec2(x, y) * texelSize).r; 
+            shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;        
+        }    
+    }
+    shadow /= 9.0;
+
+    return shadow;
+}
 
 void ProcessOutputs(vec3 colour){
     FragColour = vec4(colour, 1.0);    

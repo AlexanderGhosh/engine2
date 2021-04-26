@@ -99,12 +99,13 @@ void Terrain::init()
 }
 
 
-void Terrain::draw(float deltaTime)
+void Terrain::render(float deltaTime, bool bindShader)
 {
 	if (renderWireframe)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	glDisable(GL_CULL_FACE);
-	Render::Shading::Manager::setActive(useTexture ? shaderHM : shaderMesh);
+	if(bindShader)
+		Render::Shading::Manager::setActive(useTexture ? shaderHM : shaderMesh);
 	Render::Shading::Manager::setValue("model", transform.getModel());
 
 	int unit = 0;

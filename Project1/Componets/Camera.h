@@ -2,6 +2,7 @@
 #include <glm.hpp>
 #include <gtc/matrix_transform.hpp>
 #include "Componets.h"
+
 namespace Component {
 	class Camera : public ComponetBase
 	{
@@ -20,6 +21,8 @@ namespace Component {
 		inline Vector3 getRight() const { return right; };
 		inline Type getType() const { return Type::Camera; };
 		Float getExposure() const;
+		glm::mat4 getRotationMatrix() const;
+
 		// setters
 		inline void setPos(const glm::vec3& pos) { this->pos = pos; };
 		void setExposure(Float expo);

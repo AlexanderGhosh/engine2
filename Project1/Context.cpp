@@ -75,7 +75,7 @@ unsigned Context::getWidth() const
 
 unsigned Context::getHeight() const
 {
-	return dimentions.x;
+	return dimentions.y;
 }
 
 Context::svec2 Context::getDimentions() const

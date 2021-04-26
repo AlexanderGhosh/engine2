@@ -16,6 +16,7 @@
 #include "../UI/Panes/Canvas.h"
 #include "../ParticleSystem/ParticleEmmiter.h"
 #include "../Componets/Lights/LightBase.h"
+#include "../Componets/Lights/ShadowCaster.h"
 
 
 std::vector<GameEventsTypes> GameScene::getCurrentEvents() const
@@ -36,7 +37,7 @@ std::vector<GameEventsTypes> GameScene::getCurrentEvents() const
 
 GameScene::GameScene() : objects(), preProcessingLayers(), currentTick(0), postProcShaderId(0), FBOs_pre(), backgroundColour(0),
 							skybox(nullptr), mainContext(nullptr), opaque(), transparent(), mainCamera(nullptr), terrain(), 
-							quadModel(), isFirstLoop(false), closing(false), uiStuff(), screenDimentions(0), emmiters(), lightSources(), USE_DEFFERED(1)
+							quadModel(), isFirstLoop(false), closing(false), uiStuff(), screenDimentions(0), emmiters(), lightSources(), USE_SHADOWS(1)
 {
 	quadModel = ResourceLoader::getModel("plane.dae");
 }
@@ -49,11 +50,12 @@ void GameScene::drawOpaque()
 	}
 }
 
-void GameScene::drawTransparent()
+void GameScene::drawTransparent(bool bindShader)
 {
 	/*glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, 0);*/
-	Render::Shading::Manager::setActive(ResourceLoader::getShader("TransparentShader")); 
+	if(bindShader)
+		Render::Shading::Manager::setActive(ResourceLoader::getShader("TransparentShader")); 
 	bindLights();
 	assert(mainCamera);
 	if (NOT transparent.size()) {
@@ -74,10 +76,10 @@ void GameScene::drawTransparent()
 	transparent = sorted;
 }
 
-void GameScene::drawTerrain()
+void GameScene::drawTerrain(bool bindShader)
 {
 	for (Terrain* terrain : this->terrain) {
-		terrain->draw(mainContext->getTime().deltaTime);
+		terrain->render(mainContext->getTime().deltaTime, bindShader);
 	}
 }
 
@@ -145,6 +147,10 @@ void GameScene::setBG(Vector3 col)
 
 void GameScene::preProcess()
 {
+	const glm::mat4 lsMatrix = mainShadowCaster->getLSMatrix(mainContext->getDimentions());
+	// glm::mat4 projection = glm::perspective(glm::radians(mainCamera->getFOV()), static_cast<float>(screenDimentions.x) / static_cast<float>(screenDimentions.y), 0.01f, 5000.0f);
+	// lsMatrix = getMainCamera()->getView();
+	// lsMatrix = projection * lsMatrix;
 	for (const auto& layer : preProcessingLayers) {
 		String name = layer.first;
 		Unsigned shaderId = layer.second;
@@ -153,9 +159,14 @@ void GameScene::preProcess()
 		fbo.clearBits();
 		Render::Shading::Manager::setActive(shaderId);
 
-		if (name == "shadows" AND NOT USE_DEFFERED) {
+		if (name == "DirectionalShadows" AND mainShadowCaster) {
 			glCullFace(GL_FRONT);
+			Render::Shading::Manager::setValue("LSMatrix", lsMatrix);
 			drawOpaque();
+			// drawTerrain();
+			// Render::Shading::Manager::setActive(shaderId);
+			drawTransparent(false);
+			//drawParticles();
 			glCullFace(GL_BACK);
 		}
 		else if(name == "G-Buffer")
@@ -169,9 +180,24 @@ void GameScene::preProcess()
 			Primative::Buffers::FrameBuffer& gBuffer = FBOs_pre["G-Buffer"];
 			gBuffer.activateColourTextures(unit, { "positionTex", "albedoTex", "normalTex", "MetRouAOTex" });
 
+			Primative::Buffers::FrameBuffer& shadowBuffer = FBOs_pre["DirectionalShadows"];
+
+			glActiveTexture(GL_TEXTURE0 + unit);
+			glBindTexture(GL_TEXTURE_2D, shadowBuffer.getTexture("depth"));
+			bool suc = Render::Shading::Manager::setValue("ShadowMap", unit);
+
+			float shadowMixValue = 0;
+			if (mainShadowCaster) {
+				Render::Shading::Manager::setValue("LSMatrix", lsMatrix);
+				Render::Shading::Manager::setValue("ShadowCasterPosition", mainShadowCaster->getPosition());
+				shadowMixValue = 1;
+			}
+			Render::Shading::Manager::setValue("ShadowMixValue", shadowMixValue);
+			// the deferred quad
 			const Primative::Buffers::VertexBuffer& buffer = ResourceLoader::getBuffer(quadModel.getBuffers()[0]);
 			buffer.render();
 
+			// copy depth buffer for fwd rendering
 			gBuffer.bind(GL_READ_FRAMEBUFFER);
 			fbo.bind(GL_DRAW_FRAMEBUFFER);
 			glBlitFramebuffer(0, 0, gBuffer.getDimentions().x, gBuffer.getDimentions().y, 0, 0, screenDimentions.x, screenDimentions.y, GL_DEPTH_BUFFER_BIT, GL_NEAREST); 
@@ -186,13 +212,6 @@ void GameScene::preProcess()
 			drawParticles();
 			drawUI();
 		}
-		/*else if(NOT USE_DEFFERED) {
-			drawOpaque();
-			/*drawSkyBox();
-			drawObjects(shaderId);
-			drawUI();
-			drawParticles();
-		}*/
 		fbo.unBind();
 	}
 }
@@ -315,17 +334,31 @@ Component::Camera* GameScene::getMainCamera()
 	return mainCamera;
 }
 
+const Component::ShadowCaster* GameScene::getShadowCaster() const
+{
+	return mainShadowCaster;
+}
+
+Context* GameScene::getContext() const
+{
+	return mainContext;
+}
+
 void GameScene::initalize()
 {
 #pragma region Pre Processing
+	Primative::Buffers::FrameBuffer shadow_FBO({ "depth" }, screenDimentions, GL_CLAMP_TO_BORDER);
 	Primative::Buffers::FrameBuffer g_buffer_FBO({ "col0", "col1", "col2", "col3" }, screenDimentions);
 	Primative::Buffers::FrameBuffer lighting_FBO({ "col0", "col1" }, screenDimentions);
+
+	addFBO_Pre("LightingPass", lighting_FBO);
+	addPreProcLayer("LightingPass", ResourceLoader::getShader("DeferredFinal"));
 
 	addFBO_Pre("G-Buffer", g_buffer_FBO);
 	addPreProcLayer("G-Buffer", ResourceLoader::getShader("DeferredOpaque"));
 
-	addFBO_Pre("LightingPass", lighting_FBO);
-	addPreProcLayer("LightingPass", ResourceLoader::getShader("DeferredFinal"));
+	addFBO_Pre("DirectionalShadows", shadow_FBO);
+	addPreProcLayer("DirectionalShadows", ResourceLoader::getShader("ShadowShader"));
 
 	/*if(NOT USE_DEFFERED OR true) {
 		Primative::Buffers::FrameBuffer shadowFBO({ "depth" }, screenDimentions, { 1, 0, 1 });
@@ -365,16 +398,7 @@ void GameScene::initalize()
 	if(mainCamera)
 		mainBuffer.fill(4, &mainCamera->getExposure());
 
-	Primative::Buffers::StaticBuffer lsUBO("m4", 1);
-	// lspaceM | matrix 4
-
-	glm::mat4 lightProjection = glm::ortho<float>(-10, 10, -10, 10, 1, 50);
-	glm::mat4 lightView = glm::lookAt(glm::vec3(2), glm::vec3(0), glm::vec3(0, 1, 0));
-	lightProjection *= lightView;
-	lsUBO.fill(0, glm::value_ptr(lightProjection));
-
 	uniformBuffers.push_back(mainBuffer);
-	uniformBuffers.push_back(lsUBO);
 }
 
 void GameScene::gameLoop()
@@ -538,8 +562,16 @@ void GameScene::setContext(Context* context)
 void GameScene::setMainCamera(Component::Camera* camera)
 {
 	mainCamera = camera;
+	if(mainShadowCaster)
+		mainShadowCaster->setCamera(mainCamera);
 	if(uniformBuffers.size())
 		uniformBuffers.front().fill(4, &mainCamera->getExposure());
+}
+
+void GameScene::setShadowCaster(Component::ShadowCaster* caster)
+{
+	mainShadowCaster = caster;
+	mainShadowCaster->setCamera(mainCamera);
 }
 
 const glm::ivec2& GameScene::getScreenDimentions() const

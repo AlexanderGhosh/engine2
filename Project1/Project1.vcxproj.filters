@@ -249,6 +249,9 @@
     <ClCompile Include="ParticleSystem\Distributions\SphereDistribution.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Componets\Lights\ShadowCaster.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Rendering\Rendering.h">
@@ -501,6 +504,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ParticleSystem\Distributions\SphereDistribution.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Componets\Lights\ShadowCaster.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

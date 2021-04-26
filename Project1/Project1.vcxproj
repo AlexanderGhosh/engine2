@@ -166,6 +166,7 @@
     <ClCompile Include="Scripts\SoundControllerScript.cpp" />
     <ClCompile Include="Primatives\TextureChain.cpp" />
     <ClCompile Include="Componets\Lights\SpotLight.cpp" />
+    <ClCompile Include="Componets\Lights\ShadowCaster.cpp" />
     <ClCompile Include="Utils\NoiseGeneration.cpp" />
     <ClCompile Include="Primatives\Buffers\ArrayBuffer.cpp" />
     <ClCompile Include="Componets\Animated.cpp" />
@@ -248,6 +249,7 @@
     <ClInclude Include="Scripts\SoundControllerScript.h" />
     <ClInclude Include="Primatives\TextureChain.h" />
     <ClInclude Include="Componets\Lights\SpotLight.h" />
+    <ClInclude Include="Componets\Lights\ShadowCaster.h" />
     <ClInclude Include="UI\Page.h" />
     <ClInclude Include="Utils\NoiseGeneration.h" />
     <ClInclude Include="Primatives\Buffers\ArrayBuffer.h" />
