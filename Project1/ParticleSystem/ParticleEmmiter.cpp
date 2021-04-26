@@ -97,7 +97,7 @@ void Component::ParticleEmmiter::render(float deltaTime)
 		Render::Shading::Manager::setValue("positions[" + std::to_string(i) + "]", getParticlePosition(part));
 		i++;
 	}
-	unsigned unit = 0;
+	int unit = 0;
 	if (albedo) {
 		albedo->tryBindTexture(unit);
 		unit = 0;

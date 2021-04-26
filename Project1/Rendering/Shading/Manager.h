@@ -38,7 +38,7 @@ namespace Render {
 			// complex
 			// MatItem
 			template<class T>
-			static inline bool setValue(String name, const Materials::MatItemBase<T>& item, unsigned& texUnit) {
+			static inline bool setValue(String name, const Materials::MatItemBase<T>& item, int& texUnit) {
 				bool valid = true;
 				valid = Render::Shading::Manager::setValue(name + ".id", static_cast<int>(texUnit)) AND valid; // set to texture unit
 				if (valid) texUnit++;
@@ -48,7 +48,7 @@ namespace Render {
 				return valid;
 			};
 			// Materials
-			static bool setValue(String name, const Materials::MaterialBase*mat, unsigned& unit);
+			static bool setValue(String name, const Materials::MaterialBase*mat, int& unit);
 			// KeyFrame
 			static bool setValue(String name, const Render::Animation::KeyFrame& frame);
 			// Matrix4 collection
@@ -59,8 +59,8 @@ namespace Render {
 			static void setActive(const unsigned& shaderId);
 			static void cleanUp();
 		private:
-			static bool setValue(String name, const Materials::Forward& fwd, unsigned& unit);
-			static bool setValue(String name, const Materials::PBR& mat, unsigned& unit);
+			static bool setValue(String name, const Materials::Forward& fwd, int& unit);
+			static bool setValue(String name, const Materials::PBR& mat, int& unit);
 			// lights
 			static bool setValue(String name, const Component::DirectionalLight* light, Int index);
 			static bool setValue(String name, const Component::PointLight* light, Int index);

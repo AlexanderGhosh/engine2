@@ -44,18 +44,9 @@ void UI::UIRenderer::render(const UI::Canvas* pane) // draws the quads
 		Render::Shading::Manager::setValue("model", model); 
 
 		const Materials::MatItemBase<glm::vec3>* bg = element->getBackgroundColor();
-		unsigned unit = 0;
+		int unit = 0;
 		bg->tryBindTexture(unit);
 		Render::Shading::Manager::setValue("col", *bg, unit);
-		/*if (NOT bg.hasTex()) {
-			Render::Shading::Manager::setValue("col_vec", glm::vec4(bg.getRaw(), 1));
-		}
-		else {
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, bg.getId());
-			bool res = Render::Shading::Manager::setValue("col_vec", glm::vec4(bg.getRaw(), 0));
-			res = Render::Shading::Manager::setValue("col_id", 0); // set to texture unit
-		}*/
 
 		quadBuffer.draw();
 		element->drawContent();
@@ -74,7 +65,7 @@ void UI::UIRenderer::render(const Element* element)
 	Render::Shading::Manager::setValue("model", model);
 
 	const Materials::MatItemBase<glm::vec3>* bg = element->getBackgroundColor();
-	unsigned unit = 0;
+	int unit = 0;
 	bg->tryBindTexture(unit);
 	Render::Shading::Manager::setValue("col", *bg, unit);
 	/*if (!bg.hasTex()) {

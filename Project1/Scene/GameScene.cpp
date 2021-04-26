@@ -52,8 +52,6 @@ void GameScene::drawOpaque()
 
 void GameScene::drawTransparent(bool bindShader)
 {
-	/*glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, 0);*/
 	if(bindShader)
 		Render::Shading::Manager::setActive(ResourceLoader::getShader("TransparentShader")); 
 	bindLights();
@@ -62,8 +60,8 @@ void GameScene::drawTransparent(bool bindShader)
 		return;
 	}
 	mainContext->enable(GL_BLEND);
-	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	std::map<float, Component::RenderMesh*> sorted;
+
+	std::map<float, Component::RenderMesh*> sorted{};
 	for (auto itt = transparent.rbegin(); itt != transparent.rend(); itt++) {
 		float dist = (*itt).first;
 		Component::RenderMesh* mesh = (*itt).second;

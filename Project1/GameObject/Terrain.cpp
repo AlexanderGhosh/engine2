@@ -116,8 +116,7 @@ void Terrain::render(float deltaTime, bool bindShader)
 	}
 	if (material) {
 		material->activateTextures(unit);
-		unsigned u = unit;
-		Render::Shading::Manager::setValue("material", material, u);
+		Render::Shading::Manager::setValue("material", material, unit);
 	}
 
 	/*if (lowest) {

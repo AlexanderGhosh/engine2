@@ -35,10 +35,9 @@ void Component::RenderMesh::render(float deltaTime)
 		Materials::MaterialBase* material = materials[i];
 		if (material) {
 			material->update(deltaTime);
-			int unitI = 1;
-			unsigned unitU = unitI;
-			material->activateTextures(unitI); // activates the texture units and binds the ids
-			Render::Shading::Manager::setValue("material", material, unitU); // sets values to the samplers
+			int unit = 1;
+			material->activateTextures(unit); // activates the texture units and binds the ids
+			Render::Shading::Manager::setValue("material", material, unit); // sets values to the samplers
 		}
 		buffer.render();
 	}

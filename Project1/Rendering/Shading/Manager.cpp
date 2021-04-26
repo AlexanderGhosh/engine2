@@ -51,7 +51,7 @@ bool Render::Shading::Manager::setValue(String name, glm::mat4 val) {
 	glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(val));
 	return true;
 }
-bool Render::Shading::Manager::setValue(String name, const Materials::MaterialBase* mat, unsigned& unit)
+bool Render::Shading::Manager::setValue(String name, const Materials::MaterialBase* mat, int& unit)
  {
 	 if (Utils::isType<Materials::MaterialBase, Materials::Forward>(mat)) {
 		 return setValue(name, *dynamic_cast<const Materials::Forward*>(mat), unit);
@@ -91,7 +91,7 @@ bool Render::Shading::Manager::setValue(String type, const Component::LightBase*
 		return setValue(type + "Lights", dynamic_cast<const Component::SpotLight*>(light), lightIndex);
 	}
 }
-bool Render::Shading::Manager::setValue(String name, const Materials::Forward& fwd, unsigned& unit)
+bool Render::Shading::Manager::setValue(String name, const Materials::Forward& fwd, int& unit)
  {
 	 bool valid = true;
 
@@ -112,7 +112,7 @@ bool Render::Shading::Manager::setValue(String name, const Materials::Forward& f
 
 	 return vals[0] && vals[1] && vals[2] && vals[3];*/
  }
-bool Render::Shading::Manager::setValue(String name, const Materials::PBR& mat, unsigned& unit)
+bool Render::Shading::Manager::setValue(String name, const Materials::PBR& mat, int& unit)
  {
 	 bool val = true;
 	 val = setValue(name + ".albedo", *mat.getAlbedo(), unit) AND val;
