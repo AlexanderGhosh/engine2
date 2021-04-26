@@ -138,139 +138,10 @@ int main() {
     waterMaterial.setMetalic(&waterMetalic);
     waterMaterial.setRoughness(&waterRoughness);
     waterMaterial.setAO(&waterAO);
-  //Materials::PBR armourMaterial = ResourceLoader::createPBR("Resources/Textures/RFATextures/Armour",
-   //    { TextureType::AlbedoMap, TextureType::AOMap, TextureType::MetalicMap, TextureType::NormalMap, TextureType::RoughnessMap },
-   //    { 0, 0, 0, 0, 0 });
-   //armourMaterial.setHDRmap(hdr);
-   //armourMaterial.setIBLmap(ibl);
-   //armourMaterial.setBRDFtex(brdf);
-    // printf("armour\n");
-    // Materials::PBR clothesMaterial = ResourceLoader::createPBR("Resources/Textures/RFATextures/Clothes",
-    //         { TextureType::AlbedoMap, TextureType::AOMap, TextureType::MetalicMap, TextureType::NormalMap, TextureType::RoughnessMap },
-    //         { 0, 0, 0, 0, 0 });
-    // clothesMaterial.setHDRmap(hdr);
-    // clothesMaterial.setIBLmap(ibl);
-    // clothesMaterial.setBRDFtex(brdf);
-    // printf("cloths\n");
-    // Materials::PBR headMaterial = ResourceLoader::createPBR("Resources/Textures/RFATextures/Head",
-    //     { TextureType::AlbedoMap, TextureType::AOMap, TextureType::MetalicMap, TextureType::NormalMap, TextureType::RoughnessMap },
-    //     { 0, 0, 0, 0, 0 });
-    // headMaterial.setHDRmap(hdr);
-    // headMaterial.setIBLmap(ibl);
-    // headMaterial.setBRDFtex(brdf);
-    // printf("head\n");
-    // Materials::PBR hairMaterial = ResourceLoader::createPBR("Resources/Textures/RFATextures/Hair",
-    //     { TextureType::AlbedoMap, TextureType::AOMap, TextureType::RoughnessMap, TextureType::NormalMap },
-    //     { 0, 0, 0, 0, 0 });
-    // hairMaterial.setHDRmap(hdr);
-    // hairMaterial.setIBLmap(ibl);
-    // hairMaterial.setBRDFtex(brdf);
-    // printf("hair\n");
-    // Materials::PBR weponMaterial = ResourceLoader::createPBR("Resources/Textures/RFATextures/Weapon",
-    //     { TextureType::AlbedoMap, TextureType::AOMap, TextureType::MetalicMap, TextureType::NormalMap, TextureType::RoughnessMap },
-    //     { 0, 0, 0, 0, 0 });
-    // weponMaterial.setHDRmap(hdr);
-    // weponMaterial.setIBLmap(ibl);
-    // weponMaterial.setBRDFtex(brdf);
-    // printf("weapon\n");
+  
     timer.log();
 
     timer.start("Objects");
-    //Component::RenderMesh manR1 = Component::RenderMesh();
-    //manR1.setModel(manModel);
-    //Materials::PBR manMaterial1/* = Materials::PBR({ { 1, 0, 0 } }, { { 1, 0, 0 } }, { { 0, 0, 0 } }, { { 0.15, 0, 0 } }, { { 0, 0, 0 } })*/;
-#define MI1 Materials::MatItemSingle<float>
-#define MI3 Materials::MatItemSingle<glm::vec3>
-#define MI4 Materials::MatItemSingle<glm::vec4>
-   // manR1.setMaterial(&armourMaterial);
-    //manR1.setMaterialTo(&hairMaterial, "Hair");
-    //manR1.setMaterialTo(&clothesMaterial, "Cloth");
-    //manR1.setMaterialTo(&clothesMaterial, "Scarf");
-    //manR1.setMaterialTo(&armourMaterial, "Armour");
-    //manR1.setMaterialTo(&headMaterial, "Head");
-    //manR1.setMaterialTo(&weponMaterial, "Sword");
-    //manR1.setMaterialTo(&weponMaterial, "Dagger");
-
-    // Component::Animated manAnimatedComp = Component::Animated();
-    // const std::string AnimationLoaded = "Rig|man_run_in_place";
-    // auto anim = ResourceLoader::getAnimation(AnimationLoaded); // RFA_Attack
-    // if(anim)
-    //     manAnimatedComp.addAnimation(anim);
-    // GameObject manObject = GameObject();
-    // manObject.getTransform()->Position = { 0, -1, 0 };
-    // manObject.addComponet(&manR1);
-    // manObject.addComponet(&manAnimatedComp);
-    // manObject.getTransform()->Scale *= 0.0125;
-    // 
-    // 
-    // GameObject redWindow({ 0, 0, 3 }, { 1, 1, 1 });
-    // Component::RenderMesh plane;
-    // plane.setTransparent(true);
-    // plane.setModel(planeBuffer);
-    // Materials::PBR planeMat(MI(wi), MI({ 0.5, 0, 0 }), MI({ 0.5, 0, 0 }), MI({ 0.5, 0, 0 }), MI(Utils::xAxis(0.2)));
-    // plane.setMaterial(&planeMat);
-    // redWindow.addComponet(&plane);
-    // 
-    // GameObject yellowWindow({ 0.5, 0, 2 }, { 1, 1, 1 });
-    // Component::RenderMesh plane_y;
-    // plane_y.setTransparent(true);
-    // plane_y.setModel(planeBuffer);
-    // Materials::PBR planeMat_y(MI(wiy), MI({ 0.5, 0, 0 }), MI({ 0.5, 0, 0 }), MI({ 0.5, 0, 0 }), MI(Utils::xAxis(0.2)));
-    // plane_y.setMaterial(&planeMat_y);
-    // yellowWindow.addComponet(&plane_y);
-
-
-    /*std::vector<MI1> mi1s = {
-        MI1(0.5f), MI1(0.0f)
-    };
-    std::vector<MI3> mi3s = {
-        MI3({1.0f, 1.0f, 1.0f})
-    };
-    std::vector<MI4> mi4s = {
-        MI4({ 1, 1, 1, 1 }), 
-        MI4({ 0.5, 0.5, 0.5, 1 }), 
-        MI4({ 0, 0, 0, 1 }),
-        MI4({ 0, 0.75, 0, 1 }),
-        MI4({ 0.75, 0, 0, 1 }),
-    };
-
-
-    GameObject minikit({ 0, 0, 0 }, { 0.5, 0.5, 0.5 });
-    Component::RenderMesh minikitMesh;
-    minikitMesh.setModel(minikitBuffer);
-
-    Materials::MatItemChain<glm::vec4> whiteChain = Materials::MatItemChain<glm::vec4>({glm::vec4(1), glm::vec4(1, 0, 1, 1) }, {0, 0}, {0, 0}, {1, 1});
-
-    Materials::PBR minikitMatWhite(&whiteChain, &mi3s[0], &mi1s[0], &mi1s[0], &mi1s[1]);
-    Materials::PBR minikitMatGray (&mi4s[1], &mi3s[0], &mi1s[0], &mi1s[0], &mi1s[1]);
-    Materials::PBR minikitMatBlack(&mi4s[2], &mi3s[0], &mi1s[0], &mi1s[0], &mi1s[1]);
-    Materials::PBR minikitMatGreen(&mi4s[3], &mi3s[0], &mi1s[0], &mi1s[0], &mi1s[1]);
-    Materials::PBR minikitMatRed  (&mi4s[4], &mi3s[0], &mi1s[0], &mi1s[0], &mi1s[1]);
-
-    minikitMesh.setMaterialTo(&minikitMatWhite, "white");
-    minikitMesh.setMaterialTo(&minikitMatGray,  "gray");
-    minikitMesh.setMaterialTo(&minikitMatBlack, "black");
-    minikitMesh.setMaterialTo(&minikitMatGreen, "green");
-    minikitMesh.setMaterialTo(&minikitMatRed,   "red");
-
-    minikit.addComponet(&minikitMesh);
-    SpinScript spinScript({ -1, 1, 0 }, 0.125);
-    minikit.addComponet(&spinScript);
-    HoverScript hoverScript(1, 0.25);
-    minikit.addComponet(&hoverScript);
-    Component::AudioSource audio(SoundManager::createSoundSource());
-    // audio.addBuffer(dynamic_cast<Primative::Buffers::SoundBuffer*>(soundDatabufferS));
-    audio.addBuffer(soundDatabuffer);
-    minikit.addComponet(&audio);
-    //audio.play();
-    SoundControllerScript scs;
-    minikit.addComponet(&scs);
-    Component::ParticleEmmiter emitter(200, 2, { 0, 0, 0 }, { 1.5, 2, 1.5 });
-    //emitter.loop();
-    minikit.addComponet(&emitter);
-    emitter.setTexture(Primative::TextureChain({ rainDrop, hm }, { 1, 1 }));
-    RainMakerScript rain;
-    minikit.addComponet(&rain);*/
 
 
     GameObject orb(glm::vec3(0, 1.5, 0));
@@ -289,17 +160,6 @@ int main() {
     timer.log();
 
     timer.start("Terrain"); 
-    /*MI3 lowestColour(dirt);
-    MI3 middleColour(dirt);
-    MI3 highestColour(grass, 10.0f);
-
-    Materials::MatItemSingle<glm::vec4> landAlbedo(grass, 20.0f);
-    Materials::MatItemSingle<glm::vec3> landNormal(glm::vec3(0, 1, 0));
-    Materials::MatItemSingle<float> landMetalic(0.4f);
-    Materials::MatItemSingle<float> landRoughness(0.7f);
-    Materials::MatItemSingle<float> landAO(0.5f);
-
-    Materials::PBR landMaterial = Materials::PBR(&landAlbedo, &landNormal, &landMetalic, &landRoughness, &landAO);*/
 
     const int landSize = 2;
     const float scale = 100;
@@ -317,9 +177,6 @@ int main() {
             // land.setNoiseBuffer(Utils::NoiseGeneration::getMap(glm::vec3(i, j, 0), landRes + 1, { 1, 0.5, 0.1 }, { 1, 2, 3 }));
             land.useTextureMap(false);
             land.setMaterial(&grassMaterial);
-            /*land.setLowestTexture(&lowestColour);
-            land.setMiddleTexture(&middleColour);
-            land.setHighestTexture(&highestColour);*/
 
             allLand.push_back(land);
         }
@@ -353,21 +210,6 @@ int main() {
     Component::ShadowCaster shadowCaster = Component::ShadowCaster(&light2, 15);
     lightSource2.addComponet(&shadowCaster);
 
-   /* Materials::MatItemSingle<glm::vec4> cityAlbedo({ 0, 1, 0, 1 });
-    Materials::MatItemSingle<glm::vec3> cityNorm({ 0, 1, 0 });
-    Materials::MatItemSingle<float> cityMetalic(0.5f);
-    Materials::MatItemSingle<float> cityRoughness(0.5f);
-    Materials::MatItemSingle<float> cityAO(0.5f);
-    Materials::PBR cityMaterial(&cityAlbedo, &cityNorm, &cityMetalic, &cityRoughness, &cityAO);
-
-    GameObject city(glm::vec3(0, 10, 0));
-    Component::RenderMesh cityMesh;
-    cityMesh.setModel(cityBuffer);
-    cityMesh.setMaterial(&cityMaterial);
-    city.addComponet(&cityMesh);*/
-
-
-
 
     Materials::MatItemSingle<glm::vec4> windowAlbedo(wi);
     Materials::MatItemSingle<glm::vec3> windowNormal(glm::vec3(0, 1, 0));
@@ -388,18 +230,10 @@ int main() {
     windowMesh1.setTransparent(true);
     window1.addComponet(&windowMesh1);
 
-    /*GameObject window2(glm::vec3(0.5, 3.5, -4));
-    Component::RenderMesh windowMesh2;
-    windowMesh2.setModel(planeBuffer);
-    windowMesh2.setMaterial(&windowMat2);
-    windowMesh2.setTransparent(true);
-    window2.addComponet(&windowMesh2);*/
-
     timer.log();
 
 
     timer.start("Scene");
-    //Primative::MSAABuffer* finalQB = DBG_NEW Primative::MSAABuffer({ "col" }, { 800, 600 });
 
     GameScene scene;
     scene.setContext(&main);
@@ -431,20 +265,6 @@ int main() {
     timer.log();
     // SKYBOX //
     
-    
-    // timer.reName("Physics");
-    // timer.start();
-    // Physics::CollisionDetection::setBroadphase<Physics::NSquared>();
-    // Physics::CollisionDetection::setNarrowphase< Physics::SAT3D>();
-    // Physics::Engine::setResponse<Physics::ImpulseBased>();
-    // timer.log();
-    // Physics::Constraints::ConstraintsSolver::addConstraint<Physics::Constraints::DistanceConstraint>(rb1, rb2, Utils::fill(0.5f), Utils::fill(-0.5f), 1.0f);
-    // Physics::Constraints::ConstraintsSolver::addConstraint(DBG_NEW Physics::Constraints::DistanceConstraint(rb1, rb2, Utils::fill(0), Utils::fill(0), 1.5f));
-
-    // cube2->getTransform()->Position = { 0.5, 5, -5 };
-    // cube2->getRigidbody()->hasGravity = true;
-    //cube2->getRigidbody()->velocityAdder({ 1, -1, 0 });
-
     Gizmos::Sphere gizmo1 = Gizmos::Sphere({ 0, 4, 0 }, { 1, 0, 0 });
     gizmo1.setRadius(0.25);
     gizmo1.setThickness(2);
@@ -453,14 +273,6 @@ int main() {
     Utils::log("Started Loop");
     scene.gameLoop();
 
-    /*while (!main.shouldClose())
-    {
-
-        // PHYSICS-----------------------------------------------------------------------------------------------------------------------------------------------
-
-        // cube2->getTransform()->Position.x -= 0.01;
-        Physics::Engine::update();
-    }*/
     Physics::Engine::cleanUp();
     gizmo1.cleanUp();
     
