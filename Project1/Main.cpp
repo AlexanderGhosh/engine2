@@ -68,7 +68,7 @@ constexpr glm::ivec2 SCREEN_DIMENTIONS = glm::ivec2(1280, 720);
 long SEED;
 int main() {
     SEED = time(0);
-    SEED = 1;
+    // SEED = 1;
     srand(SEED);
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
     // _crtBreakAlloc = 69450;
@@ -81,12 +81,12 @@ int main() {
 
     SoundManager::init();
     Primative::Buffers::SoundBuffer* soundDatabuffer = SoundManager::createBuffer("Resources/Sounds/bounce.wav");
-    Primative::Buffers::SoundStreamBuffer* soundDatabufferS = SoundManager::createBuffer("Resources/Sounds/iamtheprotectorofthissystem.wav", true); // 407640__drotzruhn__countdown-30-seconds
+    Primative::Buffers::SoundStreamBuffer* soundDatabufferS = SoundManager::createBuffer("Resources/Sounds/iamtheprotectorofthissystem.wav", true);
 
     timer.start("Shaders");
     Gizmos::GizmoRenderer::init();
     std::vector<std::string> shaders = {
-        "PBRShader", "TransparentShader", "ShadowShader", "UIShader", "TextShader", "DeferredRendering/G Pass/DeferredTerrainMap", "DeferredRendering/G Pass/DeferredTerrainMesh", "PostShader", "ParticleShader", 
+        "PBRShader", "TransparentShader", "Shadows/ShadowShader", "UIShader", "TextShader", "DeferredRendering/G Pass/DeferredTerrainMap", "DeferredRendering/G Pass/DeferredTerrainMesh", "PostShader", "ParticleShader", 
         "DeferredRendering/DeferredFinal", "DeferredRendering/G Pass/DeferredOpaque", "GausianBlur"
     };
     ResourceLoader::createShaders(shaders);
@@ -124,11 +124,11 @@ int main() {
     //const unsigned cityTex  = ResourceLoader::loadTexture("Resources/Textures/City Tex.png", TextureType::AlbedoMap, 0);
 
     auto grassMaterialInfo = ResourceLoader::createPBRInfo("Resources/Textures/Grass", { TextureType::AlbedoMap, TextureType::AOMap, TextureType::MetalicMap, TextureType::NormalMap, TextureType::RoughnessMap }, { 0, 0, 0, 0, 0 });
-    auto grassMaterial = ResourceLoader::createPBR(grassMaterialInfo);
+    auto& grassMaterial = ResourceLoader::createPBR(grassMaterialInfo);
     grassMaterial.setRepeatValue(10);
 
     auto waterMaterialInfo = ResourceLoader::createPBRInfo("Resources/Textures/Water", { TextureType::AlbedoMap, TextureType::RoughnessMap, TextureType::NormalMap, TextureType::AOMap, TextureType::MetalicMap }, { 0, 0, 0, 0, 0 });
-    auto waterMaterial = ResourceLoader::createPBR(waterMaterialInfo);
+    auto& waterMaterial = ResourceLoader::createPBR(waterMaterialInfo);
     Materials::MatItemSingle<glm::vec4> waterAlbedo({ 0, 0, 1, 1 });
     Materials::MatItemSingle<float> waterMetalic(0.5f);
     Materials::MatItemSingle<float> waterRoughness(0.5f);
@@ -274,7 +274,7 @@ int main() {
 
 
     GameObject orb;
-    orb.getTransform()->Position.y = 3.5;
+    orb.getTransform()->Position.y = 1.5;
     Component::RenderMesh orbMesh = Component::RenderMesh();
     orbMesh.setModel(orbBuffer);
     orbMesh.setMaterial(&waterMaterial);
@@ -315,7 +315,7 @@ int main() {
 
             land.setPosition(glm::vec3(i * scale, -0.5f, j * scale));
             land.setScale({ scale, 10, scale });
-            land.setNoiseBuffer(Utils::NoiseGeneration::getMap(glm::vec3(i, j, 0), landRes + 1, { 1, 0.5, 0.1 }, { 1, 2, 3 }));
+            // land.setNoiseBuffer(Utils::NoiseGeneration::getMap(glm::vec3(i, j, 0), landRes + 1, { 1, 0.5, 0.1 }, { 1, 2, 3 }));
             land.useTextureMap(false);
             land.setMaterial(&grassMaterial);
             /*land.setLowestTexture(&lowestColour);
@@ -351,8 +351,7 @@ int main() {
     GameObject lightSource2(glm::vec3(0, 3.75, 0));
     Component::DirectionalLight light2 = Component::DirectionalLight({ 1, 1, 1 }, { 1, 1, 1 }, 1);
     lightSource2.addComponet(&light2);
-    Component::ShadowCaster shadowCaster = Component::ShadowCaster();
-    shadowCaster.setLightSource(&light2);
+    Component::ShadowCaster shadowCaster = Component::ShadowCaster(&light2, 15);
     lightSource2.addComponet(&shadowCaster);
 
    /* Materials::MatItemSingle<glm::vec4> cityAlbedo({ 0, 1, 0, 1 });

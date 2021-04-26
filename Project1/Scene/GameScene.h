@@ -52,8 +52,8 @@ private:
 	Component::ShadowCaster* mainShadowCaster;
 
 	std::vector<GameObject*> objects;
-	std::unordered_map<std::string, unsigned> preProcessingLayers;
-	std::unordered_map<std::string, unsigned> postProcessingLayers;
+	std::vector<std::pair<std::string, unsigned>> preProcessingLayers;
+	std::vector<std::pair<std::string, unsigned>> postProcessingLayers;
 	unsigned currentTick, postProcShaderId;
 	std::unordered_map<std::string, Primative::Buffers::FrameBuffer> FBOs_pre;
 	std::unordered_map<std::string, std::vector<Primative::Buffers::FrameBuffer>> FBOs_post;
@@ -71,7 +71,7 @@ private:
 	void drawTransparent(bool bindShader = true);
 	void drawTerrain(bool bindShader = true);
 	void drawUI();
-	void drawParticles();
+	void drawParticles(Unsigned shaderId = 0);
 
 	// polling evetns
 	std::vector<GameEventsTypes> getCurrentEvents() const;

@@ -90,11 +90,15 @@ void GameScene::drawUI()
 	}
 }
 
-void GameScene::drawParticles()
+void GameScene::drawParticles(Unsigned shaderId)
 {
+	unsigned t = Component::ParticleEmmiter::getShader();
+	if (shaderId > 0)
+		Component::ParticleEmmiter::setShader(shaderId);
 	for (Component::ParticleEmmiter* part : emmiters) {
 		part->render(mainContext->getTime().deltaTime);
 	}
+	Component::ParticleEmmiter::setShader(t);
 }
 
 void GameScene::addObject(GameObject* obj)
@@ -160,13 +164,16 @@ void GameScene::preProcess()
 		Render::Shading::Manager::setActive(shaderId);
 
 		if (name == "DirectionalShadows" AND mainShadowCaster) {
-			glCullFace(GL_FRONT);
+
 			Render::Shading::Manager::setValue("LSMatrix", lsMatrix);
+			glCullFace(GL_FRONT);
 			drawOpaque();
-			// drawTerrain();
-			// Render::Shading::Manager::setActive(shaderId);
+
+			drawTerrain(false);
+
 			drawTransparent(false);
-			//drawParticles();
+
+			// drawParticles(shaderId);
 			glCullFace(GL_BACK);
 		}
 		else if(name == "G-Buffer")
@@ -351,14 +358,15 @@ void GameScene::initalize()
 	Primative::Buffers::FrameBuffer g_buffer_FBO({ "col0", "col1", "col2", "col3" }, screenDimentions);
 	Primative::Buffers::FrameBuffer lighting_FBO({ "col0", "col1" }, screenDimentions);
 
-	addFBO_Pre("LightingPass", lighting_FBO);
-	addPreProcLayer("LightingPass", ResourceLoader::getShader("DeferredFinal"));
+
+	addFBO_Pre("DirectionalShadows", shadow_FBO);
+	addPreProcLayer("DirectionalShadows", ResourceLoader::getShader("ShadowShader"));
 
 	addFBO_Pre("G-Buffer", g_buffer_FBO);
 	addPreProcLayer("G-Buffer", ResourceLoader::getShader("DeferredOpaque"));
 
-	addFBO_Pre("DirectionalShadows", shadow_FBO);
-	addPreProcLayer("DirectionalShadows", ResourceLoader::getShader("ShadowShader"));
+	addFBO_Pre("LightingPass", lighting_FBO);
+	addPreProcLayer("LightingPass", ResourceLoader::getShader("DeferredFinal"));
 
 	/*if(NOT USE_DEFFERED OR true) {
 		Primative::Buffers::FrameBuffer shadowFBO({ "depth" }, screenDimentions, { 1, 0, 1 });
@@ -526,12 +534,13 @@ void GameScene::bindLights()
 
 void GameScene::addPreProcLayer(String name, Unsigned shaderId)
 {
-	this->preProcessingLayers[name] = shaderId;	
+	//this->preProcessingLayers[name] = shaderId;	
+	preProcessingLayers.push_back({ name, shaderId });
 }
 
 void GameScene::addPostProcLayer(String name, Unsigned shaderId)
 {
-	this->postProcessingLayers[name] = shaderId;
+	postProcessingLayers.push_back({ name, shaderId });
 }
 
 void GameScene::addFBO_Pre(String layerName, Primative::Buffers::FrameBuffer fbo)

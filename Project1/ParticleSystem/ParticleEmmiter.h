@@ -34,8 +34,6 @@ namespace Component {
 		ParticleEmmiter(Int numberOfParticels, Float duration, bool looping, Float spawnRate = 1);
 		~ParticleEmmiter() = default;
 
-		void setParent(GameObject* parent);
-		
 		inline Type getType() const { return Type::ParticleEmmiter; };
 		void update(float deltaTime);
 		void render(float deltaTime);
@@ -46,9 +44,15 @@ namespace Component {
 		void pause();
 		void togglePlay();
 
+		// getters
+		static Unsigned getShader();
+
 		// setters
 		void setAlbedo(Materials::MatItemBase<glm::vec4>* albedo);
 		void setShape(Particles::DistributionBase* shape);
+		void setParent(GameObject* parent);
+		static void setShader(Unsigned shader);
+
 	};
 }
 

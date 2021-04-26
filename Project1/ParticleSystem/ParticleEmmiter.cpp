@@ -134,6 +134,16 @@ void Component::ParticleEmmiter::togglePlay()
 	playing = NOT playing;
 }
 
+Unsigned Component::ParticleEmmiter::getShader()
+{
+	return shader;
+}
+
+void Component::ParticleEmmiter::setShader(Unsigned shader)
+{
+	ParticleEmmiter::shader = shader;
+}
+
 void Component::ParticleEmmiter::setAlbedo(Materials::MatItemBase<glm::vec4>* albedo)
 {
 	this->albedo = albedo;

@@ -17,6 +17,7 @@ namespace Component {
 			float SHADOW_DISTANCE, NEAR_PLANE, OFFSET;
 			glm::vec3 DIRECTION;
 			LightMatrix();
+			LightMatrix(Float shadowDistance);
 			~LightMatrix() = default;
 			glm::mat4 getOrtho() const;
 			glm::mat4 getView() const;
@@ -24,17 +25,22 @@ namespace Component {
 			void update(Camera* camera, float ar);
 			void cleanUp();
 		};
-		float nearPlane, farPlane;
 		LightMatrix lightMatrixInfo;
 		Camera* camera;
 	public:
 		ShadowCaster();
+		ShadowCaster(DirectionalLight* light, Float shadowDistance = 100.0f);
 		~ShadowCaster() = default;
+
 		void cleanUp();
 		void update(float deltaTime);
+
+		// getters
 		inline Type getType() const { return Type::ShadowCaster; };
 		glm::mat4 getLSMatrix(const glm::ivec2& screenDimentions) const;
 		Vector3 getPosition() const;
+
+		// setters
 		void setLightSource(DirectionalLight* light);
 		void setCamera(Camera* camera);
 	};

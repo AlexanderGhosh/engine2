@@ -5,8 +5,16 @@
 #include "../Camera.h"
 #include "DirectionalLight.h"
 
-Component::ShadowCaster::ShadowCaster() : ComponetBase(), nearPlane(-10.0f), farPlane(1000.0f), lightMatrixInfo(), camera(0)
+Component::ShadowCaster::ShadowCaster() : ComponetBase(), lightMatrixInfo(100.0f), camera(nullptr)
 {
+}
+
+Component::ShadowCaster::ShadowCaster(DirectionalLight* light, Float shadowDistance) : ShadowCaster()
+{
+	if (NOT light)
+		return;
+	lightMatrixInfo.DIRECTION = -light->getDirection();
+	lightMatrixInfo.SHADOW_DISTANCE = shadowDistance;
 }
 
 void Component::ShadowCaster::cleanUp()
@@ -25,16 +33,7 @@ void Component::ShadowCaster::update(float deltaTime)
 }
 
 glm::mat4 Component::ShadowCaster::getLSMatrix(const glm::ivec2& screenDimentions) const
-{
-
-	glm::mat4 lightProjection = glm::ortho<float>(-10, 10, -10, 10, nearPlane, farPlane);
-
-	glm::vec3 pos(10, 10, 10);
-
-	glm::mat4 lightView = glm::lookAt(
-		pos,
-		pos + glm::normalize(glm::vec3(-1)),
-		glm::vec3(0.0f, 1.0f, 0.0f));
+{;
 	glm::mat4 res = lightMatrixInfo.getMatrix();
 	return res;
 }
@@ -62,6 +61,11 @@ void Component::ShadowCaster::setCamera(Camera* camera)
 Component::ShadowCaster::LightMatrix::LightMatrix() : width(0), height(0), length(0), center(0), farHeight(0), nearHeight(0), farWidth(0), nearWidth(0),
 													SHADOW_DISTANCE(15), NEAR_PLANE(0.1), OFFSET(10), firstUpdate(true), DIRECTION(0)
 {
+}
+
+Component::ShadowCaster::LightMatrix::LightMatrix(Float shadowDistance) : LightMatrix()
+{
+	SHADOW_DISTANCE = shadowDistance;
 }
 
 glm::vec3 Component::ShadowCaster::LightMatrix::toLightSpace(Vector3 sp, Vector3 dir, Float width) const
