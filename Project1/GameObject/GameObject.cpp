@@ -1,18 +1,18 @@
 #include "GameObject.h"
-#include "../Componets/Componets.h"
+#include "../Componets/ComponetBase.h"
 #include "../Rendering/Rendering.h"
 #include "../Componets/Animated.h"
 #include "../Componets/RigidBody.h"
 #include "../Scene/GameScene.h"
 
-GameObject::GameObject(String name) : componets(), enabled(), transform(DBG_NEW Component::Transform()), alive(true), scene(nullptr), name(name) {
+GameObject::GameObject(String name) : componets(), enabled(), transform(DBG_NEW Component::Transform()), alive(true), scene(nullptr), name(name), parent(nullptr) {
 	enabled.push_back(1);
 }
 
 GameObject::GameObject(Vector3 postion, Vector3 scale) : GameObject()
 {
-	getTransform()->Position = postion;
-	getTransform()->Scale = scale;
+	getLocalTransform()->Position = postion;
+	getLocalTransform()->Scale = scale;
 }
 
 void GameObject::addComponet(Component::ComponetBase* componet)
@@ -108,6 +108,19 @@ void GameObject::tryDraw(Float deltaTime)
 	}
 }
 
+Component::Transform GameObject::getGlobalTransform()
+{
+	Component::Transform res = *transform;
+	if(parent)
+		res += *parent->transform;
+	return res;
+}
+
+Component::Transform* GameObject::getLocalTransform()
+{
+	return transform;
+}
+
 Component::RigidBody* GameObject::getRigidbody()
 {
 	for (Component::ComponetBase* comp : componets) {
@@ -174,4 +187,14 @@ String GameObject::getName() const
 void GameObject::setName(String name)
 {
 	this->name = name;
+}
+
+void GameObject::setParent(GameObject* parent)
+{
+	this->parent = parent;
+}
+
+GameObject* GameObject::getParent() const
+{
+	return parent;
 }

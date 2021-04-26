@@ -1,5 +1,5 @@
 #pragma once
-#include "Componets.h"
+#include "ComponetBase.h"
 #include <al.h>
 
 namespace Primative {

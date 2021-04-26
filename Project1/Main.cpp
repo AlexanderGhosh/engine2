@@ -273,8 +273,7 @@ int main() {
     minikit.addComponet(&rain);*/
 
 
-    GameObject orb;
-    orb.getTransform()->Position.y = 1.5;
+    GameObject orb(glm::vec3(0, 1.5, 0));
     Component::RenderMesh orbMesh = Component::RenderMesh();
     orbMesh.setModel(orbBuffer);
     orbMesh.setMaterial(&waterMaterial);
@@ -403,8 +402,8 @@ int main() {
     //Primative::MSAABuffer* finalQB = DBG_NEW Primative::MSAABuffer({ "col" }, { 800, 600 });
 
     GameScene scene;
-    scene.setMainCamera(&playerCamera);
     scene.setContext(&main);
+    scene.setMainCamera(&playerCamera);
     scene.setBG({ 1, 0.5, 0.25 });
     scene.initalize();
 

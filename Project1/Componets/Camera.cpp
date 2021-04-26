@@ -51,7 +51,7 @@ Float Component::Camera::getFOV() const
 
 Vector3 Component::Camera::getPosition() const
 {
-	return parent->getTransform()->Position;
+	return parent->getLocalTransform()->Position;
 }
 
 Vector3 Component::Camera::getForward() const

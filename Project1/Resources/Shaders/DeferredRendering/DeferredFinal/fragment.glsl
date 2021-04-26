@@ -189,7 +189,7 @@ float CalculateShadowValue(vec4 LSFragmentPosition, vec3 Normal){
             shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;        
         }    
     }
-    shadow /= 9.0;
+    shadow /= 9;
 
     return shadow;
 }

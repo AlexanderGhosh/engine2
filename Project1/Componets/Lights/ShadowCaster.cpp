@@ -28,8 +28,7 @@ void Component::ShadowCaster::update(float deltaTime)
 	if (NOT camera)
 		return;
 	auto t = parent->getScene()->getContext();
-	float ar = static_cast<float>(t->getWidth()) / static_cast<float>(t->getHeight());
-	lightMatrixInfo.update(camera, ar);
+	lightMatrixInfo.update(camera, t->getAspectRatio());
 }
 
 glm::mat4 Component::ShadowCaster::getLSMatrix(const glm::ivec2& screenDimentions) const
@@ -40,7 +39,7 @@ glm::mat4 Component::ShadowCaster::getLSMatrix(const glm::ivec2& screenDimention
 
 Vector3 Component::ShadowCaster::getPosition() const
 {
-	return parent->getTransform()->Position;
+	return parent->getLocalTransform()->Position;
 }
 
 void Component::ShadowCaster::setLightSource(DirectionalLight* light)

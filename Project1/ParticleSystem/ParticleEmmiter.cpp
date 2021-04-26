@@ -11,7 +11,7 @@
 int Component::ParticleEmmiter::shader = 0;
 Primative::Buffers::VertexBuffer Component::ParticleEmmiter::quadBuffer = {};
 
-Component::ParticleEmmiter::ParticleEmmiter() : ComponetBase(), particleCount(0), particles(), looping(false), duration(0.0f), position(nullptr),
+Component::ParticleEmmiter::ParticleEmmiter() : ComponetBase(), particleCount(0), particles(), looping(false), duration(0.0f),
 offset(0.0f), albedo(nullptr), spawnRate(1.0f), lifeTime(0.0f), timeBetweenSpawn(0.0f), numberAlive(0), playing(false), shape(nullptr), itteration(1)
 {
 	timeBetweenSpawn = 1.0f / lifeTime;
@@ -49,7 +49,7 @@ Component::ParticleEmmiter::ParticleEmmiter(Int numberOfParticels, Float duratio
 
 glm::vec3 Component::ParticleEmmiter::getParticlePosition(const Particles::Particle& particle)
 {
-	return particle.getRelativePosition() + offset + *position;
+	return particle.getRelativePosition() + offset + parent->getGlobalTransform().Position;
 }
 
 glm::vec3 Component::ParticleEmmiter::getVelocityDistributed() const
@@ -62,7 +62,6 @@ glm::vec3 Component::ParticleEmmiter::getVelocityDistributed() const
 
 void Component::ParticleEmmiter::setParent(GameObject* parent) {
 	ComponetBase::setParent(parent);
-	position = &parent->getTransform()->Position;
 }
 
 void Component::ParticleEmmiter::update(float deltaTime)

@@ -1,7 +1,7 @@
 #pragma once
 #include "../Utils/General.h"
 #include "../Primatives/Buffers/VertexBuffer.h"
-#include "../Componets/Componets.h"
+#include "../Componets/ComponetBase.h"
 namespace Utils {
 	using NoiseMap = std::vector<float>;
 }

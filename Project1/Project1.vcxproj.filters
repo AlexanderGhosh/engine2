@@ -30,7 +30,7 @@
     <ClCompile Include="Utils\ResourceLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Componets\Componets.cpp">
+    <ClCompile Include="Componets\ComponetBase.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="GameObject\GameObject.cpp">
@@ -275,7 +275,7 @@
     <ClInclude Include="Utils\General.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Componets\Componets.h">
+    <ClInclude Include="Componets\ComponetBase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GameObject\GameObject.h">

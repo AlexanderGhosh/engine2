@@ -1,7 +1,6 @@
 #include "GameScene.h"
 #include "../Rendering/Shading/Manager.h"
 #include "SkyBox.h"
-#include  "../Context.h"
 #include "../Rendering/Rendering.h"
 #include "../Componets/Camera.h"
 #include "../GameObject/Terrain.h"
@@ -17,8 +16,10 @@
 #include "../ParticleSystem/ParticleEmmiter.h"
 #include "../Componets/Lights/LightBase.h"
 #include "../Componets/Lights/ShadowCaster.h"
+#include "../Context.h"
 
 
+Primative::Model GameScene::quadModel = { };
 std::vector<GameEventsTypes> GameScene::getCurrentEvents() const
 {
 	std::vector<GameEventsTypes> res = {
@@ -36,8 +37,8 @@ std::vector<GameEventsTypes> GameScene::getCurrentEvents() const
 }
 
 GameScene::GameScene() : objects(), preProcessingLayers(), currentTick(0), postProcShaderId(0), FBOs_pre(), backgroundColour(0),
-							skybox(nullptr), mainContext(nullptr), opaque(), transparent(), mainCamera(nullptr), terrain(), 
-							quadModel(), isFirstLoop(false), closing(false), uiStuff(), screenDimentions(0), emmiters(), lightSources(), USE_SHADOWS(1)
+							skybox(nullptr), mainContext(nullptr), opaque(), transparent(), mainCamera(nullptr), terrain(), mainShadowCaster(nullptr),
+							isFirstLoop(false), closing(false), uiStuff(), screenDimentions(0), emmiters(), lightSources(), USE_SHADOWS(1)
 {
 	quadModel = ResourceLoader::getModel("plane.dae");
 }
@@ -67,7 +68,7 @@ void GameScene::drawTransparent(bool bindShader)
 		Component::RenderMesh* mesh = (*itt).second;
 		if (mesh->getParent()->isAlive())
 			mesh->render(mainContext->getTime().deltaTime);
-		dist = glm::length2(mesh->getParent()->getTransform()->Position - mainCamera->getPosition());
+		dist = glm::length2(mesh->getParent()->getGlobalTransform().Position - mainCamera->getPosition());
 		sorted[dist] = mesh;
 	}
 	transparent.clear();
@@ -276,7 +277,7 @@ void GameScene::updateObjects()
 	const auto events = getCurrentEvents();
 	for (GameObject*& obj : objects) {
 		if (obj->isAlive()) {
-			//obj->tick(currentTick++ % FIXED_UPDATE_RATE, mainContext->getTime().deltaTime);
+			//obj->tick(currentTick++ % FIXED_UPDATE_RATE, mainContext.getTime().deltaTime);
 			obj->raiseEvents(events,  mainContext->getTime().deltaTime);
 		}
 	}
@@ -560,12 +561,6 @@ void GameScene::setSkyBox(SkyBox* sb)
 	skybox = sb;
 }
 
-void GameScene::setContext(Context* context)
-{
-	mainContext = context;
-	screenDimentions = context->getDimentions();
-}
-
 void GameScene::setMainCamera(Component::Camera* camera)
 {
 	mainCamera = camera;
@@ -579,6 +574,12 @@ void GameScene::setShadowCaster(Component::ShadowCaster* caster)
 {
 	mainShadowCaster = caster;
 	mainShadowCaster->setCamera(mainCamera);
+}
+
+void GameScene::setContext(Context* context)
+{
+	mainContext = context;
+	screenDimentions = context->getDimentions();
 }
 
 const glm::ivec2& GameScene::getScreenDimentions() const

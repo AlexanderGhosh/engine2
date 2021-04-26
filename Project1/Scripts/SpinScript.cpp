@@ -15,6 +15,6 @@ SpinScript::SpinScript(Vector3 axis, Float rps) : SpinScript()
 
 void SpinScript::update(float deltaTime)
 {
-	parent->getTransform()->rotate(axis, rps * deltaTime);
+	parent->getLocalTransform()->rotate(axis, rps * deltaTime);
 	//parent->getTransform()->Rotation *= glm::normalize(glm::quat(rps * deltaTime, axis.x, axis.y, axis.z));
 }

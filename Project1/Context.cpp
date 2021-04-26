@@ -1,8 +1,14 @@
 #include "Context.h"
-#include <iostream>
 
-Context::Context(const svec2& dim, const bool vsync, short fpsLim) : window(nullptr), dimentions(dim), vsync(vsync), fpsLim(fpsLim), time()
+Context::Context() : window(nullptr), dimentions(0), vsync(false), fpsLim(0), time()
 {
+}
+
+Context::Context(const svec2& dim, const bool vsync, short fpsLim) : Context()
+{
+    dimentions = dim;
+    this->vsync = vsync;
+    this->fpsLim = fpsLim;
 }
 
 void Context::init(const std::string& name, std::list<long> enable)
@@ -86,6 +92,11 @@ Context::svec2 Context::getDimentions() const
 GLFWwindow* Context::getWindow() const
 {
     return window;
+}
+
+float Context::getAspectRatio() const
+{
+    return static_cast<float>(dimentions.x) / static_cast<float>(dimentions.y);
 }
 
 Time& Context::getTime()

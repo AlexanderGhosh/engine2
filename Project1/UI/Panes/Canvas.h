@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include "../Elements/Element.h"
-#include "../../Componets/Componets.h"
+#include "../../Componets/ComponetBase.h"
 
 namespace UI {
 	class Canvas : public Component::ComponetBase

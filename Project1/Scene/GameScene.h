@@ -1,5 +1,4 @@
 #pragma once
-#include <vector>
 #include <unordered_map>
 #include <map>
 #include "../Primatives/Model.h"
@@ -39,7 +38,7 @@ enum class GameEventsTypes {
 class GameScene
 {
 private:
-	Primative::Model quadModel;
+	static Primative::Model quadModel;
 	std::vector<Terrain*> terrain;
 	SkyBox* skybox;
 	Component::Camera* mainCamera;

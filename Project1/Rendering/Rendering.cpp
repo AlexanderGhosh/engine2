@@ -16,7 +16,7 @@ void Component::RenderMesh::render(float deltaTime)
 {
 	glm::mat4 m(1);
 	if(parent)
-		m = parent->getTransform()->getModel();
+		m = parent->getGlobalTransform().getModel();
 	Render::Shading::Manager::setValue("model", m);
 	/*if (materials.size() == 1) {
 		Materials::Material* material = materials[0];

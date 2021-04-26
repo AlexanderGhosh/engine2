@@ -213,7 +213,7 @@
     <ClCompile Include="Scene\GameScene.cpp" />
     <ClCompile Include="Primatives\Materials\MaterialBase.cpp" />
     <ClCompile Include="Utils\AssimpWrapper.cpp" />
-    <ClCompile Include="Componets\Componets.cpp" />
+    <ClCompile Include="Componets\ComponetBase.cpp" />
     <ClCompile Include="GameObject\GameObject.cpp" />
     <ClCompile Include="Componets\Camera.cpp" />
     <ClCompile Include="Rendering\Shading\Manager.cpp" />
@@ -299,7 +299,7 @@
     <ClInclude Include="Scene\GameScene.h" />
     <ClInclude Include="Primatives\Materials\MaterialBase.h" />
     <ClInclude Include="Utils\AssimpWrapper.h" />
-    <ClInclude Include="Componets\Componets.h" />
+    <ClInclude Include="Componets\ComponetBase.h" />
     <ClInclude Include="GameObject\GameObject.h" />
     <ClInclude Include="Componets\Camera.h" />
     <ClInclude Include="Rendering\Shading\Manager.h" />

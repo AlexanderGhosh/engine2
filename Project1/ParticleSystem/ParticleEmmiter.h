@@ -1,6 +1,6 @@
 #pragma once
 #include <map>
-#include "../Componets/Componets.h"
+#include "../Componets/ComponetBase.h"
 #include "../Primatives/Buffers/VertexBuffer.h"
 #include "Particle.h"
 
@@ -22,7 +22,6 @@ namespace Component {
 		bool looping, playing;
 		int particleCount, numberAlive, itteration;
 		float duration, spawnRate, lifeTime, timeBetweenSpawn;
-		glm::vec3* position;
 		glm::vec3 offset;
 		Materials::MatItemBase<glm::vec4>* albedo;
 		Particles::DistributionBase* shape;

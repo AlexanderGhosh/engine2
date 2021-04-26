@@ -17,7 +17,7 @@ void DebugScreen::awake()
 	fpsText.setForgroundColor(bgColour);
 	fpsText.setPos({ 115, 0 });
 	canvas->addElement(fpsText);
-	position.setText("Position: " + Utils::to_string_precision(parent->getTransform()->Position, 2));
+	position.setText("Position: " + Utils::to_string_precision(parent->getLocalTransform()->Position, 2));
 	position.setForgroundColor(bgColour);
 	position.setPos({ 115, 0 });
 	canvas->addElement(position);
@@ -41,7 +41,7 @@ void DebugScreen::update(float deltaTime)
 	}
 	counter += deltaTime;
 
-	position.setText("Position: " + Utils::to_string_precision(parent->getTransform()->Position, 2));
+	position.setText("Position: " + Utils::to_string_precision(parent->getLocalTransform()->Position, 2));
 	const float w = position.getWidth() / 2.0f;
 	const glm::vec2& p = position.getPos();
 	float diff = p.x - w; // left edge

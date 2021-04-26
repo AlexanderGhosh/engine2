@@ -1,7 +1,7 @@
 #pragma once
 #include <glm.hpp>
 #include <gtc/matrix_transform.hpp>
-#include "Componets.h"
+#include "ComponetBase.h"
 
 namespace Component {
 	class Camera : public ComponetBase

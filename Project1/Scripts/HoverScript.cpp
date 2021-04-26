@@ -16,7 +16,7 @@ HoverScript::HoverScript(Float dist, Float speed) : HoverScript()
 void HoverScript::update(float deltaTime)
 {
 	//deltaTime = 1.0f / 60.0f;
-	Component::Transform* transform = parent->getTransform();
+	Component::Transform* transform = parent->getLocalTransform();
 	const float delta = speed * deltaTime;
 	transform->Position.y += delta;
 	moved += fabs(delta);

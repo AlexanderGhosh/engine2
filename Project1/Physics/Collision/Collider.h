@@ -1,6 +1,6 @@
 #pragma once
 #include <glm.hpp>
-#include "../../Componets/Componets.h"
+#include "../../Componets/ComponetBase.h"
 namespace Physics {
 	struct AABB;
 	class Collider : public Component::ComponetBase

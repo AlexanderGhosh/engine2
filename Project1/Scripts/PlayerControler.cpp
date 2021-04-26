@@ -16,7 +16,7 @@ PlayerControler::PlayerControler() : Component::Scripting(), firstMouse(true), l
 }
 
 void PlayerControler::update(float deltaTime) {
-	Component::Transform* transform = parent->getTransform();
+	Component::Transform* transform = parent->getLocalTransform();
 	Component::Camera* camera = parent->getComponet<Component::Camera>();
 	Component::CharacterController* cc = parent->getComponet<Component::CharacterController>();
 

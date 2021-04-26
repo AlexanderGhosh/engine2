@@ -1,6 +1,6 @@
 #pragma once
 #include <unordered_map>
-#include "Componets.h"
+#include "ComponetBase.h"
 
 namespace Primative {
 	namespace Buffers {

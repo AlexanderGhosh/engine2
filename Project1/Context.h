@@ -32,6 +32,7 @@ private:
 	short fpsLim;
 	Time time;
 public:
+	Context();
 	Context(const svec2& dim, const bool vsync, short fpsLim = 0);
 
 	void init(const std::string& name, std::list<long> enable);
@@ -48,8 +49,8 @@ public:
 	unsigned    getHeight()     const;
 	svec2	    getDimentions() const;
 	GLFWwindow* getWindow()     const;
-
 	Time&		getTime();
+	float getAspectRatio() const;
 
 	// setters
 };

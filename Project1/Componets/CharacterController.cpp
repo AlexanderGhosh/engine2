@@ -34,7 +34,7 @@ Vector3 Component::CharacterController::getPosition() const
 void Component::CharacterController::setParent(GameObject* parent)
 {
 	ComponetBase::setParent(parent);
-	position = &parent->getTransform()->Position;
+	position = &parent->getLocalTransform()->Position;
 }
 
 void Component::CharacterController::setVelocity(Vector3 vel)

@@ -1,5 +1,5 @@
 #pragma once
-#include "Componets.h"
+#include "ComponetBase.h"
 
 namespace Component {
 	class Scripting : public ComponetBase

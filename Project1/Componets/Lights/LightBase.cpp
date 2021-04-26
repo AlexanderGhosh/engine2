@@ -1,7 +1,7 @@
 #include "LightBase.h"
 #include "../../GameObject/GameObject.h"
 
-Component::LightBase::LightBase() : ComponetBase(), position(nullptr), colour(0), brightness(0)
+Component::LightBase::LightBase() : ComponetBase(), colour(0), brightness(0)
 {
 }
 
@@ -14,7 +14,6 @@ Component::LightBase::LightBase(Vector3 colour, Float brightness) : LightBase()
 void Component::LightBase::setParent(GameObject* parent)
 {
 	ComponetBase::setParent(parent);
-	position = &parent->getTransform()->Position;
 }
 
 void Component::LightBase::cleanUp()
@@ -24,7 +23,7 @@ void Component::LightBase::cleanUp()
 
 Vector3 Component::LightBase::getPosition() const
 {
-	return *position;
+	return parent->getGlobalTransform().Position;
 }
 
 Vector3 Component::LightBase::getColour() const

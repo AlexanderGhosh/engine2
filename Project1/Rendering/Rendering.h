@@ -1,6 +1,6 @@
 #pragma once
 #include <GL/glew.h>
-#include "../Componets/Componets.h"
+#include "../Componets/ComponetBase.h"
 #include "../Utils/General.h"
 #include "../Primatives/Model.h"
 

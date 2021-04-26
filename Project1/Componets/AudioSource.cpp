@@ -19,7 +19,7 @@ void Component::AudioSource::update(float deltaTime)
 	if(isPlaying())
 		buffer->update(source);
 	// update buffers position
-	Vector3 pos = parent->getTransform()->Position;
+	Vector3 pos = parent->getLocalTransform()->Position;
 	const Component::RigidBody* rb = parent->getRigidbody();
 	if (rb) {
 		Vector3 vel = rb->getVelocity();

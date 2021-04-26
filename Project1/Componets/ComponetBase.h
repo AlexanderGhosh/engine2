@@ -21,8 +21,6 @@ namespace Component {
 		virtual void mouseButton(float deltaTime) { };
 		virtual void keyButton(float deltaTime) { };
 
-
-
 		virtual void cleanUp() = 0;
 		virtual void setParent(GameObject* parent) { this->parent = parent; };
 		inline GameObject* getParent() { return parent; };
@@ -33,14 +31,25 @@ namespace Component {
 		GameObject* parent;
 	};
 
-	struct Transform : public ComponetBase {
+	class Transform : public ComponetBase {
+	public:
 		glm::vec3 Position, Scale;
 		glm::quat Rotation;
 		const glm::mat4 getModel() const;
-		inline Transform(glm::vec3 p = Utils::zero(), glm::vec3 s = Utils::fill(1), glm::vec3 r = Utils::zero()) : Position(p), Scale(s), Rotation(r), ComponetBase() { };
+		Transform(glm::vec3 p = Utils::zero(), glm::vec3 s = Utils::fill(1), glm::vec3 r = Utils::zero());
 		inline Type getType() const { return Type::Transform; };
 		void rotate(Vector3 axis, Float angle);
 		void rotate(Vector3 rotation);
-		void cleanUp() { };
+		void cleanUp();
+
+		Transform operator+(const Transform& a) const; 
+		Transform& operator+=(const Transform& a);
+		/*
+		Num& operator+=(const Num& rhs) {
+
+			this->m_iNumber += rhs.m_iNumber;
+			return *this;
+		}
+		*/
 	};
 }

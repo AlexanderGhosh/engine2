@@ -22,6 +22,7 @@ protected:
 	std::vector<bool> enabled;
 	bool alive;
 	GameScene* scene;
+	GameObject* parent;
 	std::string name;
 public:
 	GameObject(String name = "");
@@ -34,7 +35,8 @@ public:
 	void raiseEvents(const std::vector<GameEventsTypes>& events, Float deltaTime);
 	void tick(short currentTick, float deltaTime);
 	virtual void tryDraw(Float deltaTime);
-	inline Component::Transform* getTransform() const { return transform; };
+	Component::Transform getGlobalTransform();
+	Component::Transform* getLocalTransform();
 	Component::RigidBody* getRigidbody();
 	template<class T>
 	inline T* getComponet()
@@ -55,5 +57,7 @@ public:
 	void processComponets();
 	String getName() const;
 	void setName(String name);
+	void setParent(GameObject* parent);
+	GameObject* getParent() const;
 };
 

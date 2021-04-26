@@ -34,7 +34,7 @@ void Component::RigidBody::updateInertia()
 void Component::RigidBody::setParent(GameObject* parent)
 {
 	ComponetBase::setParent(parent);
-	transform = parent->getTransform();
+	transform = parent->getLocalTransform();
 	rotation = &transform->Rotation;
 	updateInertia();
 }

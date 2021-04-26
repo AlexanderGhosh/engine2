@@ -11,7 +11,7 @@ Component::AudioReciever::AudioReciever() : ComponetBase(), placeHolder(0)
 
 void Component::AudioReciever::update(float deltaTime)
 {
-	Component::Transform* transofrm = parent->getTransform();
+	Component::Transform* transofrm = parent->getLocalTransform();
 	Component::Camera* camera = parent->getComponet<Component::Camera>();
 	Component::RigidBody* rb = parent->getComponet<Component::RigidBody>();
 	alListener3f(AL_POSITION, transofrm->Position.x, transofrm->Position.y, transofrm->Position.z);
