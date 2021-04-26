@@ -282,7 +282,7 @@ int main() {
     /*Particles::DomeDistribution distribution = Particles::DomeDistribution(1.0f);
     Component::ParticleEmmiter emmiter = Component::ParticleEmmiter(10, 10, true, 0.25);
     Materials::MatItemSingle<glm::vec4> particleAlbedo(rainDrop);
-    emmiter.setAlbedo(&particleAlbedo);
+    emmiter.setAlbedo(&particleAlbedo); m
     emmiter.setShape(&distribution);
     orb.addComponet(&emmiter);*/
 
