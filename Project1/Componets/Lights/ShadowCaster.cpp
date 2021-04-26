@@ -155,9 +155,9 @@ void Component::ShadowCaster::LightMatrix::update(Camera* camera, float ar)
 
 	const glm::vec3 toNear = fwd * NEAR_PLANE;
 
-	const glm::vec3 centerNear = toNear + camera->getPos();
+	const glm::vec3 centerNear = toNear + camera->getPosition();
 
-	const glm::vec3 centerFar = toFar + camera->getPos();
+	const glm::vec3 centerFar = toFar + camera->getPosition();
 
 	std::array<glm::vec3, 8> points = getVertices(Utils::yAxis(), camera->getRight(), centerNear, centerFar);
 

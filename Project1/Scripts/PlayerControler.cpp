@@ -71,7 +71,7 @@ void PlayerControler::mouseMove(float deltaTime)
 	lastY = pos.y;
 
 	Component::Camera* camera = parent->getComponet<Component::Camera>();
-	camera->ProcessMouseMovement(xoffset, yoffset);
+	camera->processMouseMovement(xoffset, yoffset);
 }
 
 bool PlayerControler::isGrounded(float dt)

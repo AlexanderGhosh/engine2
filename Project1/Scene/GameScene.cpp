@@ -69,7 +69,7 @@ void GameScene::drawTransparent(bool bindShader)
 		Component::RenderMesh* mesh = (*itt).second;
 		if (mesh->getParent()->isAlive())
 			mesh->render(mainContext->getTime().deltaTime);
-		dist = glm::length2(mesh->getParent()->getTransform()->Position - mainCamera->getPos());
+		dist = glm::length2(mesh->getParent()->getTransform()->Position - mainCamera->getPosition());
 		sorted[dist] = mesh;
 	}
 	transparent.clear();
@@ -432,7 +432,7 @@ void GameScene::gameLoop()
 		// RENDERING--------------------------------------------------------------------------------------------------------------------------------------------
 		auto& mainBuffer = uniformBuffers[0];
 		mainBuffer.fill(0, glm::value_ptr(mainCamera->getView()));
-		mainBuffer.fill(2, glm::value_ptr(mainCamera->getPos()));
+		mainBuffer.fill(2, glm::value_ptr(mainCamera->getPosition()));
 
 		preProcess(); // shadows and scene quad
 		postProcess();// render to screen

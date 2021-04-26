@@ -1,11 +1,21 @@
 #include "Camera.h"
 #include "../GameObject/GameObject.h"
 
+Component::Camera::Camera() : pitch(0), yaw(-90), fov(45), pos(Utils::zero()), fwd(Utils::zAxis(-1)), up(Utils::yAxis()), right(Utils::zero()), exposure(0.1f) 
+{
+	update(0); 
+}
+
+void Component::Camera::cleanUp()
+{
+}
+
 const glm::mat4 Component::Camera::getView() const
 {
-	return glm::lookAt(getPos(), getPos() + fwd, up);
+	return glm::lookAt(getPosition(), getPosition() + fwd, up);
 }
-void Component::Camera::ProcessMouseMovement(float xOffset, float yOffset, bool constrainPitch) {
+
+void Component::Camera::processMouseMovement(float xOffset, float yOffset, bool constrainPitch) {
 	xOffset *= 0.25;
 	yOffset *= 0.25;
 
@@ -20,8 +30,9 @@ void Component::Camera::ProcessMouseMovement(float xOffset, float yOffset, bool 
 			pitch = -89.0f;
 		}
 	}
-	this->update(0);
+	update(0);
 }
+
 void Component::Camera::update(float deltaTime) {
 	glm::vec3 front(0);
 	front.x = cosf(glm::radians(yaw)) * cosf(glm::radians(pitch));
@@ -33,9 +44,24 @@ void Component::Camera::update(float deltaTime) {
 	up = glm::normalize(glm::cross(right, fwd));
 }
 
-Vector3 Component::Camera::getPos() const
+Float Component::Camera::getFOV() const
+{
+	return fov;
+}
+
+Vector3 Component::Camera::getPosition() const
 {
 	return parent->getTransform()->Position;
+}
+
+Vector3 Component::Camera::getForward() const
+{
+	return fwd;
+}
+
+Vector3 Component::Camera::getRight() const
+{
+	return right;
 }
 
 Float Component::Camera::getExposure() const

@@ -24,7 +24,7 @@ offset(0.0f), albedo(nullptr), spawnRate(1.0f), lifeTime(0.0f), timeBetweenSpawn
 
 void Component::ParticleEmmiter::sortParticles()
 {
-	Vector3 camPos = parent->getScene()->getMainCamera()->getPos();
+	Vector3 camPos = parent->getScene()->getMainCamera()->getPosition();
 	std::sort(particles.begin(), particles.end(), [&](Particles::Particle& a, Particles::Particle& b)
 		{
 			float dist1 = glm::length2(getParticlePosition(a) - camPos);
