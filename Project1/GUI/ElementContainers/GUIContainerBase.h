@@ -15,6 +15,7 @@ namespace GUI {
 		~GUIContainerBase() = default;
 		virtual void cleanUp();
 		virtual void render();
+		virtual void handleEvents();
 
 		// setters
 		void setPosition(Vector2 pos);

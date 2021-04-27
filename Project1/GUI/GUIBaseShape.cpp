@@ -31,12 +31,13 @@ void GUI::GUIBaseShape::setRadius(Float r)
 	radius = r;
 }
 
-void GUI::GUIBaseShape::render(Matrix4 model, Vector2 dimetionsTranslated)
+void GUI::GUIBaseShape::render(Matrix4 model, Vector2 dimetions, Vector2 parentDim)
 {
 	Render::Shading::Manager::setActive(shaderId);
 	Render::Shading::Manager::setValue("model", model);
-	Render::Shading::Manager::setValue("dimentions", dimetionsTranslated);
+	Render::Shading::Manager::setValue("dimentions", dimetions);
 	Render::Shading::Manager::setValue("radius", radius);
+	Render::Shading::Manager::setValue("parentDimentions", parentDim);
 	if (albedo) {
 		int unit = 0;
 		albedo->tryBindTexture(unit);

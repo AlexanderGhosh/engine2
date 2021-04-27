@@ -246,6 +246,9 @@ int main() {
     canvas.setBaseAlbedo(&uiColourCanvas);
     canvas.setCornerRadius(50);
     GUI::GUIElementBase element1;
+    element1.mouseEnter = [](GUI::GUIElementBase* sender) {
+        Utils::log("mouse Over");
+    };
     GUI::GUIConstraint elementConstraints;
     elementConstraints.setScreenDimentions(SCREEN_DIMENTIONS);
     GUI::PercentConstraint percents = GUI::PercentConstraint(0.25);

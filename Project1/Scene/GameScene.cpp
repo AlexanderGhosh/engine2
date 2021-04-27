@@ -295,6 +295,10 @@ void GameScene::updateObjects()
 			obj->raiseEvents(events,  mainContext->getTime().deltaTime);
 		}
 	}
+
+	for (auto container : uiContainers) {
+		container->handleEvents();
+	}
 }
 
 void GameScene::clearFBO() const 

@@ -12,11 +12,13 @@ namespace GUI {
 		float radius;
 		static Primative::Buffers::VertexBuffer quadBuffer;
 		static unsigned shaderId;
+
+
 	public:
 		GUIBaseShape();
 		~GUIBaseShape() = default;
 		void cleanUp();
-		void render(Matrix4 model, Vector2 dimetionsTranslated);
+		void render(Matrix4 model, Vector2 dimetions, Vector2 parentDim = glm::vec2(INFINITY));
 
 		// setters
 		void setAlbedo(Materials::MatItemBase<glm::vec4>* albedo);

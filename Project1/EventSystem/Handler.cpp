@@ -16,7 +16,6 @@ void Events::Handler::init(GLFWwindow* window)
 	glfwSetCursorPosCallback(window, Events::Handler::mouseCallback);
 	glfwSetMouseButtonCallback(window, Events::Handler::mouseButtonCallback);
 	glfwSetCharCallback(window, Events::Handler::characterCallBack);
-	// glfwSetKeyCallback(window, NULL);
 }
 
 bool Events::Handler::getKey(const Key& key, const Action& action)

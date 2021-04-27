@@ -34,6 +34,13 @@ void GUI::GUIContainerBase::render()
 	baseShape.render(getModel(), dimentions);
 }
 
+void GUI::GUIContainerBase::handleEvents()
+{
+	for (auto child : children) {
+		child->handelEvents();
+	}
+}
+
 void GUI::GUIContainerBase::setPosition(Vector2 pos)
 {
 	position = pos;

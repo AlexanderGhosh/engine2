@@ -12,6 +12,8 @@ namespace GUI {
 		GUIConstraint* constraints;
 		GUIBaseShape baseShape;
 		virtual const glm::mat4 getModel() const;
+		// Event Data
+		bool cursorOver, cursorDown, cursorHover, keyDown_;
 	public:
 		GUIElementBase();
 		~GUIElementBase() = default;
@@ -26,6 +28,16 @@ namespace GUI {
 		// getters
 		GUIContainerBase* getParent() const;
 		virtual GUIConstraint* getConstraints() const;
+
+		// events
+		virtual void handelEvents();
+		void (*mouseHover)(GUIElementBase* sender);
+		void (*mouseEnter)(GUIElementBase* sender);
+		void (*mouseLeave)(GUIElementBase* sender);
+		void (*mouseUp   )(GUIElementBase* sender);
+		void (*mouseDown )(GUIElementBase* sender);
+		void (*keyDown   )(GUIElementBase* sender);
+		void (*keyUp     )(GUIElementBase* sender);
 	};
 };
 

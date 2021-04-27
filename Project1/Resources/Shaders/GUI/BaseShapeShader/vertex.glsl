@@ -9,6 +9,7 @@ layout(std140, binding = 2) uniform Matrices
 
 out vec2 TextureCoords;
 out vec2 FragPos;
+out vec2 FragPosTranslated;
 out vec2 Dimentions;
 
 uniform vec2 dimentions;
@@ -20,6 +21,7 @@ vec2 map(vec3 p){
 
 void main() {
     FragPos = map(pos) * dimentions;
+    FragPosTranslated = (model * vec4(map(pos), 0, 1)).xy;
 	gl_Position = projection * model * vec4(map(pos), 0, 1);
     TextureCoords = tex;
     Dimentions = dimentions;
