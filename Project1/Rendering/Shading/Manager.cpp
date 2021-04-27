@@ -159,6 +159,8 @@ bool Render::Shading::Manager::setValue(String name, const Component::SpotLight*
 
 void Render::Shading::Manager::setActive(const unsigned& shaderId)
  {
+	if (active == shaderId)
+		return;
 	 Manager::active = shaderId;
 	 glUseProgram(shaderId);
  }

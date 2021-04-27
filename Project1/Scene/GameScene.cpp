@@ -17,7 +17,12 @@
 #include "../Componets/Lights/LightBase.h"
 #include "../Componets/Lights/ShadowCaster.h"
 #include "../Context.h"
-
+// GUI
+#include "../GUI/ElementContainers/GUICanvas.h"
+#include "../GUI/Constraints/PixelConstraint.h"
+#include "../GUI/GUIConstraint.h"
+#include "../GUI/UIElementBase.h"
+// GUI
 
 Primative::Model GameScene::quadModel = { };
 std::vector<GameEventsTypes> GameScene::getCurrentEvents() const
@@ -38,7 +43,7 @@ std::vector<GameEventsTypes> GameScene::getCurrentEvents() const
 
 GameScene::GameScene() : objects(), preProcessingLayers(), currentTick(0), postProcShaderId(0), FBOs_pre(), backgroundColour(0),
 							skybox(nullptr), mainContext(nullptr), opaque(), transparent(), mainCamera(nullptr), terrain(), mainShadowCaster(nullptr),
-							isFirstLoop(false), closing(false), uiStuff(), screenDimentions(0), emmiters(), lightSources(), USE_SHADOWS(1)
+							isFirstLoop(false), closing(false), uiStuff(), screenDimentions(0), emmiters(), lightSources(), USE_SHADOWS(1), uiContainers()
 {
 	quadModel = ResourceLoader::getModel("plane.dae");
 }
@@ -87,6 +92,13 @@ void GameScene::drawUI()
 	for (UI::Canvas* canvas : uiStuff) {
 		canvas->render(mainContext->getTime().deltaTime);
 	}
+	mainContext->disable(GL_CULL_FACE);
+	mainContext->disable(GL_DEPTH);
+	for (auto container : uiContainers) {
+		container->render();
+	}
+	mainContext->enable(GL_CULL_FACE);
+	mainContext->enable(GL_DEPTH);
 }
 
 void GameScene::drawParticles(Unsigned shaderId)
@@ -112,6 +124,11 @@ void GameScene::addObject(GameObject* obj)
 void GameScene::addTerrain(Terrain* terrain)
 {
 	this->terrain.push_back(terrain);
+}
+
+void GameScene::addUI(GUI::GUIContainerBase* container)
+{
+	uiContainers.push_back(container);
 }
 
 void GameScene::processComponet(Component::ComponetBase* comp)
@@ -482,6 +499,10 @@ void GameScene::cleanUp()
 	for (auto itt = lightSources.begin(); itt != lightSources.end();) {
 		(*itt)->cleanUp();
 		itt = lightSources.erase(itt);
+	}
+	for (auto itt = uiContainers.begin(); itt != uiContainers.end();) {
+		(*itt)->cleanUp();
+		itt = uiContainers.erase(itt);
 	}
 
 	FBOs_pre.clear();

@@ -14,6 +14,9 @@ class Terrain;
 namespace UI {
 	class Canvas;
 }
+namespace GUI {
+	class GUIContainerBase;
+}
 namespace Component {
 	class ComponetBase;
 	class Camera;
@@ -33,7 +36,7 @@ enum class GameEventsTypes {
 	Update, FixedUpdate, MouseToggle, MouseMove, KeyToggle,
 	Render,
 	Awake, // will occour when object is added to the scene
-	Start  // will occout before first game loop
+	Start  // will occour before first game loop
 };
 class GameScene
 {
@@ -46,6 +49,7 @@ private:
 	std::vector<Component::RenderMesh*> opaque;
 	std::map<float, Component::RenderMesh*> transparent;
 	std::vector<UI::Canvas*> uiStuff;
+	std::vector<GUI::GUIContainerBase*> uiContainers;
 	std::vector<Component::ParticleEmmiter*> emmiters;
 	std::vector<Component::LightBase*> lightSources;
 	Component::ShadowCaster* mainShadowCaster;
@@ -84,6 +88,8 @@ public:
 	void gameLoop();
 	void cleanUp();
 	void close();
+	void processComponet(Component::ComponetBase* comp);
+
 	/// <summary>
 	/// binds the lights to the active shader
 	/// </summary>
@@ -96,7 +102,7 @@ public:
 	void addFBO_Post(String layerName, Primative::Buffers::FrameBuffer fbo);
 	void addObject(GameObject* obj);
 	void addTerrain(Terrain* terrain);
-	void processComponet(Component::ComponetBase* comp);
+	void addUI(GUI::GUIContainerBase* container);
 
 	// setters
 	void setBG(Vector3 col);

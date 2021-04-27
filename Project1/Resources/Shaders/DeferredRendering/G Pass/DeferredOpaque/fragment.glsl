@@ -52,7 +52,7 @@ float getData(MatItem1 item){
     return mix(item.raw, texture(item.id, TexCoords * item.repeatValue).r, item.mixValue);
 }
 vec3 getNormal(MatItem3 item){
-    return mix(Normal, texture(item.id, TexCoords * item.repeatValue).rgb, item.mixValue);
+    return mix(Normal, texture(item.id, TexCoords * item.repeatValue).rgb, item.mixValue) * 2.0 - 1.0;
 }
 
 void main()

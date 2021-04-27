@@ -150,6 +150,13 @@
     <ClCompile Include="Componets\Scripting.cpp" />
     <ClCompile Include="Componets\Lights\DirectionalLight.cpp" />
     <ClCompile Include="Componets\Lights\PointLight.cpp" />
+    <ClCompile Include="GUI\ElementContainers\GUICanvas.cpp" />
+    <ClCompile Include="GUI\Constraints\ConstraintBase.cpp" />
+    <ClCompile Include="GUI\Constraints\PixelConstraint.cpp" />
+    <ClCompile Include="GUI\GUIBaseShape.cpp" />
+    <ClCompile Include="GUI\ElementContainers\GUIContainerBase.cpp" />
+    <ClCompile Include="GUI\GUIConstraint.cpp" />
+    <ClCompile Include="GUI\UIElementBase.cpp" />
     <ClCompile Include="ParticleSystem\Distributions\DomeDistribution.cpp" />
     <ClCompile Include="ParticleSystem\Distributions\ConeDistribution.cpp" />
     <ClCompile Include="ParticleSystem\Distributions\SphereDistribution.cpp" />
@@ -230,6 +237,13 @@
     <ClInclude Include="Componets\Scripting.h" />
     <ClInclude Include="Componets\Lights\DirectionalLight.h" />
     <ClInclude Include="Componets\Lights\PointLight.h" />
+    <ClInclude Include="GUI\ElementContainers\GUICanvas.h" />
+    <ClInclude Include="GUI\Constraints\ConstraintBase.h" />
+    <ClInclude Include="GUI\Constraints\PixelConstraint.h" />
+    <ClInclude Include="GUI\GUIBaseShape.h" />
+    <ClInclude Include="GUI\ElementContainers\GUIContainerBase.h" />
+    <ClInclude Include="GUI\GUIConstraint.h" />
+    <ClInclude Include="GUI\UIElementBase.h" />
     <ClInclude Include="ParticleSystem\Distributions\DomeDistribution.h" />
     <ClInclude Include="ParticleSystem\Distributions\ConeDistribution.h" />
     <ClInclude Include="ParticleSystem\Distributions\SphereDistribution.h" />

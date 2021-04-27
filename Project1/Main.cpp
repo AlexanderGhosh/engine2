@@ -29,6 +29,11 @@
 #include "Componets/Lights/DirectionalLight.h"
 #include "Componets/Lights/ShadowCaster.h"
 
+#include "GUI/ElementContainers/GUICanvas.h"
+#include "GUI/UIElementBase.h"
+#include "GUI/GUIConstraint.h"
+#include "GUI/Constraints/PixelConstraint.h"
+
 #include "ParticleSystem/ParticleEmmiter.h"
 #include "ParticleSystem/Distributions/ConeDistribution.h"
 #include "ParticleSystem/Distributions/DomeDistribution.h"
@@ -87,7 +92,7 @@ int main() {
     Gizmos::GizmoRenderer::init();
     std::vector<std::string> shaders = {
         "PBRShader", "DeferredRendering/TransparentShader", "Shadows/ShadowShader", "UIShader", "TextShader", "DeferredRendering/G Pass/DeferredTerrainMap", "DeferredRendering/G Pass/DeferredTerrainMesh", "PostShader", "ParticleShader", 
-        "DeferredRendering/DeferredFinal", "DeferredRendering/G Pass/DeferredOpaque", "GausianBlur"
+        "DeferredRendering/DeferredFinal", "DeferredRendering/G Pass/DeferredOpaque", "GausianBlur", "GUI/BaseShapeShader"
     };
     ResourceLoader::createShaders(shaders);
     timer.log();
@@ -233,6 +238,25 @@ int main() {
     timer.log();
 
 
+    Materials::MatItemSingle<glm::vec4> uiColourCanvas(glm::vec4(0.5, 1, 1, 0.5));
+    GUI::GUICanvas canvas;
+    canvas.setDimentions(SCREEN_DIMENTIONS / 2);
+    canvas.setBaseAlbedo(&uiColourCanvas);
+    canvas.setCornerRadius(50);
+    GUI::GUIElementBase element1;
+    GUI::GUIConstraint elementConstraints;
+    elementConstraints.setScreenDimentions(SCREEN_DIMENTIONS);
+    GUI::PixelConstraint pixels = GUI::PixelConstraint(100);
+    elementConstraints.setX(&pixels);
+    elementConstraints.setY(&pixels);
+    elementConstraints.setWidth(&pixels);
+    elementConstraints.setHeight(&pixels);
+    element1.setConstraints(&elementConstraints);
+    Materials::MatItemSingle<glm::vec4> uiColour(glm::vec4(0.5, 0.0, 1, 1));
+    element1.setAlbedo(&uiColour);
+    canvas.addElement(&element1);
+
+
     timer.start("Scene");
 
     GameScene scene;
@@ -251,7 +275,8 @@ int main() {
     for (Terrain& land : allLand) {
         scene.addTerrain(&land);
     }
-    // scene.addTerrain(&land);
+    
+    scene.addUI(&canvas);
 
     scene.setShadowCaster(&shadowCaster);
 
