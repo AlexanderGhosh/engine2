@@ -17,33 +17,29 @@ uniform float radius;
 
 vec4 getAlbedo();
 
+const float SV = 0.7;
+
 void main() {
-    FragColor = getAlbedo();
-}
-vec4 getAlbedo(){
+    vec4 colour = getAlbedo();
+    float alpha = colour.a;
     if(radius > 0.0){
         float r = radius;
         vec2 maximum = Dimentions - radius;
         if(FragPos.x > maximum.x && FragPos.y > maximum.y){
-            if(distance(FragPos, maximum) > r){
-                discard;
-            }
+            alpha *= 1.0 - smoothstep(radius - SV, radius + SV, distance(FragPos, maximum));
         }
         else if(FragPos.x > maximum.x && FragPos.y < radius){
-            if(distance(FragPos, vec2(maximum.x, radius)) > r){
-                discard;
-            }
+            alpha *= 1.0 - smoothstep(radius - SV, radius + SV, distance(FragPos, vec2(maximum.x, radius)));
         }
         else if(FragPos.x < radius && FragPos.y > maximum.y){
-            if(distance(FragPos, vec2(radius, maximum.y)) > r){
-                discard;
-            }
+            alpha *= 1.0 - smoothstep(radius - SV, radius + SV, distance(FragPos, vec2(radius, maximum.y)));
         }
         else if(FragPos.x < radius && FragPos.y < radius){
-            if(distance(FragPos, vec2(radius)) > r){
-                discard;
-            }
+            alpha *= 1.0 - smoothstep(radius - SV, radius + SV, distance(FragPos, vec2(radius)));
         }
     }
+    FragColor = vec4(colour.rgb, alpha);
+}
+vec4 getAlbedo(){
     return mix(albedo.raw, texture(albedo.id, TextureCoords * albedo.repeatValue), albedo.mixValue);
 }

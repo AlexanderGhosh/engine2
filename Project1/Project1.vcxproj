@@ -162,6 +162,7 @@
     <ClCompile Include="ParticleSystem\Distributions\SphereDistribution.cpp" />
     <ClCompile Include="ParticleSystem\Particle.cpp" />
     <ClCompile Include="ParticleSystem\Distributions\DistributionBase.cpp" />
+    <ClCompile Include="GUI\Constraints\PercentConstraint.cpp" />
     <ClCompile Include="Primatives\Materials\Forward.cpp" />
     <ClCompile Include="ParticleSystem\ParticleEmmiter.cpp" />
     <ClCompile Include="Primatives\Materials\PBR.cpp" />
@@ -174,6 +175,7 @@
     <ClCompile Include="Primatives\TextureChain.cpp" />
     <ClCompile Include="Componets\Lights\SpotLight.cpp" />
     <ClCompile Include="Componets\Lights\ShadowCaster.cpp" />
+    <ClCompile Include="GUI\Constraints\SpanConstraint.cpp" />
     <ClCompile Include="Utils\NoiseGeneration.cpp" />
     <ClCompile Include="Primatives\Buffers\ArrayBuffer.cpp" />
     <ClCompile Include="Componets\Animated.cpp" />
@@ -249,6 +251,7 @@
     <ClInclude Include="ParticleSystem\Distributions\SphereDistribution.h" />
     <ClInclude Include="ParticleSystem\Particle.h" />
     <ClInclude Include="ParticleSystem\Distributions\DistributionBase.h" />
+    <ClInclude Include="GUI\Constraints\PercentConstraint.h" />
     <ClInclude Include="Primatives\Materials\MatItemBase.h" />
     <ClInclude Include="Primatives\Materials\MatItemChain.h" />
     <ClInclude Include="Primatives\Materials\Forward.h" />
@@ -264,6 +267,7 @@
     <ClInclude Include="Primatives\TextureChain.h" />
     <ClInclude Include="Componets\Lights\SpotLight.h" />
     <ClInclude Include="Componets\Lights\ShadowCaster.h" />
+    <ClInclude Include="GUI\Constraints\SpanConstraint.h" />
     <ClInclude Include="UI\Page.h" />
     <ClInclude Include="Utils\NoiseGeneration.h" />
     <ClInclude Include="Primatives\Buffers\ArrayBuffer.h" />

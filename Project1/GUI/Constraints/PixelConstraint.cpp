@@ -14,7 +14,7 @@ void GUI::PixelConstraint::cleanUp()
 {
 }
 
-void GUI::PixelConstraint::solve(float& axis)
+void GUI::PixelConstraint::solve(Float size, float& axis)
 {
 	axis = pixels;
 }

@@ -19,11 +19,12 @@ void GUI::GUIElementBase::render()
 void GUI::GUIElementBase::setParent(GUIContainerBase* parent)
 {
 	this->parent = parent;
+	constraints->solve(position, dimentions);
 }
 
 void GUI::GUIElementBase::setConstraints(GUIConstraint* constraints)
 {
-	constraints->solve(position, dimentions);
+	constraints->setParent(this);
 	this->constraints = constraints;
 }
 

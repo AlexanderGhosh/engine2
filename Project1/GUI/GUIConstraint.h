@@ -3,10 +3,11 @@
 
 namespace GUI {
 	class ConstraintBase;
-
+	class GUIElementBase;
 	class GUIConstraint {
 	private:
 		ConstraintBase* x, * y, * w, * h;
+		GUIElementBase* parent;
 		static glm::vec2 screenDimentions;
 	public:
 		GUIConstraint();
@@ -20,10 +21,12 @@ namespace GUI {
 		void setY(ConstraintBase* constraint);
 		void setWidth(ConstraintBase* constraint);
 		void setHeight(ConstraintBase* constraint);
+		void setParent(GUIElementBase* parent);
 		static void setScreenDimentions(Vector2 dim);
 
 		// getters
 		static Vector2 getScreenDimentions();
+		GUIElementBase* getParent() const;
 	};
 };
 

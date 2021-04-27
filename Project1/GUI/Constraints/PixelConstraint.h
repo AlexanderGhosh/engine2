@@ -11,7 +11,7 @@ namespace GUI {
 		PixelConstraint(Float pixelValue);
 		~PixelConstraint() = default;
 		void cleanUp();
-		void solve(float& axis);
+		void solve(Float size, float& axis);
 	};
 };
 

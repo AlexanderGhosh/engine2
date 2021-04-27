@@ -19,9 +19,6 @@
 #include "../Context.h"
 // GUI
 #include "../GUI/ElementContainers/GUICanvas.h"
-#include "../GUI/Constraints/PixelConstraint.h"
-#include "../GUI/GUIConstraint.h"
-#include "../GUI/UIElementBase.h"
 // GUI
 
 Primative::Model GameScene::quadModel = { };

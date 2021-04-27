@@ -33,6 +33,8 @@
 #include "GUI/UIElementBase.h"
 #include "GUI/GUIConstraint.h"
 #include "GUI/Constraints/PixelConstraint.h"
+#include "GUI/Constraints/PercentConstraint.h"
+#include "GUI/Constraints/SpanConstraint.h"
 
 #include "ParticleSystem/ParticleEmmiter.h"
 #include "ParticleSystem/Distributions/ConeDistribution.h"
@@ -246,10 +248,12 @@ int main() {
     GUI::GUIElementBase element1;
     GUI::GUIConstraint elementConstraints;
     elementConstraints.setScreenDimentions(SCREEN_DIMENTIONS);
+    GUI::PercentConstraint percents = GUI::PercentConstraint(0.25);
     GUI::PixelConstraint pixels = GUI::PixelConstraint(100);
-    elementConstraints.setX(&pixels);
-    elementConstraints.setY(&pixels);
-    elementConstraints.setWidth(&pixels);
+    GUI::SpanConstraint span = GUI::SpanConstraint();
+    // elementConstraints.setX(&pixels);
+    elementConstraints.setY(&percents);
+    elementConstraints.setWidth(&span);
     elementConstraints.setHeight(&pixels);
     element1.setConstraints(&elementConstraints);
     Materials::MatItemSingle<glm::vec4> uiColour(glm::vec4(0.5, 0.0, 1, 1));

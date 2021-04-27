@@ -1,8 +1,11 @@
 #include "GUIConstraint.h"
 #include "Constraints/ConstraintBase.h"
+#include "UIElementBase.h"
+#include "ElementContainers/GUIContainerBase.h"
 
 glm::vec2 GUI::GUIConstraint::screenDimentions(0);
-GUI::GUIConstraint::GUIConstraint() : x(nullptr), y(nullptr), h(nullptr), w(nullptr)
+
+GUI::GUIConstraint::GUIConstraint() : x(nullptr), y(nullptr), h(nullptr), w(nullptr), parent(nullptr)
 {
 }
 
@@ -26,9 +29,9 @@ void GUI::GUIConstraint::setHeight(ConstraintBase* constraint)
 	h = constraint;
 }
 
-Vector2 GUI::GUIConstraint::getScreenDimentions()
+void GUI::GUIConstraint::setParent(GUIElementBase* parent)
 {
-	return screenDimentions;
+	this->parent = parent;
 }
 
 void GUI::GUIConstraint::setScreenDimentions(Vector2 dim)
@@ -36,18 +39,37 @@ void GUI::GUIConstraint::setScreenDimentions(Vector2 dim)
 	screenDimentions = dim;
 }
 
+Vector2 GUI::GUIConstraint::getScreenDimentions()
+{
+	return screenDimentions;
+}
+
+GUI::GUIElementBase* GUI::GUIConstraint::getParent() const
+{
+	return parent;
+}
+
 void GUI::GUIConstraint::solve(glm::vec2& pos, glm::vec2& dim)
 {
-	x->solve(pos.x);
-	y->solve(pos.y);
-	w->solve(dim.x);
-	h->solve(dim.y);
+	Vector2 dimentions = parent->getParent()->getDimentions();
+	if(x)
+		x->solve(dimentions.x, pos.x);
+	if (y)
+		y->solve(dimentions.y, pos.y);
+	if (w)
+		w->solve(dimentions.x, dim.x);
+	if (h)
+		h->solve(dimentions.y, dim.y);
 }
 
 void GUI::GUIConstraint::cleanUp()
 {
-	x->cleanUp();
-	y->cleanUp();
-	w->cleanUp();
-	h->cleanUp();
+	if (x)
+		x->cleanUp();
+	if (y)
+		y->cleanUp();
+	if (w)
+		w->cleanUp();
+	if (h)
+		h->cleanUp();
 }
