@@ -45,3 +45,17 @@ void GUI::GUIBaseShape::render(Matrix4 model, Vector2 dimetions, Vector2 parentD
 	}
 	quadBuffer.render();
 }
+
+void GUI::GUIBaseShape::render(Matrix4 model)
+{
+	Render::Shading::Manager::setActive(shaderId);
+	Render::Shading::Manager::setValue("model", model);
+	Render::Shading::Manager::setValue("radius", 0.0f);
+	Render::Shading::Manager::setValue("parentDimentions", glm::vec2(10000));
+	if (albedo) {
+		int unit = 0;
+		albedo->tryBindTexture(unit);
+		Render::Shading::Manager::setValue("albedo", *albedo, unit);
+	}
+	quadBuffer.render();
+}

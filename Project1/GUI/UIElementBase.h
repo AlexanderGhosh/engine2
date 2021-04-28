@@ -27,7 +27,7 @@ namespace GUI {
 
 		// getters
 		GUIContainerBase* getParent() const;
-		virtual GUIConstraint* getConstraints() const;
+		GUIConstraint* getConstraints() const;
 
 		// events
 		virtual void handelEvents();

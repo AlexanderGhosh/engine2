@@ -150,6 +150,7 @@
     <ClCompile Include="Componets\Scripting.cpp" />
     <ClCompile Include="Componets\Lights\DirectionalLight.cpp" />
     <ClCompile Include="Componets\Lights\PointLight.cpp" />
+    <ClCompile Include="GUI\Elements\GUISlider.cpp" />
     <ClCompile Include="GUI\ElementContainers\GUICanvas.cpp" />
     <ClCompile Include="GUI\Constraints\ConstraintBase.cpp" />
     <ClCompile Include="GUI\Constraints\PixelConstraint.cpp" />
@@ -239,6 +240,7 @@
     <ClInclude Include="Componets\Scripting.h" />
     <ClInclude Include="Componets\Lights\DirectionalLight.h" />
     <ClInclude Include="Componets\Lights\PointLight.h" />
+    <ClInclude Include="GUI\Elements\GUISlider.h" />
     <ClInclude Include="GUI\ElementContainers\GUICanvas.h" />
     <ClInclude Include="GUI\Constraints\ConstraintBase.h" />
     <ClInclude Include="GUI\Constraints\PixelConstraint.h" />

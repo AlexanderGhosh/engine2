@@ -19,6 +19,7 @@ namespace GUI {
 		~GUIBaseShape() = default;
 		void cleanUp();
 		void render(Matrix4 model, Vector2 dimetions, Vector2 parentDim = glm::vec2(INFINITY));
+		void render(Matrix4 model);
 
 		// setters
 		void setAlbedo(Materials::MatItemBase<glm::vec4>* albedo);

@@ -279,6 +279,9 @@
     <ClCompile Include="GUI\Constraints\SpanConstraint.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="GUI\Elements\GUISlider.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Rendering\Rendering.h">
@@ -561,6 +564,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GUI\Constraints\SpanConstraint.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\Elements\GUISlider.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

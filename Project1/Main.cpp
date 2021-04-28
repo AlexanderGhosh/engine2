@@ -35,6 +35,7 @@
 #include "GUI/Constraints/PixelConstraint.h"
 #include "GUI/Constraints/PercentConstraint.h"
 #include "GUI/Constraints/SpanConstraint.h"
+#include "GUI/Elements/GUISlider.h"
 
 #include "ParticleSystem/ParticleEmmiter.h"
 #include "ParticleSystem/Distributions/ConeDistribution.h"
@@ -245,10 +246,7 @@ int main() {
     canvas.setDimentions(SCREEN_DIMENTIONS / 2);
     canvas.setBaseAlbedo(&uiColourCanvas);
     canvas.setCornerRadius(50);
-    GUI::GUIElementBase element1;
-    element1.mouseEnter = [](GUI::GUIElementBase* sender) {
-        Utils::log("mouse Over");
-    };
+    GUI::GUISlider element1 = GUI::GUISlider(0, 1);
     GUI::GUIConstraint elementConstraints;
     elementConstraints.setScreenDimentions(SCREEN_DIMENTIONS);
     GUI::PercentConstraint percents = GUI::PercentConstraint(0.25);
@@ -260,7 +258,13 @@ int main() {
     elementConstraints.setHeight(&pixels);
     element1.setConstraints(&elementConstraints);
     Materials::MatItemSingle<glm::vec4> uiColour(glm::vec4(0.5, 0.0, 1, 1));
+    Materials::MatItemSingle<glm::vec4> uiColourBar(glm::vec4(1, 0.0, 0, 1));
+    Materials::MatItemSingle<glm::vec4> uiColourPointer(glm::vec4(0, 0.0, 1, 1));
     element1.setAlbedo(&uiColour);
+    element1.setPointerAlbedo(&uiColourPointer);
+    element1.setSliderAlbedo(&uiColourBar);
+
+
     canvas.addElement(&element1);
 
 
