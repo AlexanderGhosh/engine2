@@ -17,6 +17,8 @@ GUI::GUIElementBase::GUIElementBase() : position(0), dimentions(0), constraints(
 
 	keyDown = event;
 	keyUp = event;
+
+	scroll = event;
 }
 
 void GUI::GUIElementBase::cleanUp()
@@ -77,6 +79,9 @@ void GUI::GUIElementBase::handelEvents()
 	if (Events::Handler::keyDown AND keyDown_) {
 		keyUp(this);
 		keyDown_ = false;
+	}
+	if (Events::Handler::scrollOffest == glm::vec2(0.0f)) {
+		scroll(this);
 	}
 }
 

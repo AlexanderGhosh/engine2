@@ -8,6 +8,7 @@ std::string Events::Handler::lastChar = "";
 bool Events::Handler::keyDown = false;
 bool Events::Handler::mouseMove = false;
 bool Events::Handler::buttonDown = false;
+glm::vec2 Events::Handler::scrollOffest(0.0f);
 
 void Events::Handler::init(GLFWwindow* window)
 {
@@ -62,6 +63,11 @@ void Events::Handler::mouseButtonCallback(GLFWwindow* window, int button, int ac
 
 void Events::Handler::characterCallBack(GLFWwindow* window, unsigned int codePoint)
 {
-	Events::Handler::lastChar = Utils::toUTF8(codePoint);
+	lastChar = Utils::toUTF8(codePoint);
 	// std::cout << Events::Handler::lastChar << std::endl;
+}
+
+void Events::Handler::scrollInputCallBack(GLFWwindow* window, double xoffset, double yoffset)
+{
+	scrollOffest = { static_cast<float>(xoffset), static_cast<float>(yoffset) };
 }

@@ -38,6 +38,7 @@ namespace GUI {
 		void (*mouseDown )(GUIElementBase* sender);
 		void (*keyDown   )(GUIElementBase* sender);
 		void (*keyUp     )(GUIElementBase* sender);
+		void (*scroll    )(GUIElementBase* sender);
 	};
 };
 

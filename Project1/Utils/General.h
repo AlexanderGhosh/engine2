@@ -232,6 +232,8 @@ namespace Utils {
         return dynamic_cast<const U*>(a);
     }
 
+    int sign(Float a);
+
     class Timer {
     public:
         Timer(const std::string name);

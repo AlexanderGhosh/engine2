@@ -1,17 +1,26 @@
 #include "GUISlider.h"
 #include "../ElementContainers/GUIContainerBase.h"
 #include "../GUIConstraint.h"
+#include "../../EventSystem/Handler.h"
 
 GUI::GUISlider::GUISlider() : sliderBar(), sliderMax(1), sliderMin(0), sliderPointer(), sliderValue(0), increments(), sliderMargin(50.0f)
 {
-
+	scroll = [](GUIElementBase* sender) {
+		/*GUISlider* slider = dynamic_cast<GUISlider*>(sender);
+		if (Utils::sign(Events::Handler::scrollOffest.y) == 1) {
+			slider->setSliderValue(slider->getSliderValue() + slider->getIncrement());
+		}
+		else {
+			slider->setSliderValue(slider->getSliderValue() - slider->getIncrement());
+		}*/
+	};
 }
 
 GUI::GUISlider::GUISlider(Float sliderMin, Float sliderMax) : GUISlider()
 {
 	this->sliderMin = sliderMin;
 	this->sliderMax = sliderMax;
-	sliderValue = 0.5;
+	sliderValue = 0.5 * (sliderMax - sliderMin);
 }
 
 void GUI::GUISlider::cleanUp()
@@ -43,6 +52,21 @@ void GUI::GUISlider::setSliderAlbedo(Materials::MatItemBase<glm::vec4>* albedo)
 void GUI::GUISlider::setPointerAlbedo(Materials::MatItemBase<glm::vec4>* albedo)
 {
 	sliderPointer.setAlbedo(albedo);
+}
+
+void GUI::GUISlider::setSliderValue(Float value)
+{
+	sliderValue = value;
+}
+
+Float GUI::GUISlider::getSliderValue() const
+{
+	return sliderValue;
+}
+
+Float GUI::GUISlider::getIncrement() const
+{
+	return increments;
 }
 
 glm::mat4 GUI::GUISlider::getPointerModel()

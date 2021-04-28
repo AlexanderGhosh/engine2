@@ -21,6 +21,11 @@ namespace GUI {
 		void setParent(GUIContainerBase* parent);
 		void setSliderAlbedo(Materials::MatItemBase<glm::vec4>* albedo);
 		void setPointerAlbedo(Materials::MatItemBase<glm::vec4>* albedo);
+		void setSliderValue(Float value);
+
+		// getters
+		Float getSliderValue() const;
+		Float getIncrement() const;
 	};
 };
 

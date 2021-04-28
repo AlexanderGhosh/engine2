@@ -60,12 +60,14 @@ namespace Events {
 		static const glm::vec2& getCursorPos();
 		static std::string lastChar;
 		static bool keyDown, mouseMove, buttonDown;
+		static glm::vec2 scrollOffest;
 	private:
 		static GLFWwindow* window;
 		static void keyCallBack(GLFWwindow* window, int key, int scancode, int action, int mode); 
 		static void mouseCallback(GLFWwindow* window, double xpos, double ypos);
 		static void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
 		static void characterCallBack(GLFWwindow* window, unsigned int codePoint);
+		static void scrollInputCallBack(GLFWwindow* window, double xoffset, double yoffset);
 	};
 };
 

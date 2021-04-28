@@ -299,6 +299,11 @@ float Utils::random(float min, float max)
     return (static_cast<float>(rand()) * INV_RAND_MAX) * (max - min) + min;
 }
 
+int Utils::sign(Float a)
+{
+    return (a < 0 ? -1 : 1);
+}
+
 
 
 Utils::Timer::Timer() : s(), e(), pausing()
