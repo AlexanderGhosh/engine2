@@ -74,7 +74,7 @@ glm::mat4 GUI::GUISlider::getPointerModel()
 	glm::vec2 pos = position;
 	glm::vec2 dim = dimentions;
 
-	dim.y *= 0.225f;
+	dim.y *= 0.45f;
 	pos.y -= (dimentions.y - dim.y) * 0.5f;
 
 	pos.x += sliderMargin + increments * sliderValue;
@@ -95,7 +95,7 @@ glm::mat4 GUI::GUISlider::getSliderModel()
 	glm::vec2 pos = position;
 	glm::vec2 dim = dimentions;
 
-	dim.y *= 0.225f * 0.333f;
+	dim.y *= 0.225f * 0.666666f;
 	pos.y -= (dimentions.y - dim.y) * 0.5f;
 
 	pos.x += sliderMargin;
