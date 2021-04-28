@@ -138,11 +138,13 @@ int main() {
     auto waterMaterialInfo = ResourceLoader::createPBRInfo("Resources/Textures/Water", { TextureType::AlbedoMap, TextureType::RoughnessMap, TextureType::NormalMap, TextureType::AOMap, TextureType::MetalicMap }, { 0, 0, 0, 0, 0 });
     auto& waterMaterial = ResourceLoader::createPBR(waterMaterialInfo);
     Materials::MatItemSingle<glm::vec4> waterAlbedo({ 0, 0, 1, 1 });
+    Materials::MatItemSingle<glm::vec3> waterEmission({ 0, 0, 1 });
     Materials::MatItemSingle<float> waterMetalic(0.5f);
     Materials::MatItemSingle<float> waterRoughness(0.5f);
     Materials::MatItemSingle<float> waterAO(0.5f);
 
     waterMaterial.setAlbedo(&waterAlbedo);
+    waterMaterial.setEmission(&waterEmission);
     waterMaterial.setMetalic(&waterMetalic);
     waterMaterial.setRoughness(&waterRoughness);
     waterMaterial.setAO(&waterAO);
@@ -221,15 +223,16 @@ int main() {
 
     Materials::MatItemSingle<glm::vec4> windowAlbedo(wi);
     Materials::MatItemSingle<glm::vec3> windowNormal(glm::vec3(0, 1, 0));
+    Materials::MatItemSingle<glm::vec3> windowEmission(glm::vec3(0, 1, 0));
     Materials::MatItemSingle<float> windowMetalic(0.5f);
     Materials::MatItemSingle<float> windowRoughness(0.0f);
     Materials::MatItemSingle<float> windowAO(0.5f);
 
-    Materials::PBR windowMat1(&windowAlbedo, &windowNormal, &windowMetalic, &windowRoughness, &windowAO);
+    Materials::PBR windowMat1(&windowAlbedo, &windowNormal, &windowEmission, &windowMetalic, &windowRoughness, &windowAO);
 
     Materials::MatItemSingle<glm::vec4> windowAlbedo2(wiy);
 
-    Materials::PBR windowMat2(&windowAlbedo2, &windowNormal, &windowMetalic, &windowRoughness, &windowAO);
+    Materials::PBR windowMat2(&windowAlbedo2, &windowNormal, &windowEmission, &windowMetalic, &windowRoughness, &windowAO);
 
     GameObject window1(glm::vec3(0, 3.5, -3));
     Component::RenderMesh windowMesh1;

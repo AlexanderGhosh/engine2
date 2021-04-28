@@ -8,12 +8,13 @@ namespace Materials {
 	private:
 		MatItemBase<glm::vec4>* albedo;
 		MatItemBase<glm::vec3>* normal;
+		MatItemBase<glm::vec3>* emission;
 		MatItemBase<float>* metalic;
 		MatItemBase<float>* roughness;
 		MatItemBase<float>* ao;
 	public:
 		PBR();
-		PBR(MatItemBase<glm::vec4>* albedo, MatItemBase<glm::vec3>* normal, MatItemBase<float>* metalic, MatItemBase<float>* roughness, MatItemBase<float>* ao);
+		PBR(MatItemBase<glm::vec4>* albedo, MatItemBase<glm::vec3>* normal, MatItemBase<glm::vec3>* emission, MatItemBase<float>* metalic, MatItemBase<float>* roughness, MatItemBase<float>* ao);
 		void activateTextures(Int startUnit) const;
 		void cleanUp();
 		void update(float deltaTime);
@@ -21,6 +22,7 @@ namespace Materials {
 		// getters
 		const MatItemBase<glm::vec4>* getAlbedo() const;
 		const MatItemBase<glm::vec3>* getNormal() const;
+		const MatItemBase<glm::vec3>* getEmission() const;
 		const MatItemBase<float>* getMetalic() const;
 		const MatItemBase<float>* getRoughness() const;
 		const MatItemBase<float>* getAO() const;
@@ -28,6 +30,7 @@ namespace Materials {
 		// setters
 		void setAlbedo(MatItemBase<glm::vec4>* albedo);
 		void setNormal(MatItemBase<glm::vec3>* normal);
+		void setEmission(MatItemBase<glm::vec3>* emission);
 		void setMetalic(MatItemBase<float>* metalic);
 		void setRoughness(MatItemBase<float>* roughness);
 		void setAO(MatItemBase<float>* ao);

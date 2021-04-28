@@ -198,7 +198,7 @@ void GameScene::preProcess()
 			int unit = 0;
 			bindLights();
 			Primative::Buffers::FrameBuffer& gBuffer = FBOs_pre["G-Buffer"];
-			gBuffer.activateColourTextures(unit, { "positionTex", "albedoTex", "normalTex", "MetRouAOTex" });
+			gBuffer.activateColourTextures(unit, { "positionTex", "albedoTex", "normalTex", "emissionTex", "MetRouAOTex" });
 
 			Primative::Buffers::FrameBuffer& shadowBuffer = FBOs_pre["DirectionalShadows"];
 
@@ -372,7 +372,7 @@ void GameScene::initalize()
 {
 #pragma region Pre Processing
 	Primative::Buffers::FrameBuffer shadow_FBO({ "depth" }, screenDimentions, GL_CLAMP_TO_BORDER);
-	Primative::Buffers::FrameBuffer g_buffer_FBO({ "col0", "col1", "col2", "col3" }, screenDimentions);
+	Primative::Buffers::FrameBuffer g_buffer_FBO({ "col0", "col1", "col2", "col3", "col4" }, screenDimentions);
 	Primative::Buffers::FrameBuffer lighting_FBO({ "col0", "col1" }, screenDimentions);
 
 

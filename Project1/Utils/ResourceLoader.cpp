@@ -141,10 +141,11 @@ std::string ResourceLoader::createShader(String filePath, bool hasGeom)
 #pragma region Matrials
 ResourceLoader::PBRInfo ResourceLoader::createPBRInfo(String dirPath, std::vector<TextureType> types, std::vector<bool> flip)
 {
-    std::tuple<Materials::PBR, MIS1<glm::vec4>, MIS1<glm::vec3>, std::list<MIS1<float>>> res;
+    PBRInfo res;
     Materials::PBR& material = std::get<0>(res);
     MIS1<glm::vec4>& albe = std::get<1>(res);
-    MIS1<glm::vec3>& norm = std::get<2>(res);
+    std::list<MIS1<glm::vec3>>& norm_emis = std::get<2>(res);
+    norm_emis.resize(2);
     std::list<MIS1<float>>&  mar = std::get<3>(res);
     mar.resize(3);
     const std::vector<unsigned> textures = loadTextureFile(dirPath, types, flip);
@@ -159,9 +160,14 @@ ResourceLoader::PBRInfo ResourceLoader::createPBRInfo(String dirPath, std::vecto
             material.setAlbedo(&albe);
             break;
         case TextureType::NormalMap:
-            norm.addValue(textures[i]);
-            norm.useTexture();
-            material.setNormal(&norm);
+            norm_emis.front().addValue(textures[i]);
+            norm_emis.front().useTexture();
+            material.setNormal(&norm_emis.front());
+            break;
+        case TextureType::EmissionMap:
+            norm_emis.back().addValue(textures[i]);
+            norm_emis.back().useTexture();
+            material.setNormal(&norm_emis.back());
             break;
         case TextureType::MetalicMap:
             mar.front().addValue(textures[i]);
@@ -188,7 +194,8 @@ Materials::PBR& ResourceLoader::createPBR(PBRInfo& info)
 {
     auto& mat = std::get<0>(info);
     mat.setAlbedo(&std::get<1>(info));
-    mat.setNormal(&std::get<2>(info));
+    mat.setNormal(&std::get<2>(info).front());
+    mat.setEmission(&std::get<2>(info).back());
     mat.setMetalic(&std::get<3>(info).front());
     mat.setAO(&Utils::elementAt(std::get<3>(info), 1));
     mat.setRoughness(&std::get<3>(info).back());

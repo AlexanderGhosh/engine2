@@ -43,14 +43,14 @@ namespace Render {
 enum class TextureType {
 	NormalMap, SpecularMap, DiffuseMap, HeightMap,
 	AlbedoMap, MetalicMap, AOMap, RoughnessMap,
-	CubeMap
+	CubeMap, EmissionMap
 };
 
 class ResourceLoader
 {
 public:
 #define MIS1 Materials::MatItemSingle
-	using PBRInfo = std::tuple<Materials::PBR, MIS1<glm::vec4>, MIS1<glm::vec3>, std::list<MIS1<float>>>;
+	using PBRInfo = std::tuple<Materials::PBR, MIS1<glm::vec4>, std::list<MIS1<glm::vec3>>, std::list<MIS1<float>>>;
 	// shaders
 	static std::vector<std::string> createShaders(const std::vector<std::string>& shaders, std::vector<bool>& geoms);
 	static std::vector<std::string> createShaders(const std::vector<std::string>& shaders);

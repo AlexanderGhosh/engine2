@@ -117,6 +117,7 @@ bool Render::Shading::Manager::setValue(String name, const Materials::PBR& mat, 
 	 bool val = true;
 	 val = setValue(name + ".albedo", *mat.getAlbedo(), unit) AND val;
 	 val = setValue(name + ".normal", *mat.getNormal(), unit) AND val;
+	 val = setValue(name + ".emission", *mat.getEmission(), unit) AND val;
 	 val = setValue(name + ".metalic", *mat.getMetalic(), unit) AND val;
 	 val = setValue(name + ".roughness", *mat.getRoughness(), unit) AND val;
 	 val = setValue(name + ".ao", *mat.getAO(), unit) AND val;

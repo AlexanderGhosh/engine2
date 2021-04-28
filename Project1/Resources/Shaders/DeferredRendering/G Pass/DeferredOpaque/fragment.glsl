@@ -3,7 +3,8 @@
 layout (location = 0) out vec4 positionOut;
 layout (location = 1) out vec4 albedoOut;
 layout (location = 2) out vec4 normalOut;
-layout (location = 3) out vec4 MetRouAOOut;
+layout (location = 3) out vec4 emissionOut;
+layout (location = 4) out vec4 MetRouAOOut;
 
 in vec2 TexCoords;
 in vec3 WorldPosition;
@@ -33,6 +34,8 @@ struct Material {
 
     MatItem3 normal;
 
+    MatItem3 emission;
+
     MatItem1 metalic;
 
     MatItem1 roughness;
@@ -59,6 +62,7 @@ void main()
 {    
     vec3 albedo     = getData(material.albedo);
     vec3 normal     = getNormal(material.normal);
+    vec3 emission   = getData(material.emission);
     float metalic   = getData(material.metalic);
     float roughness = 1.0 - getData(material.roughness);
     float ao        = getData(material.ao);
@@ -66,5 +70,6 @@ void main()
     positionOut = vec4(WorldPosition, 1.0);
     albedoOut   = vec4(albedo, 1.0);
     normalOut   = vec4(Normal, 1.0);
+    emissionOut   = vec4(emission, 1.0);
     MetRouAOOut = vec4(metalic, roughness, ao, 1.0);
 }  

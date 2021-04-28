@@ -52,6 +52,7 @@ vec3 DirectionalLights(DirectionalLight directionalLights[maxDirectionalLights],
 uniform sampler2D positionTex;
 uniform sampler2D albedoTex;
 uniform sampler2D normalTex;
+uniform sampler2D emissionTex;
 uniform sampler2D MetRouAOTex;
 // Shadows
 float CalculateShadowValue(vec4 LSFragmentPosition, vec3 Normal);
@@ -69,6 +70,7 @@ void main() {
     vec3 WorldFragmentPosition = texture(positionTex, TextureCoords).xyz;
     vec3 Albedo                = pow(texture(albedoTex, TextureCoords).xyz, vec3(GammaValue)); // PBR gamma corrects
     vec3 Normal                = normalize(texture(normalTex, TextureCoords).xyz);
+    vec3 Emission              = texture(emissionTex, TextureCoords).xyz;
 
     vec3 metRouAO              = texture(MetRouAOTex, TextureCoords).xyz;
 
@@ -97,7 +99,7 @@ void main() {
     float shadow = 1.0 - CalculateShadowValue(LSFragmentPosition, Normal);
 
     vec3 ambient = vec3(0.3) * Albedo;
-    vec3 colour = ambient + shadow * accumlativeLight;
+    vec3 colour = ambient + shadow * accumlativeLight + Emission;
 
     /*colour = ToneMap(colour); // HDR
     colour = GammaCorrect(colour);*/

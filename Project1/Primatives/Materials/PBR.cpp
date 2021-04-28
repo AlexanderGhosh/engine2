@@ -1,15 +1,16 @@
 #include "PBR.h"
 #include "MatItemBase.h"
 
-Materials::PBR::PBR() : MaterialBase(), albedo(nullptr), normal(nullptr), metalic(nullptr), roughness(nullptr), ao(nullptr)
+Materials::PBR::PBR() : MaterialBase(), albedo(nullptr), normal(nullptr), metalic(nullptr), roughness(nullptr), ao(nullptr), emission(nullptr)
 {
 }
 
-Materials::PBR::PBR(MatItemBase<glm::vec4>* albedo, MatItemBase<glm::vec3>* normal, 
+Materials::PBR::PBR(MatItemBase<glm::vec4>* albedo, MatItemBase<glm::vec3>* normal, MatItemBase<glm::vec3>* emission,
 	MatItemBase<float>* metalic, MatItemBase<float>* roughness, MatItemBase<float>* ao) : PBR()
 {
 	this->albedo = albedo;
 	this->normal = normal;
+	this->emission = emission;
 	this->metalic = metalic;
 	this->roughness = roughness;
 	this->ao = ao;
@@ -21,6 +22,7 @@ void Materials::PBR::activateTextures(Int startUnit) const
 
 	albedo->tryBindTexture(unit);
 	normal->tryBindTexture(unit);
+	emission->tryBindTexture(unit);
 	metalic->tryBindTexture(unit);
 	roughness->tryBindTexture(unit);
 	ao->tryBindTexture(unit);
@@ -30,6 +32,7 @@ void Materials::PBR::cleanUp()
 {
 	albedo->cleanUp();
 	normal->cleanUp();
+	emission->cleanUp();
 	metalic->cleanUp();
 	roughness->cleanUp();
 	ao->cleanUp();
@@ -39,6 +42,7 @@ void Materials::PBR::update(float deltaTime)
 {
 	albedo->update(deltaTime);
 	normal->update(deltaTime);
+	emission->update(deltaTime);
 	metalic->update(deltaTime);
 	roughness->update(deltaTime);
 	ao->update(deltaTime);
@@ -52,6 +56,11 @@ const Materials::MatItemBase<glm::vec4>* Materials::PBR::getAlbedo() const
 const Materials::MatItemBase<glm::vec3>* Materials::PBR::getNormal() const
 {
 	return normal;
+}
+
+const Materials::MatItemBase<glm::vec3>* Materials::PBR::getEmission() const
+{
+	return emission;
 }
 
 const Materials::MatItemBase<float>* Materials::PBR::getMetalic() const
@@ -79,6 +88,11 @@ void Materials::PBR::setNormal(MatItemBase<glm::vec3>* normal)
 	this->normal = normal;
 }
 
+void Materials::PBR::setEmission(MatItemBase<glm::vec3>* emission)
+{
+	this->emission = emission;
+}
+
 void Materials::PBR::setMetalic(MatItemBase<float>* metalic)
 {
 	this->metalic = metalic;
@@ -98,6 +112,7 @@ void Materials::PBR::setRepeatValue(Float mul)
 {
 	albedo->setRepeatValue(mul);
 	normal->setRepeatValue(mul);
+	emission->setRepeatValue(mul);
 	metalic->setRepeatValue(mul);
 	roughness->setRepeatValue(mul);
 	ao->setRepeatValue(mul);
