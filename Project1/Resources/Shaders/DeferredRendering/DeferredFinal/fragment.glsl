@@ -40,6 +40,21 @@ struct DirectionalLight {
 uniform int numberOfDirectionalLights;
 uniform DirectionalLight directionalLights[maxDirectionalLights];
 
+struct SpotLight {
+    vec3 position;
+    vec3 colour;
+    float brightness;
+
+    vec3 direction;
+    float cutOff
+    float outterCutOff;
+    float constant;
+    float linear;
+    float quadratic;
+};
+uniform int numberOfSpotLights;
+uniform SpotLight spotLights[maxSpotLights];
+
 // Light Source Functions
 // POINT LIGHTS
 vec3 ProcessPointLight(PointLight light, vec3 WFP, vec3 VD, vec3 N, vec3 RS, vec3 AD, float A2, float R, float M, float dotNV);
@@ -48,6 +63,8 @@ vec3 PointLights(PointLight pointLights[maxPointLights], int numberOfPointLights
 vec3 ProcessDirectionalLight(DirectionalLight light, vec3 VD, vec3 N, vec3 RS, vec3 AD, float A2, float R, float M, float dotNV);
 vec3 DirectionalLights(DirectionalLight directionalLights[maxDirectionalLights], int numberOfDirectionalLights, vec3 VD, vec3 N, vec3 RS, vec3 AD, float A2, float R, float M, float dotNV);
 // SPOT LIGHTS
+vec3 ProcessSpotLight(SpotLight light, vec3 WFP, vec3 VD, vec3 N, vec3 RS, vec3 AD, float A2, float R, float M, float dotNV);
+vec3 SpotLights(SpotLight spotLights[maxSpotLights], int numberOfSpotLights, vec3 WFP, vec3 VD, vec3 N, vec3 RS, vec3 AD, float A2, float R, float M, float dotNV);
 
 uniform sampler2D positionTex;
 uniform sampler2D albedoTex;
@@ -166,6 +183,45 @@ vec3 DirectionalLights(DirectionalLight directionalLights[maxDirectionalLights],
     vec3 accumlativeLight = vec3(0);
     for(int i = 0; i < numberOfDirectionalLights; i++){
         accumlativeLight += ProcessDirectionalLight(directionalLights[i], VD, N, RS, AD, A2, R, M, dotNV);
+    }
+    return accumlativeLight;
+}
+
+vec3 ProcessSpotLight(SpotLight light, vec3 WFP, vec3 VD, vec3 N, vec3 RS, vec3 AD, float A2, float R, float M, float dotNV){
+    // constants
+    vec3 lightDirection = normalize(-light.direction);
+    float theta = dot(lightDirection, lightDirection   
+    vec3 H = normalize(VD + lightDirection);
+    float dotNL = max(dot(N, lightDirection), 0.0);
+    float dotNH = max(dot(N, H), 0.0);
+    float dotVH = max(dot(VD, H), 0.0);
+
+    // lighting
+    float epsilon = light.cutOff - light.outterCutOff;
+    float intensity = clamp((theta - light.outterCutOff) / epsilon, 0.0, 1.0);
+    intensity *= light.colour * light.brightness;
+
+    // attenuation
+    float d = length(light.position - WFP);
+    float attenuation = 1.0 / (light.constant + d * (light.linear + light.quadratic * d)); 
+    intensity *= attenuation;
+
+    // functions
+    vec3 specularData[2];
+    SpecularTerm(dotNH, A2, dotVH, RS, dotNV, dotNL, R, specularData);
+
+    vec3 specular = specularData[0];
+    vec3 ks = specularData[1];
+    vec3 kd = vec3(1.0) - ks;  
+    kd *= 1.0 - M;
+
+    return (kd * AD + specular) * dotNL * intensity;
+}
+
+vec3 SpotLights(SpotLight spotLights[maxSpotLights], int numberOfSpotLights, vec3 WFP, vec3 VD, vec3 N, vec3 RS, vec3 AD, float A2, float R, float M, float dotNV){
+    vec3 accumlativeLight = vec3(0);
+    for(int i = 0; i < numberOfSpotLights; i++){
+        accumlativeLight += ProcessSpotLight(spotLights[i], VD, N, RS, AD, A2, R, M, dotNV);
     }
     return accumlativeLight;
 }

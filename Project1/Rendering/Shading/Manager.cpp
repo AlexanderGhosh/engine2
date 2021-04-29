@@ -155,6 +155,12 @@ bool Render::Shading::Manager::setValue(String name, const Component::SpotLight*
 	valid = setValue(txt + "position", light->getPosition()) AND valid;
 	valid = setValue(txt + "colour", light->getColour()) AND valid;
 	valid = setValue(txt + "brightness", light->getBrightness()) AND valid;
+	valid = setValue(txt + "direction", light->getDirection()) AND valid;
+	valid = setValue(txt + "cutOff", light->getCutOff()) AND valid;
+	valid = setValue(txt + "outterCutOff", light->getOutterCutOff()) AND valid;
+	valid = setValue(txt + "constant", light->getConstant()) AND valid;
+	valid = setValue(txt + "linear", light->getLinear()) AND valid;
+	valid = setValue(txt + "quadratic", light->getQuadratic()) AND valid;
 	return valid;
 }
 
