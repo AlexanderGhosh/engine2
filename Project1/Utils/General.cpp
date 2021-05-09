@@ -240,6 +240,14 @@ int Utils::countFiles(String dirPath) {
     return fileCount;
 }
 
+void Utils::writeToFile(String path, String data)
+{
+    std::ofstream myfile;
+    myfile.open(path, std::ios::out | std::ios::trunc);
+    myfile << data;
+    myfile.close();
+}
+
 glm::vec3 Utils::normalize(Vector3 a) {
     glm::vec3 res = glm::normalize(a);
     for (char i = 0; i < 3; i++) {
@@ -278,6 +286,13 @@ std::string Utils::replaceAll(std::string str, std::string from, std::string to)
         start_pos += to.length(); // Handles case where 'to' is a substring of 'from'
     }
     return str;
+}
+
+std::string Utils::to_string(const glm::ivec2& vec)
+{
+    std::string res;
+    res += std::to_string(vec.x) + ":" + std::to_string(vec.y);
+    return res;
 }
 
 std::string Utils::to_string_precision(Vector3 vec, Int dp) {

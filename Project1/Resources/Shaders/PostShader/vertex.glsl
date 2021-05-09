@@ -19,7 +19,7 @@ out float CameraExposure;
 void main() {
 	gl_Position = vec4(pos, 1);
     TextureCoords = tex;
-    TextureCoords.y *= -1;
+    TextureCoords.y *= 1;
     GammaValue = gamma;
     CameraExposure = camExposure;
 }

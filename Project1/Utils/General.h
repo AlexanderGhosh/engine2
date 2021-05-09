@@ -184,6 +184,9 @@ namespace Utils {
     // doenst go deep
     int countFiles(String dirPath);
 
+    // overrids the file or creates it
+    void writeToFile(String path, String data);
+
     glm::vec3 normalize(Vector3 a);
 
     /// <summary>
@@ -223,6 +226,7 @@ namespace Utils {
         res.pop_back();
         return res;
     }
+    std::string to_string(const glm::ivec2& vec);
     std::string to_string_precision(Vector3 vec, Int dp);
 
     float random(float min = 0, float max = 1);

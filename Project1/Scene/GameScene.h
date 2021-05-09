@@ -3,6 +3,7 @@
 #include <map>
 #include "../Primatives/Model.h"
 #include "../Utils/General.h"
+#include "../SharedMemoryManagerCPP.h"
 
 #define BLUR_ITTERATIONS 10
 #define USES_BLUR false
@@ -42,6 +43,8 @@ class GameScene
 {
 private:
 	static Primative::Model quadModel;
+	SharedMemoryLocation sharedMemory;
+	// char* ColourBuffer;
 	std::vector<Terrain*> terrain;
 	SkyBox* skybox;
 	Component::Camera* mainCamera;
@@ -89,6 +92,7 @@ public:
 	void cleanUp();
 	void close();
 	void processComponet(Component::ComponetBase* comp);
+	void createStartUpFile(String location);
 
 	/// <summary>
 	/// binds the lights to the active shader

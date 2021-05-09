@@ -38,11 +38,12 @@ std::vector<GameEventsTypes> GameScene::getCurrentEvents() const
 	return res;
 }
 
-GameScene::GameScene() : objects(), preProcessingLayers(), currentTick(0), postProcShaderId(0), FBOs_pre(), backgroundColour(0),
+GameScene::GameScene() : objects(), preProcessingLayers(), currentTick(0), postProcShaderId(0), FBOs_pre(), backgroundColour(0), sharedMemory("Engine2 Editor", 1280 * 720 * 4),
 							skybox(nullptr), mainContext(nullptr), opaque(), transparent(), mainCamera(nullptr), terrain(), mainShadowCaster(nullptr),
 							isFirstLoop(false), closing(false), uiStuff(), screenDimentions(0), emmiters(), lightSources(), USE_SHADOWS(1), uiContainers()
 {
 	quadModel = ResourceLoader::getModel("plane.dae");
+	sharedMemory.createFile();
 }
 
 void GameScene::drawOpaque()
@@ -157,6 +158,16 @@ void GameScene::processComponet(Component::ComponetBase* comp)
 	}
 }
 
+void GameScene::createStartUpFile(String location)
+{
+	std::string data = "";
+
+	data += "Screen Dimentions:";
+	data += Utils::to_string(screenDimentions) + "\n";
+
+	Utils::writeToFile(location + "\\StartUp File.txt", data);
+}
+
 void GameScene::setBG(Vector3 col) 
 { 
 	backgroundColour = col; 
@@ -238,6 +249,10 @@ void GameScene::preProcess()
 
 void GameScene::postProcess()
 {
+	glUseProgram(0);
+	glReadPixels(0, 0, screenDimentions.x, screenDimentions.y, GL_BGRA, GL_UNSIGNED_BYTE, sharedMemory.getData());
+	glUseProgram(0);
+
 	const Primative::Buffers::VertexBuffer& buffer = ResourceLoader::getBuffer(quadModel.getBuffers()[0]);
 	for (auto& layer : postProcessingLayers) {
 		String layerName = layer.first;
@@ -303,9 +318,9 @@ void GameScene::updateObjects()
 
 void GameScene::clearFBO() const 
 {
+	glViewport(0, 0, screenDimentions.x, screenDimentions.y);
 	glClearColor(backgroundColour.x, backgroundColour.y, backgroundColour.z, 1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glViewport(0, 0, screenDimentions.x, screenDimentions.y);
 }
 
 void GameScene::drawObjects(Unsigned shaderId)
@@ -424,6 +439,8 @@ void GameScene::initalize()
 		mainBuffer.fill(4, &mainCamera->getExposure());
 
 	uniformBuffers.push_back(mainBuffer);
+
+	createStartUpFile("C:\\Users\\AGWDW\\Desktop");
 }
 
 void GameScene::gameLoop()
@@ -506,6 +523,10 @@ void GameScene::cleanUp()
 		itt = uiContainers.erase(itt);
 	}
 
+	//delete[] ColourBuffer;
+	// ColourBuffer = nullptr;
+	//sharedMemory.closeFile();
+
 	FBOs_pre.clear();
 	FBOs_post.clear();
 	if(skybox)
@@ -516,6 +537,7 @@ void GameScene::cleanUp()
 	transparent.clear();
 	quadModel.cleanUp();
 	mainContext->cleanUp();
+
 }
 
 void GameScene::close()

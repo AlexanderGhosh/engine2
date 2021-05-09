@@ -177,6 +177,7 @@
     <ClCompile Include="Componets\Lights\SpotLight.cpp" />
     <ClCompile Include="Componets\Lights\ShadowCaster.cpp" />
     <ClCompile Include="GUI\Constraints\SpanConstraint.cpp" />
+    <ClCompile Include="SharedMemoryManagerCPP.cpp" />
     <ClCompile Include="Utils\NoiseGeneration.cpp" />
     <ClCompile Include="Primatives\Buffers\ArrayBuffer.cpp" />
     <ClCompile Include="Componets\Animated.cpp" />
@@ -270,6 +271,7 @@
     <ClInclude Include="Componets\Lights\SpotLight.h" />
     <ClInclude Include="Componets\Lights\ShadowCaster.h" />
     <ClInclude Include="GUI\Constraints\SpanConstraint.h" />
+    <ClInclude Include="SharedMemoryManagerCPP.h" />
     <ClInclude Include="UI\Page.h" />
     <ClInclude Include="Utils\NoiseGeneration.h" />
     <ClInclude Include="Primatives\Buffers\ArrayBuffer.h" />
