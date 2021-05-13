@@ -23,17 +23,18 @@ private:
 };
 class Context
 {
-public:
-	using svec2 = glm::vec<2, short, glm::packed_highp>;
 private:
 	GLFWwindow* window;
-	svec2 dimentions;
+	glm::svec2 dimentions;
 	bool vsync;
 	short fpsLim;
 	Time time;
+	std::string name;
+	std::list<long> enabled;
 public:
 	Context();
-	Context(const svec2& dim, const bool vsync, short fpsLim = 0);
+	Context(const glm::svec2& dim, const bool vsync, short fpsLim = 0);
+	Context(const glm::svec2& aspectRatio, short horizontalLength, const bool vsync, short fpsLim);
 
 	void init(const std::string& name, std::list<long> enable);
 	void enable(long a) const;
@@ -47,11 +48,12 @@ public:
 	// getters
 	unsigned    getWidth()      const;
 	unsigned    getHeight()     const;
-	svec2	    getDimentions() const;
-	GLFWwindow* getWindow()     const;
+	glm::svec2*	    getDimentions();
+	GLFWwindow*& getWindow();
 	Time&		getTime();
 	float getAspectRatio() const;
 
 	// setters
+	// void setDimentions(const glm::svec2& a);
 };
 

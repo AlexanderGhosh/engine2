@@ -1,18 +1,28 @@
 #include "Context.h"
 
-Context::Context() : window(nullptr), dimentions(0), vsync(false), fpsLim(0), time()
+Context::Context() : window(nullptr), dimentions(0), vsync(false), fpsLim(0), time(), name(), enabled()
 {
 }
 
-Context::Context(const svec2& dim, const bool vsync, short fpsLim) : Context()
+Context::Context(const glm::svec2& dim, const bool vsync, short fpsLim) : Context()
 {
     dimentions = dim;
     this->vsync = vsync;
     this->fpsLim = fpsLim;
 }
 
+Context::Context(const glm::svec2& aspectRatio, short horizontalLength, const bool vsync, short fpsLim) : Context()
+{
+    dimentions.x = horizontalLength;
+    dimentions.y = horizontalLength / aspectRatio.x * aspectRatio.y;
+    this->vsync = vsync;
+    this->fpsLim = fpsLim;
+}
+
 void Context::init(const std::string& name, std::list<long> enable)
 {
+    this->name = name;
+    this->enabled = enable;
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -52,7 +62,7 @@ void Context::disable(long a) const
 
 void Context::update()
 {
-    glfwSwapInterval(vsync ? 1 : fpsLim ); // V-SYNC
+    glfwSwapInterval(vsync ? 1 : fpsLim); // V-SYNC
     glfwSwapBuffers(window);
     time.update();
 }
@@ -84,12 +94,12 @@ unsigned Context::getHeight() const
 	return dimentions.y;
 }
 
-Context::svec2 Context::getDimentions() const
+glm::svec2* Context::getDimentions()
 {
-	return dimentions;
+	return &dimentions;
 }
 
-GLFWwindow* Context::getWindow() const
+GLFWwindow*& Context::getWindow()
 {
     return window;
 }
@@ -98,6 +108,13 @@ float Context::getAspectRatio() const
 {
     return static_cast<float>(dimentions.x) / static_cast<float>(dimentions.y);
 }
+
+/*void Context::setDimentions(const svec2& a)
+{
+    /*dimentions = a;
+    cleanUp();
+    init(name, enabled);*//*
+}*/
 
 Time& Context::getTime()
 {

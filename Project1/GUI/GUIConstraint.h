@@ -8,7 +8,7 @@ namespace GUI {
 	private:
 		ConstraintBase* x, * y, * w, * h;
 		GUIElementBase* parent;
-		static glm::vec2 screenDimentions;
+		static glm::svec2* screenDimentions;
 	public:
 		GUIConstraint();
 		~GUIConstraint() = default;
@@ -22,10 +22,10 @@ namespace GUI {
 		void setWidth(ConstraintBase* constraint);
 		void setHeight(ConstraintBase* constraint);
 		void setParent(GUIElementBase* parent);
-		static void setScreenDimentions(Vector2 dim);
+		static void setScreenDimentions(glm::svec2* dim);
 
 		// getters
-		static Vector2 getScreenDimentions();
+		static SVector2 getScreenDimentions();
 		GUIElementBase* getParent() const;
 	};
 };

@@ -21,6 +21,8 @@
 #include "../GUI/ElementContainers/GUICanvas.h"
 // GUI
 
+#define SHARED_MEMORY_NAME "Engine2 Editor"
+constexpr int SHARED_MEMORY_SIZE = 1280 * 720 * 4;
 Primative::Model GameScene::quadModel = { };
 std::vector<GameEventsTypes> GameScene::getCurrentEvents() const
 {
@@ -38,7 +40,7 @@ std::vector<GameEventsTypes> GameScene::getCurrentEvents() const
 	return res;
 }
 
-GameScene::GameScene() : objects(), preProcessingLayers(), currentTick(0), postProcShaderId(0), FBOs_pre(), backgroundColour(0), sharedMemory("Engine2 Editor", 1280 * 720 * 4),
+GameScene::GameScene() : objects(), preProcessingLayers(), currentTick(0), postProcShaderId(0), FBOs_pre(), backgroundColour(0), sharedMemory(SHARED_MEMORY_NAME, SHARED_MEMORY_SIZE),
 							skybox(nullptr), mainContext(nullptr), opaque(), transparent(), mainCamera(nullptr), terrain(), mainShadowCaster(nullptr),
 							isFirstLoop(false), closing(false), uiStuff(), screenDimentions(0), emmiters(), lightSources(), USE_SHADOWS(1), uiContainers()
 {
@@ -163,9 +165,19 @@ void GameScene::createStartUpFile(String location)
 	std::string data = "";
 
 	data += "Screen Dimentions:";
-	data += Utils::to_string(screenDimentions) + "\n";
+	data += Utils::to_string(*screenDimentions) + "\n";
+
+	data += "Share Memory Data:";
+	data += SHARED_MEMORY_NAME + std::string(":") + std::to_string(SHARED_MEMORY_SIZE) + "\n";
 
 	Utils::writeToFile(location + "\\StartUp File.txt", data);
+}
+
+void GameScene::reSize(const glm::vec<2, short, glm::packed_highp>& newSize)
+{
+	// mainContext->setDimentions(newSize);
+	// screenDimentions = newSize;
+    glScissor(0, 0, newSize.x, newSize.y);
 }
 
 void GameScene::setBG(Vector3 col) 
@@ -175,7 +187,7 @@ void GameScene::setBG(Vector3 col)
 
 void GameScene::preProcess()
 {
-	const glm::mat4 lsMatrix = mainShadowCaster->getLSMatrix(mainContext->getDimentions());
+	const glm::mat4 lsMatrix = mainShadowCaster->getLSMatrix();
 	// glm::mat4 projection = glm::perspective(glm::radians(mainCamera->getFOV()), static_cast<float>(screenDimentions.x) / static_cast<float>(screenDimentions.y), 0.01f, 5000.0f);
 	// lsMatrix = getMainCamera()->getView();
 	// lsMatrix = projection * lsMatrix;
@@ -228,7 +240,7 @@ void GameScene::preProcess()
 			// copy depth buffer for fwd rendering
 			gBuffer.bind(GL_READ_FRAMEBUFFER);
 			fbo.bind(GL_DRAW_FRAMEBUFFER);
-			glBlitFramebuffer(0, 0, gBuffer.getDimentions().x, gBuffer.getDimentions().y, 0, 0, screenDimentions.x, screenDimentions.y, GL_DEPTH_BUFFER_BIT, GL_NEAREST); 
+			glBlitFramebuffer(0, 0, gBuffer.getDimentions().x, gBuffer.getDimentions().y, 0, 0, screenDimentions->x, screenDimentions->y, GL_DEPTH_BUFFER_BIT, GL_NEAREST); 
 			fbo.unBind();
 			gBuffer.unBind(GL_READ_FRAMEBUFFER);
 			fbo.unBind(GL_DRAW_FRAMEBUFFER);
@@ -250,7 +262,7 @@ void GameScene::preProcess()
 void GameScene::postProcess()
 {
 	glUseProgram(0);
-	glReadPixels(0, 0, screenDimentions.x, screenDimentions.y, GL_BGRA, GL_UNSIGNED_BYTE, sharedMemory.getData());
+	glReadPixels(0, 0, screenDimentions->x, screenDimentions->y, GL_BGRA, GL_UNSIGNED_BYTE, sharedMemory.getData());
 	glUseProgram(0);
 
 	const Primative::Buffers::VertexBuffer& buffer = ResourceLoader::getBuffer(quadModel.getBuffers()[0]);
@@ -318,7 +330,7 @@ void GameScene::updateObjects()
 
 void GameScene::clearFBO() const 
 {
-	glViewport(0, 0, screenDimentions.x, screenDimentions.y);
+	glViewport(0, 0, screenDimentions->x, screenDimentions->y);
 	glClearColor(backgroundColour.x, backgroundColour.y, backgroundColour.z, 1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
@@ -386,9 +398,9 @@ Context* GameScene::getContext() const
 void GameScene::initalize()
 {
 #pragma region Pre Processing
-	Primative::Buffers::FrameBuffer shadow_FBO({ "depth" }, screenDimentions, GL_CLAMP_TO_BORDER);
-	Primative::Buffers::FrameBuffer g_buffer_FBO({ "col0", "col1", "col2", "col3", "col4" }, screenDimentions);
-	Primative::Buffers::FrameBuffer lighting_FBO({ "col0", "col1" }, screenDimentions);
+	Primative::Buffers::FrameBuffer shadow_FBO({ "depth" }, *screenDimentions, GL_CLAMP_TO_BORDER);
+	Primative::Buffers::FrameBuffer g_buffer_FBO({ "col0", "col1", "col2", "col3", "col4" }, *screenDimentions);
+	Primative::Buffers::FrameBuffer lighting_FBO({ "col0", "col1" }, *screenDimentions);
 
 
 	addFBO_Pre("DirectionalShadows", shadow_FBO);
@@ -415,8 +427,8 @@ void GameScene::initalize()
 
 #pragma region Post Processing
 	if (USES_BLUR) {
-		Primative::Buffers::FrameBuffer blur1_FBO({ "col0" }, screenDimentions);
-		Primative::Buffers::FrameBuffer blur2_FBO({ "col0" }, screenDimentions);
+		Primative::Buffers::FrameBuffer blur1_FBO({ "col0" }, *screenDimentions);
+		Primative::Buffers::FrameBuffer blur2_FBO({ "col0" }, *screenDimentions);
 		addFBO_Post("Blur", blur1_FBO);
 		addFBO_Post("Blur", blur2_FBO);
 		addPostProcLayer("Blur", ResourceLoader::getShader("GausianBlur"));
@@ -430,7 +442,7 @@ void GameScene::initalize()
 	// viewPos | vector 3
 	// gamma   | scalar f
 
-	glm::mat4 projection = glm::perspective(glm::radians(mainCamera->getFOV()), static_cast<float>(screenDimentions.x) / static_cast<float>(screenDimentions.y), 0.01f, 5000.0f);
+	glm::mat4 projection = glm::perspective(glm::radians(mainCamera->getFOV()), static_cast<float>(screenDimentions->x) / static_cast<float>(screenDimentions->y), 0.01f, 5000.0f);
 
 	mainBuffer.fill(1, glm::value_ptr(projection));
 	float gamma = 2.2f;
@@ -449,6 +461,11 @@ void GameScene::gameLoop()
 	isFirstLoop = true;
 	while (NOT (closing OR mainContext->shouldClose()))
 	{
+		if (Events::Handler::getKey(Events::Key::Space, Events::Action::Down)) {
+			reSize({ 400, 400 });
+		}
+
+
 		// FPS--------------------------------------------------------------------------------------------------------------------------------------------------
 
 		// tb.setText("FPS: " + std::to_string(main.getTime().avgFPS));
@@ -626,7 +643,7 @@ void GameScene::setContext(Context* context)
 	screenDimentions = context->getDimentions();
 }
 
-const glm::ivec2& GameScene::getScreenDimentions() const
+glm::svec2* GameScene::getScreenDimentions()
 {
 	return screenDimentions;
 }

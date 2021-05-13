@@ -72,7 +72,7 @@
 
 #include "Context.h"
 
-constexpr glm::ivec2 SCREEN_DIMENTIONS = glm::ivec2(1280, 720);
+constexpr glm::ivec2 SCREEN_DIMENTIONS = glm::ivec2(720, 405);
 long SEED;
 int main() {
     SEED = time(0);
@@ -84,8 +84,8 @@ int main() {
     Utils::Timer timer;
 
     Context main(SCREEN_DIMENTIONS, false);
-    main.init("Engine 2", { GL_BLEND, GL_DEPTH_TEST, GL_CULL_FACE, GL_MULTISAMPLE });
-    Events::Handler::init(main.getWindow());
+    main.init("Engine 2", { GL_BLEND, GL_DEPTH_TEST, GL_CULL_FACE, GL_MULTISAMPLE, GL_SCISSOR_TEST });
+    Events::Handler::init(&main.getWindow());
 
     SoundManager::init();
     Primative::Buffers::SoundBuffer* soundDatabuffer = SoundManager::createBuffer("Resources/Sounds/bounce.wav");
@@ -138,7 +138,7 @@ int main() {
     auto waterMaterialInfo = ResourceLoader::createPBRInfo("Resources/Textures/Water", { TextureType::AlbedoMap, TextureType::RoughnessMap, TextureType::NormalMap, TextureType::AOMap, TextureType::MetalicMap }, { 0, 0, 0, 0, 0 });
     auto& waterMaterial = ResourceLoader::createPBR(waterMaterialInfo);
     Materials::MatItemSingle<glm::vec4> waterAlbedo({ 0, 0, 1, 1 });
-    Materials::MatItemSingle<glm::vec3> waterEmission({ 0, 0, 1 });
+    Materials::MatItemSingle<glm::vec3> waterEmission({ 0, 0, 0 });
     Materials::MatItemSingle<float> waterMetalic(0.5f);
     Materials::MatItemSingle<float> waterRoughness(0.5f);
     Materials::MatItemSingle<float> waterAO(0.5f);
@@ -251,7 +251,7 @@ int main() {
     canvas.setCornerRadius(50);
     GUI::GUISlider element1 = GUI::GUISlider(0, 1);
     GUI::GUIConstraint elementConstraints;
-    elementConstraints.setScreenDimentions(SCREEN_DIMENTIONS);
+    elementConstraints.setScreenDimentions(main.getDimentions());
     GUI::PercentConstraint percents = GUI::PercentConstraint(0.25);
     GUI::PixelConstraint pixels = GUI::PixelConstraint(100);
     GUI::SpanConstraint span = GUI::SpanConstraint();

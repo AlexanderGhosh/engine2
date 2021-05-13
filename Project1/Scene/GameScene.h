@@ -67,7 +67,7 @@ private:
 	Context* mainContext;
 	std::vector<Primative::Buffers::StaticBuffer> uniformBuffers;
 	bool isFirstLoop, closing;
-	glm::ivec2 screenDimentions;
+	glm::svec2* screenDimentions;
 
 
 	void clearFBO() const;
@@ -94,6 +94,8 @@ public:
 	void processComponet(Component::ComponetBase* comp);
 	void createStartUpFile(String location);
 
+	void reSize(const glm::vec<2, short, glm::packed_highp>& newSize);
+
 	/// <summary>
 	/// binds the lights to the active shader
 	/// </summary>
@@ -117,7 +119,7 @@ public:
 	void setShadowCaster(Component::ShadowCaster* caster);
 
 	// getters
-	const glm::ivec2& getScreenDimentions() const;
+	glm::svec2* getScreenDimentions();
 	/// <summary>
 	/// returns the first gameobject with the given name
 	/// </summary>

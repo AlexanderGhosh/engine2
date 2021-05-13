@@ -3,25 +3,25 @@
 #include <iostream>
 
 
-GLFWwindow* Events::Handler::window = nullptr;
+GLFWwindow** Events::Handler::window = nullptr;
 std::string Events::Handler::lastChar = "";
 bool Events::Handler::keyDown = false;
 bool Events::Handler::mouseMove = false;
 bool Events::Handler::buttonDown = false;
 glm::vec2 Events::Handler::scrollOffest(0.0f);
 
-void Events::Handler::init(GLFWwindow* window)
+void Events::Handler::init(GLFWwindow** window)
 {
 	Events::Handler::window = window;
-	glfwSetKeyCallback(window, Events::Handler::keyCallBack);
-	glfwSetCursorPosCallback(window, Events::Handler::mouseCallback);
-	glfwSetMouseButtonCallback(window, Events::Handler::mouseButtonCallback);
-	glfwSetCharCallback(window, Events::Handler::characterCallBack);
+	glfwSetKeyCallback(*window, Events::Handler::keyCallBack);
+	glfwSetCursorPosCallback(*window, Events::Handler::mouseCallback);
+	glfwSetMouseButtonCallback(*window, Events::Handler::mouseButtonCallback);
+	glfwSetCharCallback(*window, Events::Handler::characterCallBack);
 }
 
 bool Events::Handler::getKey(const Key& key, const Action& action)
 {
-	return glfwGetKey(Events::Handler::window, static_cast<int>(key)) == static_cast<int>(action);
+	return glfwGetKey(*Events::Handler::window, static_cast<int>(key)) == static_cast<int>(action);
 }
 
 bool Events::Handler::getCursor(const Cursor& button, const Action& state)
@@ -36,13 +36,13 @@ bool Events::Handler::getCursor(const Cursor& button, const Action& state)
 		}
 		return res;
 	}
-	return glfwGetMouseButton(Events::Handler::window, static_cast<int>(button)) == static_cast<int>(state);
+	return glfwGetMouseButton(*Events::Handler::window, static_cast<int>(button)) == static_cast<int>(state);
 }
 
 const glm::vec2& Events::Handler::getCursorPos()
 {
 	glm::dvec2 res(0);
-	glfwGetCursorPos(Events::Handler::window, &res.x, &res.y);
+	glfwGetCursorPos(*Events::Handler::window, &res.x, &res.y);
 	return static_cast<glm::vec2>(res);
 }
 

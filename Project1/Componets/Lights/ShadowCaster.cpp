@@ -31,10 +31,9 @@ void Component::ShadowCaster::update(float deltaTime)
 	lightMatrixInfo.update(camera, t->getAspectRatio());
 }
 
-glm::mat4 Component::ShadowCaster::getLSMatrix(const glm::ivec2& screenDimentions) const
-{;
-	glm::mat4 res = lightMatrixInfo.getMatrix();
-	return res;
+glm::mat4 Component::ShadowCaster::getLSMatrix() const
+{
+	return lightMatrixInfo.getMatrix();
 }
 
 Vector3 Component::ShadowCaster::getPosition() const

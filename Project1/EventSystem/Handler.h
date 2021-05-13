@@ -53,7 +53,7 @@ namespace Events {
 	class Handler
 	{
 	public:
-		static void init(GLFWwindow* window);
+		static void init(GLFWwindow** window);
 		static inline void pollEvents() { glfwPollEvents(); };
 		static bool getKey(const Key& key, const Action& action);
 		static bool getCursor(const Cursor& button, const Action& state);
@@ -62,7 +62,7 @@ namespace Events {
 		static bool keyDown, mouseMove, buttonDown;
 		static glm::vec2 scrollOffest;
 	private:
-		static GLFWwindow* window;
+		static GLFWwindow** window;
 		static void keyCallBack(GLFWwindow* window, int key, int scancode, int action, int mode); 
 		static void mouseCallback(GLFWwindow* window, double xpos, double ypos);
 		static void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);

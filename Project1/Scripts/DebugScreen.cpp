@@ -26,7 +26,7 @@ void DebugScreen::awake()
 void DebugScreen::update(float deltaTime)
 {
 	if (screenDim.x < 0) {
-		screenDim = parent->getScene()->getScreenDimentions();
+		screenDim = *parent->getScene()->getScreenDimentions();
 		position.setPos({ 115, screenDim.y - 50 });
 		fpsText.setPos({ 115, screenDim.y - 15 });
 	}

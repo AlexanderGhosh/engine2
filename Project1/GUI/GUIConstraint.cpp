@@ -3,7 +3,7 @@
 #include "UIElementBase.h"
 #include "ElementContainers/GUIContainerBase.h"
 
-glm::vec2 GUI::GUIConstraint::screenDimentions(0);
+glm::svec2* GUI::GUIConstraint::screenDimentions(nullptr);
 
 GUI::GUIConstraint::GUIConstraint() : x(nullptr), y(nullptr), h(nullptr), w(nullptr), parent(nullptr)
 {
@@ -34,14 +34,14 @@ void GUI::GUIConstraint::setParent(GUIElementBase* parent)
 	this->parent = parent;
 }
 
-void GUI::GUIConstraint::setScreenDimentions(Vector2 dim)
+void GUI::GUIConstraint::setScreenDimentions(glm::svec2* dim)
 {
 	screenDimentions = dim;
 }
 
-Vector2 GUI::GUIConstraint::getScreenDimentions()
+SVector2 GUI::GUIConstraint::getScreenDimentions()
 {
-	return screenDimentions;
+	return *screenDimentions;
 }
 
 GUI::GUIElementBase* GUI::GUIConstraint::getParent() const

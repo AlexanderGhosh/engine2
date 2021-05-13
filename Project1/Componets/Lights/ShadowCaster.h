@@ -37,7 +37,7 @@ namespace Component {
 
 		// getters
 		inline Type getType() const { return Type::ShadowCaster; };
-		glm::mat4 getLSMatrix(const glm::ivec2& screenDimentions) const;
+		glm::mat4 getLSMatrix() const;
 		Vector3 getPosition() const;
 
 		// setters

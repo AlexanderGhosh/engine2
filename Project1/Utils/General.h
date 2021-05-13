@@ -46,6 +46,7 @@ constexpr float INV_RAND_MAX = 1.0f / static_cast<float>(RAND_MAX);
 #define RADIANS(x) (x * PI * 0.00555555f)
 #define DEGREES(x) (x * INV_PI * 180)
 
+#define SVector2 const glm::svec2&
 #define Vector2 const glm::vec2&
 #define Vector3 const glm::vec3&
 #define Vector4 const glm::vec4&
@@ -56,6 +57,10 @@ constexpr float INV_RAND_MAX = 1.0f / static_cast<float>(RAND_MAX);
 #define Float const float&
 #define Unsigned const unsigned&
 #define Int const int&
+
+namespace glm {
+    using svec2 = glm::vec<2, short, glm::packed_highp>;
+};
 
 extern long SEED;
 
