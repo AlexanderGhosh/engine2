@@ -4,7 +4,7 @@ Context::Context() : window(nullptr), dimentions(0), vsync(false), fpsLim(0), ti
 {
 }
 
-Context::Context(const svec2& dim, const bool vsync, short fpsLim) : Context()
+Context::Context(const glm::svec2& dim, const bool vsync, short fpsLim) : Context()
 {
     dimentions = dim;
     this->vsync = vsync;
@@ -84,7 +84,7 @@ unsigned Context::getHeight() const
 	return dimentions.y;
 }
 
-Context::svec2 Context::getDimentions() const
+glm::svec2 Context::getDimentions() const
 {
 	return dimentions;
 }

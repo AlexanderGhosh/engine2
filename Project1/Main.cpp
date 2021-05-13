@@ -138,7 +138,7 @@ int main() {
     auto waterMaterialInfo = ResourceLoader::createPBRInfo("Resources/Textures/Water", { TextureType::AlbedoMap, TextureType::RoughnessMap, TextureType::NormalMap, TextureType::AOMap, TextureType::MetalicMap }, { 0, 0, 0, 0, 0 });
     auto& waterMaterial = ResourceLoader::createPBR(waterMaterialInfo);
     Materials::MatItemSingle<glm::vec4> waterAlbedo({ 0, 0, 1, 1 });
-    Materials::MatItemSingle<glm::vec3> waterEmission({ 0, 0, 1 });
+    Materials::MatItemSingle<glm::vec3> waterEmission({ 0, 0, 0 });
     Materials::MatItemSingle<float> waterMetalic(0.5f);
     Materials::MatItemSingle<float> waterRoughness(0.5f);
     Materials::MatItemSingle<float> waterAO(0.5f);
