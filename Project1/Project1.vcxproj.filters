@@ -282,6 +282,9 @@
     <ClCompile Include="GUI\Elements\GUISlider.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="GUI\Elements\GUITextBlock.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Rendering\Rendering.h">
@@ -567,6 +570,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GUI\Elements\GUISlider.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\Elements\GUITextBlock.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
