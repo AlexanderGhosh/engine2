@@ -46,7 +46,7 @@ struct SpotLight {
     float brightness;
 
     vec3 direction;
-    float cutOff
+    float cutOff;
     float outterCutOff;
     float constant;
     float linear;
@@ -190,7 +190,7 @@ vec3 DirectionalLights(DirectionalLight directionalLights[maxDirectionalLights],
 vec3 ProcessSpotLight(SpotLight light, vec3 WFP, vec3 VD, vec3 N, vec3 RS, vec3 AD, float A2, float R, float M, float dotNV){
     // constants
     vec3 lightDirection = normalize(-light.direction);
-    float theta = dot(lightDirection, lightDirection   
+    float theta = dot(lightDirection, lightDirection);
     vec3 H = normalize(VD + lightDirection);
     float dotNL = max(dot(N, lightDirection), 0.0);
     float dotNH = max(dot(N, H), 0.0);
@@ -221,7 +221,7 @@ vec3 ProcessSpotLight(SpotLight light, vec3 WFP, vec3 VD, vec3 N, vec3 RS, vec3 
 vec3 SpotLights(SpotLight spotLights[maxSpotLights], int numberOfSpotLights, vec3 WFP, vec3 VD, vec3 N, vec3 RS, vec3 AD, float A2, float R, float M, float dotNV){
     vec3 accumlativeLight = vec3(0);
     for(int i = 0; i < numberOfSpotLights; i++){
-        accumlativeLight += ProcessSpotLight(spotLights[i], VD, N, RS, AD, A2, R, M, dotNV);
+        accumlativeLight += ProcessSpotLight(spotLights[i], WFP, VD, N, RS, AD, A2, R, M, dotNV);
     }
     return accumlativeLight;
 }
