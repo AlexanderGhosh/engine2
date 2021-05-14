@@ -150,6 +150,7 @@
     <ClCompile Include="Componets\Scripting.cpp" />
     <ClCompile Include="Componets\Lights\DirectionalLight.cpp" />
     <ClCompile Include="Componets\Lights\PointLight.cpp" />
+    <ClCompile Include="GUI\Text\Font.cpp" />
     <ClCompile Include="GUI\Elements\GUITextBlock.cpp" />
     <ClCompile Include="GUI\Elements\GUISlider.cpp" />
     <ClCompile Include="GUI\ElementContainers\GUICanvas.cpp" />
@@ -178,6 +179,7 @@
     <ClCompile Include="Componets\Lights\SpotLight.cpp" />
     <ClCompile Include="Componets\Lights\ShadowCaster.cpp" />
     <ClCompile Include="GUI\Constraints\SpanConstraint.cpp" />
+    <ClCompile Include="GUI\Text\TextRendering.cpp" />
     <ClCompile Include="Utils\NoiseGeneration.cpp" />
     <ClCompile Include="Primatives\Buffers\ArrayBuffer.cpp" />
     <ClCompile Include="Componets\Animated.cpp" />
@@ -241,6 +243,7 @@
     <ClInclude Include="Componets\Scripting.h" />
     <ClInclude Include="Componets\Lights\DirectionalLight.h" />
     <ClInclude Include="Componets\Lights\PointLight.h" />
+    <ClInclude Include="GUI\Text\Font.h" />
     <ClInclude Include="GUI\Elements\GUITextBlock.h" />
     <ClInclude Include="GUI\Elements\GUISlider.h" />
     <ClInclude Include="GUI\ElementContainers\GUICanvas.h" />
@@ -272,6 +275,7 @@
     <ClInclude Include="Componets\Lights\SpotLight.h" />
     <ClInclude Include="Componets\Lights\ShadowCaster.h" />
     <ClInclude Include="GUI\Constraints\SpanConstraint.h" />
+    <ClInclude Include="GUI\Text\TextRendering.h" />
     <ClInclude Include="UI\Page.h" />
     <ClInclude Include="Utils\NoiseGeneration.h" />
     <ClInclude Include="Primatives\Buffers\ArrayBuffer.h" />
