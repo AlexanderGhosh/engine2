@@ -36,6 +36,9 @@
 #include "GUI/Constraints/PercentConstraint.h"
 #include "GUI/Constraints/SpanConstraint.h"
 #include "GUI/Elements/GUISlider.h"
+#include "GUI/Elements/GUITextBlock.h"
+#include "GUI/Text/Font.h"
+#include "GUI/Text/TextRendering.h"
 
 #include "ParticleSystem/ParticleEmmiter.h"
 #include "ParticleSystem/Distributions/ConeDistribution.h"
@@ -100,7 +103,12 @@ int main() {
     ResourceLoader::createShaders(shaders);
     timer.log();
 
+    // GUI //
 
+    GUI::Font arail = GUI::Font("arial");
+    GUI::TextRendering::addFont(&arail);
+
+    // GUI //
 
     // UI //
     timer.start("UI");
@@ -249,7 +257,7 @@ int main() {
     canvas.setDimentions(SCREEN_DIMENTIONS / 2);
     canvas.setBaseAlbedo(&uiColourCanvas);
     canvas.setCornerRadius(50);
-    GUI::GUISlider element1 = GUI::GUISlider(0, 1);
+    GUI::GUITextBlock element1 = GUI::GUITextBlock("Ya Mum");
     GUI::GUIConstraint elementConstraints;
     elementConstraints.setScreenDimentions(main.getDimentions());
     GUI::PercentConstraint percents = GUI::PercentConstraint(0.25);
@@ -264,8 +272,9 @@ int main() {
     Materials::MatItemSingle<glm::vec4> uiColourBar(glm::vec4(1, 0.0, 0, 1));
     Materials::MatItemSingle<glm::vec4> uiColourPointer(glm::vec4(0, 0.0, 1, 1));
     element1.setAlbedo(&uiColour);
-    element1.setPointerAlbedo(&uiColourPointer);
-    element1.setSliderAlbedo(&uiColourBar);
+    element1.setTextColour(&uiColourPointer);
+    // element1.setPointerAlbedo(&uiColourPointer);
+    // element1.setSliderAlbedo(&uiColourBar);
 
 
     canvas.addElement(&element1);

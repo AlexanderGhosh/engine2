@@ -15,7 +15,7 @@ out vec2 Dimentions;
 uniform vec2 dimentions;
 uniform mat4 model;
 
-vec2 map(vec3 p){
+vec2 map(vec3 p) {
     return (p.xy + 1) * 0.5;
 };
 
