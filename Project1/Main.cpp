@@ -257,7 +257,7 @@ int main() {
     canvas.setDimentions(SCREEN_DIMENTIONS / 2);
     canvas.setBaseAlbedo(&uiColourCanvas);
     canvas.setCornerRadius(50);
-    GUI::GUITextBlock element1 = GUI::GUITextBlock("Ya Mom");
+    GUI::GUITextBlock element1 = GUI::GUITextBlock("Ya Mum");
     GUI::GUIConstraint elementConstraints;
     elementConstraints.setScreenDimentions(SCREEN_DIMENTIONS);
     GUI::PercentConstraint percents = GUI::PercentConstraint(0.25);

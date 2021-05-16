@@ -1,6 +1,7 @@
 #include "GUITextBlock.h"
 #include "../Text/TextRendering.h"
 #include "../../Primatives/Materials/MatItemBase.h"
+#include "../GUIConstraint.h"
 
 GUI::GUITextBlock::GUITextBlock() : GUIElementBase(), text(""), textColour(nullptr), fontSize(12)
 {
@@ -20,7 +21,7 @@ void GUI::GUITextBlock::cleanUp()
 
 void GUI::GUITextBlock::render()
 {
-	TextRendering::drawText(text, position.x, position.y, fontSize, textColour, "arial", getModel());
+	TextRendering::drawText(text, position.x, GUIConstraint::getScreenDimentions().y - (position.y + dimentions.y), 1, textColour, "arial", getModel());
 	GUIElementBase::render();
 }
 

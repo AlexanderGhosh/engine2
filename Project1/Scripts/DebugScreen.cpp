@@ -40,8 +40,8 @@ void DebugScreen::update(float deltaTime)
 		counter = 0;
 	}
 	counter += deltaTime;
-
-	position.setText("Position: " + Utils::to_string_precision(parent->getLocalTransform()->Position, 2));
+	// "Position: " + Utils::to_string_precision(parent->getLocalTransform()->Position, 2)
+	position.setText("Ya Mom");
 	const float w = position.getWidth() / 2.0f;
 	const glm::vec2& p = position.getPos();
 	float diff = p.x - w; // left edge

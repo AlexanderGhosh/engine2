@@ -37,8 +37,6 @@ GUI::Font::Font(String fontName) : Font()
         return;
     }
     else {
-        glm::vec2 maxSize(0), maxBearing(0);
-        float maxAdvance = 0;
         // set size to load glyphs as
         FT_Set_Pixel_Sizes(face, 0, 128);
 
@@ -82,21 +80,11 @@ GUI::Font::Font(String fontName) : Font()
             character.size =    glm::vec2(face->glyph->bitmap.width, face->glyph->bitmap.rows);
             character.bearing = glm::vec2(face->glyph->bitmap_left , face->glyph->bitmap_top );
 
-            character.advance = static_cast<float>(face->glyph->advance.x >> 6);
-
-            maxSize    = glm::max(glm::abs(character.size   ), maxSize   );
-            maxBearing = glm::max(glm::abs(character.bearing), maxBearing);
-            maxAdvance = glm::max(glm::abs(character.advance), maxAdvance);
+            character.advance = static_cast<unsigned>(face->glyph->advance.x) >> 6;
 
             chars.insert({ c, character });
         }
         glBindTexture(GL_TEXTURE_2D, 0);
-        for (auto& char_ : chars) {
-            auto& c = char_.second;
-            c.size    /= maxSize;
-            c.bearing /= maxBearing;
-            c.advance /= maxAdvance;
-        }
     }
     // destroy FreeType once we're finished
     FT_Done_Face(face);

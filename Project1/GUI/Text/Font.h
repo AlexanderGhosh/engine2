@@ -8,7 +8,7 @@ namespace GUI {
 		unsigned texId;
 		glm::vec2 size;
 		glm::vec2 bearing;
-		float advance;
+		unsigned advance;
 		Character();
 		~Character() = default;
 	};
