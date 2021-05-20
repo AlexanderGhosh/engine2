@@ -8,7 +8,7 @@
 unsigned UI::TextRenderer::shaderId = 0;
 std::unordered_map<std::string, UI::TextRenderer*> UI::TextRenderer::loadedFonts = { };
 
-UI::TextRenderer::TextRenderer(const glm::vec2& screenDim, String fontName, Unsigned fontSize) : chars(), VBO(0), VAO(0)
+UI::TextRenderer::TextRenderer(String fontName, Unsigned fontSize) : chars(), VBO(0), VAO(0)
 {
     FT_Library ft;
     // All functions return a value different than 0 whenever an error occurred

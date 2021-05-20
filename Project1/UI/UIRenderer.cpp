@@ -11,7 +11,7 @@ unsigned UI::UIRenderer::shaderId = 0;
 Primative::Buffers::VertexBuffer UI::UIRenderer::quadBuffer = { };
 Primative::Buffers::StaticBuffer UI::UIRenderer::uiBuffer = { };
 
-void UI::UIRenderer::init(const unsigned& shaderId, const glm::vec2& screenDim)
+void UI::UIRenderer::init(Unsigned shaderId, Vector2 screenDim)
 {
 	UI::UIRenderer::shaderId = shaderId; 
 	Primative::Mesh mesh;
@@ -29,7 +29,12 @@ void UI::UIRenderer::init(const unsigned& shaderId, const glm::vec2& screenDim)
 	quadBuffer = Primative::Buffers::VertexBuffer(mesh);
 
 	uiBuffer = Primative::Buffers::StaticBuffer("m4", 2);
-	glm::mat4 proj = glm::ortho(0.0f, screenDim.x, 0.0f, screenDim.y);
+	updateProjection(screenDim);
+}
+
+void UI::UIRenderer::updateProjection(Vector2 dim)
+{
+	glm::mat4 proj = glm::ortho(0.0f, dim.x, 0.0f, dim.y);
 	uiBuffer.fill(0, glm::value_ptr(proj));
 }
 

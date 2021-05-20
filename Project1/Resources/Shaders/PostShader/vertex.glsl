@@ -11,7 +11,7 @@ layout(std140, binding = 0) uniform Matrices
     float camExposure;
 };
 
-
+uniform int flip;
 out vec2 TextureCoords;
 out float GammaValue;
 out float CameraExposure;
@@ -19,7 +19,7 @@ out float CameraExposure;
 void main() {
 	gl_Position = vec4(pos, 1);
     TextureCoords = tex;
-    TextureCoords.y *= 1;
+    TextureCoords.y *= flip;
     GammaValue = gamma;
     CameraExposure = camExposure;
 }

@@ -1,6 +1,15 @@
 #include "General.h"
 
 
+std::vector<std::string> Utils::toStringList(char** a, int size)
+{
+    std::vector<std::string> res;
+    for (int i = 0; i < size; i++) {
+        res.push_back(std::string(a[i]));
+    }
+    return res;
+}
+
 void Utils::log(const std::vector<std::string>& msgs, String eol) {
     std::string txt = "";
     for (String msg : msgs) {

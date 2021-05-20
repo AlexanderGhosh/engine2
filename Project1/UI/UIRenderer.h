@@ -14,7 +14,8 @@ namespace UI {
 		static Primative::Buffers::VertexBuffer quadBuffer;
 		static Primative::Buffers::StaticBuffer uiBuffer;
 	public:
-		static void init(const unsigned& shaderId, const glm::vec2& screenDim);
+		static void init(Unsigned shaderId, Vector2 screenDim);
+		static void updateProjection(Vector2 dim);
 		static void render(const Canvas* pane);
 		static void render(const Element* element);
 		static void cleanUp();

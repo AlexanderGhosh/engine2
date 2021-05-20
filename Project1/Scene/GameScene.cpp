@@ -40,19 +40,20 @@ std::vector<GameEventsTypes> GameScene::getCurrentEvents() const
 	return res;
 }
 
-GameScene::GameScene() : objects(), preProcessingLayers(), currentTick(0), postProcShaderId(0), FBOs_pre(), backgroundColour(0), sharedMemory(SHARED_MEMORY_NAME, SHARED_MEMORY_SIZE),
-							skybox(nullptr), mainContext(nullptr), opaque(), transparent(), mainCamera(nullptr), terrain(), mainShadowCaster(nullptr),
+GameScene::GameScene(bool renderToSharedMemory) : objects(), preProcessingLayers(), currentTick(0), postProcShaderId(0), FBOs_pre(), backgroundColour(0), sharedMemory(SHARED_MEMORY_NAME, SHARED_MEMORY_SIZE),
+							skybox(nullptr), activeContext(nullptr), opaque(), transparent(), mainCamera(nullptr), terrain(), mainShadowCaster(nullptr), renderToSharedMemory(renderToSharedMemory),
 							isFirstLoop(false), closing(false), uiStuff(), screenDimentions(0), emmiters(), lightSources(), USE_SHADOWS(1), uiContainers()
 {
 	quadModel = ResourceLoader::getModel("plane.dae");
-	sharedMemory.createFile();
+	if(renderToSharedMemory)
+		sharedMemory.openFile();
 }
 
 void GameScene::drawOpaque()
 {
 	for (Component::RenderMesh* mesh : opaque) {
 		if(mesh->getParent()->isAlive())
-			mesh->render(mainContext->getTime().deltaTime);
+			mesh->render(activeContext->getTime().deltaTime);
 	}
 }
 
@@ -65,14 +66,14 @@ void GameScene::drawTransparent(bool bindShader)
 	if (NOT transparent.size()) {
 		return;
 	}
-	mainContext->enable(GL_BLEND);
+	activeContext->enable(GL_BLEND);
 
 	std::map<float, Component::RenderMesh*> sorted{};
 	for (auto itt = transparent.rbegin(); itt != transparent.rend(); itt++) {
 		float dist = (*itt).first;
 		Component::RenderMesh* mesh = (*itt).second;
 		if (mesh->getParent()->isAlive())
-			mesh->render(mainContext->getTime().deltaTime);
+			mesh->render(activeContext->getTime().deltaTime);
 		dist = glm::length2(mesh->getParent()->getGlobalTransform().Position - mainCamera->getPosition());
 		sorted[dist] = mesh;
 	}
@@ -83,22 +84,22 @@ void GameScene::drawTransparent(bool bindShader)
 void GameScene::drawTerrain(bool bindShader)
 {
 	for (Terrain* terrain : this->terrain) {
-		terrain->render(mainContext->getTime().deltaTime, bindShader);
+		terrain->render(activeContext->getTime().deltaTime, bindShader);
 	}
 }
 
 void GameScene::drawUI()
 {
 	for (UI::Canvas* canvas : uiStuff) {
-		canvas->render(mainContext->getTime().deltaTime);
+		canvas->render(activeContext->getTime().deltaTime);
 	}
-	mainContext->disable(GL_CULL_FACE);
-	mainContext->disable(GL_DEPTH);
+	activeContext->disable(GL_CULL_FACE);
+	activeContext->disable(GL_DEPTH);
 	for (auto container : uiContainers) {
 		container->render();
 	}
-	mainContext->enable(GL_CULL_FACE);
-	mainContext->enable(GL_DEPTH);
+	activeContext->enable(GL_CULL_FACE);
+	activeContext->enable(GL_DEPTH);
 }
 
 void GameScene::drawParticles(Unsigned shaderId)
@@ -107,7 +108,7 @@ void GameScene::drawParticles(Unsigned shaderId)
 	if (shaderId > 0)
 		Component::ParticleEmmiter::setShader(shaderId);
 	for (Component::ParticleEmmiter* part : emmiters) {
-		part->render(mainContext->getTime().deltaTime);
+		part->render(activeContext->getTime().deltaTime);
 	}
 	Component::ParticleEmmiter::setShader(t);
 }
@@ -129,6 +130,11 @@ void GameScene::addTerrain(Terrain* terrain)
 void GameScene::addUI(GUI::GUIContainerBase* container)
 {
 	uiContainers.push_back(container);
+}
+
+void GameScene::addContext(Context* context)
+{
+	contexts.push_back(context);
 }
 
 void GameScene::processComponet(Component::ComponetBase* comp)
@@ -173,11 +179,32 @@ void GameScene::createStartUpFile(String location)
 	Utils::writeToFile(location + "\\StartUp File.txt", data);
 }
 
-void GameScene::reSize(const glm::vec<2, short, glm::packed_highp>& newSize)
+void GameScene::reSize(SVector2 newSize)
 {
-	// mainContext->setDimentions(newSize);
-	// screenDimentions = newSize;
-    glScissor(0, 0, newSize.x, newSize.y);
+	activeContext->setDimentions(newSize);
+
+	// re calculate projection
+	glm::mat4 projection = glm::perspective(glm::radians(mainCamera->getFOV()), activeContext->getAspectRatio(), 0.01f, 5000.0f);
+	uniformBuffers[0].fill(1, glm::value_ptr(projection));
+
+	// reSize frame buffers
+	for (auto& frameBuffer : FBOs_pre) {
+		frameBuffer.second.reSize(newSize);
+	}
+	for (auto& item : FBOs_post) {
+		for (auto& frameBuffer : item.second) {
+			frameBuffer.reSize(newSize);
+		}
+	}
+	
+	// update UI projection
+	UI::UIRenderer::updateProjection(newSize);
+}
+
+void GameScene::reSize(SVector2 aspectRatio, Short width)
+{
+	short height = static_cast<short>((static_cast<float>(aspectRatio.y) / static_cast<float>(aspectRatio.x)) * static_cast<float>(width));
+	reSize({ width, height });
 }
 
 void GameScene::setBG(Vector3 col) 
@@ -188,9 +215,6 @@ void GameScene::setBG(Vector3 col)
 void GameScene::preProcess()
 {
 	const glm::mat4 lsMatrix = mainShadowCaster->getLSMatrix();
-	// glm::mat4 projection = glm::perspective(glm::radians(mainCamera->getFOV()), static_cast<float>(screenDimentions.x) / static_cast<float>(screenDimentions.y), 0.01f, 5000.0f);
-	// lsMatrix = getMainCamera()->getView();
-	// lsMatrix = projection * lsMatrix;
 	for (const auto& layer : preProcessingLayers) {
 		String name = layer.first;
 		Unsigned shaderId = layer.second;
@@ -240,7 +264,7 @@ void GameScene::preProcess()
 			// copy depth buffer for fwd rendering
 			gBuffer.bind(GL_READ_FRAMEBUFFER);
 			fbo.bind(GL_DRAW_FRAMEBUFFER);
-			glBlitFramebuffer(0, 0, gBuffer.getDimentions().x, gBuffer.getDimentions().y, 0, 0, screenDimentions->x, screenDimentions->y, GL_DEPTH_BUFFER_BIT, GL_NEAREST); 
+			glBlitFramebuffer(0, 0, gBuffer.getDimentions().x, gBuffer.getDimentions().y, 0, 0, fbo.getDimentions().x, fbo.getDimentions().y, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
 			fbo.unBind();
 			gBuffer.unBind(GL_READ_FRAMEBUFFER);
 			fbo.unBind(GL_DRAW_FRAMEBUFFER);
@@ -261,9 +285,11 @@ void GameScene::preProcess()
 
 void GameScene::postProcess()
 {
-	glUseProgram(0);
-	glReadPixels(0, 0, screenDimentions->x, screenDimentions->y, GL_BGRA, GL_UNSIGNED_BYTE, sharedMemory.getData());
-	glUseProgram(0);
+	if(renderToSharedMemory) {
+		glUseProgram(0);
+		glReadPixels(0, 0, screenDimentions->x, screenDimentions->y, GL_BGRA, GL_UNSIGNED_BYTE, sharedMemory.getData());
+		glUseProgram(0);
+	}
 
 	const Primative::Buffers::VertexBuffer& buffer = ResourceLoader::getBuffer(quadModel.getBuffers()[0]);
 	for (auto& layer : postProcessingLayers) {
@@ -307,6 +333,7 @@ void GameScene::postProcess()
 		Render::Shading::Manager::setValue("bloomBlur", 1);
 	}
 
+	Render::Shading::Manager::setValue("flip", renderToSharedMemory ? 1 : -1);
 	Render::Shading::Manager::setValue("scene", 0);
 	Render::Shading::Manager::setValue("Blur", USES_BLUR);
 	
@@ -319,7 +346,7 @@ void GameScene::updateObjects()
 	for (GameObject*& obj : objects) {
 		if (obj->isAlive()) {
 			//obj->tick(currentTick++ % FIXED_UPDATE_RATE, mainContext.getTime().deltaTime);
-			obj->raiseEvents(events,  mainContext->getTime().deltaTime);
+			obj->raiseEvents(events, activeContext->getTime().deltaTime);
 		}
 	}
 
@@ -348,11 +375,11 @@ void GameScene::drawSkyBox()
 {
 	if (!skybox)
 		return;
-	mainContext->disable(GL_CULL_FACE);
+	activeContext->disable(GL_CULL_FACE);
 	glDepthFunc(GL_LEQUAL);
 	skybox->draw();
 	glDepthFunc(GL_LESS);
-	mainContext->enable(GL_CULL_FACE);
+	activeContext->enable(GL_CULL_FACE);
 }
 
 Primative::Buffers::FrameBuffer& GameScene::getFBO(String name)
@@ -390,9 +417,9 @@ const Component::ShadowCaster* GameScene::getShadowCaster() const
 	return mainShadowCaster;
 }
 
-Context* GameScene::getContext() const
+Context* GameScene::getActiveContext() const
 {
-	return mainContext;
+	return activeContext;
 }
 
 void GameScene::initalize()
@@ -443,8 +470,8 @@ void GameScene::initalize()
 	// gamma   | scalar f
 
 	glm::mat4 projection = glm::perspective(glm::radians(mainCamera->getFOV()), static_cast<float>(screenDimentions->x) / static_cast<float>(screenDimentions->y), 0.01f, 5000.0f);
-
 	mainBuffer.fill(1, glm::value_ptr(projection));
+
 	float gamma = 2.2f;
 	mainBuffer.fill(3, &gamma);
 	if(mainCamera)
@@ -454,15 +481,19 @@ void GameScene::initalize()
 
 	createStartUpFile("C:\\Users\\AGWDW\\Desktop");
 }
-
+Context mainC;
 void GameScene::gameLoop()
 {
 	// float counter = 0;
 	isFirstLoop = true;
-	while (NOT (closing OR mainContext->shouldClose()))
+	while (NOT (closing OR activeContext->shouldClose()))
 	{
-		if (Events::Handler::getKey(Events::Key::Space, Events::Action::Down)) {
-			reSize({ 400, 400 });
+		if (Events::Handler::getKey(Events::Key::Backspace, Events::Action::Down)) {
+			/*mainC = Context({ 400, 400 }, false);
+			mainC.init("Engine 2", { GL_BLEND, GL_DEPTH_TEST, GL_CULL_FACE, GL_MULTISAMPLE, GL_SCISSOR_TEST });
+			addContext(&mainC);
+			setActiveContext(1);*/
+			reSize({ 1, 1 }, 400);
 		}
 
 
@@ -487,11 +518,11 @@ void GameScene::gameLoop()
 
 		preProcess(); // shadows and scene quad
 		postProcess();// render to screen
-		Gizmos::GizmoRenderer::drawAll();
+		Gizmos::GizmoRenderer::drawAll(renderToSharedMemory);
 
 		// sound->update();
 
-		mainContext->update();
+		activeContext->update();
 		Events::Handler::pollEvents();
 		isFirstLoop = false;
 	}
@@ -553,8 +584,12 @@ void GameScene::cleanUp()
 	opaque.clear();
 	transparent.clear();
 	quadModel.cleanUp();
-	mainContext->cleanUp();
-
+	for (auto itt = contexts.begin(); itt != contexts.end();) {
+		(*itt)->cleanUp();
+		itt = contexts.erase(itt);
+	}
+	if(renderToSharedMemory)
+		sharedMemory.closeFile();
 }
 
 void GameScene::close()
@@ -637,10 +672,12 @@ void GameScene::setShadowCaster(Component::ShadowCaster* caster)
 	mainShadowCaster->setCamera(mainCamera);
 }
 
-void GameScene::setContext(Context* context)
+void GameScene::setActiveContext(Unsigned index)
 {
-	mainContext = context;
-	screenDimentions = context->getDimentions();
+	activeContext = contexts[index];
+	glfwMakeContextCurrent(nullptr);
+	glfwMakeContextCurrent(activeContext->getWindow());
+	screenDimentions = activeContext->getDimentions();
 }
 
 glm::svec2* GameScene::getScreenDimentions()

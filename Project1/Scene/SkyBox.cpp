@@ -10,8 +10,7 @@ unsigned SkyBox::shaderId = 0;
 SkyBox::SkyBox() : texId(0), mesh(nullptr)
 {
 	if (!shaderId) {
-		ResourceLoader::createShader("Resources/Shaders/SkyBoxShader");
-		shaderId = ResourceLoader::getShader("SkyBoxShader");
+		shaderId = ResourceLoader::getShader("SkyBoxShader", true);
 	}
 	if (!mesh) {
 		mesh = DBG_NEW Component::RenderMesh();

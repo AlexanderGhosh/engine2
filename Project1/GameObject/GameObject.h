@@ -59,5 +59,11 @@ public:
 	void setName(String name);
 	void setParent(GameObject* parent);
 	GameObject* getParent() const;
+
+	// For Engine
+
+	// creates a byte field representing the gameobject and its components
+	Byte_Array getByteField() const;
+	int getNumberOfBytes() const;
 };
 

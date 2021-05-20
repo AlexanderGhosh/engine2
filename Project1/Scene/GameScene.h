@@ -64,9 +64,10 @@ private:
 	std::unordered_map<std::string, Primative::Buffers::FrameBuffer> FBOs_pre;
 	std::unordered_map<std::string, std::vector<Primative::Buffers::FrameBuffer>> FBOs_post;
 	glm::vec3 backgroundColour;
-	Context* mainContext;
+	Context* activeContext;
+	std::vector<Context*> contexts;
 	std::vector<Primative::Buffers::StaticBuffer> uniformBuffers;
-	bool isFirstLoop, closing;
+	bool isFirstLoop, closing, renderToSharedMemory;
 	glm::svec2* screenDimentions;
 
 
@@ -83,7 +84,7 @@ private:
 	std::vector<GameEventsTypes> getCurrentEvents() const;
 public:	
 	bool USE_SHADOWS;
-	GameScene();
+	GameScene(bool renderToSharedMemory = 0);
 	void preProcess();
 	void postProcess();
 	void updateObjects();
@@ -94,7 +95,8 @@ public:
 	void processComponet(Component::ComponetBase* comp);
 	void createStartUpFile(String location);
 
-	void reSize(const glm::vec<2, short, glm::packed_highp>& newSize);
+	void reSize(SVector2 newSize);
+	void reSize(SVector2 aspectRatio, Short width);
 
 	/// <summary>
 	/// binds the lights to the active shader
@@ -109,12 +111,13 @@ public:
 	void addObject(GameObject* obj);
 	void addTerrain(Terrain* terrain);
 	void addUI(GUI::GUIContainerBase* container);
+	void addContext(Context* context);
 
 	// setters
 	void setBG(Vector3 col);
 	void setPostProcShader(Unsigned shaderId);
 	void setSkyBox(SkyBox* sb);
-	void setContext(Context* context);
+	void setActiveContext(Unsigned index);
 	void setMainCamera(Component::Camera* camera);
 	void setShadowCaster(Component::ShadowCaster* caster);
 
@@ -128,6 +131,9 @@ public:
 	std::vector<Primative::Buffers::FrameBuffer>& getFBOs(String name);
 	Component::Camera* getMainCamera();
 	const Component::ShadowCaster* getShadowCaster() const;
-	Context* getContext() const;
+	Context* getActiveContext() const;
+
+
+
 };
 

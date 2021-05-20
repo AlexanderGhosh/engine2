@@ -36,13 +36,13 @@ public:
 	Context(const glm::svec2& dim, const bool vsync, short fpsLim = 0);
 	Context(const glm::svec2& aspectRatio, short horizontalLength, const bool vsync, short fpsLim);
 
-	void init(const std::string& name, std::list<long> enable);
-	void enable(long a) const;
-	void disable(long a) const;
+	void init(const std::string& name, std::list<long> enable, bool initGlew = true);
+	void enable(long a);
+	void disable(long a);
 	void update();
 	bool shouldClose() const;
 
-	void cleanUp();
+	void cleanUp(bool terminate = true);
 	void remove();
 
 	// getters
@@ -54,6 +54,6 @@ public:
 	float getAspectRatio() const;
 
 	// setters
-	// void setDimentions(const glm::svec2& a);
+	void setDimentions(SVector2 a);
 };
 

@@ -10,7 +10,7 @@ namespace Primative {
 			std::unordered_map<std::string, unsigned> textures;
 			unsigned depthStencilRBO;
 			glm::vec3 backgroundColour;
-			glm::ivec2 dimentions;
+			glm::svec2 dimentions;
 			GLbitfield clearMask;
 			unsigned fbo;
 
@@ -18,7 +18,7 @@ namespace Primative {
 			std::array<int, 4> getBufferData(String type, unsigned& colAttach) const;
 		public:
 			FrameBuffer();
-			FrameBuffer(const std::vector<std::string>& textures, const glm::ivec2& dimentions, long texture_param = GL_REPEAT, const glm::vec3& bgColour = Utils::zero());
+			FrameBuffer(const std::vector<std::string>& textures, SVector2 dimentions, long texture_param = GL_REPEAT, Vector3 bgColour = Utils::zero());
 			~FrameBuffer() = default;
 			void cleanUp();
 
@@ -28,10 +28,11 @@ namespace Primative {
 			/// <summary>
 			/// will active the colour unit textures and add to the unit
 			/// </summary>
-			/// <param name="unit"></param>
 			void activateColourTextures(int& unit, const std::vector<std::string>& names);
 			Unsigned getTexture(String name);
 			Vector2 getDimentions() const;
+
+			void reSize(SVector2 dimentions);
 		};
 	}
 }

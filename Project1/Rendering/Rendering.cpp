@@ -98,6 +98,11 @@ const Primative::Model& Component::RenderMesh::getModel() const
 	return model;
 }
 
+Byte_Array Component::RenderMesh::getByteField() const
+{
+	return Byte_Array();
+}
+
 Component::RenderMesh Component::RenderMesh::copy() const
 {
 	RenderMesh res = RenderMesh();

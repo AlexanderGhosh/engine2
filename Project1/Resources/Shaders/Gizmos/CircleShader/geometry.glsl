@@ -12,6 +12,7 @@ out vec3 f_col;
 const int resolution = 100;
 uniform mat4 rotation;
 uniform float radius;
+uniform int flip;
 
 float PI_1_5 = 3.1415926 * 2 / resolution;
 
@@ -26,6 +27,7 @@ void main()
         // Offset from center of point (0.3 to accomodate for aspect ratio)
         vec4 offset = gs_in[0].translation * rotation * vec4(cos(ang), 0, -sin(ang), 0) * radius;
         gl_Position = gl_in[0].gl_Position + offset;
+        gl_Position.y *= flip;
 
         EmitVertex();
     }

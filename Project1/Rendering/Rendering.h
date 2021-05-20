@@ -31,6 +31,8 @@ namespace Component {
 
 		const Primative::Model& getModel() const;
 
+		Byte_Array getByteField() const;
+
 		RenderMesh copy() const;
 	private:
 		// index of buffer in the resorce loader

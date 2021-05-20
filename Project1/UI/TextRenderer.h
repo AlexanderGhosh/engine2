@@ -20,7 +20,7 @@ namespace UI {
 		std::unordered_map<char, Character> chars;
 		unsigned VAO, VBO;
 	public:
-		TextRenderer(const glm::vec2& screenDim, String fontName = "arial", Unsigned fontSize = 48);
+		TextRenderer(String fontName = "arial", Unsigned fontSize = 48);
 		void drawText(String text, float x, float y, float scale, glm::vec3 color) const;
 		const glm::vec2& getStringDimentions(String text, Unsigned scale = 1) const;
 		inline static void setShader(Unsigned shaderId) { UI::TextRenderer::shaderId = shaderId; };

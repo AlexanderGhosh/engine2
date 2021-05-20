@@ -45,6 +45,9 @@ constexpr float INV_PI = 1.0f / PI;
 constexpr float INV_RAND_MAX = 1.0f / static_cast<float>(RAND_MAX);
 #define RADIANS(x) (x * PI * 0.00555555f)
 #define DEGREES(x) (x * INV_PI * 180)
+#define TO_BYTE_ARRAY(x) (reinterpret_cast<const char*>(&x))
+
+// unsigned char const* p = reinterpret_cast<unsigned char const*>(&f);
 
 #define SVector2 const glm::svec2&
 #define Vector2 const glm::vec2&
@@ -57,6 +60,10 @@ constexpr float INV_RAND_MAX = 1.0f / static_cast<float>(RAND_MAX);
 #define Float const float&
 #define Unsigned const unsigned&
 #define Int const int&
+#define CCharPtr const char*
+#define UChar unsigned char
+#define Short const short&
+#define Byte_Array std::vector<unsigned char>
 
 namespace glm {
     using svec2 = glm::vec<2, short, glm::packed_highp>;
@@ -65,6 +72,14 @@ namespace glm {
 extern long SEED;
 
 namespace Utils {
+    template <class T>
+    void addToByteArray(std::vector<unsigned char>& a, T& data) {
+        const char* d = TO_BYTE_ARRAY(data);
+        for (char i = 0; i < sizeof(T); i++) {
+            a.push_back(d[i]);
+        }
+    }
+    std::vector<std::string> toStringList(char** a, int size);
     void log(const std::vector<std::string>& msgs, String eol = "\n");
     void log(String msg, String eol = "\n");
 

@@ -198,3 +198,49 @@ GameObject* GameObject::getParent() const
 {
 	return parent;
 }
+
+Byte_Array GameObject::getByteField() const
+{
+	Byte_Array res;
+	const int size = getNumberOfBytes(); // doesnt account for the different types of light sources
+	res.reserve(size);
+	// name no more then 20 bytes
+	for (int i = 0; i < 20; i++) {
+		if (i >= name.size()) {
+			res.push_back(0);
+		}
+		else {
+			res.push_back(name[i]);
+		}
+	}
+
+	// the number of componts
+	res.push_back(static_cast<UChar>(componets.size()));
+
+	// the types of componets
+	for (Component::ComponetBase* comp : componets) {
+		const auto type = comp->getType();
+		if (type == Component::Type::Light) {
+			Component::LightBase* light = reinterpret_cast<Component::LightBase*>(comp);
+			
+		}
+		res.push_back(static_cast<UChar>(type));
+	}
+
+	// the compont data
+	for (Component::ComponetBase* comp : componets) {
+		const Byte_Array data = comp->getByteField();
+		res.insert(res.end(), data.begin(), data.end());
+	}
+
+	return res;
+}
+
+int GameObject::getNumberOfBytes() const
+{
+	int size = 21 + componets.size();
+	for (Component::ComponetBase* comp : componets) {
+		size += Component::ByteSizeOfComponents[static_cast<int>(comp->getType())];
+	}
+	return size;
+}

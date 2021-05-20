@@ -6,7 +6,7 @@ Primative::Buffers::FrameBuffer::FrameBuffer() : fbo(), textures(), backgroundCo
 {
 }
 
-Primative::Buffers::FrameBuffer::FrameBuffer(const std::vector<std::string>& textures, const glm::ivec2& dimentions, long texture_param, const glm::vec3& bgColour) : FrameBuffer()
+Primative::Buffers::FrameBuffer::FrameBuffer(const std::vector<std::string>& textures, SVector2 dimentions, long texture_param, Vector3 bgColour) : FrameBuffer()
 {
 	this->dimentions = dimentions;
 	this->backgroundColour = bgColour;
@@ -174,6 +174,21 @@ void Primative::Buffers::FrameBuffer::activateColourTextures(int& unit, const st
 Vector2 Primative::Buffers::FrameBuffer::getDimentions() const
 {
 	return dimentions;
+}
+
+void Primative::Buffers::FrameBuffer::reSize(SVector2 dimentions)
+{
+	this->dimentions = dimentions;
+	for (auto& tex : textures) {
+		String type = tex.first;
+		unsigned colAttach = 0;
+		std::array<int, 4> data = getBufferData(type, colAttach);
+		glBindTexture(GL_TEXTURE_2D, tex.second);
+		glTexImage2D(GL_TEXTURE_2D, 0, data[0], dimentions.x, dimentions.y, 0, data[1], data[3], NULL);
+	}
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glBindRenderbuffer(GL_RENDERBUFFER, depthStencilRBO);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, dimentions.x, dimentions.y);
 }
 
 Unsigned Primative::Buffers::FrameBuffer::getTexture(String name)
