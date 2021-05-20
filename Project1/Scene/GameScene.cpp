@@ -21,8 +21,10 @@
 #include "../GUI/ElementContainers/GUICanvas.h"
 // GUI
 
-#define SHARED_MEMORY_NAME "Engine2 Editor"
-constexpr int SHARED_MEMORY_SIZE = 1280 * 720 * 4;
+#define SHARED_MEMORY_NAME_CONTEX "Engine2 Editor Contex"
+#define SHARED_MEMORY_NAME_DATA "Engine2 Editor Data"
+constexpr int SHARED_MEMORY_SIZE_CONTEX = 1280 * 720 * 4;
+constexpr int SHARED_MEMORY_SIZE_DATA = 1280 * 720 * 4;
 Primative::Model GameScene::quadModel = { };
 std::vector<GameEventsTypes> GameScene::getCurrentEvents() const
 {
@@ -40,13 +42,16 @@ std::vector<GameEventsTypes> GameScene::getCurrentEvents() const
 	return res;
 }
 
-GameScene::GameScene(bool renderToSharedMemory) : objects(), preProcessingLayers(), currentTick(0), postProcShaderId(0), FBOs_pre(), backgroundColour(0), sharedMemory(SHARED_MEMORY_NAME, SHARED_MEMORY_SIZE),
+GameScene::GameScene(bool renderToSharedMemory) : objects(), preProcessingLayers(), currentTick(0), postProcShaderId(0), FBOs_pre(), backgroundColour(0), 
+							sharedMemoryContex(SHARED_MEMORY_NAME_CONTEX, SHARED_MEMORY_SIZE_CONTEX), sharedMemoryData(SHARED_MEMORY_NAME_DATA, SHARED_MEMORY_SIZE_DATA),
 							skybox(nullptr), activeContext(nullptr), opaque(), transparent(), mainCamera(nullptr), terrain(), mainShadowCaster(nullptr), renderToSharedMemory(renderToSharedMemory),
 							isFirstLoop(false), closing(false), uiStuff(), screenDimentions(0), emmiters(), lightSources(), USE_SHADOWS(1), uiContainers()
 {
 	quadModel = ResourceLoader::getModel("plane.dae");
-	if(renderToSharedMemory)
-		sharedMemory.openFile();
+	if (renderToSharedMemory) {
+		sharedMemoryContex.openFile();
+		sharedMemoryData.openFile();
+	}
 }
 
 void GameScene::drawOpaque()
@@ -174,7 +179,7 @@ void GameScene::createStartUpFile(String location)
 	data += Utils::to_string(*screenDimentions) + "\n";
 
 	data += "Share Memory Data:";
-	data += SHARED_MEMORY_NAME + std::string(":") + std::to_string(SHARED_MEMORY_SIZE) + "\n";
+	data += SHARED_MEMORY_NAME_CONTEX + std::string(":") + std::to_string(SHARED_MEMORY_SIZE_CONTEX) + "\n";
 
 	Utils::writeToFile(location + "\\StartUp File.txt", data);
 }
@@ -287,7 +292,7 @@ void GameScene::postProcess()
 {
 	if(renderToSharedMemory) {
 		glUseProgram(0);
-		glReadPixels(0, 0, screenDimentions->x, screenDimentions->y, GL_BGRA, GL_UNSIGNED_BYTE, sharedMemory.getData());
+		glReadPixels(0, 0, screenDimentions->x, screenDimentions->y, GL_BGRA, GL_UNSIGNED_BYTE, sharedMemoryContex.getData());
 		glUseProgram(0);
 	}
 
@@ -588,8 +593,10 @@ void GameScene::cleanUp()
 		(*itt)->cleanUp();
 		itt = contexts.erase(itt);
 	}
-	if(renderToSharedMemory)
-		sharedMemory.closeFile();
+	if (renderToSharedMemory) {
+		sharedMemoryContex.closeFile();
+		sharedMemoryData.closeFile();
+	}
 }
 
 void GameScene::close()

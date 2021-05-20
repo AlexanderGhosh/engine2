@@ -43,7 +43,7 @@ class GameScene
 {
 private:
 	static Primative::Model quadModel;
-	SharedMemoryLocation sharedMemory;
+	SharedMemoryLocation sharedMemoryContex, sharedMemoryData;
 	// char* ColourBuffer;
 	std::vector<Terrain*> terrain;
 	SkyBox* skybox;
