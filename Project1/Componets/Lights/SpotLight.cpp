@@ -24,6 +24,18 @@ void Component::SpotLight::cleanUp()
 	LightBase::cleanUp();
 }
 
+Byte_Array Component::SpotLight::getByteField() const
+{
+	Byte_Array res = LightBase::getByteField();
+	Utils::addToByteArray(res, direction);
+	Utils::addToByteArray(res, cutOff);
+	Utils::addToByteArray(res, outterCutOff);
+	Utils::addToByteArray(res, constant);
+	Utils::addToByteArray(res, linear);
+	Utils::addToByteArray(res, quadratic);
+	return res;
+}
+
 void Component::SpotLight::setDirection(Vector3 dir)
 {
 	direction = dir;

@@ -10,6 +10,14 @@ void Component::CharacterController::cleanUp()
 {
 }
 
+Byte_Array Component::CharacterController::getByteField() const
+{
+	Byte_Array res;
+	res.reserve(ByteSizeOfComponents[static_cast<int>(getType())]);
+	Utils::addToByteArray(res, hasGravity);
+	return res;
+}
+
 void Component::CharacterController::intergrateVelocity(Float deltaTime)
 {
 	/*if (hasGravity) {

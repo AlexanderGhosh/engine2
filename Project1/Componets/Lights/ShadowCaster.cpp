@@ -27,8 +27,13 @@ void Component::ShadowCaster::update(float deltaTime)
 {
 	if (NOT camera)
 		return;
-	auto t = parent->getScene()->getContext();
+	auto t = parent->getScene()->getActiveContext();
 	lightMatrixInfo.update(camera, t->getAspectRatio());
+}
+
+Byte_Array Component::ShadowCaster::getByteField() const
+{
+	return Byte_Array();
 }
 
 glm::mat4 Component::ShadowCaster::getLSMatrix() const

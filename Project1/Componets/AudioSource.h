@@ -29,6 +29,7 @@ namespace Component {
         void cleanUp();
         bool getAttenuate() const;
         inline Type getType() const { return Type::AudioSource; };
+        Byte_Array getByteField() const;
     };
 };
 

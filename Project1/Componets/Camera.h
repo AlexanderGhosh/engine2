@@ -18,6 +18,7 @@ namespace Component {
 		const glm::mat4 getView() const;
 		void processMouseMovement(float xOff, float yOff, bool constainPitch = 1);
 		void update(float deltaTime);
+		Byte_Array getByteField() const;
 
 		// getters
 		Float getFOV() const;

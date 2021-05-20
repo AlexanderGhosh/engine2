@@ -29,6 +29,21 @@ void Component::Transform::cleanUp()
 {
 }
 
+Byte_Array Component::Transform::getByteField() const
+{
+    Byte_Array res;
+    res.reserve(ByteSizeOfComponents[static_cast<int>(getType())]);
+
+    Utils::addToByteArray(res, Position);
+
+    Utils::addToByteArray(res, Scale);
+
+    glm::vec3 eulerRot = glm::degrees(glm::eulerAngles(Rotation));
+    Utils::addToByteArray(res, eulerRot);
+
+    return res;
+}
+
 Component::Transform Component::Transform::operator+(const Transform& a) const
 {
     Transform res(*this);

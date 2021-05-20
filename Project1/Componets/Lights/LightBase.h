@@ -14,6 +14,7 @@ namespace Component {
 		virtual LightType getLightType() const = 0;
 		void setParent(GameObject* parent);
 		void cleanUp();
+		Byte_Array getByteField() const;
 		// getters
 		Vector3 getPosition() const;
 		Vector3 getColour() const;

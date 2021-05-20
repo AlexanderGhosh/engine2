@@ -13,6 +13,7 @@ namespace Component {
 		LightType getLightType() const;
 		void cleanUp();
 		Vector3 getDirection() const;
+		Byte_Array getByteField() const;
 	};
 }
 

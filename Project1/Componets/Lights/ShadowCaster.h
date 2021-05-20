@@ -34,6 +34,7 @@ namespace Component {
 
 		void cleanUp();
 		void update(float deltaTime);
+		Byte_Array getByteField() const;
 
 		// getters
 		inline Type getType() const { return Type::ShadowCaster; };

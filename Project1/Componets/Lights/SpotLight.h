@@ -13,6 +13,7 @@ namespace Component {
 		~SpotLight() = default;
 		LightType getLightType() const;
 		void cleanUp();
+		Byte_Array getByteField() const;
 
 		// setters
 		void setDirection   (Vector3 dir);

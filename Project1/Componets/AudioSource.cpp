@@ -94,3 +94,12 @@ bool Component::AudioSource::getAttenuate() const
 {
 	return canAttenuate;
 }
+
+Byte_Array Component::AudioSource::getByteField() const
+{
+	std::vector<unsigned char> res;
+	res.reserve(ByteSizeOfComponents[static_cast<int>(getType())]);
+	Utils::addToByteArray(res, isLooping);
+	Utils::addToByteArray(res, canAttenuate);
+	return res;
+}

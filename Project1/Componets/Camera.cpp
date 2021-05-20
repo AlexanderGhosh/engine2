@@ -44,6 +44,16 @@ void Component::Camera::update(float deltaTime) {
 	up = glm::normalize(glm::cross(right, fwd));
 }
 
+Byte_Array Component::Camera::getByteField() const
+{
+	Byte_Array res;
+	res.reserve(ByteSizeOfComponents[static_cast<int>(getType())]);
+	Utils::addToByteArray(res, exposure);
+	Utils::addToByteArray(res, fov);
+	Utils::addToByteArray(res, up);
+	return res;
+}
+
 Float Component::Camera::getFOV() const
 {
 	return fov;

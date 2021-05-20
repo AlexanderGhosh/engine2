@@ -24,3 +24,10 @@ Vector3 Component::DirectionalLight::getDirection() const
 {
 	return direction;
 }
+
+Byte_Array Component::DirectionalLight::getByteField() const
+{
+	Byte_Array res = LightBase::getByteField();
+	Utils::addToByteArray(res, direction);
+	return res;
+}

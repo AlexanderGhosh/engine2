@@ -4,7 +4,7 @@
 #include "RigidBody.h"
 #include "Camera.h"
 
-Component::AudioReciever::AudioReciever() : ComponetBase(), placeHolder(0)
+Component::AudioReciever::AudioReciever() : ComponetBase()
 {
 
 }
@@ -29,4 +29,9 @@ void Component::AudioReciever::update(float deltaTime)
 
 void Component::AudioReciever::cleanUp()
 {
+}
+
+Byte_Array Component::AudioReciever::getByteField() const
+{
+	return Byte_Array();
 }

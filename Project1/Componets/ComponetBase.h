@@ -9,6 +9,9 @@ namespace Component {
 	{
 		Transform, Camera, AudioSource, Rigidbody, Collider, RenderMesh, Light, Animated, Script, Canvas, AudioReciever, ParticleEmmiter, CharacterController, ShadowCaster
 	};
+	constexpr std::array<int, 14> ByteSizeOfComponents = {
+		36, 20, 2, 0, 0, 2, 16, 0, 0, 0, 0, 0, 1, 0
+	};
 	class ComponetBase {
 	public:
 		// event callbacks
@@ -20,6 +23,8 @@ namespace Component {
 		virtual void mouseMove(float deltaTime) { };
 		virtual void mouseButton(float deltaTime) { };
 		virtual void keyButton(float deltaTime) { };
+
+		virtual std::vector<unsigned char> getByteField() const { return  { }; };
 
 		virtual void cleanUp() = 0;
 		virtual void setParent(GameObject* parent) { this->parent = parent; };
@@ -41,6 +46,8 @@ namespace Component {
 		void rotate(Vector3 axis, Float angle);
 		void rotate(Vector3 rotation);
 		void cleanUp();
+
+		Byte_Array getByteField() const;
 
 		Transform operator+(const Transform& a) const; 
 		Transform& operator+=(const Transform& a);

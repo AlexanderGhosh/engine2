@@ -18,6 +18,7 @@ namespace Component {
 		~CharacterController() = default;
 		inline Type getType() const { return Component::Type::CharacterController; };
 		void cleanUp();
+		Byte_Array getByteField() const;
 
 		// getters
 		Vector3 getVelocity() const;
