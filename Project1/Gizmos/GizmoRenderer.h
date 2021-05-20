@@ -16,7 +16,7 @@ namespace Gizmos {
 		static void updateInstanceDate();
 	public:
 		static void init();
-		static void drawAll();
+		static void drawAll(bool renderToSharedMemory);
 		static void drawType(const Types type);
 		static void addGizmo(Gizmo* gizmo);
 		static void cleanUp();

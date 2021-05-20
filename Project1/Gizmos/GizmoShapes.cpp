@@ -89,10 +89,11 @@ Gizmos::Point::Point(Vector3 pos, Vector3 col) : Point() {
 	this->colour = col;
 }
 
-void Gizmos::Point::draw() {
+void Gizmos::Point::draw(bool renderToSharedMemory) {
 	bindShader();
 	Render::Shading::Manager::setValue("position", position);
 	Render::Shading::Manager::setValue("colour", colour);
+	Render::Shading::Manager::setValue("flip", renderToSharedMemory ? -1 : 1);
 	drawGeneral();
 }
 
@@ -124,10 +125,11 @@ Gizmos::Line::Line(Vector3 from, Vector3 to, bool over) : Line()
 	rightOffset = half_d;
 }
 
-void Gizmos::Line::draw() {
+void Gizmos::Line::draw(bool renderToSharedMemory) {
 	bindShader();
 	Render::Shading::Manager::setValue("left", leftOffset);
 	Render::Shading::Manager::setValue("right", rightOffset);
+	Render::Shading::Manager::setValue("flip", renderToSharedMemory ? -1 : 1);
 	drawGeneral();
 }
 
@@ -161,13 +163,14 @@ Gizmos::Circle::Circle(Vector3 pos, Vector3 col) : Circle()
 	this->colour = col;
 }
 
-void Gizmos::Circle::draw() {
+void Gizmos::Circle::draw(bool renderToSharedMemory) {
 	bindShader();
 	const float angle = glm::degrees(acosf(glm::dot(Utils::yAxis(), glm::normalize(up))));
 	const glm::vec3 axis = Utils::normalize(glm::cross(Utils::yAxis(), up));
 	glm::mat4 rot = Utils::rotate(glm::mat4(1), angle * axis);
 	Render::Shading::Manager::setValue("rotation", rot);
 	Render::Shading::Manager::setValue("radius", radius);
+	Render::Shading::Manager::setValue("flip", renderToSharedMemory ? -1 : 1);
 	drawGeneral();
 }
 
@@ -202,12 +205,13 @@ Gizmos::Cuboide::Cuboide(Vector3 pos, Vector3 col) : Cuboide()
 	this->colour = col;
 }
 
-void Gizmos::Cuboide::draw() {
+void Gizmos::Cuboide::draw(bool renderToSharedMemory) {
 	bindShader();
 	glm::mat4 model = glm::translate(glm::mat4(1), position);
 	model = glm::scale(model, dimensions);
 	bool t = Render::Shading::Manager::setValue("model", model);
-	t = t AND Render::Shading::Manager::setValue("colour", colour);
+	t = Render::Shading::Manager::setValue("colour", colour) AND t;
+	t = Render::Shading::Manager::setValue("flip", renderToSharedMemory ? -1 : 1) AND t;
 	assert(t);
 	glPointSize(thickness);
 	glLineWidth(thickness);
@@ -252,7 +256,7 @@ Gizmos::Sphere::Sphere(Vector3 pos, Vector3 col) : Sphere()
 	this->colour = col;
 }
 
-void Gizmos::Sphere::draw()
+void Gizmos::Sphere::draw(bool renderToSharedMemory)
 {
 	for (char i = 0; i < 3; i++) {
 		if (updated) {
@@ -260,7 +264,7 @@ void Gizmos::Sphere::draw()
 			cirlces[i].setPosition(this->position);
 			cirlces[i].setRadius(this->radius);
 		}
-		cirlces[i].draw();
+		cirlces[i].draw(renderToSharedMemory);
 	}
 }
 

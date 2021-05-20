@@ -79,7 +79,7 @@ public:
 	// general
 	static void cleanUp();
 	// statics
-	static std::string ShaderDirectory, TextureDirectory, ModelDirectory;
+	static std::string ShaderDirectory, TextureDirectory, ModelDirectory, SoundDirectory, ScriptDirectory;
 private:
 	static std::unordered_map<std::string, unsigned> shaders;
 	static std::unordered_map<std::string, unsigned> textures;

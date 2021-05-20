@@ -75,9 +75,15 @@
 
 #include "Context.h"
 
-constexpr glm::ivec2 SCREEN_DIMENTIONS = glm::ivec2(720, 405);
+constexpr glm::svec2 SCREEN_DIMENTIONS = glm::ivec2(720, 405);
 long SEED;
-int main() {
+
+void processArgs(int argc, char** argv);
+
+bool saveToMem = false;
+int main(int argc, char** argv) {
+    // std::cout << std::filesystem::current_path() << std::endl;
+    processArgs(argc, argv);
     SEED = time(0);
     // SEED = 1;
     srand(SEED);
@@ -97,7 +103,7 @@ int main() {
     timer.start("Shaders");
     Gizmos::GizmoRenderer::init();
     std::vector<std::string> shaders = {
-        "PBRShader", "DeferredRendering/TransparentShader", "Shadows/ShadowShader", "UIShader", "TextShader", "DeferredRendering/G Pass/DeferredTerrainMap", "DeferredRendering/G Pass/DeferredTerrainMesh", "PostShader", "ParticleShader", 
+        "PBRShader", "DeferredRendering/TransparentShader", "Shadows/ShadowShader", "UIShader", "TextShader", "DeferredRendering/G Pass/DeferredTerrainMap", "DeferredRendering/G Pass/DeferredTerrainMesh", "PostShader", "ParticleShader",
         "DeferredRendering/DeferredFinal", "DeferredRendering/G Pass/DeferredOpaque", "GausianBlur", "GUI/BaseShapeShader"
     };
     ResourceLoader::createShaders(shaders);
@@ -112,7 +118,7 @@ int main() {
 
     // UI //
     timer.start("UI");
-    UI::TextRenderer font = UI::TextRenderer(SCREEN_DIMENTIONS, "arial", 25); // creates arial Font
+    UI::TextRenderer font = UI::TextRenderer("arial", 25); // creates arial Font
     UI::TextRenderer::setShader(ResourceLoader::getShader("TextShader"));
     UI::UIRenderer::init(ResourceLoader::getShader("UIShader"), SCREEN_DIMENTIONS);
     timer.log();
@@ -120,10 +126,10 @@ int main() {
 
     timer.start("Models");
     // const Primative::Model manModel    = ResourceLoader::createModel("Resources/Models/RFA_Model.fbx"); // RFA_Model
-    const Primative::Model cubeBuffer  = ResourceLoader::createModel("Resources/Models/cube.obj"); // needed for the skybox
-    const Primative::Model planeBuffer = ResourceLoader::createModel("Resources/Models/plane.dae");
+    const Primative::Model cubeBuffer = ResourceLoader::createModel("cube.obj"); // needed for the skybox
+    const Primative::Model planeBuffer = ResourceLoader::createModel("plane.dae");
     // const Primative::Model minikitBuffer = ResourceLoader::createModel("Resources/Models/minikit.fbx");
-    const Primative::Model orbBuffer = ResourceLoader::createModel("Resources/Models/sphere.obj");
+    const Primative::Model orbBuffer = ResourceLoader::createModel("sphere.obj");
     //const Primative::Model cityBuffer = ResourceLoader::createModel("Resources/Models/city.obj");
     timer.log();
 
@@ -132,18 +138,18 @@ int main() {
     timer.log();
 
     timer.start("Textures");
-    const unsigned wi   = ResourceLoader::loadTexture("Resources/Textures/window.png", TextureType::AlbedoMap, 0);
-    const unsigned wiy  = ResourceLoader::loadTexture("Resources/Textures/yellowWindow.png", TextureType::AlbedoMap, 0);
+    const unsigned wi = ResourceLoader::loadTexture("window.png", TextureType::AlbedoMap, 0);
+    const unsigned wiy = ResourceLoader::loadTexture("yellowWindow.png", TextureType::AlbedoMap, 0);
     // const unsigned hm       = ResourceLoader::loadTexture("Resources/Textures/heightmap.png", TextureType::HeightMap, 0);
-    const unsigned rainDrop = ResourceLoader::loadTexture("Resources/Textures/raindrop.png", TextureType::AlbedoMap, 0);
-    const unsigned dirt     = ResourceLoader::loadTexture("Resources/Textures/dirt.png", TextureType::AlbedoMap, 0);
+    const unsigned rainDrop = ResourceLoader::loadTexture("raindrop.png", TextureType::AlbedoMap, 0);
+    const unsigned dirt = ResourceLoader::loadTexture("dirt.png", TextureType::AlbedoMap, 0);
     //const unsigned cityTex  = ResourceLoader::loadTexture("Resources/Textures/City Tex.png", TextureType::AlbedoMap, 0);
 
-    auto grassMaterialInfo = ResourceLoader::createPBRInfo("Resources/Textures/Grass", { TextureType::AlbedoMap, TextureType::AOMap, TextureType::MetalicMap, TextureType::NormalMap, TextureType::RoughnessMap }, { 0, 0, 0, 0, 0 });
+    auto grassMaterialInfo = ResourceLoader::createPBRInfo("Grass", { TextureType::AlbedoMap, TextureType::AOMap, TextureType::MetalicMap, TextureType::NormalMap, TextureType::RoughnessMap }, { 0, 0, 0, 0, 0 });
     auto& grassMaterial = ResourceLoader::createPBR(grassMaterialInfo);
     grassMaterial.setRepeatValue(10);
 
-    auto waterMaterialInfo = ResourceLoader::createPBRInfo("Resources/Textures/Water", { TextureType::AlbedoMap, TextureType::RoughnessMap, TextureType::NormalMap, TextureType::AOMap, TextureType::MetalicMap }, { 0, 0, 0, 0, 0 });
+    auto waterMaterialInfo = ResourceLoader::createPBRInfo("Water", { TextureType::AlbedoMap, TextureType::RoughnessMap, TextureType::NormalMap, TextureType::AOMap, TextureType::MetalicMap }, { 0, 0, 0, 0, 0 });
     auto& waterMaterial = ResourceLoader::createPBR(waterMaterialInfo);
     Materials::MatItemSingle<glm::vec4> waterAlbedo({ 0, 0, 1, 1 });
     Materials::MatItemSingle<glm::vec3> waterEmission({ 0, 0, 0 });
@@ -156,7 +162,7 @@ int main() {
     waterMaterial.setMetalic(&waterMetalic);
     waterMaterial.setRoughness(&waterRoughness);
     waterMaterial.setAO(&waterAO);
-  
+
     timer.log();
 
     timer.start("Objects");
@@ -177,7 +183,7 @@ int main() {
 
     timer.log();
 
-    timer.start("Terrain"); 
+    timer.start("Terrain");
 
     const int landSize = 2;
     const float scale = 100;
@@ -217,6 +223,8 @@ int main() {
     Component::AudioReciever recieverComp;
     player.addComponet(&recieverComp);
 
+    auto res = player.getByteField();
+
 
     GameObject lightSource(glm::vec3(0, 1.5, -2.5));
     Component::PointLight light(glm::vec3(1), 100.0f);
@@ -252,7 +260,7 @@ int main() {
     timer.log();
 
 
-    Materials::MatItemSingle<glm::vec4> uiColourCanvas(glm::vec4(0.5, 1, 1, 0.5));
+    /*Materials::MatItemSingle<glm::vec4> uiColourCanvas(glm::vec4(0.5, 1, 1, 0.5));
     GUI::GUICanvas canvas;
     canvas.setDimentions(SCREEN_DIMENTIONS / 2);
     canvas.setBaseAlbedo(&uiColourCanvas);
@@ -277,15 +285,16 @@ int main() {
     // element1.setSliderAlbedo(&uiColourBar);
 
 
-    canvas.addElement(&element1);
+    canvas.addElement(&element1);*/
 
 
     timer.start("Scene");
 
-    GameScene scene;
-    scene.setContext(&main);
+    GameScene scene = GameScene(saveToMem);
+    scene.addContext(&main);
+    scene.setActiveContext(0);
     scene.setMainCamera(&playerCamera);
-    scene.setBG({ 1, 0.5, 0.25 });
+    scene.setBG({ 1, 1, 0.5 });
     scene.initalize();
 
     scene.addObject(&player);
@@ -298,8 +307,8 @@ int main() {
     for (Terrain& land : allLand) {
         scene.addTerrain(&land);
     }
-    
-    scene.addUI(&canvas);
+
+    // scene.addUI(&canvas);
 
     scene.setShadowCaster(&shadowCaster);
 
@@ -307,12 +316,12 @@ int main() {
 
     // SKYBOX //
     timer.start("Skybox");
-    ResourceLoader::loadCubeMap("Resources/Textures/DistantMtSB", ".png", 0);
+    ResourceLoader::loadCubeMap("DistantMtSB", ".png", 0);
     SkyBox sb = SkyBox("DistantMtSB.cm");
     scene.setSkyBox(&sb);
     timer.log();
     // SKYBOX //
-    
+
     Gizmos::Sphere gizmo1 = Gizmos::Sphere({ 0, 4, 0 }, { 1, 0, 0 });
     gizmo1.setRadius(0.25);
     gizmo1.setThickness(2);
@@ -323,14 +332,45 @@ int main() {
 
     Physics::Engine::cleanUp();
     gizmo1.cleanUp();
-    
+
     scene.cleanUp(); // removes and destrys all componets and fbos (destroysing comonets doesnt destry buffers(except audio source))
-    
+
     UI::TextRenderer::cleanUpStatic(); // destroys char buffers and char textures for all fonts
     UI::UIRenderer::cleanUp(); // destroys quadbuffer and UBO 1
     SoundManager::cleanUp(); // destroys sound buffers
     ResourceLoader::cleanUp(); // destroys textures shaders and models(buffers)
     Gizmos::GizmoRenderer::cleanUp();
-    
+
     return 0;
+}
+
+
+void processArgs(int argc, char** argv) {
+    // 0 - save to memory
+    // 1 - project name
+    // 2 - model   path
+    // 3 - shader  path
+    // 4 - texture path
+    // 5 - sounds  path
+    // 6 - scripts path
+    // 7 - inital  aspect ratio
+    // 8 - inital  width
+    try {
+        const std::string args = Utils::toStringList(argv, argc).at(1);
+        std::vector<std::string> argsSplit = Utils::split(args, ",");
+        for (String arg : argsSplit) {
+            Utils::log(arg);
+        }
+        saveToMem                        = stoi(argsSplit.at(0));
+        std::string projectName          = argsSplit.at(1);
+        /*ResourceLoader::ModelDirectory   = argsSplit.at(02;
+        ResourceLoader::ShaderDirectory  = argsSplit.at(3);
+        ResourceLoader::TextureDirectory = argsSplit.at(4);
+        ResourceLoader::SoundDirectory   = argsSplit.at(5);
+        ResourceLoader::ScriptDirectory  = argsSplit.at(6);*/
+    }
+    catch (std::exception e)
+    {
+
+    }
 }

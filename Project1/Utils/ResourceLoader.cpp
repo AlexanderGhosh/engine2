@@ -21,9 +21,11 @@ std::vector<Primative::Buffers::VertexBuffer> ResourceLoader::buffers = { };
 std::unordered_map<std::string, Render::Animation::Animation> ResourceLoader::animations = { };
 std::vector<Materials::MaterialBase*> ResourceLoader::materials = { };
 std::unordered_map<std::string, Primative::Model> ResourceLoader::models = { };
-std::string ResourceLoader::ShaderDirectory = "Resources/Shaders/";
-std::string ResourceLoader::TextureDirectory = "Resources/Textures";
-std::string ResourceLoader::ModelDirectory = "Resources/Models";
+std::string ResourceLoader::ShaderDirectory = "Resources\\Shaders\\";
+std::string ResourceLoader::TextureDirectory = "Resources\\Textures\\";
+std::string ResourceLoader::ModelDirectory = "Resources\\Models\\";
+std::string ResourceLoader::SoundDirectory = "Resources\\Sounds\\";
+std::string ResourceLoader::ScriptDirectory = "Scripts\\";
 std::vector<void*> ResourceLoader::roguePointers = { };
 #pragma endregion
 
@@ -39,7 +41,7 @@ std::vector<std::string> ResourceLoader::createShaders(const std::vector<std::st
         geoms.push_back(false);
     }
     for (int i = 0; i < shaders.size(); i++) {
-        res.push_back(createShader(ShaderDirectory + shaders[i], geoms[i]));
+        res.push_back(createShader(shaders[i], geoms[i]));
     }
     return res;
 }
@@ -48,12 +50,13 @@ std::vector<std::string> ResourceLoader::createShaders(const std::vector<std::st
     std::vector<std::string> res;
     res.reserve(shaders.size());
     for (int i = 0; i < shaders.size(); i++) {
-        res.push_back(createShader(ShaderDirectory + shaders[i], false));
+        res.push_back(createShader(shaders[i], false));
     }
     return res;
 }
-std::string ResourceLoader::createShader(String filePath, bool hasGeom)
+std::string ResourceLoader::createShader(String fileName, bool hasGeom)
 {
+    const std::string filePath = ShaderDirectory + fileName;
     const std::string extensions[] = { "/vertex.glsl", "/geometry.glsl", "/fragment.glsl" };
     std::string codes[] = { "", "", "" };
     std::ifstream streams[] = { { }, { }, { } };
@@ -207,7 +210,7 @@ Materials::PBR& ResourceLoader::createPBR(PBRInfo& info)
 #pragma region Textures
 const std::vector<unsigned> ResourceLoader::loadTextureFile(String dirPath, std::vector<TextureType> types, std::vector<bool> flip)
 {
-    const int s = Utils::countFiles(dirPath);
+    const int s = Utils::countFiles(TextureDirectory + dirPath);
     types.reserve(s);
     flip.reserve(s);
     while (types.size() < s) {
@@ -227,20 +230,21 @@ const std::vector<unsigned> ResourceLoader::loadTextureFile(String dirPath, std:
     std::vector<unsigned> res;
     res.reserve(s);
 
-    auto dirIter = std::filesystem::directory_iterator(dirPath);
+    auto dirIter = std::filesystem::directory_iterator(TextureDirectory + dirPath);
     int i = 0;
     for (auto& file : dirIter)
     {
         if (types[i] == TextureType::CubeMap)
             continue;
-        res.push_back(loadTexture(file.path().string(), types[i], flip[i]));
+        res.push_back(loadTexture(dirPath + "\\" + file.path().filename().string(), types[i], flip[i]));
         i++;
     }
     return res;
 }
 
-const unsigned ResourceLoader::loadTexture(String filePath, const TextureType type, const bool& flip)
+const unsigned ResourceLoader::loadTexture(String fileName, const TextureType type, const bool& flip)
 {
+    const std::string filePath = TextureDirectory + fileName;
     stbi_set_flip_vertically_on_load(flip);
     unsigned tex = 0;
     glGenTextures(1, &tex);
@@ -291,8 +295,9 @@ const unsigned ResourceLoader::loadTexture(String filePath, const TextureType ty
     return tex;
 }
 
-const unsigned ResourceLoader::loadCubeMap(String dirPath, String extension, const bool& flip)
+const unsigned ResourceLoader::loadCubeMap(String dirName, String extension, const bool& flip)
 {
+    const std::string dirPath = TextureDirectory + dirName;
     stbi_set_flip_vertically_on_load(flip);
     unsigned tex = 0;
     glGenTextures(1, &tex);
@@ -364,7 +369,7 @@ const Primative::Model ResourceLoader::processMeshData(std::vector<Primative::Me
 #pragma endregion
 const Primative::Model ResourceLoader::createModel(String filePath, GLenum draw_type)
 {
-    auto data = FileReaders::AssimpWrapper::loadModel(filePath);
+    auto data = FileReaders::AssimpWrapper::loadModel(ModelDirectory + filePath);
 
     const std::string name = Utils::getFileName(filePath, 1);
     for (auto itt = std::get<1>(data).begin(); itt != std::get<1>(data).end(); itt++) {
@@ -406,7 +411,7 @@ const unsigned ResourceLoader::getShader(String name, bool create)
     unsigned& r = shaders[name];
     if (s < shaders.size()) {
         if(create)
-            r = getShader(ResourceLoader::createShader(ShaderDirectory + name, 0), false);
+            r = getShader(ResourceLoader::createShader(name, 0), false);
         else {
             shaders.erase(name);
             return 0;

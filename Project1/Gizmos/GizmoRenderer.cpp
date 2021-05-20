@@ -22,19 +22,19 @@ void Gizmos::GizmoRenderer::updateInstanceDate()
 
 void Gizmos::GizmoRenderer::init()
 {
-	ResourceLoader::createShader("Resources/Shaders/Gizmos/PointShader", true);
-	ResourceLoader::createShader("Resources/Shaders/Gizmos/LineShader", true);
-	ResourceLoader::createShader("Resources/Shaders/Gizmos/CubeShader");
-	ResourceLoader::createShader("Resources/Shaders/Gizmos/CircleShader", true);
+	ResourceLoader::createShader("Gizmos/PointShader", true);
+	ResourceLoader::createShader("Gizmos/LineShader", true);
+	ResourceLoader::createShader("Gizmos/CubeShader");
+	ResourceLoader::createShader("Gizmos/CircleShader", true);
 }
 
-void Gizmos::GizmoRenderer::drawAll()
+void Gizmos::GizmoRenderer::drawAll(bool renderToSharedMemory)
 {
 	glDisable(GL_DEPTH_TEST);
 	for (auto itt = gizmos.begin(); itt != gizmos.end(); itt++) {
 		for (auto gizmo : (*itt).second)
 		{
-			gizmo->draw();
+			gizmo->draw(renderToSharedMemory);
 		}
 	}
 	glEnable(GL_DEPTH_TEST);
@@ -44,7 +44,7 @@ void Gizmos::GizmoRenderer::drawType(const Types type)
 {
 	for (auto gizmo : gizmos[type])
 	{
-		gizmo->draw();
+		gizmo->draw(0);
 	}
 }
 

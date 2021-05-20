@@ -17,7 +17,7 @@ namespace Gizmos {
 		void unbindVAO() const;
 		void drawGeneral();
 	public:
-		virtual void draw() = 0;
+		virtual void draw(bool renderToSharedMemory) = 0;
 		virtual void cleanUp() = 0;
 		virtual Types getType() const = 0;
 		
@@ -33,7 +33,7 @@ namespace Gizmos {
 		Point();
 		Point(Vector3 pos, Vector3 col);
 		~Point() = default;
-		void draw();
+		void draw(bool renderToSharedMemory);
 		void cleanUp();
 		Types getType() const;
 	};
@@ -45,7 +45,7 @@ namespace Gizmos {
 		Line(Vector3 pos, Vector3 col);
 		Line(Vector3 from, Vector3 to, bool over);
 		~Line() = default;
-		void draw();
+		void draw(bool renderToSharedMemory);
 		void cleanUp();
 		Types getType() const;
 		void setLeftOffset(Vector3 left);
@@ -59,7 +59,7 @@ namespace Gizmos {
 		Circle();
 		Circle(Vector3 pos, Vector3 col);
 		~Circle() = default;
-		void draw();
+		void draw(bool renderToSharedMemory);
 		void cleanUp();
 		Types getType() const;
 		void setRadius(Float r);
@@ -73,7 +73,7 @@ namespace Gizmos {
 		Cuboide();
 		Cuboide(Vector3 pos, Vector3 col);
 		~Cuboide() = default;
-		void draw();
+		void draw(bool renderToSharedMemory);
 		void cleanUp();
 		Types getType() const;
 		void setDimentions(Vector3 dim);
@@ -87,7 +87,7 @@ namespace Gizmos {
 		Sphere();
 		Sphere(Vector3 pos, Vector3 col);
 		~Sphere() = default;
-		void draw();
+		void draw(bool renderToSharedMemory);
 		void cleanUp();
 		Types getType() const;
 		void setRadius(Float r);
