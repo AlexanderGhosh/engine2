@@ -42,4 +42,7 @@ public:
 
     // true is this object created the shared memory
     bool isCreator();
+
+    // returns the file size
+    unsigned getFileSize();
 };

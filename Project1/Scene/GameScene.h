@@ -82,6 +82,9 @@ private:
 
 	// polling evetns
 	std::vector<GameEventsTypes> getCurrentEvents() const;
+
+	// for editor
+	void processCommands();
 public:	
 	bool USE_SHADOWS;
 	GameScene(bool renderToSharedMemory = 0);
@@ -132,7 +135,7 @@ public:
 	Component::Camera* getMainCamera();
 	const Component::ShadowCaster* getShadowCaster() const;
 	Context* getActiveContext() const;
-
+	SharedMemoryLocation& getSharedData();
 
 
 };

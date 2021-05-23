@@ -129,7 +129,7 @@ int main(int argc, char** argv) {
     const Primative::Model cubeBuffer = ResourceLoader::createModel("cube.obj"); // needed for the skybox
     const Primative::Model planeBuffer = ResourceLoader::createModel("plane.dae");
     // const Primative::Model minikitBuffer = ResourceLoader::createModel("Resources/Models/minikit.fbx");
-    const Primative::Model orbBuffer = ResourceLoader::createModel("sphere.obj");
+    // const Primative::Model orbBuffer = ResourceLoader::createModel("sphere.obj");
     //const Primative::Model cityBuffer = ResourceLoader::createModel("Resources/Models/city.obj");
     timer.log();
 
@@ -138,7 +138,7 @@ int main(int argc, char** argv) {
     timer.log();
 
     timer.start("Textures");
-    const unsigned wi = ResourceLoader::loadTexture("window.png", TextureType::AlbedoMap, 0);
+    /*const unsigned wi = ResourceLoader::loadTexture("window.png", TextureType::AlbedoMap, 0);
     const unsigned wiy = ResourceLoader::loadTexture("yellowWindow.png", TextureType::AlbedoMap, 0);
     // const unsigned hm       = ResourceLoader::loadTexture("Resources/Textures/heightmap.png", TextureType::HeightMap, 0);
     const unsigned rainDrop = ResourceLoader::loadTexture("raindrop.png", TextureType::AlbedoMap, 0);
@@ -161,18 +161,18 @@ int main(int argc, char** argv) {
     waterMaterial.setEmission(&waterEmission);
     waterMaterial.setMetalic(&waterMetalic);
     waterMaterial.setRoughness(&waterRoughness);
-    waterMaterial.setAO(&waterAO);
+    waterMaterial.setAO(&waterAO);*/
 
     timer.log();
 
     timer.start("Objects");
 
 
-    GameObject orb(glm::vec3(0, 1.5, 0));
+    /*GameObject orb(glm::vec3(0, 1.5, 0));
     Component::RenderMesh orbMesh = Component::RenderMesh();
     orbMesh.setModel(orbBuffer);
     orbMesh.setMaterial(&waterMaterial);
-    orb.addComponet(&orbMesh);
+    orb.addComponet(&orbMesh);*/
 
     /*Particles::DomeDistribution distribution = Particles::DomeDistribution(1.0f);
     Component::ParticleEmmiter emmiter = Component::ParticleEmmiter(10, 10, true, 0.25);
@@ -185,7 +185,7 @@ int main(int argc, char** argv) {
 
     timer.start("Terrain");
 
-    const int landSize = 2;
+    /*const int landSize = 2;
     const float scale = 100;
     const int landRes = 100;
     std::vector<Terrain> allLand;
@@ -204,7 +204,7 @@ int main(int argc, char** argv) {
 
             allLand.push_back(land);
         }
-    }
+    }*/
     timer.log();
 
 
@@ -216,17 +216,17 @@ int main(int argc, char** argv) {
     Component::CharacterController cc;
     player.addComponet(&cc);
     PlayerControler playerScript;
-    playerScript.ground = allLand;
+    // playerScript.ground = allLand;
     player.addComponet(&playerScript);
     DebugScreen debugScript;
     player.addComponet(&debugScript);
-    Component::AudioReciever recieverComp;
-    player.addComponet(&recieverComp);
+    /*Component::AudioReciever recieverComp;
+    player.addComponet(&recieverComp);*/
 
-    auto res = player.getByteField();
+    //auto res = player.getByteField();
 
 
-    GameObject lightSource(glm::vec3(0, 1.5, -2.5));
+    /*GameObject lightSource(glm::vec3(0, 1.5, -2.5));
     Component::PointLight light(glm::vec3(1), 100.0f);
     lightSource.addComponet(&light);
 
@@ -255,7 +255,7 @@ int main(int argc, char** argv) {
     windowMesh1.setModel(planeBuffer);
     windowMesh1.setMaterial(&windowMat1);
     windowMesh1.setTransparent(true);
-    window1.addComponet(&windowMesh1);
+    window1.addComponet(&windowMesh1);*/
 
     timer.log();
 
@@ -290,7 +290,7 @@ int main(int argc, char** argv) {
 
     timer.start("Scene");
 
-    GameScene scene = GameScene(saveToMem);
+    GameScene scene = GameScene(saveToMem || true);
     scene.addContext(&main);
     scene.setActiveContext(0);
     scene.setMainCamera(&playerCamera);
@@ -298,19 +298,8 @@ int main(int argc, char** argv) {
     scene.initalize();
 
     scene.addObject(&player);
-    scene.addObject(&lightSource);
-    scene.addObject(&lightSource2);
-    scene.addObject(&window1);
-    //scene.addObject(&city);
 
-    scene.addObject(&orb);
-    for (Terrain& land : allLand) {
-        scene.addTerrain(&land);
-    }
-
-    // scene.addUI(&canvas);
-
-    scene.setShadowCaster(&shadowCaster);
+    // scene.setShadowCaster(&shadowCaster);
 
     timer.log();
 

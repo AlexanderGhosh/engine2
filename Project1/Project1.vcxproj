@@ -144,6 +144,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="EditorInteraction\DataManager.cpp" />
+    <ClCompile Include="EditorInteraction\Response.cpp" />
+    <ClCompile Include="Utils\Conversions.cpp" />
+    <ClCompile Include="EditorInteraction\Command.cpp" />
     <ClCompile Include="Componets\CharacterController.cpp" />
     <ClCompile Include="Componets\AudioReciever.cpp" />
     <ClCompile Include="Componets\Lights\LightBase.cpp" />
@@ -239,6 +243,10 @@
     <ClCompile Include="Primatives\Buffers\VertexBuffer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="EditorInteraction\DataManager.h" />
+    <ClInclude Include="EditorInteraction\Response.h" />
+    <ClInclude Include="Utils\Conversions.h" />
+    <ClInclude Include="EditorInteraction\Command.h" />
     <ClInclude Include="Componets\CharacterController.h" />
     <ClInclude Include="Componets\AudioReciever.h" />
     <ClInclude Include="Componets\Scripting.h" />

@@ -104,7 +104,6 @@ void SharedMemoryLocation::writeToFile(void* data, const unsigned int& dataSize,
     void* memLoc = (void*)((char*)this->data + offset);
 
     memcpy(memLoc, data, dataSize);
-    auto t = _getch();
 }
 
 void SharedMemoryLocation::closeFile() {
@@ -119,4 +118,9 @@ void SharedMemoryLocation::closeFile() {
 
 bool SharedMemoryLocation::isCreator() {
     return owner == 1;
+}
+
+unsigned SharedMemoryLocation::getFileSize()
+{
+    return fileSize;
 }

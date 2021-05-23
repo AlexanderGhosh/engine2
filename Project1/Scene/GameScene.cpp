@@ -21,6 +21,11 @@
 #include "../GUI/ElementContainers/GUICanvas.h"
 // GUI
 
+// EDITOR
+#include "../EditorInteraction/Command.h"
+#include "../EditorInteraction/DataManager.h"
+// EDITOR
+
 #define SHARED_MEMORY_NAME_CONTEX "Engine2 Editor Contex"
 #define SHARED_MEMORY_NAME_DATA "Engine2 Editor Data"
 constexpr int SHARED_MEMORY_SIZE_CONTEX = 1280 * 720 * 4;
@@ -42,15 +47,32 @@ std::vector<GameEventsTypes> GameScene::getCurrentEvents() const
 	return res;
 }
 
+void GameScene::processCommands()
+{
+	char* data = reinterpret_cast<char*>(sharedMemoryData.getData());
+	if (data[0] == 2) { // is command
+		EditorInteraction::Command command = EditorInteraction::Command(&data[1]);
+		EditorInteraction::DataManager::executeCommand(command);
+		EditorInteraction::CommandType t = command.getCommandType();
+		Utils::log(std::to_string(static_cast<byte>(command.getCommandID())));
+		int f = 0;
+	}
+	else { // is response or invalid
+
+	}
+}
+
 GameScene::GameScene(bool renderToSharedMemory) : objects(), preProcessingLayers(), currentTick(0), postProcShaderId(0), FBOs_pre(), backgroundColour(0), 
 							sharedMemoryContex(SHARED_MEMORY_NAME_CONTEX, SHARED_MEMORY_SIZE_CONTEX), sharedMemoryData(SHARED_MEMORY_NAME_DATA, SHARED_MEMORY_SIZE_DATA),
 							skybox(nullptr), activeContext(nullptr), opaque(), transparent(), mainCamera(nullptr), terrain(), mainShadowCaster(nullptr), renderToSharedMemory(renderToSharedMemory),
 							isFirstLoop(false), closing(false), uiStuff(), screenDimentions(0), emmiters(), lightSources(), USE_SHADOWS(1), uiContainers()
 {
 	quadModel = ResourceLoader::getModel("plane.dae");
+	EditorInteraction::DataManager::setScene(this);
 	if (renderToSharedMemory) {
 		sharedMemoryContex.openFile();
 		sharedMemoryData.openFile();
+		processCommands();
 	}
 }
 
@@ -219,7 +241,9 @@ void GameScene::setBG(Vector3 col)
 
 void GameScene::preProcess()
 {
-	const glm::mat4 lsMatrix = mainShadowCaster->getLSMatrix();
+	glm::mat4 lsMatrix(1);
+	if(mainShadowCaster)
+		lsMatrix = mainShadowCaster->getLSMatrix();
 	for (const auto& layer : preProcessingLayers) {
 		String name = layer.first;
 		Unsigned shaderId = layer.second;
@@ -279,7 +303,8 @@ void GameScene::preProcess()
 			drawSkyBox();
 			Render::Shading::Manager::setActive(ResourceLoader::getShader("TransparentShader"));
 			Render::Shading::Manager::setValue("LSMatrix", lsMatrix);
-			Render::Shading::Manager::setValue("ShadowCasterPosition", mainShadowCaster->getPosition());
+			if(mainShadowCaster)
+				Render::Shading::Manager::setValue("ShadowCasterPosition", mainShadowCaster->getPosition());
 			drawTransparent(false);
 			drawParticles();
 			drawUI();
@@ -427,6 +452,11 @@ Context* GameScene::getActiveContext() const
 	return activeContext;
 }
 
+SharedMemoryLocation& GameScene::getSharedData()
+{
+	return sharedMemoryData;
+}
+
 void GameScene::initalize()
 {
 #pragma region Pre Processing
@@ -486,13 +516,14 @@ void GameScene::initalize()
 
 	createStartUpFile("C:\\Users\\AGWDW\\Desktop");
 }
-Context mainC;
+//Context mainC;
 void GameScene::gameLoop()
 {
 	// float counter = 0;
 	isFirstLoop = true;
 	while (NOT (closing OR activeContext->shouldClose()))
 	{
+		processCommands();
 		if (Events::Handler::getKey(Events::Key::Backspace, Events::Action::Down)) {
 			/*mainC = Context({ 400, 400 }, false);
 			mainC.init("Engine 2", { GL_BLEND, GL_DEPTH_TEST, GL_CULL_FACE, GL_MULTISAMPLE, GL_SCISSOR_TEST });
@@ -597,6 +628,7 @@ void GameScene::cleanUp()
 		sharedMemoryContex.closeFile();
 		sharedMemoryData.closeFile();
 	}
+	EditorInteraction::DataManager::cleanUp();
 }
 
 void GameScene::close()

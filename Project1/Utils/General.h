@@ -32,6 +32,7 @@
 #endif
 
 
+#define PAYLOAD_SIZE 100
 #define MAX_BONE_WEIGHTS 4
 #define MAX_NUM_BONES 200
 #define NOT !
@@ -64,6 +65,7 @@ constexpr float INV_RAND_MAX = 1.0f / static_cast<float>(RAND_MAX);
 #define UChar unsigned char
 #define Short const short&
 #define Byte_Array std::vector<unsigned char>
+#define byte unsigned char
 
 namespace glm {
     using svec2 = glm::vec<2, short, glm::packed_highp>;
@@ -72,6 +74,12 @@ namespace glm {
 extern long SEED;
 
 namespace Utils {
+    template <class T>
+    static T convert(char* data) {
+        T res;
+        std::memcpy(&res, data, sizeof(T));
+        return res;
+    }
     template <class T>
     void addToByteArray(std::vector<unsigned char>& a, T& data) {
         const char* d = TO_BYTE_ARRAY(data);
