@@ -13,7 +13,7 @@ EditorInteraction::Command::Command(char* data) : Command()
 	command = data[1];
 	locationType = data[2];
 	locationUID = Utils::convert<short>(&data[3]);
-	std::memcpy(&payload, &data[4], PAYLOAD_SIZE);
+	std::memcpy(&payload, &data[5], PAYLOAD_SIZE);
 }
 
 void EditorInteraction::Command::cleanUp()
@@ -55,7 +55,7 @@ bool EditorInteraction::Command::isValid() const
 	return command != 0;
 }
 
-void EditorInteraction::Command::setCommandType(const CommandType& type)
+void EditorInteraction::Command::setResponseType(const CommandType& type)
 {
 	this->command = static_cast<byte>(type);
 }

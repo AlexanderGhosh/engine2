@@ -81,7 +81,20 @@ namespace Utils {
         return res;
     }
     template <class T>
+    static T convert(const byte* data) {
+        T res;
+        std::memcpy(&res, data, sizeof(T));
+        return res;
+    }
+    template <class T>
     void addToByteArray(std::vector<unsigned char>& a, T& data) {
+        const char* d = TO_BYTE_ARRAY(data);
+        for (char i = 0; i < sizeof(T); i++) {
+            a.push_back(d[i]);
+        }
+    }
+    template <class T>
+    void addToByteArray(std::vector<char>& a, T& data) {
         const char* d = TO_BYTE_ARRAY(data);
         for (char i = 0; i < sizeof(T); i++) {
             a.push_back(d[i]);

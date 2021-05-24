@@ -9,7 +9,7 @@ namespace EditorInteraction {
     };
     enum class LocationType : byte
     {
-        GameObject
+        GameObject, Components
     };
     class Command
     {
@@ -34,7 +34,7 @@ namespace EditorInteraction {
         bool isValid() const;
 
         // setters
-        void setCommandType(const CommandType& type);
+        void setResponseType(const CommandType& type);
         void setLocationType(const LocationType& type);
         void setLocationUID(Short uid);
         void setPayload(const std::array<byte, PAYLOAD_SIZE>& payload);

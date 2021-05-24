@@ -72,7 +72,7 @@ GameScene::GameScene(bool renderToSharedMemory) : objects(), preProcessingLayers
 	if (renderToSharedMemory) {
 		sharedMemoryContex.openFile();
 		sharedMemoryData.openFile();
-		processCommands();
+		// processCommands();
 	}
 }
 

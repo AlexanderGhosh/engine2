@@ -4,25 +4,31 @@
 
 class GameScene;
 class GameObject;
+#define CC const Command&
+#define CMD_RES const Command& command, Response& response
 namespace Component {
 	class ComponetBase;
 };
 namespace EditorInteraction {
 	class Command;
+	class Response;
 	class DataManager
 	{
 	private:
 		static GameScene* scene;
-		static int UID;
-		static std::unordered_map<int, GameObject> gameObjects;
-		static std::unordered_map<int, Component::ComponetBase*> components;
-		static int getUID();
-		static bool createGameObject(const Command& command);
-		static void sendResponse(bool success, const Command& command);
+		static short UID;
+		static std::unordered_map<short, GameObject> gameObjects;
+		static std::unordered_map<short, Component::ComponetBase*> components;
+		static short getUID();
+		static bool createGameObject(CMD_RES);
+		static bool createRenderMesh(CMD_RES);
+		static bool createComponent(CMD_RES);
+		static void sendResponse(bool success, CMD_RES);
 		static void clearBuffer();
+		static bool createCommand(CMD_RES);
 	public:
 		static void cleanUp();
-		static void executeCommand(const Command& command);
+		static void executeCommand(CC command);
 		static void setScene(GameScene* scene);
 	};
 };

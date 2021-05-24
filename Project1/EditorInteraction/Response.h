@@ -10,7 +10,7 @@ namespace EditorInteraction {
 	{
     private:
         byte responseID;
-        byte response;
+        byte responseType;
         byte locationType;
         short locationUID;
         std::array<byte, PAYLOAD_SIZE> payload;
@@ -25,9 +25,11 @@ namespace EditorInteraction {
         LocationType getLocationType() const;
         Short getLocationUID() const;
         bool isValid() const;
+        std::vector<char> getData() const;
 
         // setters
-        void setCommandType(const ResponseType& type);
+        void setResponseID(const byte& id);
+        void setResponseType(const ResponseType& type);
         void setLocationType(const LocationType& type);
         void setLocationUID(Short uid);
 	};
