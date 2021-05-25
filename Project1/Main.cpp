@@ -210,7 +210,7 @@ int main(int argc, char** argv) {
 
 
     timer.start("Player");
-    GameObject player = GameObject(glm::vec3(0, 0, 5));
+    /*GameObject player = GameObject(glm::vec3(0, 0, 5));
     Component::Camera playerCamera = Component::Camera();
     player.addComponet(&playerCamera);
     Component::CharacterController cc;
@@ -220,7 +220,7 @@ int main(int argc, char** argv) {
     player.addComponet(&playerScript);
     DebugScreen debugScript;
     player.addComponet(&debugScript);
-    /*Component::AudioReciever recieverComp;
+    Component::AudioReciever recieverComp;
     player.addComponet(&recieverComp);*/
 
     //auto res = player.getByteField();
@@ -293,11 +293,11 @@ int main(int argc, char** argv) {
     GameScene scene = GameScene(saveToMem);
     scene.addContext(&main);
     scene.setActiveContext(0);
-    scene.setMainCamera(&playerCamera);
+    // scene.setMainCamera(&playerCamera);
     scene.setBG({ 1, 1, 0.5 });
     scene.initalize();
 
-    scene.addObject(&player);
+    // scene.addObject(&player);
 
     // scene.setShadowCaster(&shadowCaster);
 
