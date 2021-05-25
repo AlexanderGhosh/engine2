@@ -69,7 +69,8 @@ void PlayerControler::mouseMove(float deltaTime)
 	float yoffset = lastY - pos.y;
 	lastX = pos.x;
 	lastY = pos.y;
-
+	glm::vec3 p = glm::vec3(xoffset, yoffset, 0);
+	// Utils::log(glm::to_string(p), "\r");
 	Component::Camera* camera = parent->getComponet<Component::Camera>();
 	camera->processMouseMovement(xoffset, yoffset);
 }

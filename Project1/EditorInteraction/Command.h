@@ -5,7 +5,10 @@ namespace EditorInteraction {
     enum class CommandType : byte
     {
         ERROR,
-        Create
+        Create,
+        Edit,
+        CallFunction,
+        ResizeWindow
     };
     enum class LocationType : byte
     {

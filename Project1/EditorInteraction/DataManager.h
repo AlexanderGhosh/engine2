@@ -8,6 +8,7 @@ class GameObject;
 #define CMD_RES const Command& command, Response& response
 namespace Component {
 	class ComponetBase;
+	class Transform;
 };
 namespace EditorInteraction {
 	class Command;
@@ -20,12 +21,25 @@ namespace EditorInteraction {
 		static std::unordered_map<short, GameObject> gameObjects;
 		static std::unordered_map<short, Component::ComponetBase*> components;
 		static short getUID();
+
+		static bool resizeWindow(CMD_RES);
+
+		// creation
+		static bool createCommand(CMD_RES);
 		static bool createGameObject(CMD_RES);
 		static bool createRenderMesh(CMD_RES);
 		static bool createComponent(CMD_RES);
+
+		// editing
+		static bool editCommand(CMD_RES);
+		static bool editComponent(CMD_RES);
+		static bool editTransform(CMD_RES);
+
+		// calling functions
+		static bool callFunction(CMD_RES);
+
 		static void sendResponse(bool success, CMD_RES);
 		static void clearBuffer();
-		static bool createCommand(CMD_RES);
 	public:
 		static void cleanUp();
 		static void executeCommand(CC command);

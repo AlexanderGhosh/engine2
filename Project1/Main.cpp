@@ -290,7 +290,7 @@ int main(int argc, char** argv) {
 
     timer.start("Scene");
 
-    GameScene scene = GameScene(saveToMem || true);
+    GameScene scene = GameScene(saveToMem);
     scene.addContext(&main);
     scene.setActiveContext(0);
     scene.setMainCamera(&playerCamera);

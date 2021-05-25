@@ -49,12 +49,14 @@ std::vector<GameEventsTypes> GameScene::getCurrentEvents() const
 
 void GameScene::processCommands()
 {
+	if (NOT renderToSharedMemory)
+		return;
 	char* data = reinterpret_cast<char*>(sharedMemoryData.getData());
 	if (data[0] == 2) { // is command
 		EditorInteraction::Command command = EditorInteraction::Command(&data[1]);
 		EditorInteraction::DataManager::executeCommand(command);
 		EditorInteraction::CommandType t = command.getCommandType();
-		Utils::log(std::to_string(static_cast<byte>(command.getCommandID())));
+		// Utils::log(std::to_string(static_cast<byte>(command.getCommandID())));
 		int f = 0;
 	}
 	else { // is response or invalid
@@ -72,7 +74,6 @@ GameScene::GameScene(bool renderToSharedMemory) : objects(), preProcessingLayers
 	if (renderToSharedMemory) {
 		sharedMemoryContex.openFile();
 		sharedMemoryData.openFile();
-		// processCommands();
 	}
 }
 
@@ -517,6 +518,7 @@ void GameScene::initalize()
 	createStartUpFile("C:\\Users\\AGWDW\\Desktop");
 }
 //Context mainC;
+bool done_ = false;
 void GameScene::gameLoop()
 {
 	// float counter = 0;
@@ -529,7 +531,14 @@ void GameScene::gameLoop()
 			mainC.init("Engine 2", { GL_BLEND, GL_DEPTH_TEST, GL_CULL_FACE, GL_MULTISAMPLE, GL_SCISSOR_TEST });
 			addContext(&mainC);
 			setActiveContext(1);*/
-			reSize({ 1, 1 }, 400);
+			if (done_) {
+				reSize({ 16, 9 }, 400);
+				done_ = false;
+			}
+			else {
+				reSize({ 4, 3 }, 400);
+				done_ = true;
+			}
 		}
 
 
