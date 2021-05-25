@@ -79,6 +79,8 @@ GameScene::GameScene(bool renderToSharedMemory) : objects(), preProcessingLayers
 
 void GameScene::drawOpaque()
 {
+	if (NOT mainCamera)
+		return;
 	for (Component::RenderMesh* mesh : opaque) {
 		if(mesh->getParent()->isAlive())
 			mesh->render(activeContext->getTime().deltaTime);
@@ -87,10 +89,11 @@ void GameScene::drawOpaque()
 
 void GameScene::drawTransparent(bool bindShader)
 {
+	if (NOT mainCamera)
+		return;
 	if(bindShader)
 		Render::Shading::Manager::setActive(ResourceLoader::getShader("TransparentShader")); 
 	bindLights();
-	assert(mainCamera);
 	if (NOT transparent.size()) {
 		return;
 	}
@@ -111,6 +114,8 @@ void GameScene::drawTransparent(bool bindShader)
 
 void GameScene::drawTerrain(bool bindShader)
 {
+	if (NOT mainCamera)
+		return;
 	for (Terrain* terrain : this->terrain) {
 		terrain->render(activeContext->getTime().deltaTime, bindShader);
 	}
@@ -132,6 +137,8 @@ void GameScene::drawUI()
 
 void GameScene::drawParticles(Unsigned shaderId)
 {
+	if (NOT mainCamera)
+		return;
 	unsigned t = Component::ParticleEmmiter::getShader();
 	if (shaderId > 0)
 		Component::ParticleEmmiter::setShader(shaderId);
@@ -404,6 +411,8 @@ void GameScene::drawObjects(Unsigned shaderId)
 
 void GameScene::drawSkyBox()
 {
+	if (NOT mainCamera)
+		return;
 	if (!skybox)
 		return;
 	activeContext->disable(GL_CULL_FACE);
@@ -504,8 +513,9 @@ void GameScene::initalize()
 	// proj    | matrix 4
 	// viewPos | vector 3
 	// gamma   | scalar f
-
-	glm::mat4 projection = glm::perspective(glm::radians(mainCamera->getFOV()), static_cast<float>(screenDimentions->x) / static_cast<float>(screenDimentions->y), 0.01f, 5000.0f);
+	glm::mat4 projection(1);
+	if(mainCamera)
+		projection = glm::perspective(glm::radians(mainCamera->getFOV()), static_cast<float>(screenDimentions->x) / static_cast<float>(screenDimentions->y), 0.01f, 5000.0f);
 	mainBuffer.fill(1, glm::value_ptr(projection));
 
 	float gamma = 2.2f;
@@ -527,18 +537,15 @@ void GameScene::gameLoop()
 	{
 		processCommands();
 		if (Events::Handler::getKey(Events::Key::Backspace, Events::Action::Down)) {
-			/*mainC = Context({ 400, 400 }, false);
-			mainC.init("Engine 2", { GL_BLEND, GL_DEPTH_TEST, GL_CULL_FACE, GL_MULTISAMPLE, GL_SCISSOR_TEST });
-			addContext(&mainC);
-			setActiveContext(1);*/
-			if (done_) {
+			/*if (done_) {
 				reSize({ 16, 9 }, 400);
 				done_ = false;
 			}
 			else {
 				reSize({ 4, 3 }, 400);
 				done_ = true;
-			}
+			}*/
+			setMainCamera(objects[0]->getComponet<Component::Camera>());
 		}
 
 
@@ -558,8 +565,14 @@ void GameScene::gameLoop()
 
 		// RENDERING--------------------------------------------------------------------------------------------------------------------------------------------
 		auto& mainBuffer = uniformBuffers[0];
-		mainBuffer.fill(0, glm::value_ptr(mainCamera->getView()));
-		mainBuffer.fill(2, glm::value_ptr(mainCamera->getPosition()));
+		glm::mat4 view(1);
+		glm::vec3 viewPos(1);
+		if (mainCamera) {
+			view = mainCamera->getView();
+			viewPos = mainCamera->getPosition();
+		}
+		mainBuffer.fill(0, glm::value_ptr(view));
+		mainBuffer.fill(2, glm::value_ptr(viewPos));
 
 		preProcess(); // shadows and scene quad
 		postProcess();// render to screen
@@ -712,6 +725,10 @@ void GameScene::setMainCamera(Component::Camera* camera)
 		mainShadowCaster->setCamera(mainCamera);
 	if(uniformBuffers.size())
 		uniformBuffers.front().fill(4, &mainCamera->getExposure());
+	glm::mat4 projection(1);
+	if (mainCamera)
+		projection = glm::perspective(glm::radians(mainCamera->getFOV()), static_cast<float>(screenDimentions->x) / static_cast<float>(screenDimentions->y), 0.01f, 5000.0f);
+	uniformBuffers.front().fill(1, glm::value_ptr(projection));
 }
 
 void GameScene::setShadowCaster(Component::ShadowCaster* caster)
