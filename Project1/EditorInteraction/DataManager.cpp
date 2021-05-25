@@ -55,6 +55,21 @@ bool EditorInteraction::DataManager::createGameObject(CC command, Response& resp
 	return true;
 }
 
+bool EditorInteraction::DataManager::createComponent(CC command, Response& response) {
+	const auto& payload = command.getPayload();
+	const byte& componetType = payload[0];
+	switch (componetType)
+	{
+	case 0:
+		return createRenderMesh(command, response);
+		break;
+	case 1:
+		return createCamera(command, response);
+		break;
+	}
+
+}
+
 bool EditorInteraction::DataManager::createRenderMesh(CC command, Response& response)
 {
 	const short uid = getUID();
@@ -85,15 +100,27 @@ bool EditorInteraction::DataManager::createRenderMesh(CC command, Response& resp
 	return true;
 }
 
-bool EditorInteraction::DataManager::createComponent(CC command, Response& response) {
-	const auto& payload = command.getPayload();
-	const byte& componetType = payload[0];
-	switch (componetType)
-	{
-	case 0:
-		return createRenderMesh(command, response);
+bool EditorInteraction::DataManager::createCamera(CMD_RES)
+{
+	const short uid = getUID();
+	const short parentUID = command.getLocationUID();
+	GameObject& parentObject = gameObjects[parentUID];
+	auto& payload = command.getPayload();
+
+	const bool isMain = payload[1];
+
+	Component::Camera* cam = DBG_NEW Component::Camera();
+	parentObject.addComponet(cam);
+
+	components[uid] = cam;
+
+	if (isMain) {
+		scene->setMainCamera(cam);
 	}
 
+	response.setLocationUID(uid);
+	response.setLocationType(LocationType::Components);
+	return true;
 }
 
 void EditorInteraction::DataManager::sendResponse(bool success, CC command, Response& response)

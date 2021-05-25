@@ -27,8 +27,9 @@ namespace EditorInteraction {
 		// creation
 		static bool createCommand(CMD_RES);
 		static bool createGameObject(CMD_RES);
-		static bool createRenderMesh(CMD_RES);
 		static bool createComponent(CMD_RES);
+		static bool createRenderMesh(CMD_RES);
+		static bool createCamera(CMD_RES);
 
 		// editing
 		static bool editCommand(CMD_RES);
