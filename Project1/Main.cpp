@@ -80,7 +80,7 @@ long SEED;
 
 void processArgs(int argc, char** argv);
 
-bool saveToMem = false;
+bool saveToMem = true;
 int main(int argc, char** argv) {
     // std::cout << std::filesystem::current_path() << std::endl;
     processArgs(argc, argv);

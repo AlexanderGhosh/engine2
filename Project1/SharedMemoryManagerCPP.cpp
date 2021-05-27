@@ -100,7 +100,9 @@ void* SharedMemoryLocation::getData() {
 
 void SharedMemoryLocation::writeToFile(void* data, const unsigned int& dataSize, const unsigned int& offset) {
     assert(verify() && owner != 0);
-
+    if (!this->data) {
+        getData();
+    }
     void* memLoc = (void*)((char*)this->data + offset);
 
     memcpy(memLoc, data, dataSize);

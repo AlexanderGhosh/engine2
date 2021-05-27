@@ -60,10 +60,10 @@ bool EditorInteraction::DataManager::createComponent(CC command, Response& respo
 	const byte& componetType = payload[0];
 	switch (componetType)
 	{
-	case 0:
+	case 1:
 		return createRenderMesh(command, response);
 		break;
-	case 1:
+	case 2:
 		return createCamera(command, response);
 		break;
 	}
@@ -107,7 +107,7 @@ bool EditorInteraction::DataManager::createCamera(CMD_RES)
 	GameObject& parentObject = gameObjects[parentUID];
 	auto& payload = command.getPayload();
 
-	const bool isMain = payload[1];
+	const bool isMain = payload[2];
 
 	Component::Camera* cam = DBG_NEW Component::Camera();
 	parentObject.addComponet(cam);

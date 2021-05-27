@@ -533,6 +533,8 @@ void GameScene::gameLoop()
 {
 	// float counter = 0;
 	isFirstLoop = true;
+	char data = 3;
+	sharedMemoryData.writeToFile(&data, 1, 0); // mark ready 
 	while (NOT (closing OR activeContext->shouldClose()))
 	{
 		processCommands();
@@ -728,7 +730,8 @@ void GameScene::setMainCamera(Component::Camera* camera)
 	glm::mat4 projection(1);
 	if (mainCamera)
 		projection = glm::perspective(glm::radians(mainCamera->getFOV()), static_cast<float>(screenDimentions->x) / static_cast<float>(screenDimentions->y), 0.01f, 5000.0f);
-	uniformBuffers.front().fill(1, glm::value_ptr(projection));
+	if(uniformBuffers.size() > 0)
+		uniformBuffers.front().fill(1, glm::value_ptr(projection));
 }
 
 void GameScene::setShadowCaster(Component::ShadowCaster* caster)
