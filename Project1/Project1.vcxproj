@@ -119,6 +119,7 @@
       <AdditionalIncludeDirectories>C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\File Readers;C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\OPENAL\include;C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\FREETYPE\include;C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\ASSIMP\include;C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\GLM\glm;C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\GLFW\include;C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\GLEW\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <ExceptionHandling>Async</ExceptionHandling>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

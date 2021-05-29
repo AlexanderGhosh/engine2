@@ -20,6 +20,7 @@ namespace EditorInteraction {
 		static short UID;
 		static std::unordered_map<short, GameObject> gameObjects;
 		static std::unordered_map<short, Component::ComponetBase*> components;
+		static std::vector<short> transformUIDs;
 		static short getUID();
 
 		static bool resizeWindow(CMD_RES);
@@ -34,7 +35,7 @@ namespace EditorInteraction {
 		// editing
 		static bool editCommand(CMD_RES);
 		static bool editComponent(CMD_RES);
-		static bool editTransform(CMD_RES);
+		static bool editTransform(CMD_RES, Component::Transform* component);
 
 		// calling functions
 		static bool callFunction(CMD_RES);

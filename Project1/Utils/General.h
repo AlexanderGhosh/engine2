@@ -74,6 +74,10 @@ namespace glm {
 extern long SEED;
 
 namespace Utils {
+    template<class T, class U>
+    static T* ptrCast(U* a) {
+        return dynamic_cast<T*>(a);
+    }
     template <class T>
     static T convert(char* data) {
         T res;

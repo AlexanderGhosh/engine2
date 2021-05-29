@@ -13,6 +13,7 @@ std::unordered_map<short, GameObject>  EditorInteraction::DataManager::gameObjec
 std::unordered_map<short, Component::ComponetBase*>  EditorInteraction::DataManager::components = { };
 GameScene* EditorInteraction::DataManager::scene = nullptr;
 short EditorInteraction::DataManager::UID = 0;
+std::vector<short> EditorInteraction::DataManager::transformUIDs = { };
 
 short EditorInteraction::DataManager::getUID()
 {
@@ -46,9 +47,13 @@ bool EditorInteraction::DataManager::createCommand(CC command, Response& respons
 
 bool EditorInteraction::DataManager::createGameObject(CC command, Response& response)
 {
-	const short uid = getUID();
+	short uid = getUID();
 	GameObject& obj = gameObjects[uid];
 	scene->addObject(&obj);
+
+	uid = getUID();
+	components[uid] = obj.getLocalTransform(); 
+	transformUIDs.push_back(uid);
 
 	response.setLocationUID(uid);
 	response.setLocationType(LocationType::GameObject);
@@ -60,6 +65,8 @@ bool EditorInteraction::DataManager::createComponent(CC command, Response& respo
 	const byte& componetType = payload[0];
 	switch (componetType)
 	{
+	case 0: // transform
+		break;
 	case 1:
 		return createRenderMesh(command, response);
 		break;
@@ -67,7 +74,7 @@ bool EditorInteraction::DataManager::createComponent(CC command, Response& respo
 		return createCamera(command, response);
 		break;
 	}
-
+	return false;
 }
 
 bool EditorInteraction::DataManager::createRenderMesh(CC command, Response& response)
@@ -149,9 +156,9 @@ bool EditorInteraction::DataManager::editCommand(CC command, Response& response)
 	return success;
 }
 
-bool EditorInteraction::DataManager::editTransform(CC command, Response& response)
+bool EditorInteraction::DataManager::editTransform(CC command, Response& response, Component::Transform* component)
 {
-	const short parentUID = command.getLocationUID();
+	/*const short parentUID = command.getLocationUID();
 	GameObject& parent = gameObjects[parentUID];
 	Component::Transform* transform = parent.getLocalTransform();
 	auto& payload = command.getPayload();
@@ -177,7 +184,19 @@ bool EditorInteraction::DataManager::editTransform(CC command, Response& respons
 		break;
 	}
 	response.setLocationUID(response.getLocationUID());
-	response.setLocationType(LocationType::Components);
+	response.setLocationType(LocationType::Components);*/
+
+	const auto& payload = command.getPayload();
+	const byte& typeCode = payload[0];
+	glm::vec3 pos = Utils::convert<glm::vec3>(&payload[2]);
+	glm::vec3 scale = Utils::convert<glm::vec3>(&payload[15]);
+	glm::vec3 eular = Utils::convert<glm::vec3>(&payload[28]);
+	glm::quat rot(eular);
+
+	component->Position = pos;
+	component->Scale = scale;
+	component->Rotation = glm::normalize(rot);
+
 	return true;
 }
 
@@ -186,13 +205,13 @@ bool EditorInteraction::DataManager::editComponent(CC command, Response& respons
 	bool success = false;
 	Component::ComponetBase* component = components[command.getLocationUID()];
 	if (!component) {
-		success = editTransform(command, response);
+		success = editTransform(command, response, Utils::ptrCast<Component::Transform>(component));
 	}
 	else {
 		switch (component->getType())
 		{
 		case Component::Type::Transform:
-			success = editTransform(command, response);
+			success = editTransform(command, response, Utils::ptrCast<Component::Transform>(component));
 			break;
 		}
 	}
@@ -252,7 +271,10 @@ void EditorInteraction::DataManager::setScene(GameScene* scene)
 void EditorInteraction::DataManager::cleanUp()
 {
 	for (auto itt = components.begin(); itt != components.end();) {
-		if ((*itt).second) {
+		if (Utils::contains(transformUIDs, (*itt).first)) {
+
+		}
+		else if ((*itt).second) {
 			delete (*itt).second;
 		}
 		itt = components.erase(itt);
