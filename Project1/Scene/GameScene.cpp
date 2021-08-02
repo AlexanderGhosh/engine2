@@ -29,7 +29,7 @@
 #define SHARED_MEMORY_NAME_CONTEX "Engine2 Editor Contex"
 #define SHARED_MEMORY_NAME_DATA "Engine2 Editor Data"
 constexpr int SHARED_MEMORY_SIZE_CONTEX = 1280 * 720 * 4;
-constexpr int SHARED_MEMORY_SIZE_DATA = 1280 * 720 * 4;
+constexpr int SHARED_MEMORY_SIZE_DATA = 150;
 Primative::Model GameScene::quadModel = { };
 std::vector<GameEventsTypes> GameScene::getCurrentEvents() const
 {
@@ -413,13 +413,13 @@ void GameScene::drawSkyBox()
 {
 	if (NOT mainCamera)
 		return;
-	if (!skybox)
+	if (NOT skybox)
 		return;
-	activeContext->disable(GL_CULL_FACE);
+	glCullFace(GL_FRONT);
 	glDepthFunc(GL_LEQUAL);
 	skybox->draw();
 	glDepthFunc(GL_LESS);
-	activeContext->enable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
 }
 
 Primative::Buffers::FrameBuffer& GameScene::getFBO(String name)
@@ -527,14 +527,15 @@ void GameScene::initalize()
 
 	createStartUpFile("C:\\Users\\AGWDW\\Desktop");
 }
-//Context mainC;
-bool done_ = false;
+
 void GameScene::gameLoop()
 {
 	// float counter = 0;
 	isFirstLoop = true;
-	char data = 3;
-	sharedMemoryData.writeToFile(&data, 1, 0); // mark ready 
+	if (renderToSharedMemory) {
+		char data = 3;
+		sharedMemoryData.writeToFile(&data, 1, 0); // mark ready 
+	}
 	while (NOT (closing OR activeContext->shouldClose()))
 	{
 		processCommands();
@@ -585,6 +586,7 @@ void GameScene::gameLoop()
 		activeContext->update();
 		Events::Handler::pollEvents();
 		isFirstLoop = false;
+		Events::Handler::update(activeContext->getTime().deltaTime);
 	}
 }
 

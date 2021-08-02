@@ -12,7 +12,7 @@ namespace EditorInteraction {
     };
     enum class LocationType : byte
     {
-        GameObject, Components
+        GameObject, Components, Resource
     };
     class Command
     {

@@ -23,6 +23,7 @@
 #include "Componets/AudioSource.h"
 #include "Componets/Animated.h"
 #include "Componets/Camera.h"
+#include "Componets/OrbitCamera.h"
 #include "Componets/AudioReciever.h"
 #include "Componets/CharacterController.h"
 #include "Componets/Lights/PointLight.h"
@@ -80,7 +81,7 @@ long SEED;
 
 void processArgs(int argc, char** argv);
 
-bool saveToMem = true;
+bool saveToMem = false;
 int main(int argc, char** argv) {
     // std::cout << std::filesystem::current_path() << std::endl;
     processArgs(argc, argv);
@@ -126,11 +127,11 @@ int main(int argc, char** argv) {
 
     timer.start("Models");
     // const Primative::Model manModel    = ResourceLoader::createModel("Resources/Models/RFA_Model.fbx"); // RFA_Model
-    const Primative::Model cubeBuffer = ResourceLoader::createModel("cube.obj"); // needed for the skybox
+    const Primative::Model cubeBuffer = ResourceLoader::createModel("cube.dae"); // needed for the skybox
     const Primative::Model planeBuffer = ResourceLoader::createModel("plane.dae");
     // const Primative::Model minikitBuffer = ResourceLoader::createModel("Resources/Models/minikit.fbx");
-    // const Primative::Model orbBuffer = ResourceLoader::createModel("sphere.obj");
-    //const Primative::Model cityBuffer = ResourceLoader::createModel("Resources/Models/city.obj");
+    // const Primative::Model orbBuffer = ResourceLoader::createModel("sphere.dae");
+    //const Primative::Model cityBuffer = ResourceLoader::createModel("Resources/Models/city.dae");
     timer.log();
 
     timer.start("Animations");
@@ -211,11 +212,11 @@ int main(int argc, char** argv) {
 
     timer.start("Player");
     /*GameObject player = GameObject(glm::vec3(0, 0, 5));
-    Component::Camera playerCamera = Component::Camera();
+    Component::OrbitCamera playerCamera = Component::OrbitCamera();
     player.addComponet(&playerCamera);
     Component::CharacterController cc;
     player.addComponet(&cc);
-    PlayerControler playerScript;
+    /*PlayerControler playerScript;
     // playerScript.ground = allLand;
     player.addComponet(&playerScript);
     DebugScreen debugScript;

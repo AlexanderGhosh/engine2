@@ -13,15 +13,19 @@ namespace Component {
 namespace EditorInteraction {
 	class Command;
 	class Response;
+	class ResourceItem;
 	class DataManager
 	{
 	private:
 		static GameScene* scene;
-		static short UID;
+		static short objUID, compUID, resUID;
 		static std::unordered_map<short, GameObject> gameObjects;
 		static std::unordered_map<short, Component::ComponetBase*> components;
+		static std::unordered_map<short, ResourceItem> resources;
 		static std::vector<short> transformUIDs;
-		static short getUID();
+		static short getGameObjUID();
+		static short getCompUID();
+		static short getResUID();
 
 		static bool resizeWindow(CMD_RES);
 
@@ -31,6 +35,12 @@ namespace EditorInteraction {
 		static bool createComponent(CMD_RES);
 		static bool createRenderMesh(CMD_RES);
 		static bool createCamera(CMD_RES);
+		static bool createOrbitCamera(CMD_RES);
+		static bool createResource(CMD_RES);
+		static bool createModel(CMD_RES, String name);
+		static bool createTexture(CMD_RES, String name);
+		static bool createSound(CMD_RES, String name);
+
 
 		// editing
 		static bool editCommand(CMD_RES);

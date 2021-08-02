@@ -7,7 +7,7 @@ GUI::GUISlider::GUISlider() : sliderBar(), sliderMax(1), sliderMin(0), sliderPoi
 {
 	scroll = [](GUIElementBase* sender) {
 		/*GUISlider* slider = dynamic_cast<GUISlider*>(sender);
-		if (Utils::sign(Events::Handler::scrollOffest.y) == 1) {
+		if (Utils::sign(Events::Handler::scrollAmmount.y) == 1) {
 			slider->setSliderValue(slider->getSliderValue() + slider->getIncrement());
 		}
 		else {

@@ -164,6 +164,7 @@
     <ClCompile Include="GUI\ElementContainers\GUIContainerBase.cpp" />
     <ClCompile Include="GUI\GUIConstraint.cpp" />
     <ClCompile Include="GUI\UIElementBase.cpp" />
+    <ClCompile Include="Componets\OrbitCamera.cpp" />
     <ClCompile Include="ParticleSystem\Distributions\DomeDistribution.cpp" />
     <ClCompile Include="ParticleSystem\Distributions\ConeDistribution.cpp" />
     <ClCompile Include="ParticleSystem\Distributions\SphereDistribution.cpp" />
@@ -174,6 +175,7 @@
     <ClCompile Include="ParticleSystem\ParticleEmmiter.cpp" />
     <ClCompile Include="Primatives\Materials\PBR.cpp" />
     <ClCompile Include="Primatives\Buffers\SoundStreamBuffer.cpp" />
+    <ClCompile Include="EditorInteraction\ResourceItem.cpp" />
     <ClCompile Include="Scripts\DebugScreen.cpp" />
     <ClCompile Include="Scripts\HoverScript.cpp" />
     <ClCompile Include="Scripts\PlayerControler.cpp" />
@@ -261,6 +263,7 @@
     <ClInclude Include="GUI\ElementContainers\GUIContainerBase.h" />
     <ClInclude Include="GUI\GUIConstraint.h" />
     <ClInclude Include="GUI\UIElementBase.h" />
+    <ClInclude Include="Componets\OrbitCamera.h" />
     <ClInclude Include="ParticleSystem\Distributions\DomeDistribution.h" />
     <ClInclude Include="ParticleSystem\Distributions\ConeDistribution.h" />
     <ClInclude Include="ParticleSystem\Distributions\SphereDistribution.h" />
@@ -274,6 +277,7 @@
     <ClInclude Include="Primatives\Materials\MatItemSingle.h" />
     <ClInclude Include="ParticleSystem\ParticleEmmiter.h" />
     <ClInclude Include="Primatives\Buffers\SoundStreamBuffer.h" />
+    <ClInclude Include="EditorInteraction\ResourceItem.h" />
     <ClInclude Include="Scripts\DebugScreen.h" />
     <ClInclude Include="Scripts\HoverScript.h" />
     <ClInclude Include="Scripts\PlayerControler.h" />

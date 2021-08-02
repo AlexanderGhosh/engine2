@@ -80,7 +80,7 @@ void GUI::GUIElementBase::handelEvents()
 		keyUp(this);
 		keyDown_ = false;
 	}
-	if (Events::Handler::scrollOffest == glm::vec2(0.0f)) {
+	if (Events::Handler::scrollOffset == glm::vec2(0.0f)) {
 		scroll(this);
 	}
 }

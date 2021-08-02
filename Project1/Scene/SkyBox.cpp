@@ -14,8 +14,8 @@ SkyBox::SkyBox() : texId(0), mesh(nullptr)
 	}
 	if (!mesh) {
 		mesh = DBG_NEW Component::RenderMesh();
-		// auto model = ResourceLoader::getModel("cube.obj");
-		auto m = ResourceLoader::getModel("cube.obj");
+		// auto model = ResourceLoader::getModel("cube.dae");
+		auto m = ResourceLoader::getModel("cube.dae");
 		mesh->setModel(m);
 	}
 }

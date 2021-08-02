@@ -6,9 +6,11 @@
 GLFWwindow** Events::Handler::window = nullptr;
 std::string Events::Handler::lastChar = "";
 bool Events::Handler::keyDown = false;
-bool Events::Handler::mouseMove = false;
-bool Events::Handler::buttonDown = false;
-glm::vec2 Events::Handler::scrollOffest(0.0f);
+bool Events::Handler::mouseMove = false; 
+bool Events::Handler::buttonDown = false; 
+glm::vec2 Events::Handler::scrollAmmount(0.0f);
+glm::vec2 Events::Handler::scrollOffset(0.0f);
+glm::vec2 Events::Handler::lastScroll(0.0f);
 
 void Events::Handler::init(GLFWwindow** window)
 {
@@ -17,6 +19,7 @@ void Events::Handler::init(GLFWwindow** window)
 	glfwSetCursorPosCallback(*window, Events::Handler::mouseCallback);
 	glfwSetMouseButtonCallback(*window, Events::Handler::mouseButtonCallback);
 	glfwSetCharCallback(*window, Events::Handler::characterCallBack);
+	glfwSetScrollCallback(*window, Events::Handler::scrollInputCallBack);
 }
 
 bool Events::Handler::getKey(const Key& key, const Action& action)
@@ -46,6 +49,12 @@ const glm::vec2& Events::Handler::getCursorPos()
 	return static_cast<glm::vec2>(res);
 }
 
+void Events::Handler::update(float deltaTime)
+{
+	//scrollOffset *= 0;
+	//Utils::log(glm::to_string(Events::Handler::scrollOffset), "\r");
+}
+
 void Events::Handler::keyCallBack(GLFWwindow* window, int key, int scancode, int action, int mode)
 {
 	keyDown = action;
@@ -69,5 +78,7 @@ void Events::Handler::characterCallBack(GLFWwindow* window, unsigned int codePoi
 
 void Events::Handler::scrollInputCallBack(GLFWwindow* window, double xoffset, double yoffset)
 {
-	scrollOffest = { static_cast<float>(xoffset), static_cast<float>(yoffset) };
+	scrollOffset = { static_cast<float>(xoffset), static_cast<float>(yoffset) };
+	// scrollOffset = lastScroll - scrollAmmount;
+	lastScroll = scrollAmmount;
 }

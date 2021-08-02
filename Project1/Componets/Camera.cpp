@@ -1,7 +1,7 @@
 #include "Camera.h"
 #include "../GameObject/GameObject.h"
 
-Component::Camera::Camera() : pitch(0), yaw(-90), fov(45), pos(Utils::zero()), fwd(Utils::zAxis(-1)), up(Utils::yAxis()), right(Utils::zero()), exposure(0.1f) 
+Component::Camera::Camera() : pitch(0), yaw(-90), fov(45), fwd(Utils::zAxis(-1)), up(Utils::yAxis()), right(Utils::zero()), exposure(0.1f) 
 {
 	update(0); 
 }

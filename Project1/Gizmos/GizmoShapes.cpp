@@ -196,7 +196,7 @@ void Gizmos::Circle::setUp(Vector3 up)
 Gizmos::Cuboide::Cuboide() : Gizmo(), dimensions(0.5), cubeModel()
 {
 	shaderID = ResourceLoader::getShader("CubeShader");
-	cubeModel = ResourceLoader::getModel("cube.obj");
+	cubeModel = ResourceLoader::getModel("cube.dae");
 }
 
 Gizmos::Cuboide::Cuboide(Vector3 pos, Vector3 col) : Cuboide()

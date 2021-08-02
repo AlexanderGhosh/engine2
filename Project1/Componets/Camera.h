@@ -6,27 +6,27 @@
 namespace Component {
 	class Camera : public ComponetBase
 	{
-	private:
-		glm::vec3 pos, fwd;
+	protected:
+		glm::vec3 fwd;
 		float pitch, yaw, fov, exposure;
 		glm::vec3 up, right;
 	public:
 		Camera();
 		~Camera() = default;
-		void cleanUp();
+		virtual void cleanUp();
 
-		const glm::mat4 getView() const;
-		void processMouseMovement(float xOff, float yOff, bool constainPitch = 1);
-		void update(float deltaTime);
+		virtual const glm::mat4 getView() const;
+		virtual void processMouseMovement(float xOff, float yOff, bool constainPitch = 1);
+		virtual void update(float deltaTime);
 		Byte_Array getByteField() const;
 
 		// getters
-		Float getFOV() const;
-		Vector3 getPosition() const;
+		virtual Float getFOV() const;
+		virtual Vector3 getPosition() const;
 		Vector3 getForward() const;
 		Vector3 getRight() const;
 		inline Type getType() const { return Type::Camera; };
-		Float getExposure() const;
+		virtual Float getExposure() const;
 		glm::mat4 getRotationMatrix() const;
 
 		// setters
