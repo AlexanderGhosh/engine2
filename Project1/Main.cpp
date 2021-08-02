@@ -76,7 +76,7 @@
 
 #include "Context.h"
 
-constexpr glm::svec2 SCREEN_DIMENTIONS = glm::ivec2(720, 405);
+constexpr glm::svec2 SCREEN_DIMENTIONS = glm::ivec2(800, 800);
 long SEED;
 
 void processArgs(int argc, char** argv);
@@ -211,18 +211,19 @@ int main(int argc, char** argv) {
 
 
     timer.start("Player");
-    /*GameObject player = GameObject(glm::vec3(0, 0, 5));
-    Component::OrbitCamera playerCamera = Component::OrbitCamera();
+    GameObject player = GameObject(glm::vec3(0, 0, 5));
+    // Component::OrbitCamera playerCamera = Component::OrbitCamera();
+    Component::Camera playerCamera = Component::Camera();
     player.addComponet(&playerCamera);
     Component::CharacterController cc;
     player.addComponet(&cc);
-    /*PlayerControler playerScript;
+    PlayerControler playerScript;
     // playerScript.ground = allLand;
     player.addComponet(&playerScript);
     DebugScreen debugScript;
     player.addComponet(&debugScript);
     Component::AudioReciever recieverComp;
-    player.addComponet(&recieverComp);*/
+    player.addComponet(&recieverComp);
 
     //auto res = player.getByteField();
 
@@ -294,11 +295,11 @@ int main(int argc, char** argv) {
     GameScene scene = GameScene(saveToMem);
     scene.addContext(&main);
     scene.setActiveContext(0);
-    // scene.setMainCamera(&playerCamera);
+    scene.setMainCamera(&playerCamera);
     scene.setBG({ 1, 1, 0.5 });
     scene.initalize();
 
-    // scene.addObject(&player);
+    scene.addObject(&player);
 
     // scene.setShadowCaster(&shadowCaster);
 
@@ -312,7 +313,7 @@ int main(int argc, char** argv) {
     timer.log();
     // SKYBOX //
 
-    Gizmos::Sphere gizmo1 = Gizmos::Sphere({ 0, 4, 0 }, { 1, 0, 0 });
+    Gizmos::Sphere gizmo1 = Gizmos::Sphere({ 0, 0, 0 }, { 1, 0, 0 });
     gizmo1.setRadius(0.25);
     gizmo1.setThickness(2);
     Gizmos::GizmoRenderer::addGizmo(&gizmo1);
