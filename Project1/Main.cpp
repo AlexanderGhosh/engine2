@@ -211,7 +211,7 @@ int main(int argc, char** argv) {
 
 
     timer.start("Player");
-    GameObject player = GameObject(glm::vec3(0, 0, 5));
+    GameObject player = GameObject(glm::vec3(0, 0, 10));
     // Component::OrbitCamera playerCamera = Component::OrbitCamera();
     Component::Camera playerCamera = Component::Camera();
     player.addComponet(&playerCamera);
@@ -230,16 +230,16 @@ int main(int argc, char** argv) {
 
     /*GameObject lightSource(glm::vec3(0, 1.5, -2.5));
     Component::PointLight light(glm::vec3(1), 100.0f);
-    lightSource.addComponet(&light);
+    lightSource.addComponet(&light);*/
 
-    GameObject lightSource2(glm::vec3(0, 3.75, 0));
-    Component::DirectionalLight light2 = Component::DirectionalLight({ 1, 1, 1 }, { 1, 1, 1 }, 1);
-    lightSource2.addComponet(&light2);
-    Component::ShadowCaster shadowCaster = Component::ShadowCaster(&light2, 15);
-    lightSource2.addComponet(&shadowCaster);
+    GameObject Sun(glm::vec3(0, 3.75, 0));
+    Component::DirectionalLight sunLight = Component::DirectionalLight({ 1, 1, 1 }, { 1, 1, 1 }, 1);
+    Sun.addComponet(&sunLight);
+    Component::ShadowCaster shadowCaster = Component::ShadowCaster(&sunLight, 15);
+    Sun.addComponet(&shadowCaster);
 
 
-    Materials::MatItemSingle<glm::vec4> windowAlbedo(wi);
+    /*Materials::MatItemSingle<glm::vec4> windowAlbedo(wi);
     Materials::MatItemSingle<glm::vec3> windowNormal(glm::vec3(0, 1, 0));
     Materials::MatItemSingle<glm::vec3> windowEmission(glm::vec3(0, 1, 0));
     Materials::MatItemSingle<float> windowMetalic(0.5f);
@@ -261,7 +261,7 @@ int main(int argc, char** argv) {
 
     timer.log();
 
-
+    // ui stuff
     /*Materials::MatItemSingle<glm::vec4> uiColourCanvas(glm::vec4(0.5, 1, 1, 0.5));
     GUI::GUICanvas canvas;
     canvas.setDimentions(SCREEN_DIMENTIONS / 2);
@@ -290,6 +290,47 @@ int main(int argc, char** argv) {
     canvas.addElement(&element1);*/
 
 
+    // ------------------------------PHYSICS------------------------------ //
+#pragma region Materials
+    Materials::MatItemSingle<glm::vec4> redAlbedo({ 1, 1, 0, 1 });
+    Materials::MatItemSingle<glm::vec3> redNormal(glm::vec3(1, 1, 0));
+    Materials::MatItemSingle<glm::vec3> redEmission({ 1, 0, 0 });
+    Materials::MatItemSingle<float> redMetalic(0.5f);
+    Materials::MatItemSingle<float> redRoughness(0.5f);
+    Materials::MatItemSingle<float> redAO(0.5f);
+
+    Materials::MatItemSingle<glm::vec4> blueAlbedo({ 0, 1, 1, 1 });
+    Materials::MatItemSingle<glm::vec3> blueNormal(glm::vec3(0, 1, 1));
+    Materials::MatItemSingle<glm::vec3> blueEmission({ 1, 0, 0 });
+    Materials::MatItemSingle<float> blueMetalic(0.5f);
+    Materials::MatItemSingle<float> blueRoughness(0.5f);
+    Materials::MatItemSingle<float> blueAO(0.5f);
+#pragma endregion
+
+    Materials::PBR redMatrial(&redAlbedo, &redNormal, &redEmission, &redMetalic, &redRoughness, &redAO);
+    Materials::PBR blueMatrial(&blueAlbedo, &blueNormal, &blueEmission, &blueMetalic, &blueRoughness, &blueAO);
+
+    GameObject objA = GameObject(glm::vec3(0), glm::vec3(0.25));
+    Component::RenderMesh renderA;
+    renderA.setModel(cubeBuffer);
+    renderA.setMaterial(&redMatrial);
+    objA.addComponet(&renderA);
+
+    Component::RigidBody rbA = Component::RigidBody();
+    rbA.hasGravity = false;
+    rbA.isKinimatic = true;
+   
+
+
+    GameObject objB = GameObject(glm::vec3(0, 0.5, 0), glm::vec3(0.25));
+    Component::RenderMesh renderB;
+    renderB.setModel(cubeBuffer);
+    renderB.setMaterial(&blueMatrial);
+    objB.addComponet(&renderB);
+
+    // ------------------------------PHYSICS------------------------------ //
+    
+
     timer.start("Scene");
 
     GameScene scene = GameScene(saveToMem);
@@ -300,8 +341,11 @@ int main(int argc, char** argv) {
     scene.initalize();
 
     scene.addObject(&player);
+    scene.addObject(&objA);
+    scene.addObject(&objB);
+    scene.addObject(&Sun);
 
-    // scene.setShadowCaster(&shadowCaster);
+    scene.setShadowCaster(&shadowCaster);
 
     timer.log();
 
@@ -309,7 +353,7 @@ int main(int argc, char** argv) {
     timer.start("Skybox");
     ResourceLoader::loadCubeMap("DistantMtSB", ".png", 0);
     SkyBox sb = SkyBox("DistantMtSB.cm");
-    scene.setSkyBox(&sb);
+    scene.setSkyBox(&sb); 
     timer.log();
     // SKYBOX //
 

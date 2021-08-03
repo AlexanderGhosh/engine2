@@ -24,7 +24,7 @@ void Physics::Engine::update()
 		if (!b2->isKinimatic)
 			*manafold.bodies[1]->position += manafold.normal * manafold.penetration;
 
-        resolution->resolve(b1, b2, manafold);
+        // resolution->resolve(b1, b2, manafold);
 	}
 
 	Constraints::ConstraintsSolver::preSolveAll();

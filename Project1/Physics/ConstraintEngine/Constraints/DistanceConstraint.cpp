@@ -20,10 +20,10 @@ void Physics::Constraints::DistanceConstraint::solve(const float& dt)
 	glm::vec3 globalOnA = r1 + body1->getCOS();
 	glm::vec3 globalOnB = r2 + body2->getCOS();
 
-	glm::vec3 ab = globalOnB - globalOnA;
-	glm::vec3 abn = glm::normalize(ab);
+	const glm::vec3 ab = globalOnB - globalOnA;
+	const glm::vec3 abn = glm::normalize(ab);
 
-	glm::vec3 v0 = body1->getVelocity() + glm::cross(body1->getAngularVelocity(), r1);
+	/*glm::vec3 v0 = body1->getVelocity() + glm::cross(body1->getAngularVelocity(), r1);
 	glm::vec3 v1 = body2->getVelocity() + glm::cross(body2->getAngularVelocity(), r2);
 
 	float abnVel = glm::dot(v0 - v1, abn);
@@ -69,6 +69,39 @@ void Physics::Constraints::DistanceConstraint::solve(const float& dt)
 		body1->angularVelAdder((body1->getInvInertia_G() * glm::cross(r1, abn * jn)));
 		body2->angularVelAdder(-(body2->getInvInertia_G() * glm::cross(r2, abn * jn)));
 	}
+	*/
+	float b = -glm::dot(abn, body1->getVelocity() + glm::cross(body1->getAngularVelocity(), relPosA) - 
+		body2->getVelocity() - glm::cross(body2->getAngularVelocity(), relPosB));
+
+	float a = 0;
+	const std::array<glm::mat3, 4> inv_massMatrix = {
+		glm::mat3(body1->getInvMass()),
+		glm::mat3(body1->getInvInertia_G()),
+		glm::mat3(body2->getInvMass()),
+		glm::mat3(body2->getInvInertia_G()),
+	};
+	const std::array<glm::vec3, 4> jacobian = {
+		abn, glm::cross(relPosA, ab), -abn, -glm::cross(relPosB, ab)
+	};
+	for (int i = 0; i < 4; i++) {
+		a += glm::dot(jacobian[i] * inv_massMatrix[i], jacobian[i]);
+	}
+
+	/*float a = body1->getInvMass() + body2->getInvMass();
+	a += body1->getInvInertia_G() * glm::pow(glm::cross(abn, body1->getAngularVelocity()), glm::vec3(2.0f));
+	a -= body2->getInvInertia_G() * glm::pow(glm::cross(abn, body2->getAngularVelocity()), glm::vec3(2.0f));*/
+
+	float bias = 0.0f;
+	// -Optional -
+	float distance_offset = glm::length(ab) - targetLength;
+	float baumgarte_scalar = 0.1f;
+	bias = -(baumgarte_scalar / dt) * distance_offset;
+
+	float lambda = b / a;
+	lambda += bias;
+
+	body1->velocityAdder(abn  * (body1->getInvMass() * lambda));
+	body2->velocityAdder(-abn * (body2->getInvMass() * lambda));
 }
 
 void Physics::Constraints::DistanceConstraint::cleanUp()
