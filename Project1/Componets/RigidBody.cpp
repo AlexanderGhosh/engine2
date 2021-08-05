@@ -4,7 +4,7 @@
 #include "../Physics/Collision/Collider.h"
 
 Component::RigidBody::RigidBody() : ComponetBase(), transform(nullptr), cos(0), rotation(0), velocity(0), angularVelocity(0), isKinimatic(false),
-force(0), torque(0), mass(0), invMass(0), l_inertia(1), l_invInertia(1), g_inertia(1), g_invInertia(1), colliders(), hasGravity(true)
+force(0), torque(0), mass(10), invMass(0), l_inertia(1), l_invInertia(1), g_inertia(1), g_invInertia(1), colliders(), hasGravity(true)
 {
 	invMass = 1.0f / mass;
 	l_invInertia *= invMass;
@@ -51,6 +51,13 @@ void Component::RigidBody::cleanUp()
 		itt = colliders.erase(itt);
 	}
 
+}
+
+void Component::RigidBody::calculateExternalForce()
+{
+	if (invMass AND hasGravity) {
+		force += Physics::Engine::getGravity();
+	}
 }
 
 void Component::RigidBody::addForce(Vector3 force, Vector3 at)
@@ -117,8 +124,8 @@ void Component::RigidBody::intergrateForces()
 		return;
 	}
 	const float& dt = Physics::Engine::getDeltaTime();
-	if (invMass AND hasGravity)
-		velocity += Physics::Engine::getGravity() * dt;
+	/*if (invMass AND hasGravity)
+		velocity += Physics::Engine::getGravity() * dt;*/
 
 	velocity += force * invMass * dt;
 

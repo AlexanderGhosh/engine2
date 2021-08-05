@@ -19,16 +19,18 @@ namespace Component {
 		glm::mat3 g_inertia, g_invInertia;
 		std::list<Physics::Collider*> colliders;
 
-		void clearForces();
 	public:
 		bool isKinimatic, hasGravity;
 	public:
 		RigidBody();
+		void clearForces();
 		void addCollider(Physics::Collider* collider);
 		void updateInertia();
 		void setParent(GameObject* parent);
 		inline Type getType() const { return Type::Rigidbody; };
 		void cleanUp();
+
+		void calculateExternalForce();
 
 		// intergration
 		// for velocity

@@ -17,6 +17,14 @@
 #include "../Componets/Lights/LightBase.h"
 #include "../Componets/Lights/ShadowCaster.h"
 #include "../Context.h"
+
+// PHYSICS
+#include "../Physics/Engine.h"
+#include "../Physics/Collision/Broadphase/NSquared.h"
+#include "../Physics/Collision/Narrowphase/SAT3D.h"
+#include "../Physics/Resolution/ConstraintsBased.h"
+// PHYSICS
+
 // GUI
 #include "../GUI/ElementContainers/GUICanvas.h"
 // GUI
@@ -75,6 +83,12 @@ GameScene::GameScene(bool renderToSharedMemory) : objects(), preProcessingLayers
 		sharedMemoryContex.openFile();
 		sharedMemoryData.openFile();
 	}
+
+
+	// Physics::CollisionDetection::setBroadphase(new Physics::NSquared
+	Physics::CollisionDetection::setBroadphase<Physics::NSquared>();
+	Physics::CollisionDetection::setNarrowphase< Physics::SAT3D>();
+	Physics::Engine::setResponse<Physics::ConstraintsBased>();
 }
 
 void GameScene::drawOpaque()
@@ -581,6 +595,7 @@ void GameScene::gameLoop()
 		postProcess();// render to screen
 		Gizmos::GizmoRenderer::drawAll(renderToSharedMemory);
 
+		Physics::Engine::update();
 		// sound->update();
 
 		activeContext->update();

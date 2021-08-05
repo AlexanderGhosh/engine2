@@ -310,6 +310,7 @@ int main(int argc, char** argv) {
     Materials::PBR redMatrial(&redAlbedo, &redNormal, &redEmission, &redMetalic, &redRoughness, &redAO);
     Materials::PBR blueMatrial(&blueAlbedo, &blueNormal, &blueEmission, &blueMetalic, &blueRoughness, &blueAO);
 
+
     GameObject objA = GameObject(glm::vec3(0), glm::vec3(0.25));
     Component::RenderMesh renderA;
     renderA.setModel(cubeBuffer);
@@ -317,17 +318,26 @@ int main(int argc, char** argv) {
     objA.addComponet(&renderA);
 
     Component::RigidBody rbA = Component::RigidBody();
-    rbA.hasGravity = false;
-    rbA.isKinimatic = true;
+    rbA.hasGravity = true;
+    rbA.isKinimatic = false;
+    objA.addComponet(&rbA);
    
 
 
-    GameObject objB = GameObject(glm::vec3(0, 0.5, 0), glm::vec3(0.25));
+    GameObject objB = GameObject(glm::vec3(0, 1, 0), glm::vec3(0.25));
     Component::RenderMesh renderB;
     renderB.setModel(cubeBuffer);
     renderB.setMaterial(&blueMatrial);
     objB.addComponet(&renderB);
 
+    Component::RigidBody rbB = Component::RigidBody();
+    rbB.hasGravity = false;
+    rbB.isKinimatic = true;
+    objB.addComponet(&rbB);
+
+
+    Physics::Constraints::DistanceConstraint constraint = Physics::Constraints::DistanceConstraint(&rbA, &rbB, glm::vec3(0), glm::vec3(0), 5);
+    Physics::Constraints::ConstraintsSolver::addConstraint(&constraint);
     // ------------------------------PHYSICS------------------------------ //
     
 

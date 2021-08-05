@@ -8,12 +8,12 @@
 std::vector<Component::RigidBody*> Physics::Engine::rigidbodies = { };
 std::vector<Physics::Collider*> Physics::Engine::colliders = { }; 
 Physics::Resolution* Physics::Engine::resolution = nullptr; 
-glm::vec3 Physics::Engine::gravity = { 0, -10, 0 };
+glm::vec3 Physics::Engine::gravity = { 0, -1, 0 };
 float Physics::Engine::dampping = 1;
 
 void Physics::Engine::update()
 {
-	auto collisions = CollisionDetection::getCollisions();
+	/*auto collisions = CollisionDetection::getCollisions();
 
 	for (Physics::CollisionManfold& manafold : collisions) {
 		Component::RigidBody* b1 = manafold.bodies[0]->getParent()->getRigidbody();
@@ -24,19 +24,22 @@ void Physics::Engine::update()
 		if (!b2->isKinimatic)
 			*manafold.bodies[1]->position += manafold.normal * manafold.penetration;
 
-        // resolution->resolve(b1, b2, manafold);
-	}
+        resolution->resolve(b1, b2, manafold);
+	}*/
 
 	Constraints::ConstraintsSolver::preSolveAll();
 
-	for (Component::RigidBody* rb : rigidbodies)
-		rb->intergrateForces();
+	for (Component::RigidBody* rb : rigidbodies) {
+		rb->calculateExternalForce();
+	}
 
 	Constraints::ConstraintsSolver::solveAll(getDeltaTime());
 
 	for (Component::RigidBody* rb : rigidbodies) {
+		rb->intergrateForces();
 		rb->intergrateVelocity();
 		rb->updateInertia();
+		rb->clearForces();
 	}
 }
 
