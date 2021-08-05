@@ -164,7 +164,10 @@ void GameScene::setBG(Vector3 col)
 
 void GameScene::preProcess()
 {
-	const glm::mat4 lsMatrix = mainShadowCaster->getLSMatrix(mainContext->getDimentions());
+	glm::mat4 lsMatrix(1);
+	if (mainShadowCaster) {
+		lsMatrix = mainShadowCaster->getLSMatrix(mainContext->getDimentions());
+	}
 	// glm::mat4 projection = glm::perspective(glm::radians(mainCamera->getFOV()), static_cast<float>(screenDimentions.x) / static_cast<float>(screenDimentions.y), 0.01f, 5000.0f);
 	// lsMatrix = getMainCamera()->getView();
 	// lsMatrix = projection * lsMatrix;
@@ -227,7 +230,9 @@ void GameScene::preProcess()
 			drawSkyBox();
 			Render::Shading::Manager::setActive(ResourceLoader::getShader("TransparentShader"));
 			Render::Shading::Manager::setValue("LSMatrix", lsMatrix);
-			Render::Shading::Manager::setValue("ShadowCasterPosition", mainShadowCaster->getPosition());
+			if (mainShadowCaster) {
+				Render::Shading::Manager::setValue("ShadowCasterPosition", mainShadowCaster->getPosition());
+			}
 			drawTransparent(false);
 			drawParticles();
 			drawUI();

@@ -76,6 +76,9 @@ void PlayerControler::mouseMove(float deltaTime)
 
 bool PlayerControler::isGrounded(float dt)
 {
+	if (ground.size() == 0) {
+		return false;
+	}
 	if (dt == 0)
 		dt = 1;
 	Terrain currentGround = ground[0];
