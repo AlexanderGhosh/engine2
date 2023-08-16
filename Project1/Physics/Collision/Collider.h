@@ -23,6 +23,7 @@ namespace Physics {
 		Collider(bool add = true);
 		virtual void createInertiaTensor() { };
 	};
+
 	class AABB : public Collider {
 	protected:
 		glm::vec3 min, max;

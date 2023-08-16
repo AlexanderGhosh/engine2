@@ -1,5 +1,5 @@
 #define GLFW_INCLUDE_NONE
-#include <GLFW/glfw3.h>
+#include <glfw3.h>
 #include <GL/glew.h>
 #include <iostream>
 #include <string>
@@ -11,7 +11,7 @@
 #include <gtx/string_cast.hpp>
 #include <gtx/matrix_decompose.hpp>
 
-#include "SoundManager.h"
+// #include "SoundManager.h"
 #include "Utils/ResourceLoader.h"
 #include "GameObject/GameObject.h"
 #include "Scene/GameScene.h"
@@ -20,10 +20,10 @@
 #include "EventSystem/Handler.h"
 #include "UI/TextRenderer.h"
 #include "Rendering/Rendering.h"
-#include "Componets/AudioSource.h"
+// #include "Componets/AudioSource.h"
 #include "Componets/Animated.h"
 #include "Componets/Camera.h"
-#include "Componets/AudioReciever.h"
+// #include "Componets/AudioReciever.h"
 #include "Componets/CharacterController.h"
 #include "Componets/Lights/PointLight.h"
 #include "Componets/Lights/DirectionalLight.h"
@@ -64,8 +64,8 @@
 #include "GameObject/Terrain.h"
 #include "Primatives/Buffers/FrameBuffer.h"
 #include "Primatives/Buffers/UniformBuffer.h"
-#include "Primatives/Buffers/SoundBuffer.h"
-#include "Primatives/Buffers/SoundStreamBuffer.h"
+// #include "Primatives/Buffers/SoundBuffer.h"
+// #include "Primatives/Buffers/SoundStreamBuffer.h"
 #include "Utils/NoiseGeneration.h"
 #include "Scripts/PlayerControler.h"
 #include "Scripts/DebugScreen.h"
@@ -90,9 +90,9 @@ int main() {
     main.init("Engine 2", { GL_BLEND, GL_DEPTH_TEST, GL_CULL_FACE, GL_MULTISAMPLE });
     Events::Handler::init(main.getWindow());
 
-    SoundManager::init();
+    /*SoundManager::init();
     Primative::Buffers::SoundBuffer* soundDatabuffer = SoundManager::createBuffer("Resources/Sounds/bounce.wav");
-    Primative::Buffers::SoundStreamBuffer* soundDatabufferS = SoundManager::createBuffer("Resources/Sounds/iamtheprotectorofthissystem.wav", true);
+    Primative::Buffers::SoundStreamBuffer* soundDatabufferS = SoundManager::createBuffer("Resources/Sounds/iamtheprotectorofthissystem.wav", true);*/
 
     timer.start("Shaders");
     Gizmos::GizmoRenderer::init();
@@ -123,7 +123,7 @@ int main() {
     const Primative::Model cubeBuffer  = ResourceLoader::createModel("Resources/Models/cube.obj"); // needed for the skybox
     const Primative::Model planeBuffer = ResourceLoader::createModel("Resources/Models/plane.dae");
     // const Primative::Model minikitBuffer = ResourceLoader::createModel("Resources/Models/minikit.fbx");
-    const Primative::Model orbBuffer = ResourceLoader::createModel("Resources/Models/sphere.obj");
+    // const Primative::Model orbBuffer = ResourceLoader::createModel("Resources/Models/orb.obj");
     //const Primative::Model cityBuffer = ResourceLoader::createModel("Resources/Models/city.obj");
     timer.log();
 
@@ -143,7 +143,7 @@ int main() {
     auto& grassMaterial = ResourceLoader::createPBR(grassMaterialInfo);
     grassMaterial.setRepeatValue(10);
 
-    auto waterMaterialInfo = ResourceLoader::createPBRInfo("Resources/Textures/Water", { TextureType::AlbedoMap, TextureType::RoughnessMap, TextureType::NormalMap, TextureType::AOMap, TextureType::MetalicMap }, { 0, 0, 0, 0, 0 });
+    /*auto waterMaterialInfo = ResourceLoader::createPBRInfo("Resources/Textures/Water", {TextureType::AlbedoMap, TextureType::RoughnessMap, TextureType::NormalMap, TextureType::AOMap, TextureType::MetalicMap}, {0, 0, 0, 0, 0});
     auto& waterMaterial = ResourceLoader::createPBR(waterMaterialInfo);
     Materials::MatItemSingle<glm::vec4> waterAlbedo({ 0, 0, 1, 1 });
     Materials::MatItemSingle<glm::vec3> waterEmission({ 0, 0, 0 });
@@ -155,7 +155,7 @@ int main() {
     waterMaterial.setEmission(&waterEmission);
     waterMaterial.setMetalic(&waterMetalic);
     waterMaterial.setRoughness(&waterRoughness);
-    waterMaterial.setAO(&waterAO);
+    waterMaterial.setAO(&waterAO);*/
   
     timer.log();
 
@@ -163,10 +163,10 @@ int main() {
 
 
     GameObject orb(glm::vec3(0, 1.5, 0));
-    Component::RenderMesh orbMesh = Component::RenderMesh();
+    /*Component::RenderMesh orbMesh = Component::RenderMesh();
     orbMesh.setModel(orbBuffer);
     orbMesh.setMaterial(&waterMaterial);
-    orb.addComponet(&orbMesh);
+    orb.addComponet(&orbMesh);*/
 
     /*Particles::DomeDistribution distribution = Particles::DomeDistribution(1.0f);
     Component::ParticleEmmiter emmiter = Component::ParticleEmmiter(10, 10, true, 0.25);
@@ -214,8 +214,8 @@ int main() {
     player.addComponet(&playerScript);
     DebugScreen debugScript;
     player.addComponet(&debugScript);
-    Component::AudioReciever recieverComp;
-    player.addComponet(&recieverComp);
+    // Component::AudioReciever recieverComp;
+    // player.addComponet(&recieverComp);
 
 
     GameObject lightSource(glm::vec3(0, 1.5, -2.5));
@@ -251,7 +251,7 @@ int main() {
 
     timer.log();
 
-
+    /*
     Materials::MatItemSingle<glm::vec4> uiColourCanvas(glm::vec4(0.5, 1, 1, 0.5));
     GUI::GUICanvas canvas;
     canvas.setDimentions(SCREEN_DIMENTIONS / 2);
@@ -275,9 +275,9 @@ int main() {
     element1.setTextColour(&uiColourPointer);
     // element1.setPointerAlbedo(&uiColourPointer);
     // element1.setSliderAlbedo(&uiColourBar);
+    
 
-
-    canvas.addElement(&element1);
+    canvas.addElement(&element1);*/
 
 
     timer.start("Scene");
@@ -299,7 +299,7 @@ int main() {
         scene.addTerrain(&land);
     }
     
-    scene.addUI(&canvas);
+    //scene.addUI(&canvas);
 
     scene.setShadowCaster(&shadowCaster);
 
@@ -328,7 +328,7 @@ int main() {
     
     UI::TextRenderer::cleanUpStatic(); // destroys char buffers and char textures for all fonts
     UI::UIRenderer::cleanUp(); // destroys quadbuffer and UBO 1
-    SoundManager::cleanUp(); // destroys sound buffers
+    // SoundManager::cleanUp(); // destroys sound buffers
     ResourceLoader::cleanUp(); // destroys textures shaders and models(buffers)
     Gizmos::GizmoRenderer::cleanUp();
     

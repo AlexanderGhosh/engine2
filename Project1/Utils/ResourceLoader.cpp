@@ -1,7 +1,8 @@
 #include "ResourceLoader.h"
 #include <fstream>
 #include <sstream>
-#include <Images/STBImage.h>
+#define STB_IMAGE_IMPLEMENTATION
+#include "../STBImage.h"
 
 #include "AssimpWrapper.h"
 #include "../Primatives/Materials/PBR.h"
