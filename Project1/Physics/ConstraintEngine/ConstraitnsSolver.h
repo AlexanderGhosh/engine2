@@ -2,7 +2,7 @@
 #include "../../Utils/General.h"
 class GameObject;
 namespace Component {
-	class RigidBody;
+	class Rigidbody;
 }
 namespace Physics {
 	namespace Constraints {

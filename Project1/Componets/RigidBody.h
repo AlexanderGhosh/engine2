@@ -1,60 +1,36 @@
 #pragma once
 #include "ComponetBase.h"
-namespace Physics {
-	class Collider;
-}
+#include "../Physics/Collision/Collider.h"
+
 namespace Component {
-	struct Transform;
-	class RigidBody : public ComponetBase
+	class Rigidbody : public ComponetBase
 	{
 	private:
-		Transform* transform;
-		// Center of Mass
-		glm::vec3 cos;
-		glm::quat* rotation;
-		glm::vec3 velocity, angularVelocity;
-		glm::vec3 force, torque;
-		float mass, invMass;
-		glm::mat3 l_inertia, l_invInertia;
-		glm::mat3 g_inertia, g_invInertia;
-		std::list<Physics::Collider*> colliders;
-
-		void clearForces();
+		Physics::SphereCollider collider;
+		glm::vec3* pos;
+		bool isKinimatic;
 	public:
-		bool isKinimatic, hasGravity;
-	public:
-		RigidBody();
-		void addCollider(Physics::Collider* collider);
-		void updateInertia();
-		void setParent(GameObject* parent);
-		inline Type getType() const { return Type::Rigidbody; };
-		void cleanUp();
+		glm::vec3 velocity;
+		glm::vec3 angularVelocity;
+		Rigidbody();
+		Rigidbody(bool isKinimatic);
 
-		// intergration
-		// for velocity
-		void intergrateForces();
-		// for position
-		void intergrateVelocity();
+		void cleanUp() override;
+		inline Component::Type getType() const override { return Component::Type::Rigidbody; };
+		void setCollider(Physics::SphereCollider& collider);
+		void setParent(GameObject* parent) override;
+		void update(float deltaTime) override;
 
-		// forces
-		void addForce(Vector3 force, Vector3 at);
+		const float getInvMass() const;
+		const glm::mat3 getGlobalInvInertiaTensor() const;
 
-		// getters
-		Vector3 getCOS() const;
-		Quaternion getRotation() const;
-		glm::mat3 getRotationMatrix() const;
-		Vector3 getVelocity() const;
-		Vector3 getAngularVelocity() const;
+		void backPeddle(float d);
 
-		Matrix3 getInvInertia_G() const;
-		const float& getInvMass() const;
 
-		// setters
+		void applyForce(glm::vec3 force);
 
-		// adders
-		void velocityAdder(Vector3 add);
-		void angularVelAdder(Vector3 add);
-		void cosAdder(Vector3 add);
+
+		void intergrateForPosition(const float dt);
 	};
 };
 

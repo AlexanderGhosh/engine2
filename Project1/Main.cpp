@@ -46,14 +46,14 @@
 #include "ParticleSystem/Distributions/SphereDistribution.h"
 
 #include "Physics/Engine.h"
-#include "Physics/Collision/Broadphase/NSquared.h"
-#include "Physics/Collision/Narrowphase/GJK3D.h"
-#include "Physics/Collision/Narrowphase/SAT3D.h"
-#include "Physics/Resolution/ConstraintsBased.h"
-#include "Physics/Resolution/ImpulseBased.h"
+// #include "Physics/Collision/Broadphase/NSquared.h"
+// #include "Physics/Collision/Narrowphase/GJK3D.h"
+// #include "Physics/Collision/Narrowphase/SAT3D.h"
+// #include "Physics/Resolution/ConstraintsBased.h"
+// #include "Physics/Resolution/ImpulseBased.h"
 #include "Componets/Rigidbody.h"
-#include "Physics/ConstraintEngine/Constraints/DistanceConstraint.h"
-#include "Physics/ConstraintEngine/ConstraitnsSolver.h"
+// #include "Physics/ConstraintEngine/Constraints/DistanceConstraint.h"
+// #include "Physics/ConstraintEngine/ConstraitnsSolver.h"
 
 #include "Primatives/Materials/PBR.h"
 #include "Primatives/Materials/MatItemSingle.h"
@@ -72,6 +72,7 @@
 #include "Scripts/SpinScript.h"
 #include "Scripts/HoverScript.h"
 #include "Scripts/SoundControllerScript.h"
+#include "Scripts/PhysicsDebugger.h"
 
 #include "Context.h"
 
@@ -123,7 +124,7 @@ int main() {
     const Primative::Model cubeBuffer  = ResourceLoader::createModel("Resources/Models/cube.obj"); // needed for the skybox
     const Primative::Model planeBuffer = ResourceLoader::createModel("Resources/Models/plane.dae");
     // const Primative::Model minikitBuffer = ResourceLoader::createModel("Resources/Models/minikit.fbx");
-    // const Primative::Model orbBuffer = ResourceLoader::createModel("Resources/Models/orb.obj");
+    const Primative::Model orbBuffer = ResourceLoader::createModel("Resources/Models/orb.obj");
     //const Primative::Model cityBuffer = ResourceLoader::createModel("Resources/Models/city.obj");
     timer.log();
 
@@ -143,9 +144,9 @@ int main() {
     auto& grassMaterial = ResourceLoader::createPBR(grassMaterialInfo);
     grassMaterial.setRepeatValue(10);
 
-    /*auto waterMaterialInfo = ResourceLoader::createPBRInfo("Resources/Textures/Water", {TextureType::AlbedoMap, TextureType::RoughnessMap, TextureType::NormalMap, TextureType::AOMap, TextureType::MetalicMap}, {0, 0, 0, 0, 0});
+    auto waterMaterialInfo = ResourceLoader::createPBRInfo("Resources/Textures/Water", {TextureType::AlbedoMap, TextureType::RoughnessMap, TextureType::NormalMap, TextureType::AOMap, TextureType::MetalicMap}, {0, 0, 0, 0, 0});
     auto& waterMaterial = ResourceLoader::createPBR(waterMaterialInfo);
-    Materials::MatItemSingle<glm::vec4> waterAlbedo({ 0, 0, 1, 1 });
+    /*Materials::MatItemSingle<glm::vec4> waterAlbedo({0, 0, 1, 1});
     Materials::MatItemSingle<glm::vec3> waterEmission({ 0, 0, 0 });
     Materials::MatItemSingle<float> waterMetalic(0.5f);
     Materials::MatItemSingle<float> waterRoughness(0.5f);
@@ -156,17 +157,59 @@ int main() {
     waterMaterial.setMetalic(&waterMetalic);
     waterMaterial.setRoughness(&waterRoughness);
     waterMaterial.setAO(&waterAO);*/
+
+    Materials::MatItemSingle<glm::vec4> redAlbedo({ 1, 0, 0, 1 });
+    Materials::MatItemSingle<glm::vec4> blueAlbedo({ 0, 0, 1, 1 });
+    Materials::MatItemSingle<glm::vec3> emmision({ 0, 0, 0 });
+    Materials::MatItemSingle<float> metalic(0.5f);
+    Materials::MatItemSingle<float> roughness(0.5f);
+    Materials::MatItemSingle<float> AO(0.5f);
+
+    Materials::PBR redMat = ResourceLoader::createPBR(waterMaterialInfo);
+    redMat.setAlbedo(&redAlbedo);
+    redMat.setEmission(&emmision);
+    redMat.setMetalic(&metalic);
+    redMat.setRoughness(&roughness);
+    redMat.setAO(&AO);
+
+    Materials::PBR blueMat = ResourceLoader::createPBR(waterMaterialInfo);
+    blueMat.setAlbedo(&blueAlbedo);
+    blueMat.setEmission(&emmision);
+    blueMat.setMetalic(&metalic);
+    blueMat.setRoughness(&roughness);
+    blueMat.setAO(&AO);
   
     timer.log();
 
     timer.start("Objects");
 
 
-    GameObject orb(glm::vec3(0, 1.5, 0));
-    /*Component::RenderMesh orbMesh = Component::RenderMesh();
-    orbMesh.setModel(orbBuffer);
-    orbMesh.setMaterial(&waterMaterial);
-    orb.addComponet(&orbMesh);*/
+    GameObject redBall = GameObject(glm::vec3(0, 1, 0));
+    Component::RenderMesh orbMesh1 = Component::RenderMesh();
+    orbMesh1.setModel(orbBuffer);
+    orbMesh1.setMaterial(&redMat);
+    Component::Rigidbody rb1 = Component::Rigidbody(true);
+    Physics::SphereCollider col1 = Physics::SphereCollider(1, 10);
+    PhysicsDebugger p_debugger1 = PhysicsDebugger(true);
+    
+
+    redBall.addComponet(&rb1);
+    redBall.addComponet(&col1);
+    redBall.addComponet(&orbMesh1);
+    redBall.addComponet(&p_debugger1);
+
+    GameObject blueBall = GameObject(glm::vec3(0.5, 10, 0));
+    Component::RenderMesh orbMesh2 = Component::RenderMesh();
+    orbMesh2.setModel(orbBuffer);
+    orbMesh2.setMaterial(&blueMat);
+    Component::Rigidbody rb2 = Component::Rigidbody(false);
+    Physics::SphereCollider col2 = Physics::SphereCollider(1, 10);
+    PhysicsDebugger p_debugger2 = PhysicsDebugger(true);
+
+    blueBall.addComponet(&rb2);
+    blueBall.addComponet(&col2);
+    blueBall.addComponet(&orbMesh2);
+    blueBall.addComponet(&p_debugger2);
 
     /*Particles::DomeDistribution distribution = Particles::DomeDistribution(1.0f);
     Component::ParticleEmmiter emmiter = Component::ParticleEmmiter(10, 10, true, 0.25);
@@ -204,7 +247,7 @@ int main() {
 
 
     timer.start("Player");
-    GameObject player = GameObject(glm::vec3(0, 0, 5));
+    GameObject player = GameObject(glm::vec3(0, 0, 20));
     Component::Camera playerCamera = Component::Camera();
     player.addComponet(&playerCamera);
     Component::CharacterController cc;
@@ -229,7 +272,7 @@ int main() {
     lightSource2.addComponet(&shadowCaster);
 
 
-    Materials::MatItemSingle<glm::vec4> windowAlbedo(wi);
+    /*Materials::MatItemSingle<glm::vec4> windowAlbedo(wi);
     Materials::MatItemSingle<glm::vec3> windowNormal(glm::vec3(0, 1, 0));
     Materials::MatItemSingle<glm::vec3> windowEmission(glm::vec3(0, 1, 0));
     Materials::MatItemSingle<float> windowMetalic(0.5f);
@@ -247,7 +290,7 @@ int main() {
     windowMesh1.setModel(planeBuffer);
     windowMesh1.setMaterial(&windowMat1);
     windowMesh1.setTransparent(true);
-    window1.addComponet(&windowMesh1);
+    window1.addComponet(&windowMesh1);*/
 
     timer.log();
 
@@ -291,10 +334,11 @@ int main() {
     scene.addObject(&player);
     scene.addObject(&lightSource);
     scene.addObject(&lightSource2);
-    scene.addObject(&window1);
+    // scene.addObject(&window1);
     //scene.addObject(&city);
 
-    scene.addObject(&orb);
+    scene.addObject(&redBall);
+    scene.addObject(&blueBall);
     for (Terrain& land : allLand) {
         scene.addTerrain(&land);
     }
@@ -313,16 +357,21 @@ int main() {
     timer.log();
     // SKYBOX //
     
-    Gizmos::Sphere gizmo1 = Gizmos::Sphere({ 0, 4, 0 }, { 1, 0, 0 });
-    gizmo1.setRadius(0.25);
-    gizmo1.setThickness(2);
-    Gizmos::GizmoRenderer::addGizmo(&gizmo1);
+    // Gizmos::Sphere gizmo1 = Gizmos::Sphere({ 0, 1, 0 }, { 0, 1, 0 });
+    // gizmo1.setRadius(1);
+    // gizmo1.setThickness(2);
+    // Gizmos::GizmoRenderer::addGizmo(&gizmo1);
+
+    // Gizmos::Sphere gizmo2 = Gizmos::Sphere({ 0, 2.5, 0 }, { 0, 1, 0 });
+    // gizmo2.setRadius(1);
+    // gizmo2.setThickness(2);
+    // Gizmos::GizmoRenderer::addGizmo(&gizmo2);
 
     Utils::log("Started Loop");
     scene.gameLoop();
 
     Physics::Engine::cleanUp();
-    gizmo1.cleanUp();
+    // gizmo1.cleanUp();
     
     scene.cleanUp(); // removes and destrys all componets and fbos (destroysing comonets doesnt destry buffers(except audio source))
     

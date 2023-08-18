@@ -6,7 +6,7 @@
 namespace Component {
 	class ComponetBase;
 	struct Transform;
-	class RigidBody;
+	class Rigidbody;
 	class RenderMesh;
 }
 namespace UI {
@@ -37,7 +37,7 @@ public:
 	virtual void tryDraw(Float deltaTime);
 	Component::Transform getGlobalTransform();
 	Component::Transform* getLocalTransform();
-	Component::RigidBody* getRigidbody();
+	Component::Rigidbody* getRigidbody();
 	template<class T>
 	inline T* getComponet()
 	{

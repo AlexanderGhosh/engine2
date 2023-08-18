@@ -19,6 +19,7 @@
 #include "../Context.h"
 // GUI
 #include "../GUI/ElementContainers/GUICanvas.h"
+#include "../Physics/Engine.h"
 // GUI
 
 Primative::Model GameScene::quadModel = { };
@@ -288,6 +289,7 @@ void GameScene::postProcess()
 
 void GameScene::updateObjects()
 {
+	Physics::Engine::update();
 	const auto events = getCurrentEvents();
 	for (GameObject*& obj : objects) {
 		if (obj->isAlive()) {

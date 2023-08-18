@@ -1,12 +1,12 @@
 #pragma once
 namespace Component {
-	class RigidBody;
+	class Rigidbody;
 }
 namespace Physics {
 	class CollisionManfold;
 	class Resolution {
 	public:
-		virtual void resolve(Component::RigidBody* a, Component::RigidBody* b, Physics::CollisionManfold& manafold) = 0;
+		virtual void resolve(Component::Rigidbody* a, Component::Rigidbody* b, Physics::CollisionManfold& manafold) = 0;
 		virtual void cleanUp() = 0;
 	};
 };

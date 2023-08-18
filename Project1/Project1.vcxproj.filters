@@ -84,46 +84,13 @@
     <ClCompile Include="Physics\Engine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Physics\Collision\CollisionDetection.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Physics\Collision\Broadphase\NSquared.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Physics\Collision\Collider.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Physics\Collision\Broadphase\BPBase.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Physics\Collision\Narrowphase\GJK3D.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Physics\Resolution\ConstraintsBased.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Physics\Resolution\ImpulseBased.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Physics\Collision\Narrowphase\SAT3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Utils\Shapes.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Physics\ConstraintEngine\ConstraitnsSolver.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Physics\ConstraintEngine\Constraints\Constraints.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Physics\ConstraintEngine\Constraints\ContactConstraint.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Physics\ConstraintEngine\Constraints\DistanceConstraint.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Componets\Rigidbody.cpp">
@@ -273,6 +240,9 @@
     <ClCompile Include="GUI\Text\TextRendering.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Scripts\PhysicsDebugger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Rendering\Rendering.h">
@@ -353,46 +323,7 @@
     <ClInclude Include="Physics\Collision\Collider.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Physics\Collision\CollisionDetection.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Physics\Collision\Broadphase\Base.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Physics\Collision\Broadphase\NSquared.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Physics\Collision\Narrowphase\Base.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Physics\Collision\Narrowphase\GJK3D.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Physics\Resolution\ResolutionBase.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Physics\Resolution\ConstraintsBased.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Physics\Resolution\ImpulseBased.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Physics\Collision\Narrowphase\SAT3D.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Utils\Shapes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Physics\ConstraintEngine\ConstraitnsSolver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Physics\ConstraintEngine\Constraints\Constraints.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Physics\ConstraintEngine\Constraints\ContactConstraint.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Physics\ConstraintEngine\Constraints\DistanceConstraint.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Componets\Rigidbody.h">
@@ -552,6 +483,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="STBImage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripts\PhysicsDebugger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

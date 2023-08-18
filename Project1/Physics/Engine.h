@@ -1,32 +1,40 @@
 #pragma once
-#include "../Componets/Rigidbody.h"
-#include "Collision/CollisionDetection.h"
+#include <list>
+#include <vector>
+#include "../Utils/General.h"
+
+namespace Component {
+	class Rigidbody;
+}
+
 namespace Physics {
-	class Resolution;
+	class SphereCollider;
+	struct CollisionDetails;
+
 	class Engine
 	{
 	private:
-		static std::vector<Component::RigidBody*> rigidbodies;
-		static std::vector<Collider*> colliders;
-		static Resolution* resolution;
-		static glm::vec3 gravity;
-		static float dampping;
+		static std::list<Component::Rigidbody*> rigidbodies;
+		static std::list<Physics::SphereCollider*> colliders;
+
+		static std::vector<Physics::CollisionDetails> getIntersections();
+		/// <summary>
+		/// For each collision both objects will be moved along there velocity axis inorder to resolve overlap, then the impuse force is applyed to the sigular point of collision
+		/// </summary>
+		/// <param name="details"></param>
+		static void resolveIntersections(const std::vector<Physics::CollisionDetails>& details);
 	public:
+		static glm::vec3 gravity;
 		static void update();
 		static void cleanUp();
-		static inline void addCollider(Collider* collider) {
-			colliders.push_back(collider);
-		};
-		static inline void addRigidBody(Component::RigidBody* rigidbody) {
-			rigidbodies.push_back(rigidbody);
-		};
-		template<class T>
-		static inline void setResponse() { resolution = DBG_NEW T(); };
-		static inline std::vector<Collider*>& getColliders() { return colliders; };
 
-		static inline glm::vec3& getGravity() { return gravity; };
-		static inline float& getDamppingFactor() { return dampping; };
-		static inline float getDeltaTime() { return 1.0f / 60.0f; };
+		static void addRigidbody(Component::Rigidbody* rb);
+		static void addCollider(Physics::SphereCollider* col);
+
+		static glm::vec3 calcImpulseForce(Component::Rigidbody* a, Component::Rigidbody* b, Vector3 norm);
+
+		// template<class T>
+		// static inline void setResponse() { resolution = DBG_NEW T(); };
 	};
-};
+}
 
