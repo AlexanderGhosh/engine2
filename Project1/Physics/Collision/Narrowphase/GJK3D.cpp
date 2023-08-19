@@ -99,7 +99,8 @@ void Physics::GJK3D::EPA(Physics::CollisionManfold& manafold, const Physics::Sim
 		glm::vec3 support_ = support(manafold.a, manafold.b, minNormal).v;
 		float sDistance = glm::dot(minNormal, support_);
 
-		if (abs(sDistance - minDistance) > 0.001f) {
+		if (abs(sDistance - minDistance) > 0) {
+			// not found
 			minDistance = INFINITY;
 
 			std::vector<std::pair<int, int>> uniqueEdges;

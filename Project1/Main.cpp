@@ -201,7 +201,7 @@ int main() {
     redBall.addComponet(&cubeMesh1);
     redBall.addComponet(&p_debugger1);
 
-    GameObject blueBall = GameObject(glm::vec3(0.5, 10, 0));
+    GameObject blueBall = GameObject(glm::vec3(0, 10, 0));
     Component::RenderMesh cubeMesh2 = Component::RenderMesh();
     cubeMesh2.setModel(orbBuffer);
     cubeMesh2.setMaterial(&blueMat);
