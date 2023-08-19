@@ -35,6 +35,8 @@ namespace Physics {
 
 		inline auto begin() const { return data_.begin(); };
 		inline auto end() const { return data_.end(); };
+
+		inline Vector3 operator[](int index) const { return data_[index]; };
 	};
 }
 
