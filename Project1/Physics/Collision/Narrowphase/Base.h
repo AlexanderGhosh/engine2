@@ -1,7 +1,18 @@
 #pragma once
-#include "../Collider.h"
+#include <glm.hpp>
+
 namespace Physics {
-	struct CollisionManfold;
+	class Collider;
+	struct CollisionManfold {
+		Collider* a;
+		Collider* b;
+		bool hit;
+		bool error;
+
+		glm::vec3 normal;
+		float depth;
+	};
+
 	struct SupportPoint {
 		glm::vec3 a, b, v, dir;
 		SupportPoint() : a(0), b(0), v(0), dir(0) { }
@@ -15,6 +26,7 @@ namespace Physics {
 			return v - b.v;
 		}
 	};
+
 	class Narrowphase {
 	public:
 		virtual const CollisionManfold getCollisionData(Collider* a, Collider* b) = 0;

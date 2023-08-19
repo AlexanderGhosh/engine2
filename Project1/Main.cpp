@@ -47,7 +47,7 @@
 
 #include "Physics/Engine.h"
 // #include "Physics/Collision/Broadphase/NSquared.h"
-// #include "Physics/Collision/Narrowphase/GJK3D.h"
+#include "Physics/Collision/Narrowphase/GJK3D.h"
 // #include "Physics/Collision/Narrowphase/SAT3D.h"
 // #include "Physics/Resolution/ConstraintsBased.h"
 // #include "Physics/Resolution/ImpulseBased.h"
@@ -184,6 +184,8 @@ int main() {
 
     timer.start("Objects");
 
+    auto np = Physics::GJK3D();
+    Physics::Engine::narrowphase = &np;
 
     GameObject redBall = GameObject(glm::vec3(0, 1, 0));
     Component::RenderMesh cubeMesh1 = Component::RenderMesh();

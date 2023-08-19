@@ -2,6 +2,7 @@
 #include <list>
 #include <vector>
 #include "../Utils/General.h"
+#include "Collision/Narrowphase/Base.h"
 
 namespace Component {
 	class Rigidbody;
@@ -25,6 +26,7 @@ namespace Physics {
 		/// <param name="details"></param>
 		static void resolveIntersections(const std::vector<Physics::CollisionDetails>& details);
 	public:
+		static Physics::Narrowphase* narrowphase;
 		static glm::vec3 gravity;
 		static void update();
 		static void cleanUp();

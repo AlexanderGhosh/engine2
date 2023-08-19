@@ -14,6 +14,8 @@ namespace Physics {
 
 		void cleanUp() override;
 
+		virtual const glm::vec3 support(Vector3 axis) const = 0;
+
 		virtual const float getRadius(float theta) const = 0;
 		inline const float getInvMass() const { return invMass; };
 		const glm::mat3 getGlobalInvInertiaTensor() const;
@@ -34,9 +36,10 @@ namespace Physics {
 		SphereCollider(float radius, float mass);
 
 		const float getRadius(float theta) const override;
+		const glm::vec3 support(Vector3 axis) const override;
 	};
 
-	class CubeCollider : public Collider {
+	/*class CubeCollider : public Collider {
 	private:
 		float width;
 	public:
@@ -45,7 +48,7 @@ namespace Physics {
 		const float getRadius(float theta) const override;
 
 
-	};
+	};*/
 
 	struct CollisionDetails {
 		Collider* a;

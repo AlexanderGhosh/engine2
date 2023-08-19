@@ -1,6 +1,6 @@
 #include "GJK3D.h"
-#include "../CollisionDetection.h"
-#include <gtx/string_cast.hpp>
+#include "../Collider.h"
+#include <tuple>
 
 bool sameDirection(const glm::vec3& a, const glm::vec3& b) {
 	return glm::dot(a, b) > 0;
@@ -8,8 +8,9 @@ bool sameDirection(const glm::vec3& a, const glm::vec3& b) {
 
 Physics::SupportPoint support(const Physics::Collider* a, const Physics::Collider* b, const glm::vec3& dir) {
 	Physics::SupportPoint res;
-	res.a = a->support(dir);
-	res.b = b->support(-dir);
+	auto n = glm::normalize(dir);
+	res.a = a->support(n);
+	res.b = b->support(-n);
 	res.v = res.a - res.b;
 	res.dir = dir;
 	////////////////////////////////////////////
@@ -18,252 +19,316 @@ Physics::SupportPoint support(const Physics::Collider* a, const Physics::Collide
 	// res.v = res.b - res.a;
 	return res;
 }
-Physics::GJK3D::Triangle* Physics::GJK3D::getClosest(std::list<Triangle>& faces, float& dist)
-{
-	dist = INFINITY;
-	float d = 0;
-	Triangle* closest_face = nullptr;
-	for (Triangle& face : faces) {
-		d = glm::dot(face.a.v, face.n);
-		if (d < dist) {
-			dist = d;
-			closest_face = &face;
-		}
-	}
-	return closest_face;
-}
 
-glm::vec3 barycentricCoords(const Physics::GJK3D::Triangle& triangle)
-{
-	glm::vec3 res(0);
-	const glm::vec3 p = triangle.n * glm::dot(triangle.n, triangle.a.v);
-	const glm::vec3& a = triangle.a.v;
-	const glm::vec3& b = triangle.b.v;
-	const glm::vec3& c = triangle.c.v;
-	const glm::vec3
-		v0 = b - a,
-		v1 = c - a,
-		v2 = p - a;
-	const float d00 = glm::dot(v0, v0);
-	const float d01 = glm::dot(v0, v1);
-	const float d11 = glm::dot(v1, v1);
-	const float d20 = glm::dot(v2, v0);
-	const float d21 = glm::dot(v2, v1);
-
-	const float denom = d00 * d11 - d01 * d01;
-
-	res.y = (d11 * d20 - d01 * d21) / denom;
-	res.z = (d00 * d21 - d01 * d20) / denom;
-	res.x = 1.0f - res.y - res.z;
-	return res;
-}
-void determinCollisionData(Physics::CollisionManfold& info, const Physics::GJK3D::Triangle* face, const float& penertration) {
-
-	info.collided = true;
-	info.normal = face->n;
-	info.penetration = penertration;
-	glm::vec3 barr = barycentricCoords(*face);
-	const Physics::Collider* a = info.bodies[0];
-	const Physics::Collider* b = info.bodies[1];
-	info.points[0] =
-		barr.x * ((glm::sign(face->a.dir) * *a->scale) + *a->position) +
-		barr.y * ((glm::sign(face->b.dir) * *a->scale) + *a->position) +
-		barr.z * ((glm::sign(face->c.dir) * *a->scale) + *a->position);
-
-	info.points[1] =
-		barr.x * ((glm::sign(-face->a.dir) * *b->scale) + *b->position) +
-		barr.y * ((glm::sign(-face->b.dir) * *b->scale) + *b->position) +
-		barr.z * ((glm::sign(-face->c.dir) * *b->scale) + *b->position);
-	/*info.points[0] =
-		barr.x * face->a.a +
-		barr.y * face->b.a +
-		barr.z * face->c.a;
-
-	info.points[1] =
-		barr.x * face->a.b +
-		barr.y * face->b.b +
-		barr.z * face->c.b;*/
-	assert(!glm::isnan(info.penetration) && !glm::isinf(info.penetration) && "Cant determin collision info");
-}
-
-void Physics::GJK3D::EPA(Physics::CollisionManfold& info, Simplex& simplex) {
-#define EPA_TOLERANCE 0.0001f
-#define EPA_MAX_NUM_FACES 64
-#define EPA_MAX_NUM_LOOSE_EDGES 32
-#define EPA_MAX_NUM_ITERATIONS 64
-#define EPA_BIAS 0.000001f
-
-	std::list<Triangle> faces;
-	const SupportPoint& a = simplex.a();
-	const SupportPoint& b = simplex.b();
-	const SupportPoint& c = simplex.c();
-	const SupportPoint& d = simplex.d();
-	faces.emplace_back(a, b, c);
-	faces.emplace_back(a, c, d);
-	faces.emplace_back(a, d, b);
-	faces.emplace_back(b, d, c);
-	Triangle* closest_face = nullptr;
-	std::list<Edge> loose_edges;
-	for(short itt = 0; itt < EPA_MAX_NUM_ITERATIONS; itt++) {
-		loose_edges.clear();
-		float min = 0;
-		if (itt == EPA_MAX_NUM_ITERATIONS - 1) {
-			int t = 0;
-		}
-		closest_face = getClosest(faces, min);
-		if (!closest_face)
-			return;
-
-		const glm::vec3 dir = closest_face->n;
-		const glm::vec3 p = support(info.bodies[0], info.bodies[1], dir).v;
-		const SupportPoint p_raw = support(info.bodies[0], info.bodies[1], dir);
-
-		if (glm::dot(p, dir) - min < EPA_TOLERANCE) {
-			determinCollisionData(info, closest_face, glm::dot(p, dir));
-			// std::cout << glm::to_string(info.points[0]) << " : " << glm::to_string(info.points[1]) << /*glm::to_string(*info.bodies[1]->position) <<*/ std::endl;
-			return;
-		}
-		for (unsigned k = 0; k < faces.size(); k++) {
-			Triangle& face = Utils::elementAt(faces, k);
-			if (sameDirection(face.n, p - face.a.v)) {
-				const std::vector<const SupportPoint*> points = face.all();
-				for (char i = 0; i < 3; i++) {
-					Edge current_edge = { *points[i], *points[(i + 1) % 3] };
-					bool found_edge = false;
-					for (Edge& loose_edge : loose_edges) {
-						if (loose_edge == current_edge) {
-							loose_edge = loose_edges.back();
-							loose_edges.pop_back();
-							found_edge = true;
-							break;
-						}
-					}
-					if (!found_edge) {
-						assert(loose_edges.size() < EPA_MAX_NUM_LOOSE_EDGES);
-						loose_edges.push_back(current_edge);
-					}
-				}
-				std::swap(face, faces.back());
-				faces.pop_back();
-				k--;
-			}
-		}
-		for (Edge& edge : loose_edges) {
-			assert(faces.size() < EPA_MAX_NUM_FACES);
-			faces.emplace_back(edge.a, edge.b, p_raw);
-			Triangle& back = faces.back();
-			back.n = glm::normalize(glm::cross(edge.a.v - edge.b.v, edge.a.v - p));
-			assert(!glm::any(glm::isnan(back.n)));
-			if (glm::dot(back.a.v, back.n) + EPA_BIAS < 0) {
-				const glm::vec3 t = back.a.v;
-				back.a = back.b;
-				back.b = t;
-				back.n *= -1;
-			}
-		}
-	}
-	// EPA failed
-	/*info.collided = true;
-	info.normal = closest_face->n;
-	info.penertraion = glm::dot(closest_face->a.v, closest_face->n);
-	glm::vec3 barr = barycentricCoords(*closest_face, info.penertraion);
-	info.points[0] =
-		barr.x * closest_face->a.a +
-		barr.y * closest_face->b.a +
-		barr.z * closest_face->c.a;
-	info.points[1] = info.points[0];*/
-	determinCollisionData(info, closest_face, glm::dot(closest_face->a.v, closest_face->n));
-}
-
-const Physics::CollisionManfold Physics::GJK3D::getCollisionData(Collider* a, Collider* b)
+const Physics::CollisionManfold Physics::GJK3D::getCollisionData(Physics::Collider* a, Physics::Collider* b)
 {
 #define GJK_MAX_ITTERATION 256
-	CollisionManfold res;
-	res.collided = false;
-	res.bodies = {
-		a, b
-	};
 
-	Simplex simplex;
-	glm::vec3 dir = Utils::xAxis();
-	simplex.push(support(a, b, dir));
-	dir *= -1;
+	Physics::CollisionManfold res;
 
-	glm::vec3 ao(0);
-	glm::vec3 ab(0);
-	glm::vec3 ac(0);
-	glm::vec3 ad(0);
-	unsigned counter = 0;
+	glm::vec3 axis = Utils::xAxis();
+
+	glm::vec3 A = support(a, b, axis).v;
+
+	Simplex s;
+	s.add(A);
+	glm::vec3 D = -A;
+
+	int counter = 0;
 	while (counter++ < GJK_MAX_ITTERATION) {
-		simplex.push(support(a, b, dir));
-
-		ao = -simplex.a().v;
-		ab = simplex.b() - simplex.a();
-		ac = simplex.c() - simplex.a();
-		ad = simplex.d() - simplex.a();
-		
-		switch (simplex.size)
-		{
-		case 2: // line segment
-			if (!sameDirection(-ao, dir)) {
-				// simplex doesnt contain origin
+		A = support(a, b, D).v;
+		if (glm::dot(A, D) <= 0.001) {
+			// reject
+			res.hit = false;
+			return res;
+		}
+		else {
+			s.add(A);
+			// bool contains_origin;
+			// tie(s, D, contains_origin) = getNearestSimplex(s);
+			if (s.evaluate(D)) {
+				res.a = a;
+				res.b = b;
+				res.hit = true;
+				EPA(res, s);
 				return res;
 			}
-			// simplex could contain the origin
-
-			dir = Utils::tripProduct(ab, ao, ab); // normal of line segment directed towards the originart();
-			if (dir == Utils::zero()) { //origin is on this line segment
-				//Apparently any normal search vector will do?
-				dir = glm::cross(ab, Utils::xAxis()); //normal with x-axis
-				if (dir == Utils::zero())
-					dir = glm::cross(ab, Utils::zAxis(-1)); //normal with z-axis
-			}
-			break;
-		case 3: // triangle
-			glm::vec3 n = glm::cross(ab, ac);
-			if (sameDirection(glm::cross(ab, n), ao)) {
-				// simplex doesnt contain origin
-				dir = Utils::tripProduct(ab, ao, ab);
-				simplex.pop();
-			}
-			else if (sameDirection(glm::cross(n, ac), ao)) {
-				dir = Utils::tripProduct(ac, ao, ac);
-				simplex.pop();
-				simplex.b() = simplex.c();
-			}
-			else if (sameDirection(n, ao)) {
-				dir = n;
-			}
-			else {
-				simplex = Simplex({ simplex.a(), simplex.c(), simplex.b() });
-				dir = -n;
-			}
-			break;
-		case 4: // pyramid
-			const glm::vec3 abc = glm::cross(ab, ac); // normals of the triangles
-			const glm::vec3 acd = glm::cross(ac, ad); // normals of the triangles
-			const glm::vec3 adb = glm::cross(ad, ab); // normals of the triangles
-
-			if (sameDirection(abc, ao)) {
-				simplex.pop();
-				dir = abc;
-			}
-			else if (sameDirection(acd, ao)) {
-				simplex = Simplex({ simplex.a(), simplex.c(), simplex.d() });
-				dir = acd;
-			}
-			else if (sameDirection(adb, ao)) {
-				simplex = Simplex({ simplex.a(), simplex.d(), simplex.b() });
-				dir = adb;
-			}
-			else {
-				EPA(res, simplex);
-				// res.collided = true;
-				return res;
-			}
-			break;
 		}
 	}
 
-	return res;
+	return {};
+}
+
+void addUnique(std::vector<std::pair<int, int>>& edges, const std::vector<int>& faces, int a, int b) {
+	auto reverse = std::find(             
+		edges.begin(),                    
+		edges.end(),                      
+		std::make_pair(faces[b], faces[a])
+	);
+
+	if (reverse != edges.end()) {
+		edges.erase(reverse);
+	}
+
+	else {
+		edges.emplace_back(faces[a], faces[b]);
+	}
+}
+
+void Physics::GJK3D::EPA(Physics::CollisionManfold& manafold, const Physics::Simplex& prism) const
+{
+	std::vector<glm::vec3> polytope(prism.begin(), prism.end());
+	std::vector<int> faces = {
+		0, 1, 2,
+		0, 3, 1,
+		0, 2, 3,
+		1, 3, 2
+	};
+
+	auto [normals, minFace] = getFaceNormals(polytope, faces);
+
+	glm::vec3 minNormal;
+	float minDistance = INFINITY;
+
+	int itt = 0;
+	while (minDistance == INFINITY && itt++ < GJK_MAX_ITTERATION) {
+		Vector4 n = normals[minFace];
+		minNormal = glm::vec3(n);
+		minDistance = n.z;
+
+		glm::vec3 support_ = support(manafold.a, manafold.b, minNormal).v;
+		float sDistance = glm::dot(minNormal, support_);
+
+		if (abs(sDistance - minDistance) > 0.001f) {
+			minDistance = INFINITY;
+
+			std::vector<std::pair<int, int>> uniqueEdges;
+
+			for (int i = 0; i < normals.size(); i++) {
+				if (sameDirection(normals[i], minNormal)) {
+					int f = i * 3;
+
+					addUnique(uniqueEdges, faces, f, f + 1);
+					addUnique(uniqueEdges, faces, f + 1, f + 2);
+					addUnique(uniqueEdges, faces, f + 2, f);
+
+					faces[f + 2] = faces.back();
+					faces.pop_back();
+
+					faces[f + 1] = faces.back();
+					faces.pop_back();
+
+					faces[f] = faces.back();
+					faces.pop_back();
+
+					normals[i] = normals.back();
+					normals.pop_back();
+
+					i--;
+				}
+			}
+			if (uniqueEdges.size() == 0) {
+				break;
+			}
+
+			std::vector<int> newFaces;
+			for (auto [e1, e2] : uniqueEdges) {
+				newFaces.push_back(e1);
+				newFaces.push_back(e2);
+				newFaces.push_back(polytope.size());
+			}
+
+			polytope.push_back(support_);
+
+
+			auto [newNormals, newMinFace] = getFaceNormals(polytope, newFaces);
+
+			float newMinDistance = FLT_MAX;
+			for (int i = 0; i < normals.size(); i++) {
+				if (normals[i].w < newMinDistance) {
+					newMinDistance = normals[i].w;
+					minFace = i;
+				}
+			}
+
+			if (newNormals[newMinFace].w < newMinDistance) {
+				minFace = newMinFace + normals.size();
+			}
+
+			faces.insert(faces.end(), newFaces.begin(), newFaces.end());
+			normals.insert(normals.end(), newNormals.begin(), newNormals.end());
+		}
+	}
+
+	if (minDistance == FLT_MAX) {
+		manafold.hit = false;
+		manafold.error = true;
+	}
+	else {
+		manafold.hit = true;
+		manafold.error = false;
+		manafold.normal = minNormal;
+		manafold.depth = minDistance + 0.001f;
+	}
+}
+
+std::pair<std::vector<glm::vec4>, int> Physics::GJK3D::getFaceNormals(const std::vector<glm::vec3>& polytope, const std::vector<int>& faces) const
+{
+	std::vector<glm::vec4> normals;
+	normals.reserve(faces.size() / 3);
+
+	int minTriangle = 0;
+	float minDistance = INFINITY;
+
+	for (int i = 0; i < faces.size(); i += 3) {
+		Vector3 v1 = polytope[faces[i]];
+		Vector3 v2 = polytope[faces[i + 1]];
+		Vector3 v3 = polytope[faces[i + 2]];
+
+		glm::vec3 norm = glm::cross((v2 - v1), (v3 - v1));
+		norm = glm::normalize(norm);
+	
+		float dist = glm::dot(norm, v1);
+
+		if (dist < 0) {
+			norm *= -1;
+			dist *= -1;
+		}
+		normals.emplace_back(norm, dist);
+
+		if (dist < minDistance) {
+			minDistance = dist;
+			minTriangle = i / 3;
+		}
+
+	}
+	return { normals, minTriangle };
+}
+
+
+Physics::Simplex::Simplex() : data_(), size_(0)
+{
+}
+
+Physics::Simplex::Simplex(std::initializer_list<glm::vec3> list) : Simplex()
+{
+	for (auto v = list.begin(); v != list.end(); v++) {
+		data_[std::distance(list.begin(), v)] = *v;
+	}
+	size_ = list.size();
+}
+
+void Physics::Simplex::add(Vector3 v)
+{
+	data_ = { glm::normalize(v), data_[0], data_[1], data_[2]};
+	size_ = std::min(size_ + 1, 4u);
+}
+
+bool Physics::Simplex::evaluate(glm::vec3& dir)
+{
+	switch (size_)
+	{
+	case 2:
+		line(dir);
+		break;
+	case 3:
+		triangle(dir);
+		break;
+	case 4:
+		return prism(dir);
+	}
+	return false;
+}
+
+void Physics::Simplex::line(glm::vec3& dir)
+{
+	const glm::vec3 ao = -data_[0];
+	const glm::vec3 ab = data_[1] + ao;
+
+	if (sameDirection(ao, ab)) {
+		dir = glm::cross(ab, ao);
+		dir = glm::cross(dir, ab);
+	}
+	else {
+		data_ = { data_[0] };
+		dir = ao;
+	}
+}
+
+void Physics::Simplex::triangle(glm::vec3& dir)
+{
+	const glm::vec3 a = data_[0];
+	const glm::vec3 b = data_[1];
+	const glm::vec3 c = data_[2];
+
+	const glm::vec3 ab = b - a;
+	const glm::vec3 ac = c - a;
+	const glm::vec3 ao = -a;
+
+	const glm::vec3 abc = glm::cross(ab, ac);
+
+	if (sameDirection(glm::cross(abc, ac), ao)) {
+		if (sameDirection(ac, ao)) {
+			data_ = { a, c };
+			dir = glm::cross(ac, ao);
+			dir = glm::cross(dir, ac);
+		}
+		else {
+			line(dir);
+			data_ = { a, b, c };
+		}
+	}
+	else {
+		if (sameDirection(glm::cross(ab, abc), ao)) {
+			line(dir);
+			data_ = { a, b, c };
+		}
+		else {
+			data_ = { a, c, b };
+			dir = -abc;
+		}
+	}
+}
+
+bool Physics::Simplex::prism(glm::vec3& dir)
+{
+	const glm::vec3 a = data_[0];
+	const glm::vec3 b = data_[1];
+	const glm::vec3 c = data_[2];
+	const glm::vec3 d = data_[3];
+
+	const glm::vec3 ab = b - a;
+	const glm::vec3 ac = c - a;
+	const glm::vec3 ad = d - a;
+	const glm::vec3 ao = -a;
+
+	const glm::vec3 abc = glm::cross(ab, ac);
+	const glm::vec3 acd = glm::cross(ac, ad);
+	const glm::vec3 adb = glm::cross(ad, ab);
+
+	if (sameDirection(abc, ao)) {
+		triangle(dir);
+		return false;
+	}
+
+	if (sameDirection(acd, ao)) {
+		data_ = { a, c, d };
+		triangle(dir);
+		data_ = { a, b, c, d };
+		return false;
+	}
+
+	if (sameDirection(adb, ao)) {
+		data_ = { a, d, b };
+		triangle(dir);
+		data_ = { a, b, c, d };
+		return false;
+	}
+
+	return true;
+}
+
+bool Physics::Simplex::sameDirection(Vector3 a, Vector3 b) const
+{
+	return glm::dot(a, b) > 0;
 }

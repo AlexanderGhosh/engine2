@@ -179,6 +179,7 @@
     <ClCompile Include="GUI\Constraints\PercentConstraint.cpp" />
     <ClCompile Include="Physics\Collision\Colliders\CubeCollider.cpp" />
     <ClCompile Include="Physics\Collision\Colliders\SATBaseCollider.cpp" />
+    <ClCompile Include="Physics\Collision\Narrowphase\GJK3D.cpp" />
     <ClCompile Include="Scripts\PhysicsDebugger.cpp" />
     <ClCompile Include="Primatives\Materials\Forward.cpp" />
     <ClCompile Include="ParticleSystem\ParticleEmmiter.cpp" />
@@ -258,6 +259,8 @@
     <ClInclude Include="GUI\Constraints\PercentConstraint.h" />
     <ClInclude Include="Physics\Collision\Colliders\CubeCollider.h" />
     <ClInclude Include="Physics\Collision\Colliders\SATBaseCollider.h" />
+    <ClInclude Include="Physics\Collision\Narrowphase\Base.h" />
+    <ClInclude Include="Physics\Collision\Narrowphase\GJK3D.h" />
     <ClInclude Include="Scripts\PhysicsDebugger.h" />
     <ClInclude Include="Primatives\Materials\MatItemBase.h" />
     <ClInclude Include="Primatives\Materials\MatItemChain.h" />
@@ -321,6 +324,7 @@
     <ClInclude Include="Primatives\Buffers\VertexBuffer.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="cpp.hint" />
     <None Include="Resources\DefaultShader\fragment.glsl" />
     <None Include="Resources\DefaultShader\geometry.glsl" />
     <None Include="Resources\DefaultShader\vertex.glsl" />

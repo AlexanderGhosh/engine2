@@ -8,6 +8,7 @@
 std::list<Component::Rigidbody*> Physics::Engine::rigidbodies = {};
 std::list<Physics::Collider*> Physics::Engine::colliders = {};
 glm::vec3 Physics::Engine::gravity = { 0, -1, 0 };
+Physics::Narrowphase* Physics::Engine::narrowphase = nullptr;
 
 std::vector<Physics::CollisionDetails> Physics::Engine::getIntersections()
 {
@@ -27,11 +28,9 @@ std::vector<Physics::CollisionDetails> Physics::Engine::getIntersections()
 			float intersection_distance = radius_sum - dist_;
 
 			if (intersection_distance >= epsilon) {
-
-
-
+				int t = 0;
 				// intersection detected
-				Physics::CollisionDetails data {};
+				/*Physics::CollisionDetails data {};
 
 				data.a = a;
 				data.b = b;
@@ -47,51 +46,34 @@ std::vector<Physics::CollisionDetails> Physics::Engine::getIntersections()
 
 				data.coef_restitution = 1;
 
-				details.push_back(data);
-			}
-
-			/*SATBaseCollider* a = *i;
-			SATBaseCollider* b = *j;
-
-			std::list<glm::vec3> axis_ = a->getGlobalNormals();
-			auto b_norms = b->getGlobalNormals();
-			axis_.insert(axis_.end(), b_norms.begin(), b_norms.end());
-
-			float maximumOverlap = -INFINITY;
-			glm::vec3 axisMTV(0);
-			bool hit = true;
-			for (Vector3 axis : axis_) {
-				const std::array<float, 2> a_range = a->project(axis);
-				const std::array<float, 2> b_range = b->project(axis);
-				const float overlap = a_range[1] - b_range[0];
-				if (overlap > maximumOverlap && overlap > 0) {
-					maximumOverlap = overlap;
-					axisMTV = axis;
+				details.push_back(data);*/
 				}
-				else {
-					hit = false;
-					break;
-				}
-			}
-			if (hit) {
+
+			Physics::CollisionManfold hit = narrowphase->getCollisionData(a, b);
+			if (hit.hit) {
 				// intersection detected
 				Physics::CollisionDetails data {};
 
 				data.a = a;
 				data.b = b;
 
-				// const glm::vec3 relative_hit_a = glm::normalize(b_pos - a_pos) * a->getRadius();
-				// const glm::vec3 relative_hit_b = glm::normalize(a_pos - b_pos) * b->getRadius();
+				const glm::vec3 relative_hit_a = glm::normalize(b_pos - a_pos) * a->getRadius(45);
+				const glm::vec3 relative_hit_b = glm::normalize(a_pos - b_pos) * b->getRadius(45);
+				
+				data.a_hit = a_pos + relative_hit_a;
+				data.b_hit = b_pos + relative_hit_b;
 
-				// data.a_hit = a_pos + relative_hit_a;
-				// data.b_hit = b_pos + relative_hit_b;
+				data.intersection_norm = glm::normalize(b_pos - a_pos);
+				data.intersection_distance = intersection_distance;
 
-				// data.intersection_norm = glm::normalize(b_pos - a_pos);
-				// data.intersection_distance = intersection_distance;
-				data.mtv = axisMTV * maximumOverlap;
+				// data.intersection_norm = hit.normal;
+				// data.intersection_distance = hit.depth;
+
+				data.coef_restitution = 1;
 
 				details.push_back(data);
-			}*/
+
+			}
 		}
 	}
 	return details;
@@ -116,29 +98,16 @@ void Physics::Engine::resolveIntersections(const std::vector<Physics::CollisionD
 		Component::Rigidbody* a_rb = a->getComponet<Component::Rigidbody>();
 		Component::Rigidbody* b_rb = b->getComponet<Component::Rigidbody>();
 
-		glm::vec3 n_a = glm::normalize(a_rb->velocity);
-		if (glm::any(glm::isnan(n_a))) {
-			n_a = glm::vec3(0);
-		}
-		glm::vec3 n_b = glm::normalize(b_rb->velocity);
-		if (glm::any(glm::isnan(n_b))) {
-			n_b = glm::vec3(0);
-		}
+		a_rb->velocity *= 0;
+		b_rb->velocity *= 0;
 
-		const glm::vec3 globalVel_a = a->getLocalTransform()->Position + n_a;
-		const glm::vec3 globalVel_b = b->getLocalTransform()->Position + n_b;
-		const glm::vec3 delta = globalVel_b - globalVel_a;
-
-		const glm::vec3 hit_pos_a = globalVel_a + delta;
-		const glm::vec3 hit_pos_b = globalVel_b - delta;
-
-		a_rb->backPeddle(intercetion.intersection_distance);
+		/*a_rb->backPeddle(intercetion.intersection_distance);
 		b_rb->backPeddle(intercetion.intersection_distance);
 
 		const glm::vec3 impulse = calcImpulseForce(a_rb, b_rb, intercetion.intersection_norm, intercetion.coef_restitution);
 
 		a_rb->applyForce(-impulse);
-		b_rb->applyForce(impulse);
+		b_rb->applyForce(impulse);*/
 	}
 }
 

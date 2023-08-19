@@ -45,9 +45,14 @@ const float Physics::SphereCollider::getRadius(float theta) const
 	return radius;
 }
 
+const glm::vec3 Physics::SphereCollider::support(Vector3 axis) const
+{
+	return radius * axis + getAbsolutePosition();
+}
 
 
-Physics::CubeCollider::CubeCollider() : Collider(), width(0)
+
+/*Physics::CubeCollider::CubeCollider() : Collider(), width(0)
 {
 }
 
@@ -72,3 +77,4 @@ const float Physics::CubeCollider::getRadius(float theta) const
 	float d = sinf(theta);
 	return width / d;
 }
+*/
