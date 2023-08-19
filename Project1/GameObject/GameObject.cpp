@@ -4,6 +4,7 @@
 #include "../Componets/Animated.h"
 #include "../Componets/RigidBody.h"
 #include "../Scene/GameScene.h"
+class SATBaseCollider;
 
 GameObject::GameObject(String name) : componets(), enabled(), transform(DBG_NEW Component::Transform()), alive(true), scene(nullptr), name(name), parent(nullptr) {
 	enabled.push_back(1);
@@ -24,13 +25,13 @@ void GameObject::addComponet(Component::ComponetBase* componet)
 		Component::Rigidbody* rb = getRigidbody();
 		if (!rb)
 			return;
-		rb->setCollider(*reinterpret_cast<Physics::SphereCollider*>(componet));
+		rb->setCollider(*reinterpret_cast<Physics::Collider*>(componet));
 	}
 	else if (componet->getType() == Component::Type::Rigidbody) {
 		Component::Rigidbody* rb = reinterpret_cast<Component::Rigidbody*>(componet);
 		for (Component::ComponetBase* comp : componets) {
 			if (comp->getType() == Component::Type::Collider) {
-				rb->setCollider(*reinterpret_cast<Physics::SphereCollider*>(comp));
+				rb->setCollider(*reinterpret_cast<Physics::Collider*>(comp));
 			}
 		}
 	}

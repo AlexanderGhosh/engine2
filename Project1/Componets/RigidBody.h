@@ -6,7 +6,7 @@ namespace Component {
 	class Rigidbody : public ComponetBase
 	{
 	private:
-		Physics::SphereCollider collider;
+		Physics::Collider* collider;
 		glm::vec3* pos;
 		bool isKinimatic;
 	public:
@@ -17,8 +17,10 @@ namespace Component {
 
 		void cleanUp() override;
 		inline Component::Type getType() const override { return Component::Type::Rigidbody; };
-		void setCollider(Physics::SphereCollider& collider);
+		
+		void setCollider(Physics::Collider& collider);
 		void setParent(GameObject* parent) override;
+		
 		void update(float deltaTime) override;
 
 		const float getInvMass() const;

@@ -4,26 +4,35 @@
 #include <gtc/type_ptr.hpp>
 
 
-
-Physics::SphereCollider::SphereCollider() : radius(0), centerOfMass(0), invMass(0), inertiaTensor(1)
+Physics::Collider::Collider() : Component::ComponetBase(), centerOfMass(0), invMass(0), inertiaTensor(1)
 {
-}
-
-Physics::SphereCollider::SphereCollider(float radius, float mass) : SphereCollider()
-{
-	this->radius = radius;
 	Physics::Engine::addCollider(this);
-
-	inertiaTensor = glm::mat3(.4f * mass * radius * radius);
-	this->invMass = 1.f / mass;
 }
 
-const glm::vec3 Physics::SphereCollider::getAbsolutePosition() const
+Physics::Collider::Collider(float mass) : Collider()
+{
+	invMass = 1.f / mass;
+}
+
+Physics::SphereCollider::SphereCollider() : Physics::Collider(), radius(0)
+{
+}
+
+Physics::SphereCollider::SphereCollider(float radius, float mass) : Physics::Collider(mass), radius(radius)
+{
+	inertiaTensor = glm::mat3(.4f * mass * radius * radius);
+}
+
+const glm::vec3 Physics::Collider::getAbsolutePosition() const
 {
 	return parent->getGlobalTransform().Position + centerOfMass;
 }
 
-const glm::mat3 Physics::SphereCollider::getGlobalInvInertiaTensor() const
+void Physics::Collider::cleanUp()
+{
+}
+
+const glm::mat3 Physics::Collider::getGlobalInvInertiaTensor() const
 {
 	glm::quat r = parent->getGlobalTransform().Rotation;
 	glm::mat3 rot = glm::toMat3(r);
@@ -31,11 +40,35 @@ const glm::mat3 Physics::SphereCollider::getGlobalInvInertiaTensor() const
 	return glm::inverse(global);
 }
 
-void Physics::SphereCollider::setParent(GameObject* parent)
+const float Physics::SphereCollider::getRadius(float theta) const
 {
-	Component::ComponetBase::setParent(parent);
+	return radius;
 }
 
-void Physics::SphereCollider::cleanUp() {
 
+
+Physics::CubeCollider::CubeCollider() : Collider(), width(0)
+{
+}
+
+
+
+Physics::CubeCollider::CubeCollider(float width, float mass) : Collider(mass), width(width)
+{
+	inertiaTensor = glm::mat3((1.f / 12.f) * mass * 2.f * width * width);
+}
+
+
+
+const float Physics::CubeCollider::getRadius(float theta) const
+{
+	while (theta >= 360) {
+		theta -= 360;
+	}
+	theta = RADIANS(theta);
+	if (theta == 0) {
+		return width;
+	}
+	float d = sinf(theta);
+	return width / d;
 }

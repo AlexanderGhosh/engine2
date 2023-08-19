@@ -52,6 +52,7 @@
 // #include "Physics/Resolution/ConstraintsBased.h"
 // #include "Physics/Resolution/ImpulseBased.h"
 #include "Componets/Rigidbody.h"
+#include "Physics/Collision/Colliders/CubeCollider.h"
 // #include "Physics/ConstraintEngine/Constraints/DistanceConstraint.h"
 // #include "Physics/ConstraintEngine/ConstraitnsSolver.h"
 
@@ -185,30 +186,30 @@ int main() {
 
 
     GameObject redBall = GameObject(glm::vec3(0, 1, 0));
-    Component::RenderMesh orbMesh1 = Component::RenderMesh();
-    orbMesh1.setModel(orbBuffer);
-    orbMesh1.setMaterial(&redMat);
+    Component::RenderMesh cubeMesh1 = Component::RenderMesh();
+    cubeMesh1.setModel(orbBuffer);
+    cubeMesh1.setMaterial(&redMat);
     Component::Rigidbody rb1 = Component::Rigidbody(true);
-    Physics::SphereCollider col1 = Physics::SphereCollider(1, 10);
+    Physics::SphereCollider col1(1, 10);
     PhysicsDebugger p_debugger1 = PhysicsDebugger(true);
     
 
     redBall.addComponet(&rb1);
     redBall.addComponet(&col1);
-    redBall.addComponet(&orbMesh1);
+    redBall.addComponet(&cubeMesh1);
     redBall.addComponet(&p_debugger1);
 
     GameObject blueBall = GameObject(glm::vec3(0.5, 10, 0));
-    Component::RenderMesh orbMesh2 = Component::RenderMesh();
-    orbMesh2.setModel(orbBuffer);
-    orbMesh2.setMaterial(&blueMat);
+    Component::RenderMesh cubeMesh2 = Component::RenderMesh();
+    cubeMesh2.setModel(orbBuffer);
+    cubeMesh2.setMaterial(&blueMat);
     Component::Rigidbody rb2 = Component::Rigidbody(false);
-    Physics::SphereCollider col2 = Physics::SphereCollider(1, 10);
+    Physics::SphereCollider col2(1, 10);
     PhysicsDebugger p_debugger2 = PhysicsDebugger(true);
 
     blueBall.addComponet(&rb2);
     blueBall.addComponet(&col2);
-    blueBall.addComponet(&orbMesh2);
+    blueBall.addComponet(&cubeMesh2);
     blueBall.addComponet(&p_debugger2);
 
     /*Particles::DomeDistribution distribution = Particles::DomeDistribution(1.0f);
@@ -247,7 +248,7 @@ int main() {
 
 
     timer.start("Player");
-    GameObject player = GameObject(glm::vec3(0, 0, 20));
+    GameObject player = GameObject(glm::vec3(0, 5, 20));
     Component::Camera playerCamera = Component::Camera();
     player.addComponet(&playerCamera);
     Component::CharacterController cc;
@@ -340,7 +341,7 @@ int main() {
     scene.addObject(&redBall);
     scene.addObject(&blueBall);
     for (Terrain& land : allLand) {
-        scene.addTerrain(&land);
+        //scene.addTerrain(&land);
     }
     
     //scene.addUI(&canvas);
@@ -357,15 +358,15 @@ int main() {
     timer.log();
     // SKYBOX //
     
-    // Gizmos::Sphere gizmo1 = Gizmos::Sphere({ 0, 1, 0 }, { 0, 1, 0 });
-    // gizmo1.setRadius(1);
-    // gizmo1.setThickness(2);
-    // Gizmos::GizmoRenderer::addGizmo(&gizmo1);
+    Gizmos::Sphere gizmo1 = Gizmos::Sphere({ 0, 0, 0 }, { 1, 0, 0 });
+    gizmo1.setRadius(.1);
+    gizmo1.setThickness(2);
+    Gizmos::GizmoRenderer::addGizmo(&gizmo1);
 
-    // Gizmos::Sphere gizmo2 = Gizmos::Sphere({ 0, 2.5, 0 }, { 0, 1, 0 });
-    // gizmo2.setRadius(1);
-    // gizmo2.setThickness(2);
-    // Gizmos::GizmoRenderer::addGizmo(&gizmo2);
+    Gizmos::Sphere gizmo2 = Gizmos::Sphere({ 0, 10, 0 }, { 0, 0, 1 });
+    gizmo2.setRadius(.1);
+    gizmo2.setThickness(2);
+    Gizmos::GizmoRenderer::addGizmo(&gizmo2);
 
     Utils::log("Started Loop");
     scene.gameLoop();

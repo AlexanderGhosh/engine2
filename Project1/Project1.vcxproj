@@ -177,6 +177,8 @@
     <ClCompile Include="ParticleSystem\Particle.cpp" />
     <ClCompile Include="ParticleSystem\Distributions\DistributionBase.cpp" />
     <ClCompile Include="GUI\Constraints\PercentConstraint.cpp" />
+    <ClCompile Include="Physics\Collision\Colliders\CubeCollider.cpp" />
+    <ClCompile Include="Physics\Collision\Colliders\SATBaseCollider.cpp" />
     <ClCompile Include="Scripts\PhysicsDebugger.cpp" />
     <ClCompile Include="Primatives\Materials\Forward.cpp" />
     <ClCompile Include="ParticleSystem\ParticleEmmiter.cpp" />
@@ -254,6 +256,8 @@
     <ClInclude Include="ParticleSystem\Particle.h" />
     <ClInclude Include="ParticleSystem\Distributions\DistributionBase.h" />
     <ClInclude Include="GUI\Constraints\PercentConstraint.h" />
+    <ClInclude Include="Physics\Collision\Colliders\CubeCollider.h" />
+    <ClInclude Include="Physics\Collision\Colliders\SATBaseCollider.h" />
     <ClInclude Include="Scripts\PhysicsDebugger.h" />
     <ClInclude Include="Primatives\Materials\MatItemBase.h" />
     <ClInclude Include="Primatives\Materials\MatItemChain.h" />

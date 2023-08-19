@@ -3,9 +3,10 @@
 #include "Collision/Collider.h"
 #include "../GameObject/GameObject.h"
 #include "../Componets/RigidBody.h"
+#include "Collision/Colliders/SATBaseCollider.h"
 
 std::list<Component::Rigidbody*> Physics::Engine::rigidbodies = {};
-std::list<Physics::SphereCollider*> Physics::Engine::colliders = {};
+std::list<Physics::Collider*> Physics::Engine::colliders = {};
 glm::vec3 Physics::Engine::gravity = { 0, -1, 0 };
 
 std::vector<Physics::CollisionDetails> Physics::Engine::getIntersections()
@@ -14,10 +15,10 @@ std::vector<Physics::CollisionDetails> Physics::Engine::getIntersections()
 	std::vector<Physics::CollisionDetails> details;
 	for (auto i = colliders.begin(); i != colliders.end(); i++) {
 		for (auto j = std::next(i); j != colliders.end(); j++) {
-			SphereCollider* a = *i;
-			SphereCollider* b = *j;
+			Physics::Collider* a = *i;
+			Physics::Collider* b = *j;
 
-			const float radius_sum = a->getRadius() + b->getRadius();
+			const float radius_sum = a->getRadius(45) + b->getRadius(45);
 
 			const glm::vec3 a_pos = a->getAbsolutePosition();
 			const glm::vec3 b_pos = b->getAbsolutePosition();
@@ -26,14 +27,17 @@ std::vector<Physics::CollisionDetails> Physics::Engine::getIntersections()
 			float intersection_distance = radius_sum - dist_;
 
 			if (intersection_distance >= epsilon) {
+
+
+
 				// intersection detected
 				Physics::CollisionDetails data {};
 
 				data.a = a;
 				data.b = b;
 
-				const glm::vec3 relative_hit_a = glm::normalize(b_pos - a_pos) * a->getRadius();
-				const glm::vec3 relative_hit_b = glm::normalize(a_pos - b_pos) * b->getRadius();
+				const glm::vec3 relative_hit_a = glm::normalize(b_pos - a_pos) * a->getRadius(45);
+				const glm::vec3 relative_hit_b = glm::normalize(a_pos - b_pos) * b->getRadius(45);
 
 				data.a_hit = a_pos + relative_hit_a;
 				data.b_hit = b_pos + relative_hit_b;
@@ -41,8 +45,53 @@ std::vector<Physics::CollisionDetails> Physics::Engine::getIntersections()
 				data.intersection_norm = glm::normalize(b_pos - a_pos);
 				data.intersection_distance = intersection_distance;
 
+				data.coef_restitution = 1;
+
 				details.push_back(data);
 			}
+
+			/*SATBaseCollider* a = *i;
+			SATBaseCollider* b = *j;
+
+			std::list<glm::vec3> axis_ = a->getGlobalNormals();
+			auto b_norms = b->getGlobalNormals();
+			axis_.insert(axis_.end(), b_norms.begin(), b_norms.end());
+
+			float maximumOverlap = -INFINITY;
+			glm::vec3 axisMTV(0);
+			bool hit = true;
+			for (Vector3 axis : axis_) {
+				const std::array<float, 2> a_range = a->project(axis);
+				const std::array<float, 2> b_range = b->project(axis);
+				const float overlap = a_range[1] - b_range[0];
+				if (overlap > maximumOverlap && overlap > 0) {
+					maximumOverlap = overlap;
+					axisMTV = axis;
+				}
+				else {
+					hit = false;
+					break;
+				}
+			}
+			if (hit) {
+				// intersection detected
+				Physics::CollisionDetails data {};
+
+				data.a = a;
+				data.b = b;
+
+				// const glm::vec3 relative_hit_a = glm::normalize(b_pos - a_pos) * a->getRadius();
+				// const glm::vec3 relative_hit_b = glm::normalize(a_pos - b_pos) * b->getRadius();
+
+				// data.a_hit = a_pos + relative_hit_a;
+				// data.b_hit = b_pos + relative_hit_b;
+
+				// data.intersection_norm = glm::normalize(b_pos - a_pos);
+				// data.intersection_distance = intersection_distance;
+				data.mtv = axisMTV * maximumOverlap;
+
+				details.push_back(data);
+			}*/
 		}
 	}
 	return details;
@@ -67,10 +116,26 @@ void Physics::Engine::resolveIntersections(const std::vector<Physics::CollisionD
 		Component::Rigidbody* a_rb = a->getComponet<Component::Rigidbody>();
 		Component::Rigidbody* b_rb = b->getComponet<Component::Rigidbody>();
 
+		glm::vec3 n_a = glm::normalize(a_rb->velocity);
+		if (glm::any(glm::isnan(n_a))) {
+			n_a = glm::vec3(0);
+		}
+		glm::vec3 n_b = glm::normalize(b_rb->velocity);
+		if (glm::any(glm::isnan(n_b))) {
+			n_b = glm::vec3(0);
+		}
+
+		const glm::vec3 globalVel_a = a->getLocalTransform()->Position + n_a;
+		const glm::vec3 globalVel_b = b->getLocalTransform()->Position + n_b;
+		const glm::vec3 delta = globalVel_b - globalVel_a;
+
+		const glm::vec3 hit_pos_a = globalVel_a + delta;
+		const glm::vec3 hit_pos_b = globalVel_b - delta;
+
 		a_rb->backPeddle(intercetion.intersection_distance);
 		b_rb->backPeddle(intercetion.intersection_distance);
 
-		const glm::vec3 impulse = calcImpulseForce(a_rb, b_rb, intercetion.intersection_norm);
+		const glm::vec3 impulse = calcImpulseForce(a_rb, b_rb, intercetion.intersection_norm, intercetion.coef_restitution);
 
 		a_rb->applyForce(-impulse);
 		b_rb->applyForce(impulse);
@@ -87,19 +152,19 @@ void Physics::Engine::addRigidbody(Component::Rigidbody* rb)
 	rigidbodies.push_back(rb);
 }
 
-void Physics::Engine::addCollider(Physics::SphereCollider* col)
+void Physics::Engine::addCollider(Physics::Collider* col)
 {
 	colliders.push_back(col);
 }
 
 // b hits a therefore the norm is from a to b (points away from a)
-glm::vec3 Physics::Engine::calcImpulseForce(Component::Rigidbody* a, Component::Rigidbody* b, Vector3 norm) {
+glm::vec3 Physics::Engine::calcImpulseForce(Component::Rigidbody* a, Component::Rigidbody* b, Vector3 norm, Float coef_restitution) {
 	const glm::vec3 r_a = norm;
 	const glm::vec3 r_b = -norm;
 
 	const glm::vec3 v_pa = a->velocity + glm::cross(a->angularVelocity, r_a);
 	const glm::vec3 v_pb = b->velocity + glm::cross(b->angularVelocity, r_b);
-	const float e = 1;
+	Float e = coef_restitution;
 
 	const auto v_r = v_pb - v_pa;
 
@@ -111,6 +176,7 @@ glm::vec3 Physics::Engine::calcImpulseForce(Component::Rigidbody* a, Component::
 	denominator += glm::dot(angular_component_a + angular_component_b, norm);
 
 	const float jr = numerator / denominator;
+
 
 	return jr * norm;
 }

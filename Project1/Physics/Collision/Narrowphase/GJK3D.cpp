@@ -174,6 +174,7 @@ void Physics::GJK3D::EPA(Physics::CollisionManfold& info, Simplex& simplex) {
 	info.points[1] = info.points[0];*/
 	determinCollisionData(info, closest_face, glm::dot(closest_face->a.v, closest_face->n));
 }
+
 const Physics::CollisionManfold Physics::GJK3D::getCollisionData(Collider* a, Collider* b)
 {
 #define GJK_MAX_ITTERATION 256
@@ -193,8 +194,7 @@ const Physics::CollisionManfold Physics::GJK3D::getCollisionData(Collider* a, Co
 	glm::vec3 ac(0);
 	glm::vec3 ad(0);
 	unsigned counter = 0;
-	while (counter < GJK_MAX_ITTERATION) {
-		counter++;
+	while (counter++ < GJK_MAX_ITTERATION) {
 		simplex.push(support(a, b, dir));
 
 		ao = -simplex.a().v;

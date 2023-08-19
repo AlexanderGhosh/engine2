@@ -1,8 +1,9 @@
 #include "Rigidbody.h"
 #include "../Physics/Engine.h"
 #include "../GameObject/GameObject.h"
+#include "../Physics/Collision/Colliders/SATBaseCollider.h"
 
-Component::Rigidbody::Rigidbody() : velocity(), collider(), pos(nullptr), isKinimatic(false)
+Component::Rigidbody::Rigidbody() : velocity(), collider(), pos(nullptr), isKinimatic(false), angularVelocity(0)
 {
 }
 
@@ -16,15 +17,16 @@ void Component::Rigidbody::cleanUp()
 {
 }
 
-void Component::Rigidbody::setCollider(Physics::SphereCollider& collider)
+void Component::Rigidbody::setCollider(Physics::Collider& collider)
 {
-	this->collider = collider;
+	this->collider = &collider;
 }
 
 void Component::Rigidbody::setParent(GameObject* parent)
 {
 	Component::ComponetBase::setParent(parent);
-	this->pos = &parent->getLocalTransform()->Position;
+	this->pos = &(parent->getLocalTransform()->Position);
+	int i = 0;
 }
 
 void Component::Rigidbody::update(float deltaTime)
@@ -43,12 +45,12 @@ void Component::Rigidbody::backPeddle(float d)
 
 const float Component::Rigidbody::getInvMass() const
 {
-	return collider.getInvMass();
+	return collider->getInvMass();
 }
 
 const glm::mat3 Component::Rigidbody::getGlobalInvInertiaTensor() const
 {
-	return collider.getGlobalInvInertiaTensor();
+	return collider->getGlobalInvInertiaTensor();
 }
 
 void Component::Rigidbody::applyForce(glm::vec3 force)

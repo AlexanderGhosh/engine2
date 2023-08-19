@@ -7,15 +7,16 @@ namespace Component {
 	class Rigidbody;
 }
 
+class SATBaseCollider;
 namespace Physics {
-	class SphereCollider;
+	class Collider;
 	struct CollisionDetails;
 
 	class Engine
 	{
 	private:
 		static std::list<Component::Rigidbody*> rigidbodies;
-		static std::list<Physics::SphereCollider*> colliders;
+		static std::list<Physics::Collider*> colliders;
 
 		static std::vector<Physics::CollisionDetails> getIntersections();
 		/// <summary>
@@ -29,9 +30,9 @@ namespace Physics {
 		static void cleanUp();
 
 		static void addRigidbody(Component::Rigidbody* rb);
-		static void addCollider(Physics::SphereCollider* col);
+		static void addCollider(Physics::Collider* col);
 
-		static glm::vec3 calcImpulseForce(Component::Rigidbody* a, Component::Rigidbody* b, Vector3 norm);
+		static glm::vec3 calcImpulseForce(Component::Rigidbody* a, Component::Rigidbody* b, Vector3 norm, Float coef_restitution);
 
 		// template<class T>
 		// static inline void setResponse() { resolution = DBG_NEW T(); };
