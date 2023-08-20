@@ -8,9 +8,8 @@ bool sameDirection(const glm::vec3& a, const glm::vec3& b) {
 }
 
 const glm::vec3 Physics::GJK3D::support(const Physics::Collider* a, const Physics::Collider* b, Vector3 dir) const {
-	auto n = glm::normalize(dir);
-	const glm::vec3 v1 = a->support(n);
-	const glm::vec3 v2 = b->support(-n);
+	const glm::vec3 v1 = a->support(dir);
+	const glm::vec3 v2 = b->support(-dir);
 	return v1 - v2;
 }
 
@@ -210,7 +209,7 @@ Physics::Simplex::Simplex(std::initializer_list<glm::vec3> list) : Simplex()
 
 void Physics::Simplex::add(Vector3 v)
 {
-	data_ = { glm::normalize(v), data_[0], data_[1], data_[2]};
+	data_ = { v, data_[0], data_[1], data_[2]};
 	size_ = std::min(size_ + 1, 4u);
 }
 
@@ -219,13 +218,11 @@ bool Physics::Simplex::evaluate(glm::vec3& dir)
 	switch (size_)
 	{
 	case 2:
-		line(dir);
-		break;
+		return line(data_, dir);
 	case 3:
-		triangle(dir);
-		break;
+		return triangle(data_, dir);
 	case 4:
-		return prism(dir);
+		return prism(data_, dir);
 	}
 	return false;
 }
@@ -236,95 +233,91 @@ void Physics::Simplex::reset()
 	size_ = 0;
 }
 
-void Physics::Simplex::line(glm::vec3& dir)
+bool Physics::Simplex::line(std::array<glm::vec3, 4>& points, glm::vec3& direction)
 {
-	const glm::vec3 ao = -data_[0];
-	const glm::vec3 ab = data_[1] + ao;
+	glm::vec3 a = points[0];
+	glm::vec3 b = points[1];
 
-	if (sameDirection(ao, ab)) {
-		dir = glm::cross(ab, ao);
-		dir = glm::cross(dir, ab);
+	glm::vec3 ab = b - a;
+	glm::vec3 ao = -a;
+
+	if (sameDirection(ab, ao)) {
+		direction = glm::cross(glm::cross(ab, ao), ab);
 	}
+
 	else {
-		data_ = { data_[0] };
-		dir = ao;
+		points = { a };
+		direction = ao;
 	}
+	return false;
 }
 
-void Physics::Simplex::triangle(glm::vec3& dir)
+bool Physics::Simplex::triangle(std::array<glm::vec3, 4>& points, glm::vec3& direction)
 {
-	const glm::vec3 a = data_[0];
-	const glm::vec3 b = data_[1];
-	const glm::vec3 c = data_[2];
+	glm::vec3 a = points[0];
+	glm::vec3 b = points[1];
+	glm::vec3 c = points[2];
 
-	const glm::vec3 ab = b - a;
-	const glm::vec3 ac = c - a;
-	const glm::vec3 ao = -a;
+	glm::vec3 ab = b - a;
+	glm::vec3 ac = c - a;
+	glm::vec3 ao = -a;
 
-	const glm::vec3 abc = glm::cross(ab, ac);
+	glm::vec3 abc = cross(ab, ac);
 
-	if (sameDirection(glm::cross(abc, ac), ao)) {
+	if (sameDirection(cross(abc, ac), ao)) {
 		if (sameDirection(ac, ao)) {
-			data_ = { a, c };
-			dir = glm::cross(ac, ao);
-			dir = glm::cross(dir, ac);
+			points = { a, c };
+			direction = glm::cross(glm::cross(ac, ao), ac);
 		}
+
 		else {
-			line(dir);
-			data_ = { a, b, c };
+			return line(points = { a, b }, direction);
 		}
 	}
+
 	else {
 		if (sameDirection(glm::cross(ab, abc), ao)) {
-			line(dir);
-			data_ = { a, b, c };
+			return line(points = { a, b }, direction);
 		}
+
 		else {
-			data_ = { a, c, b };
-			dir = -abc;
+			if (sameDirection(abc, ao)) {
+				direction = abc;
+			}
+
+			else {
+				points = { a, c, b };
+				direction = -abc;
+			}
 		}
 	}
+	return false;
 }
 
-bool Physics::Simplex::prism(glm::vec3& dir)
+bool Physics::Simplex::prism(std::array<glm::vec3, 4>& points, glm::vec3& direction)
 {
-	const glm::vec3 a = data_[0];
-	const glm::vec3 b = data_[1];
-	const glm::vec3 c = data_[2];
-	const glm::vec3 d = data_[3];
+	glm::vec3 a = points[0];
+	glm::vec3 b = points[1];
+	glm::vec3 c = points[2];
+	glm::vec3 d = points[3];
 
-	const glm::vec3 ab = b - a;
-	const glm::vec3 ac = c - a;
-	const glm::vec3 ad = d - a;
-	const glm::vec3 ao = -a;
+	glm::vec3 ab = b - a;
+	glm::vec3 ac = c - a;
+	glm::vec3 ad = d - a;
+	glm::vec3 ao = -a;
 
-	const glm::vec3 abc = glm::cross(ab, ac);
-	const glm::vec3 acd = glm::cross(ac, ad);
-	const glm::vec3 adb = glm::cross(ad, ab);
+	glm::vec3 abc = glm::cross(ab, ac);
+	glm::vec3 acd = glm::cross(ac, ad);
+	glm::vec3 adb = glm::cross(ad, ab);
 
-	if (sameDirection(abc, ao)) {
-		triangle(dir);
-		return false;
-	}
-
-	if (sameDirection(acd, ao)) {
-		data_ = { a, c, d };
-		triangle(dir);
-		data_ = { a, b, c, d };
-		return false;
-	}
-
-	if (sameDirection(adb, ao)) {
-		data_ = { a, d, b };
-		triangle(dir);
-		data_ = { a, b, c, d };
-		return false;
-	}
+	if (sameDirection(abc, ao)) return triangle(points = { a, b, c }, direction);
+	if (sameDirection(acd, ao)) return triangle(points = { a, c, d }, direction);
+	if (sameDirection(adb, ao)) return triangle(points = { a, d, b }, direction);
 
 	return true;
 }
 
-bool Physics::Simplex::sameDirection(Vector3 a, Vector3 b) const
+bool Physics::Simplex::sameDirection(Vector3 a, Vector3 b)
 {
 	return glm::dot(a, b) > 0;
 }

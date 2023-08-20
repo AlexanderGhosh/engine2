@@ -10,11 +10,11 @@ namespace Physics {
 		std::array<glm::vec3, 4> data_;
 		unsigned int size_;
 
-		void line(glm::vec3& dir);
-		void triangle(glm::vec3& dir);
-		bool prism(glm::vec3& dir);
+		static bool line(std::array<glm::vec3, 4>& points, glm::vec3& direction);
+		static bool triangle(std::array<glm::vec3, 4>& points, glm::vec3& direction);
+		static bool prism(std::array<glm::vec3, 4>& points, glm::vec3& direction);
 
-		bool sameDirection(Vector3 a, Vector3 b) const;
+		static bool sameDirection(Vector3 a, Vector3 b);
 	public:
 		Simplex();
 		Simplex(std::initializer_list<glm::vec3> list);
