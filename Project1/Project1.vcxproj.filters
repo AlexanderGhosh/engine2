@@ -249,6 +249,12 @@
     <ClCompile Include="Physics\Collision\Colliders\CubeCollider.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Physics\Collision\Narrowphase\GJK3D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\DebugRenderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Rendering\Rendering.h">
@@ -500,6 +506,15 @@
     <ClInclude Include="Physics\Collision\Colliders\CubeCollider.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Physics\Collision\Narrowphase\Base.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\Collision\Narrowphase\GJK3D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\DebugRenderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\DefaultShader\fragment.glsl" />
@@ -514,6 +529,7 @@
     <None Include="Resources\UIShader\fragment.glsl" />
     <None Include="Resources\UIShader\geometry.glsl" />
     <None Include="Resources\UIShader\vertex.glsl" />
+    <None Include="cpp.hint" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="Resources\Fonts\arial.ttf" />

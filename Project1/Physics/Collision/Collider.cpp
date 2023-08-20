@@ -47,7 +47,7 @@ const float Physics::SphereCollider::getRadius(float theta) const
 
 const glm::vec3 Physics::SphereCollider::support(Vector3 axis) const
 {
-	return radius * axis + getAbsolutePosition();
+	return (radius * axis) + getAbsolutePosition();
 }
 
 

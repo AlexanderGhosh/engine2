@@ -5,10 +5,14 @@
 class SATBaseCollider;
 
 namespace Physics {
+	enum class ColliderType {
+		Sphere, Cube
+	};
 	class Collider : public Component::ComponetBase
 	{
 	public:
 		inline Component::Type getType() const override { return Component::Type::Collider; };
+		virtual inline Physics::ColliderType getColliderType() const = 0;
 
 		const glm::vec3 getAbsolutePosition() const;
 
@@ -34,6 +38,8 @@ namespace Physics {
 	public:
 		SphereCollider();
 		SphereCollider(float radius, float mass);
+
+		inline Physics::ColliderType getColliderType() const override { return ColliderType::Sphere; };
 
 		const float getRadius(float theta) const override;
 		const glm::vec3 support(Vector3 axis) const override;

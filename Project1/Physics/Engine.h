@@ -26,6 +26,7 @@ namespace Physics {
 		/// <param name="details"></param>
 		static void resolveIntersections(const std::vector<Physics::CollisionDetails>& details);
 	public:
+		static bool RenderDebug;
 		static Physics::Narrowphase* narrowphase;
 		static glm::vec3 gravity;
 		static void update();
