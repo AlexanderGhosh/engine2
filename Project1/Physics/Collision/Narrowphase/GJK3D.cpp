@@ -8,7 +8,7 @@ bool sameDirection(const glm::vec3& a, const glm::vec3& b) {
 }
 
 const glm::vec3 Physics::GJK3D::support(const Physics::Collider* a, const Physics::Collider* b, Vector3 dir) const {
-	auto n = glm::normalize(dir);
+	auto n = dir;
 	const glm::vec3 v1 = a->support(n);
 	const glm::vec3 v2 = b->support(-n);
 	return v1 - v2;
@@ -43,7 +43,19 @@ const Physics::CollisionManfold Physics::GJK3D::getCollisionData(Physics::Collid
 				res.a = a;
 				res.b = b;
 				res.hit = true;
-				DebugRenderer::addSimplex(&simplex);
+				std::vector<glm::vec3> polytope(simplex.begin(), simplex.end());
+				std::vector<int>  faces = {
+					0, 1, 2,
+					0, 3, 1,
+					0, 2, 3,
+					1, 3, 2
+				};
+				auto [norms, _] = getFaceNormals(polytope, faces);
+				std::vector<glm::vec3	> ns;
+				for (auto& n : norms) {
+					ns.push_back(n);
+				}
+				DebugRenderer::addSimplex(&simplex, ns);
 				EPA(res, simplex);
 				return res;
 			}
@@ -210,7 +222,7 @@ Physics::Simplex::Simplex(std::initializer_list<glm::vec3> list) : Simplex()
 
 void Physics::Simplex::add(Vector3 v)
 {
-	data_ = { glm::normalize(v), data_[0], data_[1], data_[2]};
+	data_ = { v, data_[0], data_[1], data_[2]};
 	size_ = std::min(size_ + 1, 4u);
 }
 

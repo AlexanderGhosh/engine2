@@ -28,6 +28,8 @@ namespace Physics {
 		inline auto end() const { return data_.end(); };
 
 		inline Vector3 operator[](int index) const { return data_[index]; };
+
+		inline const auto raw() const { return data_; };
 	};
 
 	class GJK3D : public Narrowphase

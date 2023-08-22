@@ -4,7 +4,7 @@
 
 namespace Gizmos {
 	enum class Types {
-		Point, Line, Circle, Cuboide, Sphere, Triangle
+		Point, Line, Circle, Cuboide, Sphere, Triangle, Arrow
 	};
 	class Gizmo {
 	protected:
@@ -50,8 +50,8 @@ namespace Gizmos {
 		void draw() override;
 		void cleanUp() override;
 		Types getType() const override;
-		void setLeftOffset(Vector3 left);
-		void setRightOffset(Vector3 right);
+		void setStart(Vector3 left);
+		void setEnd(Vector3 right);
 
 		void setPosition(Vector3 pos) override;
 	};
@@ -110,6 +110,22 @@ namespace Gizmos {
 		Triangle();
 		Triangle(Vector3 p1, Vector3 p2, Vector3 p3, bool drawPoints);
 		~Triangle() = default;
+
+		void draw() override;
+		void cleanUp() override;
+		Types getType() const override;
+
+		void setPosition(Vector3 pos) override;
+		void setColour(Vector3 colour) override;
+	};
+
+	class Arrow : public Gizmo {
+	private:
+		std::array<Line, 3> lines;
+	public:
+		Arrow();
+		Arrow(Vector3 start, Vector3 end);
+		~Arrow() = default;
 
 		void draw() override;
 		void cleanUp() override;
