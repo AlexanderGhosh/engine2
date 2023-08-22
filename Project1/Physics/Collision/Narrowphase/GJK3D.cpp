@@ -1,49 +1,56 @@
 #include "GJK3D.h"
 #include "../Collider.h"
 #include <tuple>
-#include "../../DebugRenderer.h"
 
 bool sameDirection(const glm::vec3& a, const glm::vec3& b) {
 	return glm::dot(a, b) > 0;
 }
 
-const glm::vec3 Physics::GJK3D::support(const Physics::Collider* a, const Physics::Collider* b, Vector3 dir) const {
-	const glm::vec3 v1 = a->support(dir);
-	const glm::vec3 v2 = b->support(-dir);
-	return v1 - v2;
+Physics::SupportPoint support(const Physics::Collider* a, const Physics::Collider* b, const glm::vec3& dir) {
+	Physics::SupportPoint res;
+	auto n = glm::normalize(dir);
+	res.a = a->support(n);
+	res.b = b->support(-n);
+	res.v = res.a - res.b;
+	res.dir = dir;
+	////////////////////////////////////////////
+	// res.a = a->support(-dir);
+	// res.b = b->support(dir);
+	// res.v = res.b - res.a;
+	return res;
 }
 
 const Physics::CollisionManfold Physics::GJK3D::getCollisionData(Physics::Collider* a, Physics::Collider* b)
 {
 #define GJK_MAX_ITTERATION 256
-	simplex.reset();
+
 	Physics::CollisionManfold res;
 
 	glm::vec3 axis = Utils::xAxis();
 
-	glm::vec3 A = support(a, b, axis);
+	glm::vec3 A = support(a, b, axis).v;
 
-	simplex.add(A);
+	Simplex s;
+	s.add(A);
 	glm::vec3 D = -A;
 
 	int counter = 0;
 	while (counter++ < GJK_MAX_ITTERATION) {
-		A = support(a, b, D);
+		A = support(a, b, D).v;
 		if (glm::dot(A, D) <= 0.001) {
 			// reject
 			res.hit = false;
 			return res;
 		}
 		else {
-			simplex.add(A);
+			s.add(A);
 			// bool contains_origin;
 			// tie(s, D, contains_origin) = getNearestSimplex(s);
-			if (simplex.evaluate(D)) {
+			if (s.evaluate(D)) {
 				res.a = a;
 				res.b = b;
 				res.hit = true;
-				DebugRenderer::addSimplex(&simplex);
-				EPA(res, simplex);
+				EPA(res, s);
 				return res;
 			}
 		}
@@ -70,9 +77,8 @@ void addUnique(std::vector<std::pair<int, int>>& edges, const std::vector<int>& 
 
 void Physics::GJK3D::EPA(Physics::CollisionManfold& manafold, const Physics::Simplex& prism) const
 {
-#define GJK_EPA_MAX_ITER 128
-	std::vector<glm::vec3> polytope(simplex.begin(), simplex.end());
-	std::vector<int>  faces = {
+	std::vector<glm::vec3> polytope(prism.begin(), prism.end());
+	std::vector<int> faces = {
 		0, 1, 2,
 		0, 3, 1,
 		0, 2, 3,
@@ -82,56 +88,59 @@ void Physics::GJK3D::EPA(Physics::CollisionManfold& manafold, const Physics::Sim
 	auto [normals, minFace] = getFaceNormals(polytope, faces);
 
 	glm::vec3 minNormal;
-	float minDistance = FLT_MAX;
+	float minDistance = INFINITY;
 
-	int iterations = 0;
-	while (minDistance == FLT_MAX)
-	{
-		minNormal = glm::vec3(normals[minFace]);
-		minDistance = normals[minFace].w;
+	int itt = 0;
+	while (minDistance == INFINITY && itt++ < GJK_MAX_ITTERATION) {
+		Vector4 n = normals[minFace];
+		minNormal = glm::vec3(n);
+		minDistance = n.z;
 
-		if (iterations++ > GJK_EPA_MAX_ITER) {
-			break;
-		}
+		glm::vec3 support_ = support(manafold.a, manafold.b, minNormal).v;
+		float sDistance = glm::dot(minNormal, support_);
 
-		glm::vec3 support = this->support(manafold.a, manafold.b, minNormal);
-		float sDistance = glm::dot(minNormal, support);
-
-		if (abs(sDistance - minDistance) > 0.001f) {
-			minDistance = FLT_MAX;
+		if (abs(sDistance - minDistance) > 0) {
+			// not found
+			minDistance = INFINITY;
 
 			std::vector<std::pair<int, int>> uniqueEdges;
 
 			for (int i = 0; i < normals.size(); i++) {
-				if (sameDirection(glm::vec3(normals[i]), support)) {
+				if (sameDirection(normals[i], minNormal)) {
 					int f = i * 3;
 
 					addUnique(uniqueEdges, faces, f, f + 1);
 					addUnique(uniqueEdges, faces, f + 1, f + 2);
 					addUnique(uniqueEdges, faces, f + 2, f);
 
-					faces[f + 2] = faces.back(); faces.pop_back();
-					faces[f + 1] = faces.back(); faces.pop_back();
-					faces[f] = faces.back(); faces.pop_back();
+					faces[f + 2] = faces.back();
+					faces.pop_back();
 
-					normals[i] = normals.back(); normals.pop_back();
+					faces[f + 1] = faces.back();
+					faces.pop_back();
+
+					faces[f] = faces.back();
+					faces.pop_back();
+
+					normals[i] = normals.back();
+					normals.pop_back();
 
 					i--;
 				}
 			}
-
 			if (uniqueEdges.size() == 0) {
 				break;
 			}
 
 			std::vector<int> newFaces;
-			for (auto [edge1, edge2] : uniqueEdges) {
-				newFaces.push_back(edge1);
-				newFaces.push_back(edge2);
+			for (auto [e1, e2] : uniqueEdges) {
+				newFaces.push_back(e1);
+				newFaces.push_back(e2);
 				newFaces.push_back(polytope.size());
 			}
 
-			polytope.push_back(support);
+			polytope.push_back(support_);
+
 
 			auto [newNormals, newMinFace] = getFaceNormals(polytope, newFaces);
 
@@ -153,12 +162,15 @@ void Physics::GJK3D::EPA(Physics::CollisionManfold& manafold, const Physics::Sim
 	}
 
 	if (minDistance == FLT_MAX) {
+		manafold.hit = false;
 		manafold.error = true;
-		return;
 	}
-
-	manafold.normal = minNormal;
-	manafold.depth = minDistance + 0.001f;
+	else {
+		manafold.hit = true;
+		manafold.error = false;
+		manafold.normal = minNormal;
+		manafold.depth = minDistance + 0.001f;
+	}
 }
 
 std::pair<std::vector<glm::vec4>, int> Physics::GJK3D::getFaceNormals(const std::vector<glm::vec3>& polytope, const std::vector<int>& faces) const
@@ -177,7 +189,7 @@ std::pair<std::vector<glm::vec4>, int> Physics::GJK3D::getFaceNormals(const std:
 		glm::vec3 norm = glm::cross((v2 - v1), (v3 - v1));
 		norm = glm::normalize(norm);
 	
-		float dist = glm::dot(norm, -abs(v1));
+		float dist = glm::dot(norm, v1);
 
 		if (dist < 0) {
 			norm *= -1;
@@ -227,13 +239,7 @@ bool Physics::Simplex::evaluate(glm::vec3& dir)
 	return false;
 }
 
-void Physics::Simplex::reset()
-{
-	data_ = {};
-	size_ = 0;
-}
-
-bool Physics::Simplex::line(std::array<glm::vec3, 4>& points, glm::vec3& direction)
+void Physics::Simplex::line(glm::vec3& dir)
 {
 	glm::vec3 a = points[0];
 	glm::vec3 b = points[1];

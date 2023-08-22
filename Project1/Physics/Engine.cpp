@@ -4,13 +4,11 @@
 #include "../GameObject/GameObject.h"
 #include "../Componets/RigidBody.h"
 #include "Collision/Colliders/SATBaseCollider.h"
-#include "DebugRenderer.h"
 
 std::list<Component::Rigidbody*> Physics::Engine::rigidbodies = {};
 std::list<Physics::Collider*> Physics::Engine::colliders = {};
 glm::vec3 Physics::Engine::gravity = { 0, -1, 0 };
 Physics::Narrowphase* Physics::Engine::narrowphase = nullptr;
-bool Physics::Engine::RenderDebug = true;
 
 std::vector<Physics::CollisionDetails> Physics::Engine::getIntersections()
 {
@@ -70,7 +68,6 @@ std::vector<Physics::CollisionDetails> Physics::Engine::getIntersections()
 
 				// data.intersection_norm = hit.normal;
 				// data.intersection_distance = hit.depth;
-				std::cout << glm::to_string(glm::vec4(hit.normal, hit.depth)) << std::endl;
 
 				data.coef_restitution = 1;
 
@@ -84,20 +81,12 @@ std::vector<Physics::CollisionDetails> Physics::Engine::getIntersections()
 
 void Physics::Engine::update()
 {
-	if (RenderDebug) {
-		for (auto& col : colliders) {
-			DebugRenderer::addCollider(col);
-		}
-	}
 	for (auto rb : rigidbodies) {
 		rb->applyForce(gravity);
 	}
-
 	auto intersections = getIntersections();
 	resolveIntersections(intersections);
 	int i = 0;
-
-	DebugRenderer::update();
 }
 
 void Physics::Engine::resolveIntersections(const std::vector<Physics::CollisionDetails>& details)
@@ -124,9 +113,7 @@ void Physics::Engine::resolveIntersections(const std::vector<Physics::CollisionD
 
 void Physics::Engine::cleanUp()
 {
-	if (RenderDebug) {
-		DebugRenderer::cleanUp();
-	}
+
 }
 
 void Physics::Engine::addRigidbody(Component::Rigidbody* rb)
