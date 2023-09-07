@@ -213,7 +213,7 @@ int main() {
     redBall.addComponet(&col1_s);
 #endif
     redBall.addComponet(&cubeMesh1);
-    // redBall.addComponet(&p_debugger1);
+    redBall.addComponet(&p_debugger1);
 
 
 
@@ -230,7 +230,6 @@ int main() {
     rb2.velocity.y = -1;
     SpinScript spinning({ 0, 1, 0 }, 0.5f);
 
-
     blueBall.addComponet(&rb2);
 #ifdef TestOBJ_B_isCUBE
     Physics::CubeCollider col2_c(1, 1);
@@ -240,7 +239,6 @@ int main() {
     blueBall.addComponet(&col2_s);
 #endif
     blueBall.addComponet(&cubeMesh2);
-    // blueBall.addComponet(&spinning);
 
     /*Particles::DomeDistribution distribution = Particles::DomeDistribution(1.0f);
     Component::ParticleEmmiter emmiter = Component::ParticleEmmiter(10, 10, true, 0.25);
@@ -285,7 +283,6 @@ int main() {
     PlayerControler playerScript;
     //playerScript.ground = allLand;
     player.addComponet(&playerScript);
-
     DebugScreen debugScript;
     player.addComponet(&debugScript);
     // Component::AudioReciever recieverComp;
@@ -421,7 +418,6 @@ int main() {
     Gizmos::GizmoRenderer::addGizmo(&yAxis);
     Gizmos::GizmoRenderer::addGizmo(&xAxis);
     Gizmos::GizmoRenderer::addGizmo(&zAxis);
-
 
     Utils::log("Started Loop");
     scene.gameLoop();

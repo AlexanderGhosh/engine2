@@ -25,7 +25,6 @@ namespace Physics {
 	{
 	public:
 		inline Component::Type getType() const override { return Component::Type::Collider; };
-		virtual inline Physics::ColliderType getColliderType() const = 0;
 
 		const glm::vec3 getAbsolutePosition() const;
 
