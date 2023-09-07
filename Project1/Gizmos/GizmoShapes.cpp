@@ -91,8 +91,6 @@ Gizmos::Point::Point(Vector3 pos, Vector3 col) : Point() {
 
 void Gizmos::Point::draw() {
 	bindShader();
-	Render::Shading::Manager::setValue("position", position);
-	Render::Shading::Manager::setValue("colour", colour);
 	drawGeneral();
 }
 
@@ -105,7 +103,7 @@ Gizmos::Types Gizmos::Point::getType() const
 	return Types::Point;
 }
 
-Gizmos::Line::Line() : Gizmo(), leftOffset(0), rightOffset(0)
+Gizmos::Line::Line() : Gizmo(), p1_(0), p2_(0)
 {
 	shaderID = ResourceLoader::getShader("LineShader");
 }
@@ -118,16 +116,18 @@ Gizmos::Line::Line(Vector3 pos, Vector3 col) : Line()
 
 Gizmos::Line::Line(Vector3 from, Vector3 to, bool over) : Line()
 {
-	const glm::vec3 half_d = (to - from) / 2.0f;
-	position = from + half_d;
-	leftOffset = -half_d;
-	rightOffset = half_d;
+	p1_ = from;
+	p2_ = to;
+	// const glm::vec3 half_d = (to - from) / 2.0f;
+	// position = from + half_d;
+	// p1_ = -half_d;
+	// p2_ = half_d;
 }
 
 void Gizmos::Line::draw() {
 	bindShader();
-	Render::Shading::Manager::setValue("left", leftOffset);
-	Render::Shading::Manager::setValue("right", rightOffset);
+	Render::Shading::Manager::setValue("left", p1_);
+	Render::Shading::Manager::setValue("right", p2_);
 	drawGeneral();
 }
 
@@ -140,14 +140,22 @@ Gizmos::Types Gizmos::Line::getType() const
 	return Types::Line;
 }
 
-void Gizmos::Line::setLeftOffset(Vector3 left)
+void Gizmos::Line::setStart(Vector3 left)
 {
-	this->leftOffset = left;
+	this->p1_ = left;
 }
 
-void Gizmos::Line::setRightOffset(Vector3 right)
+void Gizmos::Line::setEnd(Vector3 right)
 {
-	this->rightOffset = right;
+	this->p2_ = right;
+}
+
+void Gizmos::Line::setPosition(Vector3 pos)
+{
+	Gizmo::setPosition(pos);
+	const glm::vec3 delta = pos - position;
+	p1_ += delta;
+	p2_ += delta;
 }
 
 Gizmos::Circle::Circle() : Gizmo(), radius(0.5), up(Utils::yAxis())
@@ -205,6 +213,7 @@ Gizmos::Cuboide::Cuboide(Vector3 pos, Vector3 col) : Cuboide()
 void Gizmos::Cuboide::draw() {
 	bindShader();
 	glm::mat4 model = glm::translate(glm::mat4(1), position);
+	model = Utils::rotate(model, rotation);
 	model = glm::scale(model, dimensions);
 	bool t = Render::Shading::Manager::setValue("model", model);
 	t = t AND Render::Shading::Manager::setValue("colour", colour);
@@ -238,6 +247,11 @@ Gizmos::Types Gizmos::Cuboide::getType() const
 void Gizmos::Cuboide::setDimentions(Vector3 dim)
 {
 	this->dimensions = dim;
+}
+
+void Gizmos::Cuboide::setRotation(Quaternion rot)
+{
+	rotation = rot;
 }
 
 Gizmos::Sphere::Sphere() : Gizmo(), radius(1), cirlces(), updated(true)
@@ -292,4 +306,125 @@ void Gizmos::Sphere::setColour(Vector3 colour)
 {
 	updated = true;
 	Gizmo::setColour(colour);
+}
+
+Gizmos::Triangle::Triangle() : Gizmo(), lines(), points()
+{
+}
+
+Gizmos::Triangle::Triangle(Vector3 p1, Vector3 p2, Vector3 p3, bool drawPoints) : Triangle()
+{
+	lines[0] = Line(p1, p2, true);
+	lines[1] = Line(p2, p3, true);
+	lines[2] = Line(p3, p1, true);
+
+	if (drawPoints) {
+		points.push_back(Point(p1, colour));
+		points.push_back(Point(p2, colour));
+		points.push_back(Point(p3, colour));
+		for (auto& p : points) {
+			p.setThickness(1);
+		}
+	}
+}
+
+void Gizmos::Triangle::draw()
+{
+	for (auto& line : lines) {
+		line.draw();
+	}
+	for (auto& point : points) {
+		point.draw();
+	}
+}
+
+void Gizmos::Triangle::cleanUp()
+{
+	for (auto& line : lines) {
+		line.cleanUp();
+	}
+	for (auto& point : points) {
+		point.cleanUp();
+	}
+}
+
+Gizmos::Types Gizmos::Triangle::getType() const
+{
+	return Types::Triangle;
+}
+
+void Gizmos::Triangle::setPosition(Vector3 pos)
+{
+	const glm::vec3 delta = pos - position;
+	for (auto& l : lines) {
+		l.setPosition(l.getPosition() + delta);
+	}
+}
+
+void Gizmos::Triangle::setColour(Vector3 colour)
+{
+	Gizmo::setColour(colour);
+	for (auto& line : lines) {
+		line.setColour(colour);
+	}
+	for (auto& point : points) {
+		point.setColour(colour);
+	}
+}
+
+Gizmos::Arrow::Arrow() : Gizmo(), lines()
+{
+}
+
+Gizmos::Arrow::Arrow(Vector3 start, Vector3 end) : Arrow()
+{
+	lines[0] = Line(start, end, true);
+	const float size = 0.2f;
+	const glm::vec3 d = glm::normalize(end - start);
+
+	glm::vec3 axis = Utils::zAxis(size);
+	if (d.z != 0) {
+		axis = Utils::xAxis(size);
+	}
+
+	const glm::vec3 s1 = end - size * d + Utils::zAxis(size);
+	const glm::vec3 s2 = end - size * d - Utils::zAxis(size);
+
+	lines[1] = Line(s1, end, true);
+	lines[2] = Line(s2, end, true);
+}
+
+void Gizmos::Arrow::draw()
+{
+	for (auto& line : lines) {
+		line.draw();
+	}
+}
+
+void Gizmos::Arrow::cleanUp()
+{
+	for (auto& line : lines) {
+		line.cleanUp();
+	}
+}
+
+Gizmos::Types Gizmos::Arrow::getType() const
+{
+	return Types::Arrow;
+}
+
+void Gizmos::Arrow::setPosition(Vector3 pos)
+{
+	const glm::vec3 delta = pos - position;
+	for (auto& l : lines) {
+		l.setPosition(l.getPosition() + delta);
+	}
+}
+
+void Gizmos::Arrow::setColour(Vector3 colour)
+{
+	Gizmo::setColour(colour);
+	for (auto& line : lines) {
+		line.setColour(colour);
+	}
 }

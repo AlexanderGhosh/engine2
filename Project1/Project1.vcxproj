@@ -29,26 +29,26 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -88,10 +88,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>C:\Users\AGWDW\Desktop\Programing\SOURCE\GLM\Include;C:\Users\AGWDW\Desktop\Programing\SOURCE\GLFW\Include;C:\Users\AGWDW\Desktop\Programing\SOURCE\GLEW\include;C:\Users\AGWDW\Desktop\Programing\SOURCE\Assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>C:\Users\AGWDW\Desktop\Programing\SOURCE\GLEW\lib\Release\Win32;C:\Users\AGWDW\Desktop\Programing\SOURCE\GLFW\Lib\32Bit;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;glfw3.lib;glew32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -102,12 +106,16 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>C:\Users\AGWDW\Desktop\Programing\SOURCE\GLM\Include;C:\Users\AGWDW\Desktop\Programing\SOURCE\GLFW\Include;C:\Users\AGWDW\Desktop\Programing\SOURCE\GLEW\include;C:\Users\AGWDW\Desktop\Programing\SOURCE\Assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>C:\Users\AGWDW\Desktop\Programing\SOURCE\GLEW\lib\Release\Win32;C:\Users\AGWDW\Desktop\Programing\SOURCE\GLFW\Lib\32Bit;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;glfw3.lib;glew32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -116,15 +124,15 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\File Readers;C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\OPENAL\include;C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\FREETYPE\include;C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\ASSIMP\include;C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\GLM\glm;C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\GLFW\include;C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\GLEW\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>C:\Users\AGWDW\Desktop\Programing\SOURCE\Freetype\include;C:\Users\AGWDW\Desktop\Programing\SOURCE\GLM\Include;C:\Users\AGWDW\Desktop\Programing\SOURCE\GLFW\Include;C:\Users\AGWDW\Desktop\Programing\SOURCE\GLEW\include;C:\Users\AGWDW\Desktop\Programing\SOURCE\Assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\OPENAL\libs\Win64;C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\FREETYPE\release dll\win64;C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\ASSIMP\lib;C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\GLFW\lib-vc2019;C:\Users\AGWDW\Desktop\OpenGL projs\OpenGL Req\GLEW\lib\Release\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>OpenAL32.lib;freetype.lib;assimp-vc142-mt.lib;opengl32.lib;glew32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\AGWDW\Desktop\Programing\SOURCE\Freetype\release static\vs2015-2022\win64;C:\Users\AGWDW\Desktop\Programing\SOURCE\GLFW\Lib\64Bit;C:\Users\AGWDW\Desktop\Programing\SOURCE\Assimp\lib\x64;C:\Users\AGWDW\Desktop\Programing\SOURCE\GLEW\lib\Release\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;glfw3.lib;glew32.lib;assimp-vc143-mt.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -135,17 +143,20 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>C:\Users\AGWDW\Desktop\Programing\SOURCE\Freetype\include;C:\Users\AGWDW\Desktop\Programing\SOURCE\GLM\Include;C:\Users\AGWDW\Desktop\Programing\SOURCE\GLFW\Include;C:\Users\AGWDW\Desktop\Programing\SOURCE\GLEW\include;C:\Users\AGWDW\Desktop\Programing\SOURCE\Assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>C:\Users\AGWDW\Desktop\Programing\SOURCE\Freetype\release static\vs2015-2022\win64;C:\Users\AGWDW\Desktop\Programing\SOURCE\GLFW\Lib\64Bit;C:\Users\AGWDW\Desktop\Programing\SOURCE\Assimp\lib\x64;C:\Users\AGWDW\Desktop\Programing\SOURCE\GLEW\lib\Release\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;glfw3.lib;glew32.lib;assimp-vc143-mt.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Componets\CharacterController.cpp" />
-    <ClCompile Include="Componets\AudioReciever.cpp" />
     <ClCompile Include="Componets\Lights\LightBase.cpp" />
     <ClCompile Include="Componets\Scripting.cpp" />
     <ClCompile Include="Componets\Lights\DirectionalLight.cpp" />
@@ -166,15 +177,17 @@
     <ClCompile Include="ParticleSystem\Particle.cpp" />
     <ClCompile Include="ParticleSystem\Distributions\DistributionBase.cpp" />
     <ClCompile Include="GUI\Constraints\PercentConstraint.cpp" />
+    <ClCompile Include="Physics\Collision\Colliders\CubeCollider.cpp" />
+    <ClCompile Include="Physics\Collision\Colliders\SATBaseCollider.cpp" />
+    <ClCompile Include="Physics\Collision\Narrowphase\GJK3D.cpp" />
+    <ClCompile Include="Scripts\PhysicsDebugger.cpp" />
     <ClCompile Include="Primatives\Materials\Forward.cpp" />
     <ClCompile Include="ParticleSystem\ParticleEmmiter.cpp" />
     <ClCompile Include="Primatives\Materials\PBR.cpp" />
-    <ClCompile Include="Primatives\Buffers\SoundStreamBuffer.cpp" />
     <ClCompile Include="Scripts\DebugScreen.cpp" />
     <ClCompile Include="Scripts\HoverScript.cpp" />
     <ClCompile Include="Scripts\PlayerControler.cpp" />
     <ClCompile Include="Scripts\SpinScript.cpp" />
-    <ClCompile Include="Scripts\SoundControllerScript.cpp" />
     <ClCompile Include="Primatives\TextureChain.cpp" />
     <ClCompile Include="Componets\Lights\SpotLight.cpp" />
     <ClCompile Include="Componets\Lights\ShadowCaster.cpp" />
@@ -189,31 +202,17 @@
     <ClCompile Include="Primatives\Model.cpp" />
     <ClCompile Include="Rendering\Animation\Bones.cpp" />
     <ClCompile Include="Context.cpp" />
-    <ClCompile Include="Physics\ConstraintEngine\Constraints\ContactConstraint.cpp" />
-    <ClCompile Include="Physics\ConstraintEngine\ConstraitnsSolver.cpp" />
-    <ClCompile Include="Physics\Resolution\ImpulseBased.cpp" />
-    <ClCompile Include="Physics\Resolution\ConstraintsBased.cpp" />
-    <ClCompile Include="Physics\Collision\Narrowphase\GJK3D.cpp" />
-    <ClCompile Include="Physics\ConstraintEngine\Constraints\Constraints.cpp" />
-    <ClCompile Include="Physics\Collision\Broadphase\BPBase.cpp" />
-    <ClCompile Include="Physics\Collision\Broadphase\NSquared.cpp" />
     <ClCompile Include="Physics\Collision\Collider.cpp" />
-    <ClCompile Include="Physics\Collision\CollisionDetection.cpp" />
-    <ClCompile Include="Componets\AudioSource.cpp" />
     <ClCompile Include="Physics\Engine.cpp" />
-    <ClCompile Include="Physics\Collision\Narrowphase\SAT3D.cpp" />
     <ClCompile Include="Componets\Rigidbody.cpp" />
-    <ClCompile Include="Physics\ConstraintEngine\Constraints\DistanceConstraint.cpp" />
     <ClCompile Include="Scene\SkyBox.cpp" />
     <ClCompile Include="GameObject\Terrain.cpp" />
-    <ClCompile Include="Primatives\Buffers\SoundBuffer.cpp" />
     <ClCompile Include="Primatives\Buffers\UniformBuffer.cpp" />
     <ClCompile Include="Utils\General.cpp" />
     <ClCompile Include="Utils\Shapes.cpp" />
     <ClCompile Include="UI\Elements\ListBox.cpp" />
     <ClCompile Include="UI\Panes\Grid.cpp" />
     <ClCompile Include="MainWindow.cpp" />
-    <ClCompile Include="SoundManager.cpp" />
     <ClCompile Include="UI\Elements\TextField.cpp" />
     <ClCompile Include="UI\Elements\ImageBox.cpp" />
     <ClCompile Include="UI\Elements\Button.cpp" />
@@ -239,7 +238,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Componets\CharacterController.h" />
-    <ClInclude Include="Componets\AudioReciever.h" />
     <ClInclude Include="Componets\Scripting.h" />
     <ClInclude Include="Componets\Lights\DirectionalLight.h" />
     <ClInclude Include="Componets\Lights\PointLight.h" />
@@ -259,23 +257,27 @@
     <ClInclude Include="ParticleSystem\Particle.h" />
     <ClInclude Include="ParticleSystem\Distributions\DistributionBase.h" />
     <ClInclude Include="GUI\Constraints\PercentConstraint.h" />
+    <ClInclude Include="Physics\Collision\Colliders\CubeCollider.h" />
+    <ClInclude Include="Physics\Collision\Colliders\SATBaseCollider.h" />
+    <ClInclude Include="Physics\Collision\Narrowphase\Base.h" />
+    <ClInclude Include="Physics\Collision\Narrowphase\GJK3D.h" />
+    <ClInclude Include="Scripts\PhysicsDebugger.h" />
     <ClInclude Include="Primatives\Materials\MatItemBase.h" />
     <ClInclude Include="Primatives\Materials\MatItemChain.h" />
     <ClInclude Include="Primatives\Materials\Forward.h" />
     <ClInclude Include="Primatives\Materials\PBR.h" />
     <ClInclude Include="Primatives\Materials\MatItemSingle.h" />
     <ClInclude Include="ParticleSystem\ParticleEmmiter.h" />
-    <ClInclude Include="Primatives\Buffers\SoundStreamBuffer.h" />
     <ClInclude Include="Scripts\DebugScreen.h" />
     <ClInclude Include="Scripts\HoverScript.h" />
     <ClInclude Include="Scripts\PlayerControler.h" />
     <ClInclude Include="Scripts\SpinScript.h" />
-    <ClInclude Include="Scripts\SoundControllerScript.h" />
     <ClInclude Include="Primatives\TextureChain.h" />
     <ClInclude Include="Componets\Lights\SpotLight.h" />
     <ClInclude Include="Componets\Lights\ShadowCaster.h" />
     <ClInclude Include="GUI\Constraints\SpanConstraint.h" />
     <ClInclude Include="GUI\Text\TextRendering.h" />
+    <ClInclude Include="STBImage.h" />
     <ClInclude Include="UI\Page.h" />
     <ClInclude Include="Utils\NoiseGeneration.h" />
     <ClInclude Include="Primatives\Buffers\ArrayBuffer.h" />
@@ -287,32 +289,16 @@
     <ClInclude Include="Rendering\Animation\Bones.h" />
     <ClInclude Include="Context.h" />
     <ClInclude Include="Componets\Lights\LightBase.h" />
-    <ClInclude Include="Physics\ConstraintEngine\Constraints\ContactConstraint.h" />
-    <ClInclude Include="Physics\ConstraintEngine\ConstraitnsSolver.h" />
-    <ClInclude Include="Physics\Resolution\ImpulseBased.h" />
-    <ClInclude Include="Physics\Resolution\ConstraintsBased.h" />
-    <ClInclude Include="Physics\Collision\Narrowphase\GJK3D.h" />
-    <ClInclude Include="Physics\ConstraintEngine\Constraints\Constraints.h" />
-    <ClInclude Include="Physics\Collision\Broadphase\NSquared.h" />
-    <ClInclude Include="Physics\Collision\Broadphase\Base.h" />
-    <ClInclude Include="Physics\Collision\CollisionDetection.h" />
     <ClInclude Include="Physics\Collision\Collider.h" />
-    <ClInclude Include="Componets\AudioSource.h" />
-    <ClInclude Include="Physics\Collision\Narrowphase\Base.h" />
     <ClInclude Include="Physics\Engine.h" />
-    <ClInclude Include="Physics\Resolution\ResolutionBase.h" />
-    <ClInclude Include="Physics\Collision\Narrowphase\SAT3D.h" />
     <ClInclude Include="Componets\Rigidbody.h" />
-    <ClInclude Include="Physics\ConstraintEngine\Constraints\DistanceConstraint.h" />
     <ClInclude Include="Scene\SkyBox.h" />
     <ClInclude Include="GameObject\Terrain.h" />
     <ClInclude Include="Primatives\Buffers\UniformBuffer.h" />
-    <ClInclude Include="Primatives\Buffers\SoundBuffer.h" />
     <ClInclude Include="Utils\Shapes.h" />
     <ClInclude Include="UI\Elements\ListBox.h" />
     <ClInclude Include="UI\Panes\Grid.h" />
     <ClInclude Include="MainWindow.h" />
-    <ClInclude Include="SoundManager.h" />
     <ClInclude Include="UI\Elements\TextField.h" />
     <ClInclude Include="UI\Elements\ImageBox.h" />
     <ClInclude Include="UI\Elements\Button.h" />
@@ -338,6 +324,7 @@
     <ClInclude Include="Primatives\Buffers\VertexBuffer.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="cpp.hint" />
     <None Include="Resources\DefaultShader\fragment.glsl" />
     <None Include="Resources\DefaultShader\geometry.glsl" />
     <None Include="Resources\DefaultShader\vertex.glsl" />

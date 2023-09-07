@@ -15,9 +15,9 @@ void main()
 {
     f_col = colour;
 
-    gl_Position = gs_in[0].translation * (gl_in[0].gl_Position + vec4(left, 1));
+    gl_Position = gs_in[0].translation * (vec4(left, 1));
     EmitVertex();
-    gl_Position = gs_in[0].translation * (gl_in[0].gl_Position + vec4(right, 1));
+    gl_Position = gs_in[0].translation * (vec4(right, 1));
     EmitVertex();
 
     EndPrimitive();

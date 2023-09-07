@@ -1,7 +1,7 @@
 #include "TextRenderer.h"
 #include <GL/glew.h>
 #include <iostream>
-#include <GLFW/glfw3.h>
+#include <glfw3.h>
 
 #include "../Rendering/Shading/Manager.h"
 

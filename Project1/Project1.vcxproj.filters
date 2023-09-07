@@ -66,12 +66,6 @@
     <ClCompile Include="UI\Elements\TextField.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Componets\AudioSource.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SoundManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Componets\Camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -90,46 +84,13 @@
     <ClCompile Include="Physics\Engine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Physics\Collision\CollisionDetection.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Physics\Collision\Broadphase\NSquared.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Physics\Collision\Collider.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Physics\Collision\Broadphase\BPBase.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Physics\Collision\Narrowphase\GJK3D.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Physics\Resolution\ConstraintsBased.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Physics\Resolution\ImpulseBased.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Physics\Collision\Narrowphase\SAT3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Utils\Shapes.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Physics\ConstraintEngine\ConstraitnsSolver.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Physics\ConstraintEngine\Constraints\Constraints.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Physics\ConstraintEngine\Constraints\ContactConstraint.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Physics\ConstraintEngine\Constraints\DistanceConstraint.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Componets\Rigidbody.cpp">
@@ -168,9 +129,6 @@
     <ClCompile Include="Primatives\Buffers\FrameBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Primatives\Buffers\SoundBuffer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Primatives\Buffers\UniformBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -196,15 +154,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Scripts\HoverScript.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Componets\AudioReciever.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Scripts\SoundControllerScript.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Primatives\Buffers\SoundStreamBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ParticleSystem\ParticleEmmiter.cpp">
@@ -291,6 +240,15 @@
     <ClCompile Include="GUI\Text\TextRendering.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Scripts\PhysicsDebugger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\Collision\Colliders\SATBaseCollider.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\Collision\Colliders\CubeCollider.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Rendering\Rendering.h">
@@ -350,12 +308,6 @@
     <ClInclude Include="UI\Elements\TextField.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Componets\AudioSource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SoundManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Componets\Camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -377,46 +329,7 @@
     <ClInclude Include="Physics\Collision\Collider.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Physics\Collision\CollisionDetection.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Physics\Collision\Broadphase\Base.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Physics\Collision\Broadphase\NSquared.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Physics\Collision\Narrowphase\Base.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Physics\Collision\Narrowphase\GJK3D.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Physics\Resolution\ResolutionBase.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Physics\Resolution\ConstraintsBased.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Physics\Resolution\ImpulseBased.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Physics\Collision\Narrowphase\SAT3D.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Utils\Shapes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Physics\ConstraintEngine\ConstraitnsSolver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Physics\ConstraintEngine\Constraints\Constraints.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Physics\ConstraintEngine\Constraints\ContactConstraint.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Physics\ConstraintEngine\Constraints\DistanceConstraint.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Componets\Rigidbody.h">
@@ -458,9 +371,6 @@
     <ClInclude Include="Primatives\Buffers\FrameBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Primatives\Buffers\SoundBuffer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Primatives\Buffers\UniformBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -486,15 +396,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Scripts\HoverScript.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Componets\AudioReciever.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Scripts\SoundControllerScript.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Primatives\Buffers\SoundStreamBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ParticleSystem\ParticleEmmiter.h">
@@ -585,6 +486,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GUI\Text\TextRendering.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="STBImage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripts\PhysicsDebugger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\Collision\Colliders\SATBaseCollider.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\Collision\Colliders\CubeCollider.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

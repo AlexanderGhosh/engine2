@@ -4,6 +4,7 @@
 #include "../Componets/Animated.h"
 #include "../Componets/RigidBody.h"
 #include "../Scene/GameScene.h"
+class SATBaseCollider;
 
 GameObject::GameObject(String name) : componets(), enabled(), transform(DBG_NEW Component::Transform()), alive(true), scene(nullptr), name(name), parent(nullptr) {
 	enabled.push_back(1);
@@ -21,16 +22,16 @@ void GameObject::addComponet(Component::ComponetBase* componet)
 	enabled.push_back(1);
 	componet->setParent(this);
 	if (componet->getType() == Component::Type::Collider) {
-		Component::RigidBody* rb = getRigidbody();
+		Component::Rigidbody* rb = getRigidbody();
 		if (!rb)
 			return;
-		rb->addCollider(reinterpret_cast<Physics::Collider*>(componet));
+		rb->setCollider(*reinterpret_cast<Physics::Collider*>(componet));
 	}
 	else if (componet->getType() == Component::Type::Rigidbody) {
-		Component::RigidBody* rb = reinterpret_cast<Component::RigidBody*>(componet);
+		Component::Rigidbody* rb = reinterpret_cast<Component::Rigidbody*>(componet);
 		for (Component::ComponetBase* comp : componets) {
 			if (comp->getType() == Component::Type::Collider) {
-				rb->addCollider(reinterpret_cast<Physics::Collider*>(comp));
+				rb->setCollider(*reinterpret_cast<Physics::Collider*>(comp));
 			}
 		}
 	}
@@ -121,11 +122,11 @@ Component::Transform* GameObject::getLocalTransform()
 	return transform;
 }
 
-Component::RigidBody* GameObject::getRigidbody()
+Component::Rigidbody* GameObject::getRigidbody()
 {
 	for (Component::ComponetBase* comp : componets) {
 		if (comp->getType() == Component::Type::Rigidbody)
-			return reinterpret_cast<Component::RigidBody*>(comp);
+			return reinterpret_cast<Component::Rigidbody*>(comp);
 	}
 	return nullptr;
 }

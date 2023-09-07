@@ -6,7 +6,7 @@ namespace Physics {
 		{
 		public:
 			DistanceConstraint(Vector3 relPosA, Vector3 relPosB, float targetLength);
-			DistanceConstraint(Component::RigidBody* a, Component::RigidBody* b, Vector3 relPosA, Vector3 relPosB, float targetLength);
+			DistanceConstraint(Component::Rigidbody* a, Component::Rigidbody* b, Vector3 relPosA, Vector3 relPosB, float targetLength);
 			void solve(const float& dt);
 			void cleanUp();
 			void buildJacobian();

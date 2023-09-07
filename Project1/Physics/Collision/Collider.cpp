@@ -1,187 +1,118 @@
 #include "Collider.h"
-#include "../Engine.h"
-#include <gtx/string_cast.hpp>
 #include "../../GameObject/GameObject.h"
+#include "../Engine.h"
+#include <gtc/type_ptr.hpp>
 
-glm::vec3 Physics::AABB::support(const glm::vec3& direction) const
+
+Physics::Collider::Collider() : Component::ComponetBase(), centerOfMass(0), invMass(0), inertiaTensor(1), allVertices(), faces()
 {
-	glm::vec3 res = *position;
-	for (char i = 0; i < 3; i++)
-		res[i] += direction[i] < 0 ? min[i] : max[i];
-	return res;
+	Physics::Engine::addCollider(this);
 }
 
-void Physics::AABB::createInertiaTensor()
+Physics::Collider::Collider(float mass) : Collider()
 {
-	const float m = mass * 0.5f;
-	const float w = pow(scale->x, 2.0f);
-	const float h = pow(scale->y, 2.0f);
-	const float d = pow(scale->z, 2.0f);
-	localInertiaTensor = {
-		{ m * (h + d), 0, 0 },
-		{ 0, m * (w + d), 0 },
-		{ 0, 0, m * (w + h) }
-	};
+	invMass = 1.f / mass;
 }
 
-void Physics::Collider::setParent(GameObject* parent)
+Physics::SphereCollider::SphereCollider() : Physics::Collider(), radius(0)
 {
-	ComponetBase::setParent(parent);
-	Component::Transform* t = parent->getLocalTransform();
-	position = &t->Position;
-	rotation = &t->Rotation;
-	scale = &t->Scale;
+}
+
+Physics::SphereCollider::SphereCollider(float radius, float mass) : Physics::Collider(mass), radius(radius)
+{
+	inertiaTensor = glm::mat3(.4f * mass * radius * radius);
+}
+
+const glm::vec3 Physics::Collider::getAbsolutePosition() const
+{
+	return parent->getGlobalTransform().Position + centerOfMass;
 }
 
 void Physics::Collider::cleanUp()
 {
-	position = nullptr;
-	rotation = nullptr;
-	scale = nullptr;
 }
 
-Physics::Collider::Collider(bool add) : mass(10), localCentroid(0), localInertiaTensor(0), position(nullptr), scale(nullptr), rotation(nullptr) {
-	if(add)
-		Engine::addCollider(this);
-}
-
-const Physics::AABB* Physics::BoxCollider::constructAABB()
+const glm::mat3 Physics::Collider::getGlobalInvInertiaTensor() const
 {
-	std::array<glm::vec3, 8> translated = {
-		min, max,
-		{min.x, max.y, max.z},
-		{min.x, min.y, max.z},
-		{min.x, max.y, min.z},
+	glm::quat r = parent->getGlobalTransform().Rotation;
+	glm::mat3 rot = glm::toMat3(r);
+	glm::mat3 global = rot * inertiaTensor * glm::transpose(rot);
+	return glm::inverse(global);
+}
 
-		{max.x, min.y, min.z},
-		{max.x, max.y, min.z},
-		{max.x, min.y, max.z},
+const float Physics::SphereCollider::getRadius() const
+{
+	return radius;
+}
+
+const glm::vec3 Physics::SphereCollider::support(Vector3 axis, bool local = false) const
+{
+	glm::vec3 local_p = radius * glm::normalize(axis);
+	if (local) {
+		return local_p;
+	}
+	return local_p + getAbsolutePosition();
+}
+
+
+
+const glm::quat Physics::CubeCollider::getRotation() const
+{
+	return parent->getGlobalTransform().Rotation;
+}
+
+Physics::CubeCollider::CubeCollider() : Collider(), width(0)
+{
+	allVertices = {
+		{  0.5f,  0.5f, 0.5f },
+		{ -0.5f,  0.5f, 0.5f },
+		{  0.5f, -0.5f, 0.5f },
+		{ -0.5f, -0.5f, 0.5f },
+
+		{  0.5f,  0.5f, -0.5f },
+		{ -0.5f,  0.5f, -0.5f },
+		{  0.5f, -0.5f, -0.5f },
+		{ -0.5f, -0.5f, -0.5f }
 	};
-	glm::vec3 min(INFINITY);
-	glm::vec3 max(-INFINITY);
-	for (glm::vec3& tra : translated) {
-		tra *= *scale;
-		tra = glm::rotate(*rotation, tra);
-		tra += *position;
-		for (char i = 0; i < 3; i++) {
-			if (tra[i] < min[i]) {
-				min[i] = tra[i];
-			}
-			if (tra[i] > max[i]) {
-				max[i] = tra[i];
-			}
-		}
-	}
-	aabb.setMin(min - *position);
-	aabb.setMax(max - *position);
-	aabb.setParent(this->getParent());
-	return &aabb;
-}
 
-glm::vec3 Physics::BoxCollider::support(const glm::vec3& direction) const
-{
-	glm::vec3 res(0);
-	const glm::vec3 dir = direction * glm::inverse(glm::toMat3(*rotation));
+	faces = {
+		Face(Utils::xAxis(), { 0, 2, 4, 6 }),
+		Face(Utils::yAxis(), { 0, 1, 4 ,5 }),
+		Face(Utils::zAxis(), { 0, 1, 2, 3 }),
 
-	res = glm::sign(dir) * *scale * 0.5f;
-	for (char i = 0; i < 3; i++) {
-		res[i] = dir[i] > 0 ? max[i] : min[i];
-	}
-
-	res = (res * glm::toMat3(*rotation)) + *position;
-	// std::cout << glm::to_string(res) << "/#/\n";
-	return res;
-}
-
-const Physics::AABB* Physics::BoxColliderSAT::constructAABB()
-{
-	glm::vec3 mi = Utils::fill(-0.5f), ma = Utils::fill(0.5f);
-	std::array<glm::vec3, 8> translated = {
-		mi, ma,
-		{mi.x, ma.y, ma.z},
-		{mi.x, mi.y, ma.z},
-		{mi.x, ma.y, mi.z},
-
-		{ma.x, mi.y, mi.z},
-		{ma.x, ma.y, mi.z},
-		{ma.x, mi.y, ma.z},
+		Face(Utils::xAxis(-1), { 1, 3, 5, 7 }),
+		Face(Utils::yAxis(-1), { 2, 3, 6, 7 }),
+		Face(Utils::zAxis(-1), { 4, 5, 6, 7 }),
 	};
-	glm::vec3 min(INFINITY);
-	glm::vec3 max(-INFINITY);
-	for (glm::vec3& tra : translated) {
-		tra *= *scale;
-		tra = glm::rotate(*rotation, tra);
-		tra += *position;
-		for (char i = 0; i < 3; i++) {
-			if (tra[i] < min[i]) {
-				min[i] = tra[i];
-			}
-			if (tra[i] > max[i]) {
-				max[i] = tra[i];
-			}
-		}
-	}
-	aabb.setMin(min - *position);
-	aabb.setMax(max - *position);
-	aabb.setParent(this->getParent());
-	// return DBG_NEW AABB(min - *position, max - *position, false, parent); // memory leak
-	return &aabb;
 }
 
-std::list<glm::vec3> Physics::ColliderSAT::getAllFaces(const glm::vec3& vertex, bool localSpace, bool getIndices) const
+
+
+Physics::CubeCollider::CubeCollider(float width, float mass) : Collider(mass), width(width)
 {
-	std::list<glm::vec3> res;
-	auto transform = [&](glm::vec3 v)->glm::vec3 {
-		if (localSpace)
-			return v;
-		return v * *scale * glm::toMat3(*rotation) + *position;
+	inertiaTensor = glm::mat3((1.f / 12.f) * mass * 4.f * width * width);
+}
+
+const glm::vec3 Physics::CubeCollider::support(Vector3 axis, bool local = false) const {
+	auto sgn = [](float x) {
+		if (x < 0) return -1.f;
+		else return 1.f;
 	};
-	for (unsigned i = 0; i < indices.size(); i++) {
-		const unsigned& index = indices[i];
-		if (vertices[index] == vertex) {
-			unsigned j = i % faceSize;
-			j = i - j;
-			for (char k = 0; k < faceSize; k++) {
-				if (!getIndices)
-					res.push_back(transform(vertices[indices[j + k]]));
-				else
-					res.push_back(Utils::fill(j + k));
-			}
-		}
-	}
-	return res;
-}
 
-std::list<glm::vec3> Physics::ColliderSAT::getAllFaces(const unsigned& vertexIndex, bool localSpace, bool getIndices) const
-{
-	return getAllFaces(vertices[vertexIndex], localSpace, getIndices);
-}
+	const glm::quat rot_inv = glm::inverse(getRotation());
 
-std::list<std::list<glm::vec3>> Physics::ColliderSAT::getAdjacentFaces(std::list<glm::vec3>& face) const
-{
-	std::vector<char> facesAdded;
-	std::list<std::list<glm::vec3>> res;
-	for (const glm::vec3& v : face) {
-		for (unsigned i = 0; i < indices.size(); i++) {
-			const glm::vec3 vert = vertices[indices[i]] * *scale * *rotation + *position;
-			const char faceIndex = static_cast<int>(floor(i / 4));
-			if (vert == v AND NOT Utils::contains(facesAdded, faceIndex)) {
-				facesAdded.push_back(faceIndex);
-				std::list<glm::vec3> f;
-				for (int j = 0; j < 4; j++) {
-					f.push_back(vertices[indices[faceIndex * faceSize + j]] * *scale * *rotation + *position);
-				}
-				if (f != face) {
-					res.push_back(f);
-					break;
-				}
-				else
-					f.clear();
-			}
-			else if (vert == v) {
-				int t = 0;
-			}
-		}
+	const glm::vec3 a = glm::rotate(rot_inv, axis);
+
+	glm::vec3 local_p =  {
+		sgn(a.x) * width,
+		sgn(a.y) * width,
+		sgn(a.z) * width
+	};
+	if (local) {
+		return local_p;
 	}
-	return res;
+
+	glm::vec3 world = glm::rotate(getRotation(), local_p);
+	world += getAbsolutePosition();
+	return world;
 }

@@ -1,6 +1,6 @@
 #pragma once
 #define GLFW_INCLUDE_NONE
-#include <GLFW/glfw3.h>
+#include <glfw3.h>
 #include <GL/glew.h>
 #include <glm.hpp>
 #include <list>
@@ -40,7 +40,7 @@ public:
 	bool shouldClose() const;
 
 	void cleanUp();
-	void remove();
+	void pop();
 
 	// getters
 	unsigned    getWidth()      const;

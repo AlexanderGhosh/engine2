@@ -7,7 +7,7 @@ namespace Physics {
 	{
 	public:
 		ConstraintsBased();
-		void resolve(Component::RigidBody* a, Component::RigidBody* b, Physics::CollisionManfold& manafold);
+		void resolve(Component::Rigidbody* a, Component::Rigidbody* b, Physics::CollisionManfold& manafold);
 		void cleanUp();
 	private:
 		std::list<Constraint*> constraints;
