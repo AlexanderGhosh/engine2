@@ -35,7 +35,7 @@
       Animated GIF still needs a proper API, but here's one way to do it:
           http://gist.github.com/urraka/685d9a6340b26b830d49
 
-      - decode from memory or through FILE (define STBI_NO_STDIO to remove code)
+      - decode from memory or through FILE (define STBI_NO_STDIO to pop code)
       - decode from arbitrary I/O callbacks
       - SIMD acceleration on x86/x64 (SSE2) and ARM (NEON)
 
@@ -62,11 +62,11 @@ RECENT REVISION HISTORY:
       2.17  (2018-01-29) bugfix, 1-bit BMP, 16-bitness query, fix warnings
       2.16  (2017-07-23) all functions have 16-bit variants; optimizations; bugfixes
       2.15  (2017-03-18) fix png-1,2,4; all Imagenet JPGs; no runtime SSE detection on GCC
-      2.14  (2017-03-03) remove deprecated STBI_JPEG_OLD; fixes for Imagenet JPGs
+      2.14  (2017-03-03) pop deprecated STBI_JPEG_OLD; fixes for Imagenet JPGs
       2.13  (2016-12-04) experimental 16-bit API, only for PNG so far; fixes
       2.12  (2016-04-02) fix typo in 2.11 PSD fix that caused crashes
       2.11  (2016-04-02) 16-bit PNGS; enable SSE2 in non-gcc x64
-                         RGB-format JPEG; remove white matting in PSD;
+                         RGB-format JPEG; pop white matting in PSD;
                          allocate large structures on the stack;
                          correct channel count for PNG & BMP
       2.10  (2016-01-22) avoid warning introduced in 2.09
@@ -317,7 +317,7 @@ RECENT REVISION HISTORY:
 // stbi_convert_iphone_png_to_rgb(1).
 //
 // Call stbi_set_unpremultiply_on_load(1) as well to force a divide per
-// pixel to remove any premultiplied alpha *only* if the image file explicitly
+// pixel to pop any premultiplied alpha *only* if the image file explicitly
 // says there's premultiplied data (currently only happens in iPhone images,
 // and only if iPhone convert-to-rgb processing is on).
 //
@@ -2500,7 +2500,7 @@ static void stbi__idct_block(stbi_uc *out, int out_stride, short data[64])
       STBI__IDCT_1D(v[0],v[1],v[2],v[3],v[4],v[5],v[6],v[7])
       // constants scaled things up by 1<<12, plus we had 1<<2 from first
       // loop, plus horizontal and vertical each scale by sqrt(8) so together
-      // we've got an extra 1<<3, so 1<<17 total we need to remove.
+      // we've got an extra 1<<3, so 1<<17 total we need to pop.
       // so we want to round that, which means adding 0.5 * 1<<17,
       // aka 65536. Also, we'll end up with -128 to 127 that we want
       // to encode as 0..255 by adding 128, so we'll add that before the shift
@@ -6278,7 +6278,7 @@ static void *stbi__psd_load(stbi__context *s, int *x, int *y, int *comp, int req
       }
    }
 
-   // remove weird white matte from PSD
+   // pop weird white matte from PSD
    if (channelCount >= 4) {
       if (ri->bits_per_channel == 16) {
          for (i=0; i < w*h; ++i) {
@@ -7780,11 +7780,11 @@ STBIDEF int stbi_is_16_bit_from_callbacks(stbi_io_callbacks const *c, void *user
                          warning fixes; disable run-time SSE detection on gcc;
                          uniform handling of optional "return" values;
                          thread-safe initialization of zlib tables
-      2.14  (2017-03-03) remove deprecated STBI_JPEG_OLD; fixes for Imagenet JPGs
+      2.14  (2017-03-03) pop deprecated STBI_JPEG_OLD; fixes for Imagenet JPGs
       2.13  (2016-11-29) add 16-bit API, only supported for PNG right now
       2.12  (2016-04-02) fix typo in 2.11 PSD fix that caused crashes
       2.11  (2016-04-02) allocate large structures on the stack
-                         remove white matting for transparent PSD
+                         pop white matting for transparent PSD
                          fix reported channel count for PNG & BMP
                          re-enable SSE2 in non-gcc 64-bit
                          support RGB-formatted JPEG
@@ -7845,7 +7845,7 @@ STBIDEF int stbi_is_16_bit_from_callbacks(stbi_io_callbacks const *c, void *user
               suppress MSVC warnings on integer casts truncating values
               fix accidental rename of 'skip' field of I/O
       1.37  (2014-06-04)
-              remove duplicate typedef
+              pop duplicate typedef
       1.36  (2014-06-03)
               convert to header file single-file library
               if de-iphone isn't set, load iphone images color-swapped instead of returning NULL

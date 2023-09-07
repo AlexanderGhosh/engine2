@@ -32,7 +32,7 @@ void UI::TextField::checkEvents()
 		std::string str = getText();
 		str.pop_back();
 		str.pop_back();
-		// str.erase(std::remove(str.begin(), str.end(), '|'), str.end());
+		// str.erase(std::pop(str.begin(), str.end(), '|'), str.end());
 		setText(str);
 	}*/
 	Button::checkEvents();

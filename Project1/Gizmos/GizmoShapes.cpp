@@ -140,12 +140,12 @@ Gizmos::Types Gizmos::Line::getType() const
 	return Types::Line;
 }
 
-void Gizmos::Line::setLeftOffset(Vector3 left)
+void Gizmos::Line::setStart(Vector3 left)
 {
 	this->p1_ = left;
 }
 
-void Gizmos::Line::setRightOffset(Vector3 right)
+void Gizmos::Line::setEnd(Vector3 right)
 {
 	this->p2_ = right;
 }
@@ -213,6 +213,7 @@ Gizmos::Cuboide::Cuboide(Vector3 pos, Vector3 col) : Cuboide()
 void Gizmos::Cuboide::draw() {
 	bindShader();
 	glm::mat4 model = glm::translate(glm::mat4(1), position);
+	model = Utils::rotate(model, rotation);
 	model = glm::scale(model, dimensions);
 	bool t = Render::Shading::Manager::setValue("model", model);
 	t = t AND Render::Shading::Manager::setValue("colour", colour);
@@ -246,6 +247,11 @@ Gizmos::Types Gizmos::Cuboide::getType() const
 void Gizmos::Cuboide::setDimentions(Vector3 dim)
 {
 	this->dimensions = dim;
+}
+
+void Gizmos::Cuboide::setRotation(Quaternion rot)
+{
+	rotation = rot;
 }
 
 Gizmos::Sphere::Sphere() : Gizmo(), radius(1), cirlces(), updated(true)
@@ -363,5 +369,62 @@ void Gizmos::Triangle::setColour(Vector3 colour)
 	}
 	for (auto& point : points) {
 		point.setColour(colour);
+	}
+}
+
+Gizmos::Arrow::Arrow() : Gizmo(), lines()
+{
+}
+
+Gizmos::Arrow::Arrow(Vector3 start, Vector3 end) : Arrow()
+{
+	lines[0] = Line(start, end, true);
+	const float size = 0.2f;
+	const glm::vec3 d = glm::normalize(end - start);
+
+	glm::vec3 axis = Utils::zAxis(size);
+	if (d.z != 0) {
+		axis = Utils::xAxis(size);
+	}
+
+	const glm::vec3 s1 = end - size * d + Utils::zAxis(size);
+	const glm::vec3 s2 = end - size * d - Utils::zAxis(size);
+
+	lines[1] = Line(s1, end, true);
+	lines[2] = Line(s2, end, true);
+}
+
+void Gizmos::Arrow::draw()
+{
+	for (auto& line : lines) {
+		line.draw();
+	}
+}
+
+void Gizmos::Arrow::cleanUp()
+{
+	for (auto& line : lines) {
+		line.cleanUp();
+	}
+}
+
+Gizmos::Types Gizmos::Arrow::getType() const
+{
+	return Types::Arrow;
+}
+
+void Gizmos::Arrow::setPosition(Vector3 pos)
+{
+	const glm::vec3 delta = pos - position;
+	for (auto& l : lines) {
+		l.setPosition(l.getPosition() + delta);
+	}
+}
+
+void Gizmos::Arrow::setColour(Vector3 colour)
+{
+	Gizmo::setColour(colour);
+	for (auto& line : lines) {
+		line.setColour(colour);
 	}
 }
