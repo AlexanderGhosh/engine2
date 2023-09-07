@@ -69,7 +69,7 @@ void Context::cleanUp()
 	window = nullptr;
 }
 
-void Context::remove()
+void Context::pop()
 {
 	cleanUp();
 }

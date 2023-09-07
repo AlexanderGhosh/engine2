@@ -2,6 +2,9 @@
 #include "../Collider.h"
 #include <tuple>
 #include "../../DebugRenderer.h"
+#include "../../../GameObject/GameObject.h"
+
+const glm::vec3 getBarycentricCoords(Vector3 p, Vector3 a, Vector3 b, Vector3 c);
 
 bool sameDirection(const glm::vec3& a, const glm::vec3& b) {
 	return glm::dot(a, b) > 0;
@@ -14,36 +17,45 @@ const glm::vec3 Physics::GJK3D::support(const Physics::Collider* a, const Physic
 	return v1 - v2;
 }
 
-const Physics::CollisionManfold Physics::GJK3D::getCollisionData(Physics::Collider* a, Physics::Collider* b)
+const Physics::CollisionDetails Physics::GJK3D::getCollisionData(Physics::Collider* a, Physics::Collider* b)
 {
-#define GJK_MAX_ITTERATION 256
+#define GJK_MAX_ITTERATION 1024
 	simplex.reset();
-	Physics::CollisionManfold res;
+	Physics::CollisionDetails res;
+	res.a = a;
+	res.b = b;
 
-	glm::vec3 axis = Utils::xAxis();
+	glm::vec3 axis(1.f);
 
 	glm::vec3 A = support(a, b, axis);
 
-	simplex.add(A);
+	simplex.add(A, axis);
 	glm::vec3 D = -A;
 
 	int counter = 0;
 	while (counter++ < GJK_MAX_ITTERATION) {
 		A = support(a, b, D);
-		if (glm::dot(A, D) <= 0.001) {
+		auto t = glm::dot(A, D);
+		if (glm::dot(A, D) <= 0) {
 			// reject
 			res.hit = false;
 			return res;
 		}
 		else {
-			simplex.add(A);
+			simplex.add(A, D);
 			// bool contains_origin;
 			// tie(s, D, contains_origin) = getNearestSimplex(s);
 			if (simplex.evaluate(D)) {
 				res.a = a;
 				res.b = b;
 				res.hit = true;
-				std::vector<glm::vec3> polytope(simplex.begin(), simplex.end());
+
+				// simplex.add({ 0 , 1, 0 });
+				// simplex.add({ -.5 , 0, .5 });
+				// simplex.add({ .5 , 0, .5 });
+				// simplex.add({ 0 , 0, -.5 });
+
+				std::vector<glm::vec3> polytope(simplex.begin_data(), simplex.end_data());
 				std::vector<int>  faces = {
 					0, 1, 2,
 					0, 3, 1,
@@ -81,10 +93,13 @@ void addUnique(std::vector<std::pair<int, int>>& edges, const std::vector<int>& 
 	}
 }
 
-void Physics::GJK3D::EPA(Physics::CollisionManfold& manafold, const Physics::Simplex& prism) const
+void Physics::GJK3D::EPA(Physics::CollisionDetails& details, const Physics::Simplex& prism) const
 {
 #define GJK_EPA_MAX_ITER 128
-	std::vector<glm::vec3> polytope(simplex.begin(), simplex.end());
+	std::vector <glm::vec3> polytope(simplex.begin_data(), simplex.end_data());
+	std::vector<glm::vec3> directions(simplex.begin_dir(), simplex.end_dir());
+
+	std::vector<glm::vec3> supportDirections;
 	std::vector<int>  faces = {
 		0, 1, 2,
 		0, 3, 1,
@@ -107,7 +122,7 @@ void Physics::GJK3D::EPA(Physics::CollisionManfold& manafold, const Physics::Sim
 			break;
 		}
 
-		glm::vec3 support = this->support(manafold.a, manafold.b, minNormal);
+		glm::vec3 support = this->support(details.a, details.b, minNormal);
 		float sDistance = glm::dot(minNormal, support);
 
 		if (abs(sDistance - minDistance) > 0.001f) {
@@ -145,6 +160,7 @@ void Physics::GJK3D::EPA(Physics::CollisionManfold& manafold, const Physics::Sim
 			}
 
 			polytope.push_back(support);
+			directions.push_back(minNormal);
 
 			auto [newNormals, newMinFace] = getFaceNormals(polytope, newFaces);
 
@@ -163,15 +179,78 @@ void Physics::GJK3D::EPA(Physics::CollisionManfold& manafold, const Physics::Sim
 			faces.insert(faces.end(), newFaces.begin(), newFaces.end());
 			normals.insert(normals.end(), newNormals.begin(), newNormals.end());
 		}
+		else {
+		}
 	}
 
 	if (minDistance == FLT_MAX) {
-		manafold.error = true;
+		details.error = true;
 		return;
 	}
 
-	manafold.normal = minNormal;
-	manafold.depth = minDistance + 0.001f;
+	details.intersection_norm = minNormal;
+	details.intersection_distance = minDistance + 0.001f;
+
+	const int face_index = minFace * 3;
+	const glm::vec3 v1 = polytope[faces[face_index]];
+	const glm::vec3 v2 = polytope[faces[face_index + 1]];
+	const glm::vec3 v3 = polytope[faces[face_index + 2]];
+
+	const glm::vec3 d1 = directions[faces[face_index]];
+	const glm::vec3 d2 = directions[faces[face_index + 1]];
+	const glm::vec3 d3 = directions[faces[face_index + 2]];
+
+	calculateContactPoint(details, v1, v2, v3, d1, d2, d3);
+}
+
+void Physics::GJK3D::calculateContactPoint(CollisionDetails& details, Vector3 v1, Vector3 v2, Vector3 v3, Vector3 dir1, Vector3 dir2, Vector3 dir3) const
+{
+	float t = glm::dot(v1, details.intersection_norm);
+	// t /= glm::dot(details.intersection_norm, details.intersection_norm);
+
+	glm::vec3 cloest_point = t * details.intersection_norm;
+
+	glm::vec3 bary = getBarycentricCoords(cloest_point, v1, v2, v3);
+
+	std::array<glm::vec3, 3> supports_a, supports_b;
+
+	supports_a[0] = details.a->support(dir1, true);
+	supports_a[1] = details.a->support(dir2, true);
+	supports_a[2] = details.a->support(dir3, true);
+
+	supports_b[0] = details.b->support(-dir1, true);
+	supports_b[1] = details.b->support(-dir2, true);
+	supports_b[2] = details.b->support(-dir3, true);
+
+	glm::vec3 a_local = bary.x * supports_a[0] + bary.y * supports_a[1] + bary.z * supports_a[2];
+	glm::vec3 b_local = bary.x * supports_b[0] + bary.y * supports_b[1] + bary.z * supports_b[2];
+
+	// Component::Transform* a_t = details.a->getParent()->getLocalTransform();
+	// Component::Transform* b_t = details.a->getParent()->getLocalTransform();
+
+	// a_local -= details.a->getAbsolutePosition();
+	// a_local = glm::rotate(glm::inverse(a_t->Rotation), a_local);
+	//   
+	// b_local -= details.b->getAbsolutePosition();
+	// b_local = glm::rotate(glm::inverse(b_t->Rotation), b_local);
+
+	details.a_hit = a_local;
+	details.b_hit = b_local;
+}
+
+const glm::vec3 getBarycentricCoords(Vector3 p, Vector3 a, Vector3 b, Vector3 c) {
+	glm::vec3 v0 = b - a, v1 = c - a, v2 = p - a;
+	float d00 = glm::dot(v0, v0);
+	float d01 = glm::dot(v0, v1);
+	float d11 = glm::dot(v1, v1);
+	float d20 = glm::dot(v2, v0);
+	float d21 = glm::dot(v2, v1);
+	float denom = d00 * d11 - d01 * d01;
+	glm::vec3 res;
+	res.x = (d11 * d20 - d01 * d21) / denom;
+	res.y = (d00 * d21 - d01 * d20) / denom;
+	res.z = 1.0f - res.x - res.y;
+	return res;
 }
 
 std::pair<std::vector<glm::vec4>, int> Physics::GJK3D::getFaceNormals(const std::vector<glm::vec3>& polytope, const std::vector<int>& faces) const
@@ -190,7 +269,7 @@ std::pair<std::vector<glm::vec4>, int> Physics::GJK3D::getFaceNormals(const std:
 		glm::vec3 norm = glm::cross((v2 - v1), (v3 - v1));
 		norm = glm::normalize(norm);
 	
-		float dist = glm::dot(norm, -abs(v1));
+		float dist = glm::dot(norm, v1);
 
 		if (dist < 0) {
 			norm *= -1;
@@ -208,7 +287,7 @@ std::pair<std::vector<glm::vec4>, int> Physics::GJK3D::getFaceNormals(const std:
 }
 
 
-Physics::Simplex::Simplex() : data_(), size_(0)
+Physics::Simplex::Simplex() : data_(), size_(0), directions_()
 {
 }
 
@@ -220,10 +299,23 @@ Physics::Simplex::Simplex(std::initializer_list<glm::vec3> list) : Simplex()
 	size_ = list.size();
 }
 
-void Physics::Simplex::add(Vector3 v)
+void Physics::Simplex::add(Vector3 v, Vector3 dir)
 {
 	data_ = { v, data_[0], data_[1], data_[2]};
 	size_ = std::min(size_ + 1, 4u);
+	directions_ = { v, directions_[0], directions_[1], directions_[2] };
+}
+
+void Physics::Simplex::reorder(std::initializer_list<int> order) {
+	std::array<glm::vec3, 4> newData;
+	for (auto i = order.begin(); i != order.end(); i++) {
+		newData[std::distance(order.begin(), i)] = data_[*i];
+	}
+	std::array<glm::vec3, 4> newDirs;
+	for (auto i = order.begin(); i != order.end(); i++) {
+		newDirs[std::distance(order.begin(), i)] = directions_[*i];
+	}
+	size_ = order.size();
 }
 
 bool Physics::Simplex::evaluate(glm::vec3& dir)
@@ -245,6 +337,7 @@ bool Physics::Simplex::evaluate(glm::vec3& dir)
 void Physics::Simplex::reset()
 {
 	data_ = {};
+	directions_ = {};
 	size_ = 0;
 }
 
@@ -258,7 +351,9 @@ void Physics::Simplex::line(glm::vec3& dir)
 		dir = glm::cross(dir, ab);
 	}
 	else {
-		data_ = { data_[0] };
+		reorder({ 0 });
+		// data_ = { data_[0] };
+		// size_ = 1;
 		dir = ao;
 	}
 }
@@ -277,23 +372,35 @@ void Physics::Simplex::triangle(glm::vec3& dir)
 
 	if (sameDirection(glm::cross(abc, ac), ao)) {
 		if (sameDirection(ac, ao)) {
-			data_ = { a, c };
+			// data_ = { a, c };
+			// size_ = 2;
+			reorder({ 0, 2 });
 			dir = glm::cross(ac, ao);
 			dir = glm::cross(dir, ac);
 		}
 		else {
+			reorder({ 0, 1 });
+			// data_ = { a, b };
+			// size_ = 2;
 			line(dir);
-			data_ = { a, b, c };
 		}
 	}
 	else {
 		if (sameDirection(glm::cross(ab, abc), ao)) {
+			reorder({ 0, 1 });
+			// data_ = { a, b };
+			// size_ = 2;
 			line(dir);
-			data_ = { a, b, c };
 		}
 		else {
-			data_ = { a, c, b };
-			dir = -abc;
+			if (sameDirection(abc, ao)) {
+				dir = abc;
+			}
+			else {
+				reorder({ 0, 2, 1 });
+				// data_ = { a, c, b };
+				dir = -abc;
+			}
 		}
 	}
 }
@@ -315,21 +422,26 @@ bool Physics::Simplex::prism(glm::vec3& dir)
 	const glm::vec3 adb = glm::cross(ad, ab);
 
 	if (sameDirection(abc, ao)) {
+		// data_ = { a, b, c };
+		// size_ = 3;
+		reorder({ 0, 1, 2 });
 		triangle(dir);
 		return false;
 	}
 
 	if (sameDirection(acd, ao)) {
-		data_ = { a, c, d };
+		// data_ = { a, c, d };
+		// size_ = 3;
+		reorder({ 0, 2, 3 });
 		triangle(dir);
-		data_ = { a, b, c, d };
 		return false;
 	}
 
 	if (sameDirection(adb, ao)) {
-		data_ = { a, d, b };
+		// data_ = { a, d, b };
+		// size_ = 3;
+		reorder({ 0, 3, 1 });
 		triangle(dir);
-		data_ = { a, b, c, d };
 		return false;
 	}
 

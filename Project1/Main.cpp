@@ -10,6 +10,7 @@
 #include <gtc/matrix_transform.hpp>
 #include <gtx/string_cast.hpp>
 #include <gtx/matrix_decompose.hpp>
+#include <gtx/rotate_vector.hpp>
 
 // #include "SoundManager.h"
 #include "Utils/ResourceLoader.h"
@@ -187,32 +188,59 @@ int main() {
     auto np = Physics::GJK3D();
     Physics::Engine::narrowphase = &np;
 
-    GameObject redBall = GameObject(glm::vec3(0, 1, 0));
+
+#define TestOBJ_A_isCUBE
+#define TestOBJ_B_isCUBE
+
+    GameObject redBall = GameObject(glm::vec3(-0., 1, 0));
     Component::RenderMesh cubeMesh1 = Component::RenderMesh();
+#ifdef TestOBJ_A_isCUBE
+        cubeMesh1.setModel(cubeBuffer);
+#else
     cubeMesh1.setModel(orbBuffer);
+#endif
     cubeMesh1.setMaterial(&redMat);
-    Component::Rigidbody rb1 = Component::Rigidbody(true);
-    Physics::SphereCollider col1(1, 10);
+    Component::Rigidbody rb1 = Component::Rigidbody(true, false);
     // PhysicsDebugger p_debugger1 = PhysicsDebugger(true);
     
 
-    redBall.addComponet(&rb1);
-    redBall.addComponet(&col1);
+    redBall.addComponet(&rb1); 
+#ifdef TestOBJ_A_isCUBE
+    Physics::CubeCollider col1_c(1, 1);
+    redBall.addComponet(&col1_c);
+#else
+    Physics::SphereCollider col1_s(1, 10);
+    redBall.addComponet(&col1_s);
+#endif
     redBall.addComponet(&cubeMesh1);
     // redBall.addComponet(&p_debugger1);
 
+
+
     GameObject blueBall = GameObject(glm::vec3(0, 10, 0));
+    // blueBall.getLocalTransform()->rotate({ 1, 1, 1 }, RADIANS(45.f));
     Component::RenderMesh cubeMesh2 = Component::RenderMesh();
+#ifdef TestOBJ_B_isCUBE
+    cubeMesh2.setModel(cubeBuffer);
+#else
     cubeMesh2.setModel(orbBuffer);
+#endif
     cubeMesh2.setMaterial(&blueMat);
-    Component::Rigidbody rb2 = Component::Rigidbody(false);
-    Physics::SphereCollider col2(1, 10);
-    // PhysicsDebugger p_debugger2 = PhysicsDebugger(true);
+    Component::Rigidbody rb2 = Component::Rigidbody(false, false);
+    rb2.velocity.y = -1;
+    SpinScript spinning({ 0, 1, 0 }, 0.5f);
+
 
     blueBall.addComponet(&rb2);
-    blueBall.addComponet(&col2);
+#ifdef TestOBJ_B_isCUBE
+    Physics::CubeCollider col2_c(1, 1);
+    blueBall.addComponet(&col2_c);
+#else
+    Physics::SphereCollider col2_s(1, 10);
+    blueBall.addComponet(&col2_s);
+#endif
     blueBall.addComponet(&cubeMesh2);
-    // blueBall.addComponet(&p_debugger2);
+    // blueBall.addComponet(&spinning);
 
     /*Particles::DomeDistribution distribution = Particles::DomeDistribution(1.0f);
     Component::ParticleEmmiter emmiter = Component::ParticleEmmiter(10, 10, true, 0.25);
@@ -225,7 +253,7 @@ int main() {
 
     timer.start("Terrain"); 
 
-    const int landSize = 2;
+    /*const int landSize = 2;
     const float scale = 100;
     const int landRes = 100;
     std::vector<Terrain> allLand;
@@ -245,8 +273,7 @@ int main() {
             allLand.push_back(land);
         }
     }
-    timer.log();
-
+    timer.log();*/
 
 
     timer.start("Player");
@@ -256,7 +283,7 @@ int main() {
     Component::CharacterController cc;
     player.addComponet(&cc);
     PlayerControler playerScript;
-    playerScript.ground = allLand;
+    //playerScript.ground = allLand;
     player.addComponet(&playerScript);
 
     DebugScreen debugScript;
@@ -343,9 +370,9 @@ int main() {
 
     scene.addObject(&redBall);
     scene.addObject(&blueBall);
-    for (Terrain& land : allLand) {
+    /*for (Terrain& land : allLand) {
         //scene.addTerrain(&land);
-    }
+    }*/
     
     //scene.addUI(&canvas);
 
@@ -395,9 +422,6 @@ int main() {
     Gizmos::GizmoRenderer::addGizmo(&xAxis);
     Gizmos::GizmoRenderer::addGizmo(&zAxis);
 
-    Gizmos::Point zero0({ 0, 0, 0 }, { 0, 0, 0 });
-    zero0.setThickness(8);
-    Gizmos::GizmoRenderer::addGizmo(&zero0);
 
     Utils::log("Started Loop");
     scene.gameLoop();

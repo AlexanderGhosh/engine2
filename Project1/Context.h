@@ -40,7 +40,7 @@ public:
 	bool shouldClose() const;
 
 	void cleanUp();
-	void remove();
+	void pop();
 
 	// getters
 	unsigned    getWidth()      const;

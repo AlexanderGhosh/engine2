@@ -1,6 +1,7 @@
 #pragma once
 #include <list>
 #include <vector>
+#include <map>
 #include "../Utils/General.h"
 #include "Collision/Narrowphase/Base.h"
 
@@ -35,7 +36,7 @@ namespace Physics {
 		static void addRigidbody(Component::Rigidbody* rb);
 		static void addCollider(Physics::Collider* col);
 
-		static glm::vec3 calcImpulseForce(Component::Rigidbody* a, Component::Rigidbody* b, Vector3 norm, Float coef_restitution);
+		static std::pair<float, glm::vec3> calcImpulseForce(Component::Rigidbody* a, Component::Rigidbody* b, Vector3 norm, Float coef_restitution);
 
 		// template<class T>
 		// static inline void setResponse() { resolution = DBG_NEW T(); };

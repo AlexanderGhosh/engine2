@@ -213,6 +213,7 @@ Gizmos::Cuboide::Cuboide(Vector3 pos, Vector3 col) : Cuboide()
 void Gizmos::Cuboide::draw() {
 	bindShader();
 	glm::mat4 model = glm::translate(glm::mat4(1), position);
+	model = Utils::rotate(model, rotation);
 	model = glm::scale(model, dimensions);
 	bool t = Render::Shading::Manager::setValue("model", model);
 	t = t AND Render::Shading::Manager::setValue("colour", colour);
@@ -246,6 +247,11 @@ Gizmos::Types Gizmos::Cuboide::getType() const
 void Gizmos::Cuboide::setDimentions(Vector3 dim)
 {
 	this->dimensions = dim;
+}
+
+void Gizmos::Cuboide::setRotation(Quaternion rot)
+{
+	rotation = rot;
 }
 
 Gizmos::Sphere::Sphere() : Gizmo(), radius(1), cirlces(), updated(true)

@@ -75,6 +75,7 @@ namespace Gizmos {
 	private:
 		glm::vec3 dimensions;
 		Primative::Model cubeModel;
+		glm::quat rotation;
 	public:
 		Cuboide();
 		Cuboide(Vector3 pos, Vector3 col);
@@ -83,6 +84,7 @@ namespace Gizmos {
 		void cleanUp() override;
 		Types getType() const override;
 		void setDimentions(Vector3 dim);
+		void setRotation(Quaternion rot);
 	};
 
 	class Sphere : public Gizmo {
